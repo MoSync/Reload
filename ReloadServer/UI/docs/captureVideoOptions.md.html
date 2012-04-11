@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="CaptureVideoOptions">CaptureVideoOptions</a></h1>
+
+<blockquote>
+  <p>Encapsulates video capture configuration options.</p>
+</blockquote>
+
+<h2>Properties</h2>
+
+<ul>
+<li>
+<strong>limit:</strong> The maximum number of video clips the device user can capture in a single capture operation.  The value must be greater than or equal to 1 (defaults to 1).</li>
+<li>
+<strong>duration:</strong> The maximum duration of a video clip, in seconds.</li>
+<li>
+<strong>mode:</strong> The selected video capture mode.  The value must match one of the elements in <code>capture.supportedVideoModes</code>.</li>
+</ul>
+<h2>Quick Example</h2>
+
+<pre class="prettyprint"><code>// limit capture operation to 3 video clips
+var options = { limit: 3 };
+
+navigator.device.<a href="captureVideo.md.html#capture.captureVideo">capture.captureVideo</a>(captureSuccess, captureError, options);
+</code></pre>
+
+<h2>Android Quirks</h2>
+
+<ul>
+<li>The <strong>duration</strong> parameter is not supported.  Recording lengths cannot be limited programmatically.</li>
+<li>The <strong>mode</strong> parameter is not supported.  The video <a href="size.md.html#size">size</a> and format cannot be altered programmatically; however, these parameters can be changed by the device user. By default, videos are recorded in 3GPP (video/3gpp) format.</li>
+</ul>
+<h2>iOS Quirks</h2>
+
+<ul>
+<li>The <strong>limit</strong> parameter is not supported.  One video is recorded per invocation.</li>
+<li>The <strong>duration</strong> parameter is not supported.  Recording lengths cannot be limited programmatically.</li>
+<li>The <strong>mode</strong> parameter is not supported.  The video <a href="size.md.html#size">size</a> and format cannot be altered programmatically. By default, videos are recorded in MOV (video/quicktime) format.</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

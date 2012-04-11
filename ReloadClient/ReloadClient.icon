@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<icon>
+	<instance size="36x36" src="reloadNoBackground.svg" />
+	<instance size="96x96" src="reloadNoBackground.svg" />
+	<instance size="default" src="reload.svg" />
+</icon>

@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<blockquote>
+  <h1><a name="Widget%20Types">Widget Types</a></h1>
+
+<h2>Screen</h2>
+
+<p>A screen is the root of all widgets currently visible on a screen. See <a href="ScreenProperties.md.html#Screen%20properties">Screen properties</a> for the properties available.</p>
+
+<h2>TabScreen</h2>
+
+<p>A tab screen is a special type of screen that can have any number of sub-screens each switchable using a tab bar. See <a href="TabScreenProperties.md.html#Tab%20screen%20properties">Tab screen properties</a> for the properties available.</p>
+
+<h2>StackScreen</h2>
+
+<p>A stack screen is a special type of screen that manages navigation between a set of screens.</p>
+
+<h2>Button</h2>
+
+<p>A button is a widget that represent a physical button that can be pressed. See <a href="ButtonProperties.md.html#Button%20properties">Button properties</a> for the properties available.</p>
+
+<h2>Image</h2>
+
+<p>An image is a widget that can be used to display an image. See <a href="ImageProps.md.html#Image%20properties">Image properties</a> for the properties available.</p>
+
+<h2>ImageButton</h2>
+
+<p>An image button is a button that will also affect the appearance of the background image when pressed. See <a href="ImageButtonProperties.md.html#Image%20button%20properties">Image button properties</a> for the properties available.</p>
+
+<h2>Label</h2>
+
+<p>A label is a widget that can be used to display static non-editable text. See <a href="LabelProperties.md.html#Label%20properties">Label properties</a> for the properties available.</p>
+
+<h2>EditBox</h2>
+
+<p>An editbox is an editable label. See Editbox properties for the properties available.</p>
+
+<h2>ListView</h2>
+
+<p>A list view is a vertical list of widgets that is also scrollable.</p>
+
+<h2>ListViewItem</h2>
+
+<p>A list view item is a special kind of layout compatible with the list view. That has a predefined common layout for adding text, an icon etc. See <a href="ListviewitemProps.md.html#List%20view%20item%20properties">List view item properties</a> for the properties available.</p>
+
+<h2>CheckBox</h2>
+
+<p>A check box is a widget that acts like a physical switch. When pressed it will toggle its internal state that can either be checked or non-checked. See <a href="checkBoxprops.md.html#Check%20box%20properties">Check box properties</a> for the properties available. If you want to display it with a "light" indicator, as it is on iOS use a Toggle Button instead.</p>
+
+<h2>HorizontalLayout</h2>
+
+<p>A horizontal layout is a layout that stacks widgets in the horizontal axis. See <a href="HorLayoutProps.md.html#Horizontal%20layout%20properties">Horizontal layout properties</a> for the properties available.</p>
+
+<h2>VerticalLayout</h2>
+
+<p>A vertical layout is a layout that stacks widgets in the vertical axis. See <a href="VerLayoutProps.md.html#Vertical%20layout%20properties">Vertical layout properties</a> for the properties available.</p>
+
+<h2>RelativeLayout</h2>
+
+<p>A relative layout is a layout that layouts widgets relative to its coordinate system.</p>
+
+<h2>SearchBar</h2>
+
+<p>A search bar is a special kind of edit box that is used for searching. See <a href="SearchBarProps.md.html#Search%20bar%20properties">Search bar properties</a> for the properties available.</p>
+
+<h2>NavBar</h2>
+
+<p>A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See Nav bar properties for the properties available. See <a href="NaviBarProps.md.html#Navigation%20Bar%20properties">Navigation Bar properties</a> for the properties available.</p>
+
+<h2>GLView</h2>
+
+<p>A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 1.0/1.1 calls. See <a href="GLViewProps.md.html#GL%20view%20properties">GL view properties</a> for the properties available.</p>
+
+<h2>GL2View</h2>
+
+<p>A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 2.0 calls. See <a href="GLViewProps.md.html#GL%20view%20properties">GL view properties</a> for the properties available.</p>
+
+<h2>CameraPreview</h2>
+
+<p>A Camera preview widget is a widget that can bound to a camera and contain the live veiw data from the camera.</p>
+
+<h2>WebView</h2>
+
+<p>A web view is a widget used to render web pages. See <a href="WebViewProps.md.html#Web%20view%20properties">Web view properties</a> for the properties available.</p>
+
+<h2>ProgressBar</h2>
+
+<p>A progress bar is a visual indicator of progress in some operation. Displays a bar to the user representing how far the operation has progressed. A progress bar can also be made indeterminate, when the length of the task is unknown.</p>
+
+<h2>ActivityIndicator</h2>
+
+<p>An activity indicator is a visual indicator of progress in some operation. It shows a cyclic animation without an indication of progress. It is used when the length of the task is unknown.</p>
+
+<h2>Slider</h2>
+
+<p>A Slider is an extension of ProgressBar that adds a draggable thumb. The user can touch the thumb and drag left or right to set the current progress level.</p>
+
+<h2>DatePicker</h2>
+
+<p>A Date Picker is a widget for selecting a date. The date can be selected by a year, month, and day spinners. The minimal and maximal date from which dates to be selected can be customized. The picker is initialized with the current system date.</p>
+
+<h2>TimePicker</h2>
+
+<p>A Time Picker is a widget for selecting time of day, in 24 hour mode. The hour and each minute digit can be controlled by vertical spinners. The hour can be entered by keyboard input. Availabe only on iOS for the moment. See <a href="TimePickerProps.md.html#Time%20Picker%20properties">Time Picker properties</a> for the properties available.</p>
+
+<h2>NumberPicker</h2>
+
+<p>A Number Picker is a widget that enables the user to select a number from a predefined range. Note: for the moment it is available only on iOS. See <a href="NumberPickerProps.md.html#Number%20Picker%20properties">Number Picker properties</a> for the properties available.</p>
+
+<h2>VideoView</h2>
+
+<p>A Video View displays a video file. By default, it has attached a controller view that typically contains the buttons like "Play/Pause", "Rewind", "Fast Forward" and a progress slider. See <a href="VideoViewProps.md.html#Video%20View%20properties">Video View properties</a> for the properties available.</p>
+
+<h2>ToggleButton</h2>
+
+<p>A Toggle Button is a widget that acts like a physical switch. Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF". It is available only on Android, and it's similar to the Check Box on iOS. When pressed it will toggle its internal state that can either be checked or non-checked. See <a href="ToggleButtonProps.md.html#Toggle%20button%20properties">Toggle button properties</a> for the properties available.</p>
+
+<h2>ModalDialog</h2>
+
+<p>A dialog is a sort of modal view, that can look different depending on the platform. A Dialog gets visible only after calling maWidgetModalDialogShow(). On Android it is a modal alert dialog. On iPad it is a PopoverController, and on iPhone it is a modal view. When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via maWidgetAddChild syscalls. To show a Dialog call maWidgetModalDialogShow(), to dismiss it call: maWidgetModalDialogHide(), and to delete it call maWidgetDestroy. See <a href="ModalDialogProps.md.html#Modal%20Dialog%20properties">Modal Dialog properties</a> for the properties available.</p>
+
+<h2>PanoramaView</h2>
+
+<p>A panorama control is a Windows Phone 7 specific control Available only on Windows Phone 7 See <a href="PanaromaProperties.md.html#Panorama%20View%20properties">Panorama View properties</a> for the properties available.</p>
+</blockquote>
+
+	</div>
+
+</div>
+</body>
+</html>

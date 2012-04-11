@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="Contents">Contents</a></h1>
+
+<ul>
+<li><a href="mosync-bridge.js.html#mosync">mosync</a></li>
+<li><a href="mosync-bridge.js.html#mosync.notification.HTMLToast">mosync.notification.HTMLToast</a></li>
+<li><a href="mosync-bridge.js.html#mosync.notification.messageBox">mosync.notification.messageBox</a></li>
+<li><a href="mosync-bridge.js.html#encoder.lengthAsUTF8">encoder.lengthAsUTF8</a></li>
+<li><a href="mosync-bridge.js.html#encoder.encodeString">encoder.encodeString</a></li>
+<li><a href="mosync-bridge.js.html#bridge.send">bridge.send</a></li>
+<li><a href="mosync-bridge.js.html#bridge.sendJSON">bridge.sendJSON</a></li>
+<li><a href="mosync-bridge.js.html#bridge.sendAll">bridge.sendAll</a></li>
+<li><a href="mosync-bridge.js.html#bridge.sendAllJSON">bridge.sendAllJSON</a></li>
+<li><a href="mosync-bridge.js.html#bridge.sendRaw">bridge.sendRaw</a></li>
+<li><a href="mosync-bridge.js.html#bridge.getMessageData">bridge.getMessageData</a></li>
+<li><a href="mosync-bridge.js.html#bridge.reply">bridge.reply</a></li>
+</ul>
+<h1><a name="mosync">mosync</a></h1>
+
+<p>Create a global instance of the library.</p>
+
+<h1><a name="mosync.notification.HTMLToast">mosync.notification.HTMLToast</a></h1>
+
+<p>Displays a "toast" message box using HTML,
+similar to a Toast on Android. Can be used
+as a replacement for alert on platforms that
+do not support it.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>message</strong> String with message to show.</li>
+<li>
+<strong>durationInMilliseconds</strong> Optional parameter
+that specifies the time the message will be shown,
+defaults to 3000 (three seconds) if omitted.</li>
+</ul>
+<p>Note: This function works less well together with
+JavaScript libraries that manipulate the DOM at
+the same time.</p>
+
+<h1><a name="mosync.notification.messageBox">mosync.notification.messageBox</a></h1>
+
+<p>Displays a native message box.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>title</strong> String with message box title.</li>
+<li>
+<strong>message</strong> String with message to show.</li>
+</ul>
+<h1><a name="encoder.lengthAsUTF8">encoder.lengthAsUTF8</a></h1>
+
+<p>@return The length in bytes of the string encoded
+as UTF8.</p>
+
+<h1><a name="encoder.encodeString">encoder.encodeString</a></h1>
+
+<p>Encode a string with a length value followed by string data.</p>
+
+<h1><a name="bridge.send">bridge.send</a></h1>
+
+<p>Send message strings to C++. If a callback function is
+supplied, a callbackId parameter will be added to
+the message, this id can be used when sending a reply
+back to JavaScript from C++.</p>
+
+<p>This method queues messages and can be called multiple
+times in sqeuential JS code. When execution of sequential
+code is done, a timer will get activated and send all messages
+in the queue in one chunk. This enhances performance of
+message sending.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li><p><strong>message</strong> An array of message strings.</p></li>
+<li><p><strong>callbackFun</strong> An optional function to receive the
+result of the message asynchronosly. The id of the
+callback function is added after the strings in the
+messageStrings array.</p></li>
+</ul>
+<h1><a name="bridge.sendJSON">bridge.sendJSON</a></h1>
+
+<p>Send a JSON message to C++. If a callback function is
+supplied, a callbackId parameter will be added to
+the message, this id can be used when sending a reply
+back to JavaScript from C++.</p>
+
+<p>This method queues a message and can be called multiple
+times in sqeuential JS code. When execution of sequential
+code is done, a timer will get activated and send all messages
+in the queue in one chunk. This enhances performance of
+message sending.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li><p><strong>message</strong> A dictionary with the message parameters.
+The parameter "messageName" specifyes the <a href="name.md.html#name">name</a> of the
+message selector (the "command <a href="name.md.html#name">name</a>") and must always be
+included.</p></li>
+<li><p><strong>callbackFun</strong> An optional function to receive the
+result of the message asynchronosly.</p></li>
+</ul>
+<h1><a name="bridge.sendAll">bridge.sendAll</a></h1>
+
+<p>Send all queued message strings.</p>
+
+<h1><a name="bridge.sendAllJSON">bridge.sendAllJSON</a></h1>
+
+<p>Send all queued JSON messages.</p>
+
+<h1><a name="bridge.sendRaw">bridge.sendRaw</a></h1>
+
+<p>Send raw data to the C++ side.</p>
+
+<h1><a name="bridge.getMessageData">bridge.getMessageData</a></h1>
+
+<p>Called from iOS runtime to get message.</p>
+
+<h1><a name="bridge.reply">bridge.reply</a></h1>
+
+<p>This function is meant to be used to call back from C++ to
+JavaScript. The function takes a variable number of parameters.</p>
+
+<p>For example, to return the value 'Hello World' to the callback
+with id 82, you can use this code in a WebAppMoblet:</p>
+
+<p>callJS("<a href="mosync-bridge.js.html#mosync">mosync</a>.<a href="mosync-bridge.js.html#bridge.reply">bridge.reply</a>(82, 'Hello World')");</p>
+
+<p>You can obtain the callbackId from the C++ WebViewMessage
+object, if you use that class to parse the message.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>callBackId</strong> The first parameter is the id of the
+callback function. Remaning parameters are applied to the
+function refered to by the callbackId.</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

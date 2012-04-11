@@ -1,0 +1,576 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="Contents">Contents</a></h1>
+
+<ul>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui">mosync.nativeui</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement">mosync.nativeui.NativeWidgetElement</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.setProperty">mosync.nativeui.NativeWidgetElement.setProperty</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.getProperty">mosync.nativeui.NativeWidgetElement.getProperty</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.addEventListener">mosync.nativeui.NativeWidgetElement.addEventListener</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.addChild">mosync.nativeui.NativeWidgetElement.addChild</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.insertChild">mosync.nativeui.NativeWidgetElement.insertChild</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.removeChild">mosync.nativeui.NativeWidgetElement.removeChild</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.addTo">mosync.nativeui.NativeWidgetElement.addTo</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.clone">mosync.nativeui.NativeWidgetElement.clone</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.show">mosync.nativeui.NativeWidgetElement.show</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.pushTo">mosync.nativeui.NativeWidgetElement.pushTo</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.pop">mosync.nativeui.NativeWidgetElement.pop</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.showDialog">mosync.nativeui.NativeWidgetElement.showDialog</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.hideDialog">mosync.nativeui.NativeWidgetElement.hideDialog</a></li>
+<li><a href="mosync-nativeui.js.html#document.getNativeElementById">document.getNativeElementById</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.UIReady">mosync.nativeui.UIReady</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.initUI">mosync.nativeui.initUI</a></li>
+</ul>
+<h1><a name="mosync.nativeui">mosync.nativeui</a></h1>
+
+<p>This is a class. Please look into the memebers for usage</p>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement">mosync.nativeui.NativeWidgetElement</a></h1>
+
+<p>A widget object that user can interact with instead of using the low level
+functions. This class is not used directly see  <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>  for usage.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>widgetType</strong> 
+       Type of the widget that has been created</li>
+<li>
+<strong>widgetID</strong> 
+       ID of the widget used for identifying the widget(can be ignored by
+       the user)</li>
+<li>
+<strong>params</strong> A dictionary that includes a list of properties to be set on the widget</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h1><a name="mosync.nativeui.NativeWidgetElement.setProperty">mosync.nativeui.NativeWidgetElement.setProperty</a></h1>
+
+<p>Sets a property to the widget in question.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>property</strong> 
+       <a href="name.md.html#name">name</a> of the property</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is successful</li>
+<li>
+<p><strong>errorCallback</strong> 
+       a function that will be called if an error occurs</p>
+
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>    var myWidget = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton");
+    myWidget.setProperty("width", "100%")
+</code></pre>
+</li>
+</ul>
+<h1><a name="mosync.nativeui.NativeWidgetElement.getProperty">mosync.nativeui.NativeWidgetElement.getProperty</a></h1>
+
+<p>Retirves a property and call the respective callback.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>property</strong> 
+       <a href="name.md.html#name">name</a> of the property</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is successful.
+       The value and wigetID will be passed to this function</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h1><a name="mosync.nativeui.NativeWidgetElement.addEventListener">mosync.nativeui.NativeWidgetElement.addEventListener</a></h1>
+
+<p>Registers an event listener for this widget.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>eventType</strong> 
+       type of the event that the user wants to listen to</li>
+<li>
+<strong>listenerFunction</strong> 
+       a function that will be called when that event is fired</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>    //Create a new button and add an event listener to it
+    var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+    {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+    });
+    myButton.addEventListener("Clicked", function()
+    {
+        alert("second button is cliecked");
+    });
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.addChild">mosync.nativeui.NativeWidgetElement.addChild</a></h1>
+
+<p>Adds a child widget to the current widget.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>childID</strong> 
+       the ID for the child widget</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>     //Create a Native Screen
+   var myScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Screen" ,"myScreen", {
+        "title": "My Screen"
+   });
+
+   //Create a Button
+     var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+     {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+     });
+
+    //Add the button to the Created Screen
+  myScreen.addChild("myButton")
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.insertChild">mosync.nativeui.NativeWidgetElement.insertChild</a></h1>
+
+<p>Inserts a new child widget in the specified index.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>childID</strong> 
+       ID of the child widget</li>
+<li>
+<strong>index</strong> 
+       the index for the place that the new child should be inserted</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>     //Create a Native Screen
+   var myScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Screen" ,"myScreen", {
+        "title": "My Screen"
+   });
+
+   //Create a Button
+     var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+     {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+     });
+
+    //Insert the button to the Created Screen child list
+  myScreen.insertChild(0, "myButton")
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.removeChild">mosync.nativeui.NativeWidgetElement.removeChild</a></h1>
+
+<p>Removes a child widget from the child list of the current widget.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>childID</strong> 
+       Id of the child widget that will be removed</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>     //Create a Native Screen
+   var myScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Screen" ,"myScreen", {
+        "title": "My Screen"
+   });
+
+   //Create a Button
+     var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+     {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+     });
+
+    //Add myButton to the screen
+  myButton.addTo("myScreen");
+
+    //Remove mybutton from the childs of myScreen
+  myScreen.removeChild("myButton")
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.addTo">mosync.nativeui.NativeWidgetElement.addTo</a></h1>
+
+<p>Adds the current widget as a child to another widget.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>parentId</strong> 
+       JavaScript ID of the parent widget</li>
+<li>
+<strong>successCallback</strong> 
+       (optional) a function that will be called when the operation
+       is done successfuly</li>
+<li>
+<strong>errorCallback</strong> 
+       (optional) a function that will be called when the operation
+       encounters an error</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>    //Create a new button and add an event listener to it
+    var secondButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"SecondButton",
+    {
+        //properties of the button
+        "width": "100%",
+        "text": "Second Button"
+    });
+    secondButton.addTo("mainLayout");
+    secondButton.addEventListener("Clicked", function()
+    {
+        alert("second button is clicked");
+    });
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.clone">mosync.nativeui.NativeWidgetElement.clone</a></h1>
+
+<p>Clones the current Widget.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>newID</strong> The id for the newly created widget.</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>    //Create a new button and add an event listener to it
+    var secondButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"SecondButton",
+    {
+        //properties of the button
+        "width": "100%",
+        "text": "Second Button"
+    });
+    secondButton.addTo("mainLayout");
+    var thirdButton = secondButton.clone();
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.show">mosync.nativeui.NativeWidgetElement.show</a></h1>
+
+<p>Shows a screen widget on the screen. Will be set to null if the widget
+is not of type screen.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is
+       successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>     //Create a Native Screen
+   var myScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Screen" ,"myScreen", {
+        "title": "My Screen"
+   });
+
+   //Create a Button
+     var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+     {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+     });
+
+    //Add the button to the Created Screen
+  myScreen.addChild("myButton");
+
+  //Show the created screen on the device's screen
+  myScreen.show();
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.pushTo">mosync.nativeui.NativeWidgetElement.pushTo</a></h1>
+
+<p>Pushes a screen to a StackScreen.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>stackScreenID</strong> 
+       the ID for the stackscreen that should be used for pushing
+       the current screen</li>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is
+       successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>     //Create a Native StackScreen
+   var myStackScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("StackScreen" ,"myStackScreen");
+   var myScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Screen" ,"myScreen", {
+        "title": "My Screen"
+   });
+
+   //Create a Button
+     var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+     {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+     });
+
+    //Add the button to the Created Screen
+  myScreen.addChild("myButton");
+
+  //Show the created screen on the device's screen
+  myStackScreen.show();
+
+  myScreen.pushTo("myStackScreen")
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.pop">mosync.nativeui.NativeWidgetElement.pop</a></h1>
+
+<p>Pops a screen from the current stackscreen, Uuse only for StackScreen
+widgets.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is
+       successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>     //Create a Native StackScreen
+   var myStackScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("StackScreen" ,"myStackScreen");
+   var myScreen = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Screen" ,"myScreen", {
+        "title": "My Screen"
+   });
+
+   //Create a Button
+     var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button" ,"myButton",
+     {
+        //properties of the button
+        "width": "100%",
+        "text": "Click Me!"
+     });
+
+    //Add the button to the Created Screen
+  myScreen.addChild("myButton");
+
+  //Show the created screen on the device's screen
+  myStackScreen.show();
+
+  myScreen.pushTo("myStackScreen");
+
+  myStackScreen.pop();
+</code></pre>
+
+<h1><a name="mosync.nativeui.NativeWidgetElement.showDialog">mosync.nativeui.NativeWidgetElement.showDialog</a></h1>
+
+<p>Shows a modal dialog widget on the screen.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is
+       successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h1><a name="mosync.nativeui.NativeWidgetElement.hideDialog">mosync.nativeui.NativeWidgetElement.hideDialog</a></h1>
+
+<p>Hides a modal dialog widget from the screen.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>successCallback</strong> 
+       a function that will be called if the operation is
+       successful</li>
+<li>
+<strong>errorCallback</strong> 
+       a function that will be called if an error occurs</li>
+</ul>
+<h1><a name="document.getNativeElementById">document.getNativeElementById</a></h1>
+
+<p>Used to access the nativeWidgetElements created from the HTML markup. It
+returns the object that can be used to change the properties of the specified
+widget.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>widgetID</strong> 
+       the ID attribute used for identifying the widget in DOM</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>      //Get the screen widget
+    var myScreen = <a href="mosync-nativeui.js.html#document.getNativeElementById">document.getNativeElementById</a>("MyScreen")
+    //Show it on the device's screen
+    myScreen.show()
+</code></pre>
+
+<h1><a name="mosync.nativeui.create">mosync.nativeui.create</a></h1>
+
+<p>creates a widget and returns a <a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement">mosync.nativeui.NativeWidgetElement</a> object.
+The object then can be used for modifying the respective NativeElement.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>widgetType</strong> 
+       type of the widget that should be created</li>
+<li>
+<strong>widgetID</strong> 
+       ID that will be used for refrencing to the widget</li>
+<li>
+<strong>successCallback</strong> 
+       (optional) a function that will be called when the operation is
+       done successfully</li>
+<li>
+<strong>errorCallback</strong> 
+       (optional) a function that will be called when the operation
+       encounters an error</li>
+</ul>
+<p><strong>ReturnValue:</strong> An object of type <a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement">mosync.nativeui.NativeWidgetElement</a></p>
+
+<h2>Example:</h2>
+
+<pre class="prettyprint"><code>        var myButton = <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a>("Button", "myButton", {
+                    "text" : "Click Me!",
+                    "width" : "100%"
+                    });
+</code></pre>
+
+<h1><a name="mosync.nativeui.UIReady">mosync.nativeui.UIReady</a></h1>
+
+<p>A function that is called when the UI is ready. By default it loads the
+element with ID "mainScreen" Override this function to add extra
+functionality. See <a href="mosync-nativeui.js.html#mosync.nativeui.initUI">mosync.nativeui.initUI</a> for more information.</p>
+
+<h1><a name="mosync.nativeui.initUI">mosync.nativeui.initUI</a></h1>
+
+<p>Initializes the UI system and parsing of the XML input.
+This function should be called when the document body is loaded.</p>
+
+<pre class="prettyprint"><code>  &lt;!-- The function can be called in the initialization phase of HTML document.--&gt;
+  &lt;body onload="<a href="mosync-nativeui.js.html#mosync.nativeui.initUI">mosync.nativeui.initUI</a>()"&gt;
+</code></pre>
+
+<p>After finalizing the widgets, the UI system will call the UIReady function.
+ In order to add your operation you can override the UIReady function as below:</p>
+
+<pre class="prettyprint"><code>  <a href="mosync-nativeui.js.html#mosync.nativeui.UIReady">mosync.nativeui.UIReady</a> = function()
+  {
+  //Do something, and show your main screen
+  }
+</code></pre>
+
+	</div>
+
+</div>
+</body>
+</html>

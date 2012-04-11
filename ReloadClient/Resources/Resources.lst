@@ -1,0 +1,20 @@
+.res SPLASH_IMAGE
+.image "Reload_Logo_Trans_Icon.png"
+.res LOGO_IMAGE
+.image "Reload_Menubar_Logo.png"
+.res MOSYNC_IMAGE
+.image "MoSync_Logo.png"
+.res CONNECT_BG
+.image "connect_background.png"
+.res RELOAD_BG
+.image "reload_background.png"
+.res BACKGROUND
+.image "background.png"
+.res INFO_ICON
+.image "info.png"
+.res BEEP_WAV
+.media "audio/x-wav", "beep.wav"
+.res INFO_TEXT
+.ubin
+.include "information"
+.eof

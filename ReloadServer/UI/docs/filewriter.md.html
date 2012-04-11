@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="FileWriter">FileWriter</a></h1>
+
+<p><a href="filewriter.md.html#FileWriter">FileWriter</a> is an object that allows one to write a file.</p>
+
+<h2>Properties</h2>
+
+<ul>
+<li>
+<strong>readyState:</strong> One of the three states the reader can be in INIT, WRITING or DONE.</li>
+<li>
+<strong>fileName:</strong> The <a href="name.md.html#name">name</a> of the file to be written. <em>(DOMString)</em>
+</li>
+<li>
+<strong>length:</strong> The length of the file to be written. <em>(long)</em>
+</li>
+<li>
+<strong>position:</strong> The current position of the file pointer. <em>(long)</em>
+</li>
+<li>
+<strong>error:</strong> An object containing errors. <em>(<a href="fileerror.md.html#FileError">FileError</a>)</em>
+</li>
+<li>
+<strong>onwritestart:</strong> Called when the write starts. . <em>(Function)</em>
+</li>
+<li>
+<strong>onprogress:</strong> Called while writing the file, reports progress (progess.loaded/progress.total). <em>(Function)</em> -NOT SUPPORTED</li>
+<li>
+<strong>onwrite:</strong> Called when the request has completed successfully.  <em>(Function)</em>
+</li>
+<li>
+<strong>onabort:</strong> Called when the write has been aborted. For instance, by invoking the abort() method. <em>(Function)</em>
+</li>
+<li>
+<strong>onerror:</strong> Called when the write has failed. <em>(Function)</em>
+</li>
+<li>
+<strong>onwriteend:</strong> Called when the request has completed (either in success or failure).  <em>(Function)</em>
+</li>
+</ul>
+<h2>Methods</h2>
+
+<ul>
+<li>
+<strong>abort</strong>: Aborts writing file.</li>
+<li>
+<strong>seek</strong>: Moves the file pointer to the byte specified.</li>
+<li>
+<strong>truncate</strong>: Shortens the file to the length specified.</li>
+<li>
+<strong>write</strong>: Writes data to the file.</li>
+</ul>
+<h2>Details</h2>
+
+<p>The <code><a href="filewriter.md.html#FileWriter">FileWriter</a></code> object is a way to write files from the devices file system.  Users register their own event listeners to receive the writestart, progress, write, writeend, error and abort events.</p>
+
+<p>A <a href="filewriter.md.html#FileWriter">FileWriter</a> is created for a single file. You can use it to write to a file multiple times. The <a href="filewriter.md.html#FileWriter">FileWriter</a> maintains the file's position and length attributes, so you can seek and write anywhere in the file. By default, the <a href="filewriter.md.html#FileWriter">FileWriter</a> writes to the beginning of the file (will overwrite existing data). Set the optional append boolean to true in the <a href="filewriter.md.html#FileWriter">FileWriter</a>'s constructor to begin writing to the end of the file.</p>
+
+<p>NOTE: <strong>write</strong> does not adjust the file length if you overwrite an existing file with shorter content. Use <strong>truncate</strong> with the new content length to remove old data at the end of the file, if desired.</p>
+
+<h2>Seek Quick Example</h2>
+
+<pre class="prettyprint"><code>function win(writer) {
+    // fast forwards file pointer to end of file
+    writer.seek(writer.length);
+};
+
+var fail = function(evt) {
+    console.log(error.code);
+};
+
+entry.createWriter(win, fail);
+</code></pre>
+
+<h2>Truncate Quick Example</h2>
+
+<pre class="prettyprint"><code>function win(writer) {
+    writer.truncate(10);
+};
+
+var fail = function(evt) {
+    console.log(error.code);
+};
+
+entry.createWriter(win, fail);
+</code></pre>
+
+<h2>Write Quick Example</h2>
+
+<pre class="prettyprint"><code>function win(writer) {
+    writer.onwrite = function(evt) {
+        console.log("write success");
+    };
+    writer.write("some sample text");
+};
+
+var fail = function(evt) {
+    console.log(error.code);
+};
+
+entry.createWriter(win, fail);
+</code></pre>
+
+<h2>Append Quick Example</h2>
+
+<pre class="prettyprint"><code>function win(writer) {
+    writer.onwrite = function(evt) {
+        console.log("write success");
+    };
+    writer.seek(writer.length);
+    writer.write("appended text");
+};
+
+var fail = function(evt) {
+    console.log(error.code);
+};
+
+entry.createWriter(win, fail);
+</code></pre>
+
+<h2>Abort Quick Example</h2>
+
+<pre class="prettyprint"><code>function win(writer) {
+    writer.onwrite = function(evt) {
+        console.log("write success");
+    };
+    writer.write("some sample text");
+    writer.abort();
+};
+
+var fail = function(evt) {
+    console.log(error.code);
+};
+
+entry.createWriter(win, fail);
+</code></pre>
+
+<h2>Full Example</h2>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;<a href="filewriter.md.html#FileWriter">FileWriter</a> Example&lt;/title&gt;
+
+    &lt;script type="text/javascript" charset="utf-8" src="js/wormhole.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" charset="utf-8"&gt;
+
+    // Wait for Wormhole to load
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // Wormhole is ready
+    //
+    function onDeviceReady() {
+        window.requestFileSystem(<a href="localfilesystem.md.html#LocalFileSystem">LocalFileSystem</a>.PERSISTENT, 0, gotFS, fail);
+    }
+
+    function gotFS(fileSystem) {
+        fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
+    }
+
+    function gotFileEntry(fileEntry) {
+        fileEntry.createWriter(gotFileWriter, fail);
+    }
+
+    function gotFileWriter(writer) {
+        writer.onwrite = function(evt) {
+            console.log("write success");
+        };
+        writer.write("some sample text");
+        // contents of file now 'some sample text'
+        writer.truncate(11);
+        // contents of file now 'some sample'
+        writer.seek(4);
+        // contents of file still 'some sample' but file pointer is after the 'e' in 'some'
+        writer.write(" different text");
+        // contents of file now 'some different text'
+    }
+
+    function fail(error) {
+        console.log(error.code);
+    }
+
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Example&lt;/h1&gt;
+    &lt;p&gt;Write <a href="file.md.html#File">File</a>&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+	</div>
+
+</div>
+</body>
+</html>

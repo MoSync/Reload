@@ -1,0 +1,5 @@
+begin
+Android/2.x
+iOS/iPhone
+Windows Phone/7
+end

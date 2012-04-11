@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="accelerometer.clearWatch">accelerometer.clearWatch</a></h1>
+
+<p>Stop watching the <code><a href="acceleration.md.html#Acceleration">Acceleration</a></code> referenced by the watch ID parameter.</p>
+
+<pre class="prettyprint"><code>navigator.<a href="accelerometer.clearWatch.md.html#accelerometer.clearWatch">accelerometer.clearWatch</a>(watchID);
+</code></pre>
+
+<ul>
+<li>
+<strong>watchID</strong>: The ID returned by <code><a href="accelerometer.watchAcceleration.md.html#accelerometer.watchAcceleration">accelerometer.watchAcceleration</a></code>.</li>
+</ul>
+<h2>Quick Example</h2>
+
+<pre class="prettyprint"><code>var watchID = navigator.<a href="accelerometer.watchAcceleration.md.html#accelerometer.watchAcceleration">accelerometer.watchAcceleration</a>(onSuccess, onError, options);
+
+// ... later on ...
+
+navigator.<a href="accelerometer.clearWatch.md.html#accelerometer.clearWatch">accelerometer.clearWatch</a>(watchID);
+</code></pre>
+
+<h2>Full Example</h2>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;<a href="acceleration.md.html#Acceleration">Acceleration</a> Example&lt;/title&gt;
+
+    &lt;script type="text/javascript" charset="utf-8" src="js/wormhole.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" charset="utf-8"&gt;
+
+    // The watch id references the current `watchAcceleration`
+    var watchID = null;
+
+    // Wait for Wormhole to load
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // Wormhole is ready
+    //
+    function onDeviceReady() {
+        startWatch();
+    }
+
+    // Start watching the acceleration
+    //
+    function startWatch() {
+
+        // Update acceleration every 3 seconds
+        var options = { frequency: 3000 };
+
+        watchID = navigator.<a href="accelerometer.watchAcceleration.md.html#accelerometer.watchAcceleration">accelerometer.watchAcceleration</a>(onSuccess, onError, options);
+    }
+
+    // Stop watching the acceleration
+    //
+    function stopWatch() {
+        if (watchID) {
+            navigator.<a href="accelerometer.clearWatch.md.html#accelerometer.clearWatch">accelerometer.clearWatch</a>(watchID);
+            watchID = null;
+        }
+    }
+
+    // onSuccess: Get a snapshot of the current acceleration
+    //
+    function onSuccess(acceleration) {
+        var element = document.getElementById('accelerometer');
+        element.innerHTML = '<a href="acceleration.md.html#Acceleration">Acceleration</a> X: ' + acceleration.x + '&lt;br /&gt;' +
+                            '<a href="acceleration.md.html#Acceleration">Acceleration</a> Y: ' + acceleration.y + '&lt;br /&gt;' +
+                            '<a href="acceleration.md.html#Acceleration">Acceleration</a> Z: ' + acceleration.z + '&lt;br /&gt;' +
+                            'Timestamp: ' + acceleration.timestamp + '&lt;br /&gt;';
+    }
+
+    // onError: Failed to get the acceleration
+    //
+    function onError() {
+        alert('onError!');
+    }
+
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="accelerometer"&gt;Waiting for accelerometer...&lt;/div&gt;
+    &lt;button onclick="stopWatch();"&gt;Stop Watching&lt;/button&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+	</div>
+
+</div>
+</body>
+</html>

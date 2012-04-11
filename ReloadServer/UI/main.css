@@ -1,0 +1,339 @@
+/**
+		Copyright (C) 2012  MoSync AB
+
+	  This program is free software: you can redistribute it and/or modify
+	  it under the terms of the GNU Affero General Public License as
+	  published by the Free Software Foundation, either version 3 of the
+	  License, or (at your option) any later version.
+
+	  This program is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU Affero General Public License for more details.
+
+	  You should have received a copy of the GNU Affero General Public License
+	  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+body {
+	background-color: #434343;
+}
+
+#HeaderContainer {
+	width: 100%;
+	height: 70px;
+	top: 0px;
+	left:0px;
+	right: 0px;
+	position:fixed;
+}
+
+#infoDiv {
+	width:70px;
+	height:70px;
+	float:right;
+	padding:11px;
+}
+#MoSyncLogoContainer {
+	width: 320px;
+	height: 70px;
+	background-image: url('img/MenuBar_left.png');
+	float: left;
+}
+
+#MoSyncLogoDiv
+{
+	width: 320px;
+	height: 70px;
+	float: left;
+	padding-top: 12px;
+	padding-left: 35px;	
+}
+
+#MenuBar {
+	width: 100%;
+	height: 70px;
+	background-image: url('img/MenuBar_right.png');
+}
+
+
+#MoSyncLogo {
+	float:right;
+	padding-right: 10px;
+	padding-top: 10px;
+}
+#PoweredByDiv {
+	float: right;
+	font-family: Helvetica,Arial,sans-serif;
+	font-size:10px;
+	color:white;
+	padding-right: 5px;
+	padding-top: 10px;
+}
+
+#ServerAddress {
+	font-family: Helvetica,Arial,sans-serif;
+	color: white;
+	font-size: 16px;
+	width: 100%;
+	padding-top: 20px;
+	padding-left: 30px;
+	float: left;
+}
+#MainClientListContainer {
+	font-family: Helvetica,Arial,sans-serif;
+	color: white;
+	font-size: 16px;
+	padding-top: 20px;
+	padding-left: 30px;
+	float: left;
+	width:100%;
+}
+
+#MainContainer {
+	height:100%;
+	bottom:0px;
+}
+
+#sideBar {
+	width: 320px;
+	top:70px;
+	bottom: 0px;
+	left:0px;
+	background-color: #595959;
+	float: left;
+	overflow:hidden;
+	position: fixed;
+}
+
+#projectsContainer {
+	width: 320px;
+	height: 51px;
+	background-image: url('img/Projects_Header_Background.png');
+	color: #a5a5a5;
+	font-size: 20px;
+	font-family: Helvetica,Arial,sans-serif;
+	float:left;
+}
+
+#projectDiv {
+	width: 100px;
+	height: 51px;
+	font-size: 20px;
+	padding-left: 10px;
+	padding-top: 15px;
+	float:left;
+}
+
+#buttonDiv {
+	padding-top: 9px;
+	padding-right: 9px;
+	width: 33px; 
+	height:51px;
+	float:right;
+}
+
+#menuBarShadow {
+	width:100%;
+	height:51px;
+	top:70px;
+	left:320px;
+	position:fixed;
+	background-image: url('img/LoggingPane_TopShadow.png');
+}
+
+#mainContent {
+	overflow: auto;
+	bottom:0px;
+}
+
+#projectListContainer {
+	padding-top: 30px;
+	top:121px;
+	position:fixed;
+	left:0px;
+	width:320px;
+	bottom:0px;
+	overflow: auto;
+}
+
+#changeWorkSpaceContainer {
+	height:33px;
+	width:132px;
+	text-align:center;
+	padding-top:9px;
+	padding-right:3px;
+	float:right;
+	color:white;
+	font-size: 12px;
+	font-weight: bold;
+	
+}
+
+#workspacePath{
+	width: 95%;
+}
+
+#changeWorkspaceButton {
+	background-image: url("img/button_workspace.png");
+	text-align:center;
+	height:33px;
+}
+
+#changeWorkspaceText {
+	padding:10px;
+}
+#LogTitle {
+	width:100%;
+	padding-left:10px;
+	font-family: Helvetica,Arial,sans-serif;
+	color: white;
+	font-size: 18px;	
+}
+#contentDiv {
+	right: 10px;
+	top:191px;
+	left:370px;
+	bottom:0px;
+	overflow:auto;
+	position:fixed;
+	padding:20px;
+	font-family: Helvetica,Arial,sans-serif;
+	color: white;
+	font-size: 12px;
+}
+
+.projectContainerEven {
+	width: 320px;
+	height:24px;
+	background-color: #4F4F4F;
+	padding-top: 4px;
+
+}
+
+.projectContainerOdd {
+	width: 320px;
+	height: 26px;
+	padding-top: 4px;
+}
+
+.projectIconContainer {
+	padding-left: 26px;
+	float:left;
+}
+
+.projectNameContainer {
+	float: left;
+	font-family: Helvetica, Arial, sans-serif;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	width:120px;
+	overflow: hidden;
+}
+
+.projectOpenContainer {
+	float:right;
+	padding-right:10px;
+}
+
+.projectUpdateContainer {
+	float:right;
+	padding-right: 30px;
+}
+
+#tabList{
+	background-color: #434343;
+	background:none;
+	border-radius: 0px;
+	border:none;
+	float: right;
+}
+
+#tabListContainer{
+	width:100%;
+	height:44px;
+	border-bottom:1px solid #666;
+	
+}
+#tabs { 
+	list-style:none; 
+	margin:0 !important; 
+	padding:0;
+	height:30px;
+	border:none;
+	background-color: #434343;
+	background:none;
+	top:81px;
+	left:320px;
+	right:0px;
+	position: fixed;
+}
+
+.tabNameContainer {
+	float:right;
+}
+#tabContainer {
+	position:fixed;
+	bottom: 0px;
+	top:141px;
+	right:10px;
+	left:325px;
+}
+#tabs-1 {
+	position:fixed;
+	bottom: 0px;
+	top:141px;
+	right:10px;
+	left:325px;	
+}
+#tabs-2{
+	position:fixed;
+	bottom: 0px;
+	top:141px;
+	right:10px;
+	left:325px;
+}
+
+#docsFrame {
+	width:100%;
+	height:600px;
+}
+#tabs-4 {
+	padding: 0px;
+}
+#WelcomeFrame {
+	width:100%;
+	height:600px;
+	border:none;
+}
+#clientList {
+	padding-top: 20px;	
+}
+
+.clientInfoContainer {
+	border:solid;
+	border-width: 1px;
+	border-radius:5px;
+	border-color: white;
+	padding-left: 20px;
+	padding-top: 10px;
+	padding-bottom: 30px;
+	width: 60%;
+	background-color: orange;
+	color: black;
+	overflow: auto;
+}
+
+.clientAddressContainer {
+	float:left;
+}
+
+.clientPlatofrmContainer {
+	float:left;
+	padding-left:10px;
+}
+
+.clientVersionContainer {
+	float:left;
+	padding-left:10px;
+}
