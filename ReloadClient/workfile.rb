@@ -17,9 +17,6 @@
 
 #!/usr/bin/ruby
 
-require File.expand_path(ENV['MOSYNCDIR']+'/rules/mosync_exe.rb')
-require File.expand_path(ENV['MOSYNCDIR']+'/rules/mosync_util.rb')
-require File.expand_path(ENV['MOSYNCDIR']+"/rules/util.rb")
 require "FileUtils"
 
 pipeToolPath = ENV['MOSYNCDIR'] + "/bin/pipe-tool"
@@ -54,10 +51,10 @@ for fileName in projectFiles do
 end
 
 FileUtils.mkpath([commonPath, androidPath + "package/", iOSPath + "package/", wp7Path + "package/", androidPackagePath, iOSPackagePath, wp7PackagePath]);
-sh pipeToolPath + " -appcode=DSFN -R -depend=" + commonPath + "resources.deps "+ commonPath +"resources Resources/Resources.lst"
+system(pipeToolPath + " -appcode=DSFN -R -depend=" + commonPath + "resources.deps "+ commonPath +"resources Resources/Resources.lst")
 
 for fileName in cFiles do
-	sh xgccPath + " -o " + commonPath + File.basename(fileName,".cpp") + ".s -S -g -MMD -MF " + commonPath + File.basename(fileName,".cpp") + ".s.deps -DMAPIP -O2 -DPLATFORM_IOS -DVARIANT_IOS_IPHONE " + fileName + " -I" + ENV['MOSYNCDIR'] + "/include -I" + commonPath
+	system(xgccPath + " -o " + commonPath + File.basename(fileName,".cpp") + ".s -S -g -MMD -MF " + commonPath + File.basename(fileName,".cpp") + ".s.deps -DMAPIP -O2 -DPLATFORM_IOS -DVARIANT_IOS_IPHONE " + fileName + " -I" + ENV['MOSYNCDIR'] + "/include -I" + commonPath)
 end
 
 sFileListString = ""
@@ -68,23 +65,23 @@ for fileName in Dir.entries(commonPath) do
 end
 
 #Android
-sh pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B " + commonPath + "program " + sFileListString + libs
-sh packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + androidPath + "package -m Android/2.x --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 1"
+system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B " + Dir.getwd + "/" + commonPath + "program " + sFileListString + libs)
+system(packagerPath + " -t platform -p " + Dir.getwd + "/" + commonPath + "program -r " + Dir.getwd + "/" + commonPath + "resources -i " + iconFile + " -d " + Dir.getwd + "/" + androidPath + "package -m Android/2.x --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 1")
 FileUtils.cp_r androidPath + "package/" + programName + ".apk", androidPackagePath, :verbose => true
 
 oldWD = Dir.getwd;
 #WP7
 Dir.chdir(wp7Path);
-sh pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cs " + oldWD + "/" + commonPath + "program " + sFileListString + libs
+system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cs " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
 Dir.chdir(oldWD);
-sh packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + wp7Path + "package -m \"Windows Phone/7\" --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --cs-output " + wp7Path + " --wp-project-only --wp-target device --wp-config rebuild_release --wp-guid 3e0fa7b0-3ec6-102f-8003-a9d7f020192f"
+system(packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + wp7Path + "package -m \"Windows Phone/7\" --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --cs-output " + wp7Path + " --wp-project-only --wp-target device --wp-config rebuild_release --wp-guid 3e0fa7b0-3ec6-102f-8003-a9d7f020192f")
 FileUtils.cp_r Dir.glob(wp7Path + "package/project/*"), wp7PackagePath, :verbose => true
 
 #iOS
 Dir.chdir(iOSPath);
-sh pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cpp " + oldWD + "/" + commonPath + "program " + sFileListString + libs
+system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cpp " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
 Dir.chdir(oldWD);
-sh packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + iOSPath + "package -m iOS/iPhone --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --ios-project-only --ios-cert \"iPhone Developer\" --ios-sdk iphoneos5.0 --ios-xcode-target Release --cpp-output " + iOSPath
+system(packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + iOSPath + "package -m iOS/iPhone --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --ios-project-only --ios-cert \"iPhone Developer\" --ios-sdk iphoneos5.0 --ios-xcode-target Release --cpp-output " + iOSPath)
 FileUtils.cp_r Dir.glob(iOSPath + "package/xcode-proj/*"), iOSPackagePath, :verbose => true
 plist = IO.read(iOSPackagePath + "ReloadClient.plist")
 f = File.new(iOSPackagePath + "ReloadClient.plist", 'w');
