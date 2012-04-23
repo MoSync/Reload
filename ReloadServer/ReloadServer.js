@@ -14,6 +14,8 @@
    You should have received a copy of the GNU Affero General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+// TODO: Group globals together below, and name them with prefix "g".
 var localAddress;
 var http = require('http');
 var net = require('net');
@@ -83,7 +85,8 @@ function generateProjectListJSON(projects)
  * Generates a small HTML page that redirects to the real
  * HTML editing interface
  */
-function generateHTML(projects) {
+function generateHTML(projects)
+{
 	var html = " \
 	<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0 Transitional//EN'>\
 	<html>\
@@ -103,22 +106,22 @@ function generateHTML(projects) {
  * supplied to the callback
  */
 function getNetworkIP(callback) {
-  var socket = net.createConnection(80, "www.google.com");
-  socket.on('connect', function() {
-    callback(undefined, socket.address().address);
-    socket.end();
-  });
-  socket.on('error', function(e) {
-    callback(e, 'error');
-  });
-
-
+	var socket = net.createConnection(80, "www.google.com");
+	socket.on('connect', function()
+	{
+		callback(undefined, socket.address().address);
+		socket.end();
+	});
+	socket.on('error', function(e) {
+		callback(e, 'error');
+	});
 }
 
-getNetworkIP(function (error, ip) {
- console.log("My IP address is: " + ip);
- localAddress = ip;
-
+// Call the above function to get the id-address.
+getNetworkIP(function (error, ip)
+{
+	console.log("My IP address is: " + ip);
+	localAddress = ip;
 });
 
 /**
@@ -126,17 +129,21 @@ getNetworkIP(function (error, ip) {
  * workspace. If the file does not exist, sets the workspace
  * to the default one at the user's home directory
  */
-function getLatestPath() {
-	try{
-		path.exists('lastWorkspace.dat', function(exists){
-			if(exists)
+function getLatestPath()
+{
+	try
+	{
+		path.exists('lastWorkspace.dat', function(exists)
+		{
+			if (exists)
 			{
 				var data = fs.readFileSync('lastWorkspace.dat', "utf8");
 				setRootWorkspacePath(String(data));
 			}
 			else
 			{
-				setRootWorkspacePath(homeDir + fileSeparator  + "MoSync_Reload_Projects");
+				setRootWorkspacePath(homeDir + fileSeparator +
+					"MoSync_Reload_Projects");
 			}
 		});
 	}
@@ -149,12 +156,13 @@ function getLatestPath() {
 /**
  * Sets the current workspace for projects, and saves it to lastWorkspace.dat
  */
-function setRootWorkspacePath(path) {
+function setRootWorkspacePath(path)
+{
 	rootWorkspacePath = path;
 	console.log("Using workspace at :" + path);
-	try{
-		fs.writeFile('lastWorkspace.dat', path, function (err) {
-		});
+	try
+	{
+		fs.writeFile('lastWorkspace.dat', path, function (err) { });
 	}
 	catch(err)
 	{
@@ -169,26 +177,30 @@ function setRootWorkspacePath(path) {
  * which is also used by the MoSync build system.
  */
 function bundleApp(projectDir, callback) {
-	try{
+	try
+	{
 		var exec = require('child_process').exec;
-		function puts(error, stdout, stderr) {
+		function puts(error, stdout, stderr)
+		{
 			console.log(stdout);
 			console.log(stderr);
 			console.log(error);
-			callback(rootWorkspacePath + fileSeparator + projectDir + "/LocalFiles.bin");
+			callback(rootWorkspacePath + fileSeparator +
+				projectDir + "/LocalFiles.bin");
 		}
 		var bundleCommand = "bin\\win\\Bundle.exe";
-		if(localPlatform.indexOf("darwin") >=0)
+		if (localPlatform.indexOf("darwin") >=0)
 		{
 		  bundleCommand = "bin/mac/Bundle";
 		}
-		else if(localPlatform.indexOf("linux") >=0)
+		else if (localPlatform.indexOf("linux") >=0)
 		{
 		  bundleCommand = "bin/linux/Bundle";
 		}
-		var command =  bundleCommand + " -in "  + rootWorkspacePath +
-					fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
-					rootWorkspacePath + fileSeparator + projectDir  + fileSeparator + "LocalFiles.bin";
+		var command =  bundleCommand + " -in " + rootWorkspacePath +
+			fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
+			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
+			"LocalFiles.bin";
 		exec(command, puts);
 	}
 	catch(err)
@@ -442,45 +454,64 @@ var deviceInfoListJSON = "[]";
  * Called by the TCP library whenever a new TCP lient connects to the server.
  * It saves and initializes the client socket.
  */
-function saveClient(socket) {
-	try{
-	clientList.push(socket);
-	socket.setEncoding('utf8'); //We only transfer text messages over the TCP connection
-	socket.on('close',function (had_error) //Executed then the client closes the connection
-					{
-						var address = "-unknown address-";
-						if(socket.deviceInfo != undefined)
-						{
-							address = socket.deviceInfo.address;
-						}
-						console.log("Client " + address + " (" + socket.deviceInfo.name + ") has disconnected." )
-						for(var i = 0; i < clientList.length ; i++)
-						{
-							if(clientList[i].remoteAddress == socket.remoteAddress)
-							{
-								clientList.splice(i,1);
-								generateDeviceInfoListJSON();
-								break;
-							}
-						}
-					});
-	socket.on('data',function(jsonString) //Executed when the client sends data to the server
-					{
-						message = JSON.parse(jsonString); //The data is always in JSON format
-						if(message != undefined);
-						{
-							if(message.type == "deviceInfo") //The device sent it's info upon connecting
-							{
-								//platform, name, uuid, version, phonegap
-								message.type == null;
-								socket.deviceInfo = message;
-								socket.deviceInfo.address = socket.remoteAddress;
-								generateDeviceInfoListJSON();
-								console.log("Client " + socket.remoteAddress +
-										" (" + socket.deviceInfo.name + ") has connected." )
-							}
-						}
-					});
+function saveClient(socket)
+{
+	try
+	{
+		clientList.push(socket);
+
+		// We only transfer text messages over the TCP connection.
+		socket.setEncoding('utf8');
+
+		// Executed then the client closes the connection.
+		socket.on('close',function (had_error)
+		{
+			var address = "-unknown address-";
+			if (socket.deviceInfo != undefined)
+			{
+				address = socket.deviceInfo.address;
+			}
+			console.log(
+				"Client " +
+				address + " (" +
+				socket.deviceInfo.name +
+				") has disconnected.");
+			for (var i = 0; i < clientList.length ; i++)
+			{
+				if (clientList[i].remoteAddress == socket.remoteAddress)
+				{
+					clientList.splice(i,1);
+					generateDeviceInfoListJSON();
+					break;
+				}
+			}
+		});
+
+		// Executed when the client sends data to the server.
+		socket.on('data',function(jsonString)
+		{
+			// The data is always in JSON format.
+			var message = JSON.parse(jsonString);
+			if (message != undefined);
+			{
+				// The device sent it's info upon connecting.
+				if (message.type == "deviceInfo")
+				{
+					// Platform, name, uuid, os version, phonegap version.
+					message.type == null;
+					socket.deviceInfo = message;
+					socket.deviceInfo.address = socket.remoteAddress;
+					generateDeviceInfoListJSON();
+					console.log("Client " + socket.remoteAddress +
+						" (" + socket.deviceInfo.name + ") has connected." )
+				}
+				// The device sent a log message.
+				else if (message.type == "log")
+				{
+					// TODO: Output log message.
+				}
+			}
+		});
 	}
 	catch(err)
 	{
@@ -626,12 +657,12 @@ function handleHTTPGet(req, res)
 			res.end(String(localAddress) + ":7000");
 
 		}
-		
+
 		//Editing page asks the server for the version information
 		else if(page == "/getVersionInfo")
 		{
 			var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
-			
+
 			var versionInfoJSON = JSON.stringify({"version":versionInfo[0], "timestamp": versionInfo[1]});
 			console.log(versionInfoJSON)
 			res.writeHead(200, {
@@ -664,19 +695,28 @@ function handleHTTPGet(req, res)
 			createNewProject(pageSplit[1], pageSplit[2]);
 		}
 		//Editing page asks the server to reload a project
-		else if(page.slice(page.length-15, page.length) == "LocalFiles.html")
+		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
 			console.log("Reloading project");
-			res.writeHead(200, {
-			});
+			res.writeHead(200, { });
 			res.end();
 
 			//send the new bundle URL to the device clients
-			clientList.forEach(function(client){
+			clientList.forEach(function(client)
+			{
 				var url = page.replace("LocalFiles.html", "LocalFiles.bin");
 				console.log(url);
 				try
 				{
+					// TODO: We need to send length of url.
+					// First length as hex 8 didgits, e.g.: "000000F0"
+					// Then string data follows.
+					// Update client to read this format.
+					// Or should we use "number:stringdata", e.g.: "5:Hello" ??
+					// Advantage with hex is that we can read fixed numer of bytes
+					// in the read operation.
+					// Convert to hex:
+					// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 					var result = client.write(url, "ascii");
 				}
 				catch(err)
