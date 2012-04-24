@@ -41,45 +41,45 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	int screenHeight = EXTENT_Y(ex);
 
 	int centerH = screenWidth / 2;
-	int buttonWidth = screenWidth * 0.75;
+	int buttonWidth = (int)((float)screenWidth * 0.75);
 	if(screenHeight > 1000)
 	{
-		buttonWidth = screenWidth * 0.4;
+		buttonWidth = (int)((float)screenWidth * 0.4);
 	}
-	int buttonHeight = screenWidth * 0.15;
+	int buttonHeight = (int)((float)screenWidth * 0.15);
 	if(screenHeight > 1000)
 	{
-		buttonHeight = screenWidth * 0.07;
+		buttonHeight = (int)((float)screenWidth * 0.07);
 	}
-	int buttonSpacing = buttonHeight * 0.3;
+	int buttonSpacing = (int)((float)buttonHeight * 0.3);
 	if(os.find("Windows", 0) >= 0)
 	{
-		buttonSpacing = buttonHeight * 0.1;
+		buttonSpacing = (int)((float)buttonHeight * 0.1);
 	}
-	int editBoxHeight = screenHeight * 0.07;
+	int editBoxHeight = (int)((float)screenHeight * 0.07);
 	if(screenHeight > 1000)
 	{
-		editBoxHeight = screenHeight * 0.02;
+		editBoxHeight = (int)((float)screenHeight * 0.02);
 	}
-	int logoWidth = screenWidth * 0.75;
-	int layoutTop = screenHeight * 0.3;
+	int logoWidth = (int)((float)screenWidth * 0.75);
+	int layoutTop = (int)((float)screenHeight * 0.3);
 	if(screenHeight > 1000)
 	{
-		layoutTop = screenHeight * 0.25;
+		layoutTop = (int)((float)screenHeight * 0.25);
 	}
-	int labelHeight = screenHeight * 0.05;
+	int labelHeight = (int)((float)screenHeight * 0.05);
 	if(screenHeight > 1000)
 	{
-		labelHeight = screenHeight * 0.025;
+		labelHeight = (int)((float)screenHeight * 0.025);
 	}
 	int labelWidth = screenWidth;
-	int labelSpacing = screenHeight * 0.02;
+	int labelSpacing = (int)((float)screenHeight * 0.02);
 	if(screenHeight > 1000)
 	{
-		labelSpacing = labelSpacing * 0.01;
+		labelSpacing = (int)((float)labelSpacing * 0.01);
 	}
 	int layoutHeight = (buttonHeight + buttonSpacing) * 2;
-	int ipBoxButtonSpacing = screenHeight * 0.03;
+	int ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
 
 	mLoginScreen = new Screen();
 

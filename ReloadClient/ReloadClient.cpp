@@ -130,7 +130,8 @@ void ReloadClient::handleWebViewMessage(WebView* webView, MAHandle data)
 	// Uncomment to print message data for debugging.
 	// You need to build the project in debug mode for
 	// the log output to be displayed.
-	//printMessage(data);
+	// TODO: Comment out again.
+	printMessage(data);
 
 	// Check the message protocol.
 	MessageProtocol protocol(data);
@@ -263,13 +264,22 @@ void ReloadClient::printMessage(MAHandle dataHandle)
 void ReloadClient::connectFinished(Connection *conn, int result)
 {
 	printf("connection result: %d\n", result);
-	if(result > 0)
+	if (result > 0)
 	{
 		mLoginScreen->connectedTo(mServerAddress.c_str());
 		mSocket.recv(mBuffer,1024);
 
-		//Save the server address
-		mFileUtil->writeTextToFile(mFileUtil->getLocalPath() + "LastServerAddress.txt",mServerAddress);
+		// Save the server address.
+		mFileUtil->writeTextToFile(
+			mFileUtil->getLocalPath() + "LastServerAddress.txt",
+			mServerAddress);
+
+		// Set URL for remote log service.
+		MAUtil::String remoteLogURL = "http://";
+		remoteLogURL += mServerAddress + "/log/";
+		//mResourceMessageHandler.setRemoteLogURL(remoteLogURL);
+		// TODO: Remove print.
+		printf("@@@ Remote Log URL: %s\n", remoteLogURL.c_str());
 
 		sendClientDeviceInfo();
 	}

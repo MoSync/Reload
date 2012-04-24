@@ -509,6 +509,7 @@ function saveClient(socket)
 				else if (message.type == "log")
 				{
 					// TODO: Output log message.
+					//socket.deviceInfo.name // the name of the device.
 				}
 			}
 		});
@@ -655,9 +656,7 @@ function handleHTTPGet(req, res)
 			  'Content-Type': '	text/html'
 			});
 			res.end(String(localAddress) + ":7000");
-
 		}
-
 		//Editing page asks the server for the version information
 		else if(page == "/getVersionInfo")
 		{
@@ -729,6 +728,11 @@ function handleHTTPGet(req, res)
 					}
 				}
 			});
+		}
+		// Remote log request.
+		else if (page.indexOf("/log/") != -1)
+		{
+			console.log("LOG: " + page);
 		}
 		//Default HTTP request, used for sending over UI files to the page
 		else
