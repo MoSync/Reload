@@ -167,7 +167,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 
 	//Some instructions for the user
 	Label *instructionsLabel = new Label();
-	instructionsLabel->setText("Use the HTML Interface to load an app");
+	instructionsLabel->setText("Use the Reload Web UI to load an app");
 	instructionsLabel->setFontColor(0xFFFFFF);
 	instructionsLabel->setWidth(labelWidth);
 	instructionsLabel->setMaxNumberOfLines(2);

@@ -47,6 +47,7 @@ console.log("Current working path: "  + currentWorkingPath);
 var clientList = []; //List of TCP mobile clients
 var localPlatform = os.platform();
 var homeDir;
+var gRemoteLogData = [];
 
 debugLog("Platform: " + localPlatform);
 
@@ -120,8 +121,11 @@ function getNetworkIP(callback) {
 // Call the above function to get the id-address.
 getNetworkIP(function (error, ip)
 {
-	console.log("My IP address is: " + ip);
 	localAddress = ip;
+
+	console.log("Server IP address is: " + ip);
+	console.log("If the Web UI does not open automatically,");
+	console.log("open a browser on: http://localhost:8282");
 });
 
 /**
@@ -447,6 +451,17 @@ function getDebugData()
 	}
 }
 
+/**
+ * Returns a JSON string with the contents of the remote log buffer,
+ * then empties the buffer.
+ */
+function getRemoteLogData()
+{
+	var dataString  = JSON.stringify(gRemoteLogData);
+	gRemoteLogData = [];
+	return dataString;
+}
+
 //This variable always keeps the latest info about all connected devices
 var deviceInfoListJSON = "[]";
 
@@ -539,18 +554,22 @@ function generateDeviceInfoListJSON()
  */
 function handleHTTPGet(req, res)
 {
-	try{
+	try
+	{
 		var page = req.url.replace("%20", " ");
-		//A device client requested an app bundle
-		if(page.slice(page.length-14, page.length) == "LocalFiles.bin")
+		
+		// A device client requested an app bundle.
+		if (page.slice(page.length-14, page.length) == "LocalFiles.bin")
 		{
 			var pageSplit = page.split("/");
-			var path = pageSplit[pageSplit.length -2]; //Path to the project folder
-			//Bundle the app
+			// Set path to the project folder.
+			var path = pageSplit[pageSplit.length -2];
+			// Bundle the app.
 			bundleApp(path, function(actualPath){
-				//Send the .bin file when bundling is complete
+				// Send the .bin file when bundling is complete.
 				var data = fs.readFileSync(actualPath);
-				res.writeHead(200, {
+				res.writeHead(200,
+				{
 				  'Content-Length': data.length,
 				  'Content-Type': '	binary'
 				});
@@ -580,7 +599,17 @@ function handleHTTPGet(req, res)
 			var data = getDebugData();
 			res.writeHead(200, {
 			  'Content-Length': data.length,
-			  'Content-Type': '	text/JSON'
+			  'Content-Type': 'text/JSON'
+			});
+			res.end(data);
+		}
+		//Editing page is polling for remote log messages.
+		else if (page == "/getRemoteLogData")
+		{
+			var data = getRemoteLogData();
+			res.writeHead(200, {
+			  'Content-Length': data.length,
+			  'Content-Type': 'text/JSON'
 			});
 			res.end(data);
 		}
@@ -694,6 +723,7 @@ function handleHTTPGet(req, res)
 			createNewProject(pageSplit[1], pageSplit[2]);
 		}
 		//Editing page asks the server to reload a project
+		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
 			console.log("Reloading project");
@@ -730,11 +760,18 @@ function handleHTTPGet(req, res)
 			});
 		}
 		// Remote log request.
-		else if (page.indexOf("/log/") != -1)
+		// TODO: Add check for specific index,
+		// once we know the format of "page" data.
+		else if (page.indexOf("/remoteLogMessage/") != -1)
 		{
-			console.log("LOG: " + page);
+			var index = page.indexOf("/remoteLogMessage/");
+			var message = unescape(page.slice(index + 18));
+			console.log("Remote Log: " + message);
+			gRemoteLogData.push(message);
+			res.writeHead(200, { });
+			res.end();
 		}
-		//Default HTTP request, used for sending over UI files to the page
+		// Default HTTP request, used for sending over UI files to the page.
 		else
 		{
 			try
@@ -765,7 +802,10 @@ function handleHTTPGet(req, res)
 					var data = fs.readFileSync("." + page + "/index.html");
 					res.writeHead(200, {
 					  'Content-Length': data.length,
-					  'Content-Type': 'html'
+					  'Content-Type': 'html',
+					  'Pragma': 'no-cache',
+					  'Cache-Control': 'no-cache',
+					  'Expires': '-1'
 					});
 					res.write(data);
 					res.end("");
@@ -792,7 +832,10 @@ function handleHTTPGet(req, res)
 					var data = fs.readFileSync("." + page);
 					res.writeHead(200, {
 					  'Content-Length': data.length,
-					  'Content-type': contentType
+					  'Content-type': contentType,
+					  'Pragma': 'no-cache',
+					  'Cache-Control': 'no-cache',
+					  'Expires': '-1'
 					});
 					res.write(data);
 					res.end("");

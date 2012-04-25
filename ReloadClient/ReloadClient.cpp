@@ -23,12 +23,48 @@ MA 02110-1301, USA.
  *      Author: Ali Sarrafi, Iraklis Rossis
  */
 
+#include <Wormhole/EasyHttpConnection.h>
+#include <Wormhole/WebViewMessage.h>
 #include "ReloadClient.h"
+
+#define SERVER_PORT "8282"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 using namespace Wormhole; // Wormhole library.
+
+/**
+ * Helper class for making a HTTP request for a remote log message.
+ * This class is just used to send a request, it will not do anything
+ * with the result sent back from teh server.
+ */
+class RemoteLogConnection : public EasyHttpConnection
+{
+public:
+	RemoteLogConnection()
+		: EasyHttpConnection()
+	{
+	}
+
+	void dataDownloaded(MAHandle data, int result)
+	{
+		char buf[128];
+		maWriteLog("RES1", 4);
+		sprintf(buf, "  result: %d", result);
+		maWriteLog(buf, strlen(buf));
+
+		// If we get data then delete it.
+		if (NULL != data)
+		{
+			maWriteLog("RES2", 4);
+			maDestroyPlaceholder(data);
+		}
+
+		// Delete this instance.
+		delete this;
+	}
+};
 
 ReloadClient::ReloadClient() :
 		mSocket(this),
@@ -51,7 +87,9 @@ ReloadClient::ReloadClient() :
 	mLoginScreen->initializeScreen(mOS);
 	mLoadingScreen->initializeScreen(mOS);
 
-	bool success = mFileUtil->readTextFromFile(mFileUtil->getLocalPath() + "LastServerAddress.txt",mServerAddress);
+	bool success = mFileUtil->readTextFromFile(
+		mFileUtil->getLocalPath() + "LastServerAddress.txt",
+		mServerAddress);
 	if(!success)
 	{
 		mServerAddress = "localhost";
@@ -88,6 +126,10 @@ ReloadClient::ReloadClient() :
 	mRunningApp = false;
 	mLoginScreen->show();
 
+	mResourceMessageHandler.setLogMessageListener(this);
+	mResourceMessageHandler.sendRemoteLogMessage(
+		"http://192.168.0.145:8282/remoteLogMessage/",
+		"******* HelloWorld");
 }
 
 MAUtil::String ReloadClient::getInfo()
@@ -276,10 +318,10 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 
 		// Set URL for remote log service.
 		MAUtil::String remoteLogURL = "http://";
-		remoteLogURL += mServerAddress + "/log/";
-		//mResourceMessageHandler.setRemoteLogURL(remoteLogURL);
+		remoteLogURL += mServerAddress + ":" + SERVER_PORT + "/remoteLogMessage/";
+		setRemoteLogURL(remoteLogURL);
 		// TODO: Remove print.
-		printf("@@@ Remote Log URL: %s\n", remoteLogURL.c_str());
+		printf("@@@ Setting remote Log URL: %s\n", remoteLogURL.c_str());
 
 		sendClientDeviceInfo();
 	}
@@ -297,15 +339,18 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 	{
 		//Null terminate the string message (it's a URL of the .bin bundle)
 		mBuffer[result] = '\0';
-		sprintf(mBundleAddress,"http://%s:8282%s", mServerAddress.c_str(), mBuffer);
+		sprintf(
+			mBundleAddress,
+			"http://%s:%s%s",
+			mServerAddress.c_str(),
+			SERVER_PORT,
+			mBuffer);
 		lprintfln("FileURL:%s\n",mBundleAddress);
 		//Reset the app environment (destroy widgets, stop sensors)
         freeHardware();
         downloadBundle();
 		//Set the socket to receive the next TCP message
 		mSocket.recv(mBuffer, 1024);
-
-
 	}
 	else
 	{
@@ -314,7 +359,6 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 		//Go back to the login screen on an error
 		mLoginScreen->show();
 	}
-
 }
 
 void ReloadClient::downloadBundle()
@@ -553,4 +597,42 @@ void ReloadClient::disconnect()
 	//Close the socket, and show the connect controls again
 	mSocket.close();
 	mLoginScreen->disconnected();
+}
+
+
+/**
+ * Set the url to be used for remote log messages.
+ * @param url The url to use for the remote logging service,
+ * for example: "http://localhost:8282/log/"
+ */
+void ReloadClient::setRemoteLogURL(const MAUtil::String& url)
+{
+	maWriteLog("LOG1", 4);
+	maWriteLog(url.c_str(), strlen(url.c_str()));
+
+	mRemoteLogURL = url;
+}
+
+void ReloadClient::onLogMessage(const char* message, const char* url)
+{
+	String remoteLogURL = url;
+
+	// If the url is set to "undefined", we should
+	// use a previously set url.
+	if (0 == strcmp("undefined", url))
+	{
+		// If the url is not passed from JavaScript,
+		// use the one set earlier.
+		remoteLogURL = mRemoteLogURL;
+	}
+
+	// Escape ("percent encode") the message.
+	MAUtil::String request = remoteLogURL + WebViewMessage::escape(message);
+
+	maWriteLog("LOG2", 4);
+	maWriteLog(request.c_str(), strlen(request.c_str()));
+
+	// Send request to server.
+	RemoteLogConnection* connection = new RemoteLogConnection();
+	connection->get(request.c_str());
 }
