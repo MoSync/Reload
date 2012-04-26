@@ -35,86 +35,86 @@ LoadingScreen::LoadingScreen(ReloadClient *client)
 
 void LoadingScreen::initializeScreen(MAUtil::String &os)
 {
-			MAExtent ex = maGetScrSize();
-			int screenWidth = EXTENT_X(ex);
-			int screenHeight = EXTENT_Y(ex);
+	MAExtent ex = maGetScrSize();
+	int screenWidth = EXTENT_X(ex);
+	int screenHeight = EXTENT_Y(ex);
 
-			mSplashScreen = new Screen();
-			mSplashScreen->setBackgroundColor(40,40,40);
+	mSplashScreen = new Screen();
+	mSplashScreen->setBackgroundColor(40,40,40);
 
-			//Layout that holds the screen elements
-			RelativeLayout* relativeLayout = new RelativeLayout();
-			relativeLayout->setSize(screenWidth, screenHeight);
+	//Layout that holds the screen elements
+	RelativeLayout* relativeLayout = new RelativeLayout();
+	relativeLayout->setSize(screenWidth, screenHeight);
 
-			//The huge Reload "Circle"
-			Image* logo = new Image();
-			logo->setImage(SPLASH_IMAGE);
-			logo->setSize(screenWidth,screenWidth);
-			logo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+	//The huge Reload "Circle"
+	Image* logo = new Image();
+	logo->setImage(SPLASH_IMAGE);
+	logo->setSize(screenWidth,screenWidth);
+	logo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
 
-			//Indicator placed on top of the reload circle
-			mIndicator = new ActivityIndicator();
-			mIndicator->show();
+	//Indicator placed on top of the reload circle
+	mIndicator = new ActivityIndicator();
+	mIndicator->show();
 
-			//Progress bar for the download
-			mProgressBar = new ProgressBar();
-			mProgressBar->setWidth((int)(screenWidth * 0.75));
-			mProgressBar->setMaximumValue(100);
+	//Progress bar for the download
+	mProgressBar = new ProgressBar();
+	mProgressBar->setWidth((int)(screenWidth * 0.75));
+	mProgressBar->setMaximumValue(100);
 
-			//Padding between the progress bar and the cancel button
-			HorizontalLayout *paddingLayout = new HorizontalLayout();
-			paddingLayout->setHeight(screenHeight / 36);
+	//Padding between the progress bar and the cancel button
+	HorizontalLayout *paddingLayout = new HorizontalLayout();
+	paddingLayout->setHeight(screenHeight / 36);
 
-			//the cancel button stops the download and returns the user
-			//to the login screen
-			if(os == "Android")
-			{
-				mCancelDownloadButton = new Button();
-				((Button*)mCancelDownloadButton)->addButtonListener(this);
-			}
-			else
-			{
-				mCancelDownloadButton = new ImageButton();
-				((ImageButton*)mCancelDownloadButton)->addButtonListener(this);
-				((ImageButton*)mCancelDownloadButton)->setBackgroundImage(RELOAD_BG);
-				mCancelDownloadButton->setFontColor(0x000000);
-			}
+	//the cancel button stops the download and returns the user
+	//to the login screen
+	if(os == "Android")
+	{
+		mCancelDownloadButton = new Button();
+		((Button*)mCancelDownloadButton)->addButtonListener(this);
+	}
+	else
+	{
+		mCancelDownloadButton = new ImageButton();
+		((ImageButton*)mCancelDownloadButton)->addButtonListener(this);
+		((ImageButton*)mCancelDownloadButton)->setBackgroundImage(RELOAD_BG);
+		mCancelDownloadButton->setFontColor(0x000000);
+	}
 
-			mCancelDownloadButton->setText("Cancel");
-			mCancelDownloadButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-			mCancelDownloadButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
-			mCancelDownloadButton->setWidth((int)(screenWidth * 0.75));
-			mCancelDownloadButton->setHeight((int)(screenHeight * 0.1));
+	mCancelDownloadButton->setText("Cancel");
+	mCancelDownloadButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mCancelDownloadButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mCancelDownloadButton->setWidth((int)(screenWidth * 0.75));
+	mCancelDownloadButton->setHeight((int)(screenHeight * 0.1));
 
-			//Spacing between the cancel button and the bottom of the screen
-			HorizontalLayout *paddingLayout2 = new HorizontalLayout();
-			paddingLayout2->setHeight(screenHeight / 15);
+	//Spacing between the cancel button and the bottom of the screen
+	HorizontalLayout *paddingLayout2 = new HorizontalLayout();
+	paddingLayout2->setHeight(screenHeight / 15);
 
-			VerticalLayout* logolayout = new VerticalLayout();
-			logolayout->setSize(screenWidth, screenHeight);
-			logolayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-			logolayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
-			logolayout->addChild(logo);
+	VerticalLayout* logolayout = new VerticalLayout();
+	logolayout->setSize(screenWidth, screenHeight);
+	logolayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	logolayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	logolayout->addChild(logo);
 
-			VerticalLayout* activitylayout = new VerticalLayout();
-			activitylayout->setSize(screenWidth, screenHeight);
-			activitylayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-			activitylayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
-			activitylayout->addChild(mIndicator);
+	VerticalLayout* activitylayout = new VerticalLayout();
+	activitylayout->setSize(screenWidth, screenHeight);
+	activitylayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	activitylayout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	activitylayout->addChild(mIndicator);
 
-			VerticalLayout* progresslayout = new VerticalLayout();
-			progresslayout->setSize(screenWidth, screenHeight);
-			progresslayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-			progresslayout->setChildVerticalAlignment(MAW_ALIGNMENT_BOTTOM);
-			progresslayout->addChild(mProgressBar);
-			progresslayout->addChild(paddingLayout);
-			progresslayout->addChild(mCancelDownloadButton);
-			progresslayout->addChild(paddingLayout2);
+	VerticalLayout* progresslayout = new VerticalLayout();
+	progresslayout->setSize(screenWidth, screenHeight);
+	progresslayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	progresslayout->setChildVerticalAlignment(MAW_ALIGNMENT_BOTTOM);
+	progresslayout->addChild(mProgressBar);
+	progresslayout->addChild(paddingLayout);
+	progresslayout->addChild(mCancelDownloadButton);
+	progresslayout->addChild(paddingLayout2);
 
-			relativeLayout->addChild(logolayout);
-			relativeLayout->addChild(activitylayout);
-			relativeLayout->addChild(progresslayout);
-			mSplashScreen->setMainWidget(relativeLayout);
+	relativeLayout->addChild(logolayout);
+	relativeLayout->addChild(activitylayout);
+	relativeLayout->addChild(progresslayout);
+	mSplashScreen->setMainWidget(relativeLayout);
 }
 
 /**

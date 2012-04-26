@@ -166,7 +166,6 @@ void ReloadClient::handleWebViewMessage(WebView* webView, MAHandle data)
 	// Uncomment to print message data for debugging.
 	// You need to build the project in debug mode for
 	// the log output to be displayed.
-	// TODO: Comment out again.
 	//printMessage(data);
 
 	// Check the message protocol.
@@ -426,14 +425,20 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
-	if(mFileUtil->openFileForReading(mFileUtil->getLocalPath() + "index.html") < 0)
+	// Clear web view cache.
+	getWebView()->setProperty("cache", "clearall");
+
+	// Check that index.html is there.
+	int result = mFileUtil->openFileForReading(
+		mFileUtil->getLocalPath() + "index.html");
+	if (result < 0)
 	{
 		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
 	}
 	//We do lazy initialization of the NativeUI message handler for the
 	//sake of WP7
-	if(mNativeUIMessageHandler == NULL)
+	if (mNativeUIMessageHandler == NULL)
 	{
 		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
 	}
