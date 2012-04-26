@@ -153,7 +153,7 @@ function getLatestPath()
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in getLatestPath: " + err);
 	}
 }
 
@@ -170,7 +170,7 @@ function setRootWorkspacePath(path)
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in setRootWorkspacePath: " + err);
 	}
 }
 
@@ -184,15 +184,18 @@ function bundleApp(projectDir, callback) {
 	try
 	{
 		var exec = require('child_process').exec;
+
 		function puts(error, stdout, stderr)
 		{
-			console.log(stdout);
-			console.log(stderr);
-			console.log(error);
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			console.log("error: " + error);
 			callback(rootWorkspacePath + fileSeparator +
 				projectDir + "/LocalFiles.bin");
 		}
+
 		var bundleCommand = "bin\\win\\Bundle.exe";
+		
 		if (localPlatform.indexOf("darwin") >=0)
 		{
 		  bundleCommand = "bin/mac/Bundle";
@@ -201,6 +204,7 @@ function bundleApp(projectDir, callback) {
 		{
 		  bundleCommand = "bin/linux/Bundle";
 		}
+
 		var command =  bundleCommand + " -in " + rootWorkspacePath +
 			fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
 			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
@@ -209,7 +213,7 @@ function bundleApp(projectDir, callback) {
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in bundleApp: " + err);
 	}
 }
 
@@ -256,9 +260,9 @@ function findProjects(callback) {
 		callback(projects);
 		});
 	}
-	catch(err)
+	catch (err)
 	{
-		console.log(err);
+		console.log("Error in findProjects: " + err);
 	}
 }
 
@@ -271,8 +275,9 @@ function openProjectFolder(projectFolder)
 	try{
 		var exec = require('child_process').exec;
 		function puts(error, stdout, stderr) {
-			console.log(stdout);
-			console.log(stderr);
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			console.log("error: " + error);
 		}
 		if((localPlatform.indexOf("darwin") >= 0))
 		{
@@ -299,7 +304,7 @@ function openProjectFolder(projectFolder)
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in openProjectFolder: " + err);
 	}
 }
 
@@ -315,11 +320,13 @@ function fixPathsUnix(path)
 function createNewProject(projectName, projectType)
 {
 	try{
-		console.log("Creating new project: " + projectName + ", of type " + projectType);
+		console.log(
+			"Creating new project: " + projectName + 
+			", of type " + projectType);
 		var templateName = "ReloadTemplate";
-		if(projectType)
+		if (projectType)
 		{
-			if(projectType == "native")
+			if (projectType == "native")
 			{
 				templateName = "NativeUITemplate";
 			}
@@ -330,11 +337,11 @@ function createNewProject(projectName, projectType)
 		}
 		var exec = require('child_process').exec;
 		function resultCommand(error, stdout, stderr) {
-			console.log(stdout);
-			console.log(stderr);
-			if(error)
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			if (error)
 			{
-				console.log(error);
+				console.log("error: " + error);
 			}
 			var file = require("fs");
 			var projectData = file.readFileSync(rootWorkspacePath + fileSeparator + projectName + fileSeparator + ".project", 'utf8');
@@ -351,16 +358,14 @@ function createNewProject(projectName, projectType)
 			var command = "xcopy /e /I \"" + currentWorkingPath + "\\templates\\" + templateName +
 							"\" \"" + rootWorkspacePath + fileSeparator + projectName + "\"";
 		}
-		console.log(command);
+		console.log("Command: " + command);
 		exec(command, resultCommand);
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in createNewProject: " + err);
 	}
 }
-
-
 
 var adb; //The Android adb tool used for debugging on Android clients
 var clearData = false;
@@ -410,7 +415,7 @@ function startDebugging() {
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in startDebugging: " + err);
 	}
 }
 
@@ -531,7 +536,7 @@ function saveClient(socket)
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in saveClient: " + err);
 	}
 }
 
@@ -571,7 +576,7 @@ function handleHTTPGet(req, res)
 				res.writeHead(200,
 				{
 				  'Content-Length': data.length,
-				  'Content-Type': '	binary'
+				  'Content-Type': 'binary'
 				});
 				res.write(data);
 				res.end("");
@@ -584,9 +589,10 @@ function handleHTTPGet(req, res)
 			findProjects(function(projects){
 				//Sending the page that redirects to the real interface
 				var html = generateHTML(projects);
-				res.writeHead(200, {
+				res.writeHead(200, 
+				{
 				  'Content-Length': html.length,
-				  'Content-Type': '	text/html'
+				  'Content-Type': 'text/html'
 				});
 				res.write(html);
 				res.end("");
@@ -734,7 +740,7 @@ function handleHTTPGet(req, res)
 			clientList.forEach(function(client)
 			{
 				var url = page.replace("LocalFiles.html", "LocalFiles.bin");
-				console.log(url);
+				console.log("url: " + url);
 				try
 				{
 					// TODO: We need to send length of url.
@@ -766,7 +772,7 @@ function handleHTTPGet(req, res)
 		{
 			var index = page.indexOf("/remoteLogMessage/");
 			var message = unescape(page.slice(index + 18));
-			console.log("Remote Log: " + message);
+			console.log("CLIENT LOG: " + message);
 			gRemoteLogData.push(message);
 			res.writeHead(200, { });
 			res.end();
@@ -851,7 +857,7 @@ function handleHTTPGet(req, res)
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in handleHTTPGet: " + err);
 	}
 }
 

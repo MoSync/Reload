@@ -49,15 +49,9 @@ public:
 
 	void dataDownloaded(MAHandle data, int result)
 	{
-		char buf[128];
-		maWriteLog("RES1", 4);
-		sprintf(buf, "  result: %d", result);
-		maWriteLog(buf, strlen(buf));
-
 		// If we get data then delete it.
 		if (NULL != data)
 		{
-			maWriteLog("RES2", 4);
 			maDestroyPlaceholder(data);
 		}
 
@@ -173,7 +167,7 @@ void ReloadClient::handleWebViewMessage(WebView* webView, MAHandle data)
 	// You need to build the project in debug mode for
 	// the log output to be displayed.
 	// TODO: Comment out again.
-	printMessage(data);
+	//printMessage(data);
 
 	// Check the message protocol.
 	MessageProtocol protocol(data);
@@ -320,8 +314,6 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 		MAUtil::String remoteLogURL = "http://";
 		remoteLogURL += mServerAddress + ":" + SERVER_PORT + "/remoteLogMessage/";
 		setRemoteLogURL(remoteLogURL);
-		// TODO: Remove print.
-		printf("@@@ Setting remote Log URL: %s\n", remoteLogURL.c_str());
 
 		sendClientDeviceInfo();
 	}
@@ -607,9 +599,6 @@ void ReloadClient::disconnect()
  */
 void ReloadClient::setRemoteLogURL(const MAUtil::String& url)
 {
-	maWriteLog("LOG1", 4);
-	maWriteLog(url.c_str(), strlen(url.c_str()));
-
 	mRemoteLogURL = url;
 }
 
@@ -628,9 +617,6 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 
 	// Escape ("percent encode") the message.
 	MAUtil::String request = remoteLogURL + WebViewMessage::escape(message);
-
-	maWriteLog("LOG2", 4);
-	maWriteLog(request.c_str(), strlen(request.c_str()));
 
 	// Send request to server.
 	RemoteLogConnection* connection = new RemoteLogConnection();
