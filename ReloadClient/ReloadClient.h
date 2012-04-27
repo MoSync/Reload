@@ -251,6 +251,11 @@ private:
 	 * The TCP port we are connecting to
 	 */
 	String mPort;
+
+	/**
+	 * The relative path to the downloaded app folder
+	 */
+	String mAppPath;
 };
 
 #endif /* RELOADCLIENT_H_ */

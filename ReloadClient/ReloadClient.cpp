@@ -360,7 +360,18 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     lprintfln("Completed download");
     //extract the file System
     setCurrentFileSystem(data, 0);
-    int result = MAFS_extractCurrentFileSystem(mFileUtil->getLocalPath().c_str());
+    MAHandle appDirHandle = maFileOpen((mFileUtil->getLocalPath() + mAppPath).c_str(), MA_ACCESS_READ_WRITE);
+    if(maFileExists(appDirHandle))
+    {
+    	lprintfln("Deleting file");
+    	maFileDelete(appDirHandle);
+    }
+    char buf[128];
+    sprintf(buf, "%d", maGetMilliSecondCount());
+    mAppPath = buf;
+    mAppPath.append("/", 1);
+    lprintfln("App Path:%s", mAppPath.c_str());
+    int result = MAFS_extractCurrentFileSystem((mFileUtil->getLocalPath() + mAppPath).c_str());
     freeCurrentFileSystem();
     maDestroyPlaceholder(mResourceFile);
     if(result > 0)
@@ -380,7 +391,7 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
-	if(mFileUtil->openFileForReading(mFileUtil->getLocalPath() + "index.html") < 0)
+	if(mFileUtil->openFileForReading(mFileUtil->getLocalPath() + mAppPath + "index.html") < 0)
 	{
 		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
@@ -392,9 +403,8 @@ void ReloadClient::loadSavedApp()
 		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
 	}
 	showWebView();
-
 	// Open the page.
-	getWebView()->openURL("index.html");
+	getWebView()->openURL(mAppPath + "index.html");
 	hasPage = true;
 	//Send the Device Screen size to JavaScript
 	MAExtent scrSize = maGetScrSize();
@@ -430,6 +440,7 @@ void ReloadClient::freeHardware()
 	{
 		maSensorStop(i);
 	}
+	getWebView()->openURL("about:blank");
 }
 
 /**
