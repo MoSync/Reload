@@ -270,6 +270,11 @@ private:
 	 * Address of url that will receive remote log messages.
 	 */
 	MAUtil::String mRemoteLogURL;
+
+	/**
+	 * The relative path to the downloaded app folder
+	 */
+	String mAppPath;
 };
 
 #endif /* RELOADCLIENT_H_ */
