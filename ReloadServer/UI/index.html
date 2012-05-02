@@ -34,9 +34,9 @@
 		<script language="JavaScript" charset="UTF-8" src="jquery-ui-1.8.16.custom.min.js"></script>
 		<script language="JavaScript" charset="UTF-8">
 			$(function() {
-				$(".ui-tabs .ui-tabs-nav li").each(function() { 
-					  $(this).prependTo($(this).parent()); 
-				}); 
+				$(".ui-tabs .ui-tabs-nav li").each(function() {
+					  $(this).prependTo($(this).parent());
+				});
 
 				$( "#tabs" ).tabs();
 			});
@@ -61,7 +61,7 @@
 							if(newProjectName.value != "")
 							{
 								createNewProject(newProjectName.value, type);
-								$(this).dialog("close");							
+								$(this).dialog("close");
 							}
 							else
 							{
@@ -85,13 +85,13 @@
 						"Change" : function() {
 							var workspacePath = document.getElementById("workspacePath");
 							if(workspacePath.value != "")
-							{							
+							{
 								changeWorkspace(workspacePath.value);
-								$(this).dialog("close");							
+								$(this).dialog("close");
 							}
 							else
 							{
-								alert("Please enter a path!")	
+								alert("Please enter a path!")
 							}
 						},
 						"Cancel" : function() {
@@ -118,16 +118,16 @@
 					}
 				});
 			})
-			
+
 			function getVersionInfo() {
 				$.getJSON("http://localhost:8282/getVersionInfo", function(data) {
 						var versionLabel = document.getElementById("reloadVersion");
 						versionLabel.innerHTML = data.version;
 						var timestampLabel = document.getElementById("reloadTimeStamp");
-						timestampLabel.innerHTML = data.timestamp;						 
-				});					
+						timestampLabel.innerHTML = data.timestamp;
+				});
 			}
-			
+
 			function changeWorkspace(workspacePath) {
 				$.ajax({
 					url : "http://localhost:8282/changeWorkspace?" + workspacePath,
@@ -155,9 +155,10 @@
 				$.getJSON("http://localhost:8282/getWorkSpacePath", function(data) {
 						console.log("Worspacepath : " + data.path);
 						var workspacePathDiv = document.getElementById("workspacePath");
-						workspacePathDiv.value = data.path; 
+						workspacePathDiv.value = data.path;
 				});
 			}
+			
 			function getServerAddress() {
 				$.ajax({
 					url : "http://localhost:8282/getAddress",
@@ -166,11 +167,12 @@
 						var addressDiv = document.getElementById("ServerAddress");
 						if((data.indexOf("127.0.0.1") <0) &&(data.indexOf("error") < 0))
 						{
-							addressDiv.innerHTML = "Server Address:  " + String(data);						
+							addressDiv.innerHTML = "Server Address:  " + String(data);
+							document.title = "MoSync Reload  " + String(data);
 						}
 						else
 						{
-							addressDiv.innerHTML = "Could not find the server address, <br> Please read it fro myour operating system.";													
+							addressDiv.innerHTML = "Could not find the server address, <br> Please read it fro myour operating system.";
 						}
 					}
 				});
@@ -209,14 +211,14 @@
 				projectListContainer.innerHTML = "";
 				for(var i = 0; i < data.length; i++) {
 					var projectNameClass = ((i % 2) == 0) ? "projectContainerEven" : "projectContainerOdd";
-					projectListContainer.innerHTML += " " + 
+					projectListContainer.innerHTML += " " +
 						"<div class='" + projectNameClass + "' id='project2'> " +
-							"<div class='projectIconContainer'> " + 
-								"<img src='img/MoSync_Project_Icon.png' />" +
-							"</div>" +
+							//"<div class='projectIconContainer'> " +
+							//	"<img src='img/MoSync_Project_Icon.png' />" +
+							//"</div>" +
 							"<div class='projectNameContainer' id='" + data[i].name + "'>" + data[i].name + "</div>" +
 							"<div class='projectUpdateContainer'>" +
-								"<a href='#' onclick=\"reloadProject('" + data[i].url + "','" + data[i].name + "')\"><img src='img/Reload.png' /></a>" +
+								"<a href='#' onclick=\"reloadProject('" + data[i].url + "','" + data[i].name + "')\"><img src='img/ReloadOrange.png' /></a>" +
 							"</div>" +
 							"<div class='projectOpenContainer'>" +
 								"<a href='#' onclick=\"openProjectFolder('" + data[i].name + "')\"><img src='img/Magnifying_Glass.png'/></a>" +
@@ -235,7 +237,7 @@
 				return false;
 			}
 			function isProjectListupdated(d) {
-				
+
 				if((d.length == 0) || (currentProjectList.length == 0)) {
 					return true;
 				}
@@ -260,7 +262,7 @@
 					}
 				});
 			}
-			
+
 			function getClientsInfo()
 			{
 				$.getJSON("http://localhost:8282/getClientsInfo.JSON", function(data) {
@@ -268,13 +270,13 @@
 					clientList.innerHTML = "";
 					if(data)
 					{
-						
+
 						for(var key = 0; key < data.length; key ++)
 						{
 							if(data[key] != undefined)
 							{
-								clientList.innerHTML += 
-									"<div class='clientInfoContainer'>" + 
+								clientList.innerHTML +=
+									"<div class='clientInfoContainer'>" +
 										"<div class='clientAddressContainer'> Address: " + data[key].address + "</div>" +
 										"<div class='clientPlatofrmContainer'>Platform: " + data[key].platform + "</div>" +
 										"<div class='clientVersionContainer'> Platform Version: " + data[key].version + "</div>" +
@@ -282,39 +284,60 @@
 							}
 						}
 					}
-				});				
+				});
 			}
+
 			function getDebugData() {
 				$.getJSON("http://localhost:8282/getDebugData", function(debugdata) {
-					var contentDiv = document.getElementById("contentDiv");
+					var contentDiv = document.getElementById("JSContentDiv");
 					if(debugdata) {
 						for(var i=0; i <= debugdata.length; i++) {
 							if(debugdata[i] != undefined)
 							{
-								
 								var datasplit = debugdata[i].split("\n");
-								if(datasplit && datasplit.length >0)
+								if (datasplit && datasplit.length >0)
 								{
-									for(var key = 0; key <= datasplit.length; key++) {
-										if(datasplit[key] != undefined)
+									for (var key = 0; key <= datasplit.length; key++) {
+										if (datasplit[key] != undefined)
 										{
 											if(datasplit[key].indexOf("Web Console") >= 0) {
-												contentDiv.innerHTML += datasplit[key] + "<br>";
+												contentDiv.innerHTML += datasplit[key] + "<br/>";
 												contentDiv.scrollTop += 20;
 											}
-										}									
-									}							
-									
+										}
+									}
 								}
 								else
 								{
 									if(debugdata[i].indexOf("Web Console") >= 0) {
-										contentDiv.innerHTML += debugdata[i] + "<br>";
+										contentDiv.innerHTML += debugdata[i] + "<br/>";
 										contentDiv.scrollTop += 20;
 									}
 								}
 							}
-						}						
+						}
+					}
+				});
+			}
+
+			function getRemoteLogData()
+			{
+				$.getJSON("http://localhost:8282/getRemoteLogData", function(logdata)
+				{
+					var contentDiv = document.getElementById("RemoteContentDiv");
+					if (logdata)
+					{
+						for (var i=0; i <= logdata.length; i++)
+						{
+							if (logdata[i] != undefined)
+							{
+								contentDiv.innerHTML += 
+									"<pre class=\"RemoteLogMessage\">" +
+									logdata[i] +
+									"</pre>";
+								contentDiv.scrollTop = contentDiv.scrollHeight;
+							}
+						}
 					}
 				});
 			}
@@ -340,8 +363,9 @@
 			}
 
 			function startGettingData() {
-				window.setInterval(getDebugData,500);
-				window.setInterval(getClientsInfo, 100);
+				window.setInterval(getDebugData, 500);
+				window.setInterval(getClientsInfo, 500);
+				window.setInterval(getRemoteLogData, 200);
 			}
 
 			function initialize() {
@@ -386,7 +410,7 @@
 					<div id="changeWorkSpaceContainer">
 						<div id="changeWorkspaceButton"  onclick="changeWorkspaceDialog()">
 							<div id="changeWorkspaceText">
-								Change Workspace							
+								Change Workspace
 							</div>
 						</div>
 					</div>
@@ -399,43 +423,52 @@
 					<div id="tabListContainer">
 						<ul id="tabList"  class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
 							<li class="tabNameContainer">
-								<a href="#tabs-1">Log Console</a>
+								<a href="#tabs-remote-log">Client Log</a>
 							</li>
 							<li class="tabNameContainer">
-								<a href="#tabs-2">Network Info</a>
+								<a href="#tabs-js-log">Android Log</a>
 							</li>
 							<li class="tabNameContainer">
-								<a href="#tabs-3">API Documentation</a>
+								<a href="#tabs-network-info">Network Info</a>
 							</li>
 							<li class="tabNameContainer">
-								<a href="#tabs-4">Welcome</a>
+								<a href="#tabs-api-documentation">API Docs</a>
+							</li>
+							<li class="tabNameContainer">
+								<a href="#tabs-welcome">Welcome</a>
 							</li>
 						</ul>
 					</div>
 					<div id="tabContainer">
-						<div id="tabs-1">
-							<div id="LogTitle">
-								JavaScript Log:
+						<div id="tabs-remote-log">
+							<div id="RemoteLogTitle">
+								Client Log&nbsp;&nbsp;(use <code>mosync.rlog("Log message")</code> in JavaScript)
 							</div>
-							<div id="contentDiv"></div>
+							<div id="RemoteContentDiv"></div>
 						</div>
-						<div id="tabs-2">
+						<div id="tabs-js-log">
+							<div id="JSLogTitle">
+								Android Web Console Log (logcat):
+							</div>
+							<div id="JSContentDiv"></div>
+						</div>
+						<div id="tabs-network-info">
 							<div id="ServerAddress"></div>
 							<div id="MainClientListContainer">
 								<div id="ClientListTile">
 									Connected Clients:
 								</div>
 								<div id="clientList">
-									
+
 								</div>
 							</div>
 						</div>
-						<div id="tabs-3">
+						<div id="tabs-api-documentation">
 							<iframe id="docsFrame" src="docs/index.html"></iframe>
-						</div>						
-						<div id="tabs-4">
+						</div>
+						<div id="tabs-welcome">
 							<iframe id="WelcomeFrame" src="welcome/index.html"></iframe>
-						</div>						
+						</div>
 					</div>
 				</div>
 			</div>
