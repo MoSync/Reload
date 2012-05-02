@@ -512,7 +512,6 @@ var mosync = (function()
 // =============================================================
 //
 // File: phonegap-bridge.js
-
 /*
 Copyright (C) 2011 MoSync AB
 
@@ -628,11 +627,10 @@ if(navigator.geolocation == undefined)
 	};
 
 }
+}
 
 // =============================================================
 //
-// File: phonegap-1.2.0.js
-
 /*
 PhoneGap
 ========
@@ -4685,11 +4683,10 @@ PhoneGap.addConstructor(function() {
     }
 });
 } // End of notification API
+});
+} // End of notification API
 
 // =============================================================
-//
-// File: mosync-resource.js
-
 /*
 Copyright (C) 2012 MoSync AB
 
@@ -4848,11 +4845,175 @@ mosync.resource.imageDownloadFinished = function(imageHandle)
 				null);
 	}
 };
+/**
+ * The Resource handler submodule.
+ * @private
+ */
+mosync.resource = {};
+
+/**
+ * A Hash containing all registered callback functions for
+ * loadImage function.
+ * @private
+ */
+mosync.resource.imageCallBackTable = {};
+
+mosync.resource.imageIDTable = {};
+
+mosync.resource.imageDownloadQueue = [];
+
+/**
+ * Loads images into image handles for use in MoSync UI systems.
+ *
+ *  @param imagePath relative path to the image file.
+ *  @param imageID a custom ID used for refering to the image in JavaScript
+ *  @param callBackFunction a function that will be called when the image is ready.
+ *
+ *  Example
+ *  -------
+ *  \code
+ *    mosync.resource.loadImage("./img/logo.png", "Logo", function(imageID, imageHandle){
+ *			var myImageButton = document.getNativeElementById("myImageButton");
+ *			myImageButton.setProperty("image", imageHandle);
+ * 		});
+ *  \endcode
+ *
+ */
+mosync.resource.loadImage = function(imagePath, imageID, successCallback)
+{
+	mosync.resource.imageCallBackTable[imageID] = successCallback;
+	mosync.bridge.send(
+			[
+				"Resource",
+				"loadImage",
+				imagePath,
+				imageID
+			], null);
+};
+
+/**
+ * A function that is called by C++ to pass the loaded image information.
+ *
+ * @param imageID JavaScript ID of the image
+ * @param imageHandle C++ handle of the imge which can be used for refering to the loaded image
+ * @private
+ */
+mosync.resource.imageLoaded = function(imageID, imageHandle)
+{
+	var callbackFun = mosync.resource.imageCallBackTable[imageID];
+	if (undefined != callbackFun)
+	{
+		var args = Array.prototype.slice.call(arguments);
+
+		// Call the function.
+		callbackFun.apply(null, args);
+	}
+};
+
+/**
+ * Loads images into image handles from a remote URL for use in MoSync UI systems.
+ *
+ *  @param imageURL URL to the image file.
+ *  @param imageID a custom ID used for refering to the image in JavaScript
+ *  @param callBackFunction a function that will be called when the image is ready.
+ *
+ *  Example
+ *  -------
+ *  \code
+ *    mosync.resource.loadRemoteImage("http://www.example.com/img/logo.png", "Logo", function(imageID, imageHandle){
+ *			var myImageButton = document.getNativeElementById("myImageButton");
+ *			myImageButton.setProperty("image", imageHandle);
+ * 		});
+ *  \endcode
+ */
+mosync.resource.loadRemoteImage = function(imageURL, imageID, callBackFunction)
+{
+	mosync.resource.imageCallBackTable[imageID] = callBackFunction;
+	var message = [
+		"Resource",
+		"loadRemoteImage",
+		imageURL,
+		imageID
+	];
+	// Add message to queue.
+	mosync.resource.imageDownloadQueue.push(message);
+
+	if (1 == mosync.resource.imageDownloadQueue.length)
+	{
+		mosync.bridge.send(message, null);
+	}
+
+};
+
+mosync.resource.imageDownloadStarted = function(imageID, imageHandle)
+{
+	mosync.resource.imageIDTable[imageHandle] = imageID;
+};
+
+mosync.resource.imageDownloadFinished = function(imageHandle)
+{
+	var imageID = mosync.resource.imageIDTable[imageHandle];
+	var callbackFun = mosync.resource.imageCallBackTable[imageID];
+	if (undefined != callbackFun)
+	{
+		// Call the function.
+		callbackFun(imageID, imageHandle);
+	}
+	// Remove first message.
+	if (mosync.resource.imageDownloadQueue.length > 0)
+	{
+		mosync.resource.imageDownloadQueue.shift();
+	}
+
+	// If there are more messages, send the next
+	// message in the queue.
+	if (mosync.resource.imageDownloadQueue.length > 0)
+	{
+		mosync.bridge.send(
+			mosync.resource.imageDownloadQueue[0],
+			null);
+	}
+};
+
+/**
+ * Send a log message to a remote server. This is a useful way
+ * to display debug info when developing/testing on a device.
+ *
+ * @param message The message to be sent, for example "Hello World".
+ * @param url Optional parameter the specifies the remove server
+ * to handle the log request, for example: "http://localhost:8282/log/".
+ * If this parameter is not supplied or set to null, "undefined" will
+ * be passed to the C++ message handler, and the url set in C++
+ * code will be used.
+ */
+mosync.resource.sendRemoteLogMessage = function(message, url)
+{
+	var urlParam = url;
+	if (!urlParam)
+	{
+		urlParam = "undefined";
+	}
+	mosync.bridge.send([
+		"Resource",
+		"sendRemoteLogMessage",
+		urlParam,
+		message
+	]);
+};
+
+/**
+ * Short alias for mosync.resource.sendRemoteLogMessage.
+ * Set the url of the logging service in C++ code, then
+ * just use mosync.rlog("Hello World") in your JS code.
+ * "rlog" is short for "remote log".
+ */
+mosync.rlog = mosync.resource.sendRemoteLogMessage;
+
+ * This library only supports image resources and used  together with the
+ */
+mosync.rlog = mosync.resource.sendRemoteLogMessage;
 
 // =============================================================
-//
-// File: mosync-nativeui.js
-
 /*
 Copyright (C) 2012 MoSync AB
 
@@ -6450,11 +6611,11 @@ else
 		mosync.nativeui.screenHeight = window.innerHeight;
 	}
 }
+ * Provides support for designing UI both programatically and declaratively.
+	}
+}
 
 // =============================================================
-//
-// File: mosync-sensormanager.js
-
 /*
 Copyright (C) 2012 MoSync AB
 
@@ -6800,9 +6961,8 @@ function SensorConnection(options)
 	this.setStatus("open");
 }
 
-// =============================================================
-//
-// File: mosync-pushnotifications.js
+	this.setStatus("open");
+}
 
 /*
 Copyright (C) 2012 MoSync AB
@@ -7149,6 +7309,10 @@ PushNotificationManager.prototype.listener = function(callback)
  */
 PhoneGap.addConstructor(function() {
 	if (typeof navigator.pushNotification === "undefined") {
+		navigator.pushNotification = new PushNotificationManager();
+	}
+});
+} // End of Push Notification API
 		navigator.pushNotification = new PushNotificationManager();
 	}
 });

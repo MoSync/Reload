@@ -23,12 +23,42 @@ MA 02110-1301, USA.
  *      Author: Ali Sarrafi, Iraklis Rossis
  */
 
+#include <Wormhole/HighLevelHttpConnection.h>
+#include <Wormhole/WebViewMessage.h>
 #include "ReloadClient.h"
+
+#define SERVER_PORT "8282"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 using namespace Wormhole; // Wormhole library.
+
+/**
+ * Helper class for making a HTTP request for a remote log message.
+ * This class is just used to send a request, it will not do anything
+ * with the result sent back from the server.
+ */
+class RemoteLogConnection : public HighLevelHttpConnection
+{
+public:
+	RemoteLogConnection()
+		: HighLevelHttpConnection()
+	{
+	}
+
+	void dataDownloaded(MAHandle data, int result)
+	{
+		// If we get data then delete it.
+		if (NULL != data)
+		{
+			maDestroyPlaceholder(data);
+		}
+
+		// Delete this instance.
+		delete this;
+	}
+};
 
 ReloadClient::ReloadClient() :
 		mSocket(this),
@@ -51,7 +81,9 @@ ReloadClient::ReloadClient() :
 	mLoginScreen->initializeScreen(mOS);
 	mLoadingScreen->initializeScreen(mOS);
 
-	bool success = mFileUtil->readTextFromFile(mFileUtil->getLocalPath() + "LastServerAddress.txt",mServerAddress);
+	bool success = mFileUtil->readTextFromFile(
+		mFileUtil->getLocalPath() + "LastServerAddress.txt",
+		mServerAddress);
 	if(!success)
 	{
 		mServerAddress = "localhost";
@@ -88,6 +120,7 @@ ReloadClient::ReloadClient() :
 	mRunningApp = false;
 	mLoginScreen->show();
 
+	mResourceMessageHandler.setLogMessageListener(this);
 }
 
 MAUtil::String ReloadClient::getInfo()
@@ -263,13 +296,20 @@ void ReloadClient::printMessage(MAHandle dataHandle)
 void ReloadClient::connectFinished(Connection *conn, int result)
 {
 	printf("connection result: %d\n", result);
-	if(result > 0)
+	if (result > 0)
 	{
 		mLoginScreen->connectedTo(mServerAddress.c_str());
 		mSocket.recv(mBuffer,1024);
 
-		//Save the server address
-		mFileUtil->writeTextToFile(mFileUtil->getLocalPath() + "LastServerAddress.txt",mServerAddress);
+		// Save the server address.
+		mFileUtil->writeTextToFile(
+			mFileUtil->getLocalPath() + "LastServerAddress.txt",
+			mServerAddress);
+
+		// Set URL for remote log service.
+		MAUtil::String remoteLogURL = "http://";
+		remoteLogURL += mServerAddress + ":" + SERVER_PORT + "/remoteLogMessage/";
+		setRemoteLogURL(remoteLogURL);
 
 		sendClientDeviceInfo();
 	}
@@ -287,15 +327,18 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 	{
 		//Null terminate the string message (it's a URL of the .bin bundle)
 		mBuffer[result] = '\0';
-		sprintf(mBundleAddress,"http://%s:8282%s", mServerAddress.c_str(), mBuffer);
+		sprintf(
+			mBundleAddress,
+			"http://%s:%s%s",
+			mServerAddress.c_str(),
+			SERVER_PORT,
+			mBuffer);
 		lprintfln("FileURL:%s\n",mBundleAddress);
 		//Reset the app environment (destroy widgets, stop sensors)
         freeHardware();
         downloadBundle();
 		//Set the socket to receive the next TCP message
 		mSocket.recv(mBuffer, 1024);
-
-
 	}
 	else
 	{
@@ -304,7 +347,6 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 		//Go back to the login screen on an error
 		mLoginScreen->show();
 	}
-
 }
 
 void ReloadClient::downloadBundle()
@@ -380,14 +422,20 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
-	if(mFileUtil->openFileForReading(mFileUtil->getLocalPath() + "index.html") < 0)
+	// Clear web view cache.
+	getWebView()->setProperty("cache", "clearall");
+
+	// Check that index.html is there.
+	int result = mFileUtil->openFileForReading(
+		mFileUtil->getLocalPath() + "index.html");
+	if (result < 0)
 	{
 		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
 	}
 	//We do lazy initialization of the NativeUI message handler for the
 	//sake of WP7
-	if(mNativeUIMessageHandler == NULL)
+	if (mNativeUIMessageHandler == NULL)
 	{
 		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
 	}
@@ -543,4 +591,36 @@ void ReloadClient::disconnect()
 	//Close the socket, and show the connect controls again
 	mSocket.close();
 	mLoginScreen->disconnected();
+}
+
+
+/**
+ * Set the url to be used for remote log messages.
+ * @param url The url to use for the remote logging service,
+ * for example: "http://localhost:8282/log/"
+ */
+void ReloadClient::setRemoteLogURL(const MAUtil::String& url)
+{
+	mRemoteLogURL = url;
+}
+
+void ReloadClient::onLogMessage(const char* message, const char* url)
+{
+	String remoteLogURL = url;
+
+	// If the url is set to "undefined", we should
+	// use a previously set url.
+	if (0 == strcmp("undefined", url))
+	{
+		// If the url is not passed from JavaScript,
+		// use the one set earlier.
+		remoteLogURL = mRemoteLogURL;
+	}
+
+	// Escape ("percent encode") the message.
+	MAUtil::String request = remoteLogURL + WebViewMessage::escape(message);
+
+	// Send request to server.
+	RemoteLogConnection* connection = new RemoteLogConnection();
+	connection->get(request.c_str());
 }
