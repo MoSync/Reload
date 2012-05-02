@@ -23,7 +23,7 @@ MA 02110-1301, USA.
  *      Author: Ali Sarrafi, Iraklis Rossis
  */
 
-#include <Wormhole/EasyHttpConnection.h>
+#include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/WebViewMessage.h>
 #include "ReloadClient.h"
 
@@ -37,13 +37,13 @@ using namespace Wormhole; // Wormhole library.
 /**
  * Helper class for making a HTTP request for a remote log message.
  * This class is just used to send a request, it will not do anything
- * with the result sent back from teh server.
+ * with the result sent back from the server.
  */
-class RemoteLogConnection : public EasyHttpConnection
+class RemoteLogConnection : public HighLevelHttpConnection
 {
 public:
 	RemoteLogConnection()
-		: EasyHttpConnection()
+		: HighLevelHttpConnection()
 	{
 	}
 
@@ -121,9 +121,6 @@ ReloadClient::ReloadClient() :
 	mLoginScreen->show();
 
 	mResourceMessageHandler.setLogMessageListener(this);
-	mResourceMessageHandler.sendRemoteLogMessage(
-		"http://192.168.0.145:8282/remoteLogMessage/",
-		"******* HelloWorld");
 }
 
 MAUtil::String ReloadClient::getInfo()
