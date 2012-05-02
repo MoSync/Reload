@@ -14,6 +14,8 @@
    You should have received a copy of the GNU Affero General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+// TODO: Group globals together below, and name them with prefix "g".
 var localAddress;
 var http = require('http');
 var net = require('net');
@@ -45,6 +47,7 @@ console.log("Current working path: "  + currentWorkingPath);
 var clientList = []; //List of TCP mobile clients
 var localPlatform = os.platform();
 var homeDir;
+var gRemoteLogData = [];
 
 debugLog("Platform: " + localPlatform);
 
@@ -83,7 +86,8 @@ function generateProjectListJSON(projects)
  * Generates a small HTML page that redirects to the real
  * HTML editing interface
  */
-function generateHTML(projects) {
+function generateHTML(projects)
+{
 	var html = " \
 	<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0 Transitional//EN'>\
 	<html>\
@@ -103,22 +107,25 @@ function generateHTML(projects) {
  * supplied to the callback
  */
 function getNetworkIP(callback) {
-  var socket = net.createConnection(80, "www.google.com");
-  socket.on('connect', function() {
-    callback(undefined, socket.address().address);
-    socket.end();
-  });
-  socket.on('error', function(e) {
-    callback(e, 'error');
-  });
-
-
+	var socket = net.createConnection(80, "www.google.com");
+	socket.on('connect', function()
+	{
+		callback(undefined, socket.address().address);
+		socket.end();
+	});
+	socket.on('error', function(e) {
+		callback(e, 'error');
+	});
 }
 
-getNetworkIP(function (error, ip) {
- console.log("My IP address is: " + ip);
- localAddress = ip;
+// Call the above function to get the id-address.
+getNetworkIP(function (error, ip)
+{
+	localAddress = ip;
 
+	console.log("Server IP address is: " + ip);
+	console.log("If the Web UI does not open automatically,");
+	console.log("open a browser on: http://localhost:8282");
 });
 
 /**
@@ -126,39 +133,44 @@ getNetworkIP(function (error, ip) {
  * workspace. If the file does not exist, sets the workspace
  * to the default one at the user's home directory
  */
-function getLatestPath() {
-	try{
-		path.exists('lastWorkspace.dat', function(exists){
-			if(exists)
+function getLatestPath()
+{
+	try
+	{
+		path.exists('lastWorkspace.dat', function(exists)
+		{
+			if (exists)
 			{
 				var data = fs.readFileSync('lastWorkspace.dat', "utf8");
 				setRootWorkspacePath(String(data));
 			}
 			else
 			{
-				setRootWorkspacePath(homeDir + fileSeparator  + "MoSync_Reload_Projects");
+				setRootWorkspacePath(homeDir + fileSeparator +
+					"MoSync_Reload_Projects");
 			}
 		});
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in getLatestPath: " + err);
 	}
 }
 
 /**
  * Sets the current workspace for projects, and saves it to lastWorkspace.dat
  */
-function setRootWorkspacePath(path) {
+function setRootWorkspacePath(path)
+{
 	rootWorkspacePath = path;
 	console.log("Using workspace at :" + path);
-	try{
-		fs.writeFile('lastWorkspace.dat', path, function (err) {
-		});
+	try
+	{
+		fs.writeFile('lastWorkspace.dat', path, function (err) { });
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in setRootWorkspacePath: " + err);
 	}
 }
 
@@ -169,31 +181,39 @@ function setRootWorkspacePath(path) {
  * which is also used by the MoSync build system.
  */
 function bundleApp(projectDir, callback) {
-	try{
+	try
+	{
 		var exec = require('child_process').exec;
-		function puts(error, stdout, stderr) {
-			console.log(stdout);
-			console.log(stderr);
-			console.log(error);
-			callback(rootWorkspacePath + fileSeparator + projectDir + "/LocalFiles.bin");
+
+		function puts(error, stdout, stderr)
+		{
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			console.log("error: " + error);
+			callback(rootWorkspacePath + fileSeparator +
+				projectDir + "/LocalFiles.bin");
 		}
+
 		var bundleCommand = "bin\\win\\Bundle.exe";
-		if(localPlatform.indexOf("darwin") >=0)
+		
+		if (localPlatform.indexOf("darwin") >=0)
 		{
 		  bundleCommand = "bin/mac/Bundle";
 		}
-		else if(localPlatform.indexOf("linux") >=0)
+		else if (localPlatform.indexOf("linux") >=0)
 		{
 		  bundleCommand = "bin/linux/Bundle";
 		}
-		var command =  bundleCommand + " -in "  + rootWorkspacePath +
-					fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
-					rootWorkspacePath + fileSeparator + projectDir  + fileSeparator + "LocalFiles.bin";
+
+		var command =  bundleCommand + " -in " + rootWorkspacePath +
+			fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
+			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
+			"LocalFiles.bin";
 		exec(command, puts);
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in bundleApp: " + err);
 	}
 }
 
@@ -240,9 +260,9 @@ function findProjects(callback) {
 		callback(projects);
 		});
 	}
-	catch(err)
+	catch (err)
 	{
-		console.log(err);
+		console.log("Error in findProjects: " + err);
 	}
 }
 
@@ -255,8 +275,9 @@ function openProjectFolder(projectFolder)
 	try{
 		var exec = require('child_process').exec;
 		function puts(error, stdout, stderr) {
-			console.log(stdout);
-			console.log(stderr);
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			console.log("error: " + error);
 		}
 		if((localPlatform.indexOf("darwin") >= 0))
 		{
@@ -283,7 +304,7 @@ function openProjectFolder(projectFolder)
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in openProjectFolder: " + err);
 	}
 }
 
@@ -299,11 +320,13 @@ function fixPathsUnix(path)
 function createNewProject(projectName, projectType)
 {
 	try{
-		console.log("Creating new project: " + projectName + ", of type " + projectType);
+		console.log(
+			"Creating new project: " + projectName + 
+			", of type " + projectType);
 		var templateName = "ReloadTemplate";
-		if(projectType)
+		if (projectType)
 		{
-			if(projectType == "native")
+			if (projectType == "native")
 			{
 				templateName = "NativeUITemplate";
 			}
@@ -314,11 +337,11 @@ function createNewProject(projectName, projectType)
 		}
 		var exec = require('child_process').exec;
 		function resultCommand(error, stdout, stderr) {
-			console.log(stdout);
-			console.log(stderr);
-			if(error)
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			if (error)
 			{
-				console.log(error);
+				console.log("error: " + error);
 			}
 			var file = require("fs");
 			var projectData = file.readFileSync(rootWorkspacePath + fileSeparator + projectName + fileSeparator + ".project", 'utf8');
@@ -335,16 +358,14 @@ function createNewProject(projectName, projectType)
 			var command = "xcopy /e /I \"" + currentWorkingPath + "\\templates\\" + templateName +
 							"\" \"" + rootWorkspacePath + fileSeparator + projectName + "\"";
 		}
-		console.log(command);
+		console.log("Command: " + command);
 		exec(command, resultCommand);
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in createNewProject: " + err);
 	}
 }
-
-
 
 var adb; //The Android adb tool used for debugging on Android clients
 var clearData = false;
@@ -394,7 +415,7 @@ function startDebugging() {
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in startDebugging: " + err);
 	}
 }
 
@@ -435,6 +456,17 @@ function getDebugData()
 	}
 }
 
+/**
+ * Returns a JSON string with the contents of the remote log buffer,
+ * then empties the buffer.
+ */
+function getRemoteLogData()
+{
+	var dataString  = JSON.stringify(gRemoteLogData);
+	gRemoteLogData = [];
+	return dataString;
+}
+
 //This variable always keeps the latest info about all connected devices
 var deviceInfoListJSON = "[]";
 
@@ -442,49 +474,69 @@ var deviceInfoListJSON = "[]";
  * Called by the TCP library whenever a new TCP lient connects to the server.
  * It saves and initializes the client socket.
  */
-function saveClient(socket) {
-	try{
-	clientList.push(socket);
-	socket.setEncoding('utf8'); //We only transfer text messages over the TCP connection
-	socket.on('close',function (had_error) //Executed then the client closes the connection
-					{
-						var address = "-unknown address-";
-						if(socket.deviceInfo != undefined)
-						{
-							address = socket.deviceInfo.address;
-						}
-						console.log("Client " + address + " (" + socket.deviceInfo.name + ") has disconnected." )
-						for(var i = 0; i < clientList.length ; i++)
-						{
-							if(clientList[i].remoteAddress == socket.remoteAddress)
-							{
-								clientList.splice(i,1);
-								generateDeviceInfoListJSON();
-								break;
-							}
-						}
-					});
-	socket.on('data',function(jsonString) //Executed when the client sends data to the server
-					{
-						message = JSON.parse(jsonString); //The data is always in JSON format
-						if(message != undefined);
-						{
-							if(message.type == "deviceInfo") //The device sent it's info upon connecting
-							{
-								//platform, name, uuid, version, phonegap
-								message.type == null;
-								socket.deviceInfo = message;
-								socket.deviceInfo.address = socket.remoteAddress;
-								generateDeviceInfoListJSON();
-								console.log("Client " + socket.remoteAddress +
-										" (" + socket.deviceInfo.name + ") has connected." )
-							}
-						}
-					});
+function saveClient(socket)
+{
+	try
+	{
+		clientList.push(socket);
+
+		// We only transfer text messages over the TCP connection.
+		socket.setEncoding('utf8');
+
+		// Executed then the client closes the connection.
+		socket.on('close',function (had_error)
+		{
+			var address = "-unknown address-";
+			if (socket.deviceInfo != undefined)
+			{
+				address = socket.deviceInfo.address;
+			}
+			console.log(
+				"Client " +
+				address + " (" +
+				socket.deviceInfo.name +
+				") has disconnected.");
+			for (var i = 0; i < clientList.length ; i++)
+			{
+				if (clientList[i].remoteAddress == socket.remoteAddress)
+				{
+					clientList.splice(i,1);
+					generateDeviceInfoListJSON();
+					break;
+				}
+			}
+		});
+
+		// Executed when the client sends data to the server.
+		socket.on('data',function(jsonString)
+		{
+			// The data is always in JSON format.
+			var message = JSON.parse(jsonString);
+			if (message != undefined);
+			{
+				// The device sent it's info upon connecting.
+				if (message.type == "deviceInfo")
+				{
+					// Platform, name, uuid, os version, phonegap version.
+					message.type == null;
+					socket.deviceInfo = message;
+					socket.deviceInfo.address = socket.remoteAddress;
+					generateDeviceInfoListJSON();
+					console.log("Client " + socket.remoteAddress +
+						" (" + socket.deviceInfo.name + ") has connected." )
+				}
+				// The device sent a log message.
+				else if (message.type == "log")
+				{
+					// TODO: Output log message.
+					//socket.deviceInfo.name // the name of the device.
+				}
+			}
+		});
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in saveClient: " + err);
 	}
 }
 
@@ -507,20 +559,24 @@ function generateDeviceInfoListJSON()
  */
 function handleHTTPGet(req, res)
 {
-	try{
+	try
+	{
 		var page = req.url.replace("%20", " ");
-		//A device client requested an app bundle
-		if(page.slice(page.length-14, page.length) == "LocalFiles.bin")
+		
+		// A device client requested an app bundle.
+		if (page.slice(page.length-14, page.length) == "LocalFiles.bin")
 		{
 			var pageSplit = page.split("/");
-			var path = pageSplit[pageSplit.length -2]; //Path to the project folder
-			//Bundle the app
+			// Set path to the project folder.
+			var path = pageSplit[pageSplit.length -2];
+			// Bundle the app.
 			bundleApp(path, function(actualPath){
-				//Send the .bin file when bundling is complete
+				// Send the .bin file when bundling is complete.
 				var data = fs.readFileSync(actualPath);
-				res.writeHead(200, {
+				res.writeHead(200,
+				{
 				  'Content-Length': data.length,
-				  'Content-Type': '	binary'
+				  'Content-Type': 'binary'
 				});
 				res.write(data);
 				res.end("");
@@ -533,9 +589,10 @@ function handleHTTPGet(req, res)
 			findProjects(function(projects){
 				//Sending the page that redirects to the real interface
 				var html = generateHTML(projects);
-				res.writeHead(200, {
+				res.writeHead(200, 
+				{
 				  'Content-Length': html.length,
-				  'Content-Type': '	text/html'
+				  'Content-Type': 'text/html'
 				});
 				res.write(html);
 				res.end("");
@@ -548,7 +605,17 @@ function handleHTTPGet(req, res)
 			var data = getDebugData();
 			res.writeHead(200, {
 			  'Content-Length': data.length,
-			  'Content-Type': '	text/JSON'
+			  'Content-Type': 'text/JSON'
+			});
+			res.end(data);
+		}
+		//Editing page is polling for remote log messages.
+		else if (page == "/getRemoteLogData")
+		{
+			var data = getRemoteLogData();
+			res.writeHead(200, {
+			  'Content-Length': data.length,
+			  'Content-Type': 'text/JSON'
 			});
 			res.end(data);
 		}
@@ -624,14 +691,12 @@ function handleHTTPGet(req, res)
 			  'Content-Type': '	text/html'
 			});
 			res.end(String(localAddress) + ":7000");
-
 		}
-		
 		//Editing page asks the server for the version information
 		else if(page == "/getVersionInfo")
 		{
 			var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
-			
+
 			var versionInfoJSON = JSON.stringify({"version":versionInfo[0], "timestamp": versionInfo[1]});
 			console.log(versionInfoJSON)
 			res.writeHead(200, {
@@ -664,19 +729,29 @@ function handleHTTPGet(req, res)
 			createNewProject(pageSplit[1], pageSplit[2]);
 		}
 		//Editing page asks the server to reload a project
-		else if(page.slice(page.length-15, page.length) == "LocalFiles.html")
+		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
+		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
 			console.log("Reloading project");
-			res.writeHead(200, {
-			});
+			res.writeHead(200, { });
 			res.end();
 
 			//send the new bundle URL to the device clients
-			clientList.forEach(function(client){
+			clientList.forEach(function(client)
+			{
 				var url = page.replace("LocalFiles.html", "LocalFiles.bin");
-				console.log(url);
+				console.log("url: " + url);
 				try
 				{
+					// TODO: We need to send length of url.
+					// First length as hex 8 didgits, e.g.: "000000F0"
+					// Then string data follows.
+					// Update client to read this format.
+					// Or should we use "number:stringdata", e.g.: "5:Hello" ??
+					// Advantage with hex is that we can read fixed numer of bytes
+					// in the read operation.
+					// Convert to hex:
+					// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 					var result = client.write(url, "ascii");
 				}
 				catch(err)
@@ -690,7 +765,19 @@ function handleHTTPGet(req, res)
 				}
 			});
 		}
-		//Default HTTP request, used for sending over UI files to the page
+		// Remote log request.
+		// TODO: Add check for specific index,
+		// once we know the format of "page" data.
+		else if (page.indexOf("/remoteLogMessage/") != -1)
+		{
+			var index = page.indexOf("/remoteLogMessage/");
+			var message = unescape(page.slice(index + 18));
+			console.log("CLIENT LOG: " + message);
+			gRemoteLogData.push(message);
+			res.writeHead(200, { });
+			res.end();
+		}
+		// Default HTTP request, used for sending over UI files to the page.
 		else
 		{
 			try
@@ -721,7 +808,10 @@ function handleHTTPGet(req, res)
 					var data = fs.readFileSync("." + page + "/index.html");
 					res.writeHead(200, {
 					  'Content-Length': data.length,
-					  'Content-Type': 'html'
+					  'Content-Type': 'html',
+					  'Pragma': 'no-cache',
+					  'Cache-Control': 'no-cache',
+					  'Expires': '-1'
 					});
 					res.write(data);
 					res.end("");
@@ -748,7 +838,10 @@ function handleHTTPGet(req, res)
 					var data = fs.readFileSync("." + page);
 					res.writeHead(200, {
 					  'Content-Length': data.length,
-					  'Content-type': contentType
+					  'Content-type': contentType,
+					  'Pragma': 'no-cache',
+					  'Cache-Control': 'no-cache',
+					  'Expires': '-1'
 					});
 					res.write(data);
 					res.end("");
@@ -764,7 +857,7 @@ function handleHTTPGet(req, res)
 	}
 	catch(err)
 	{
-		console.log(err);
+		console.log("Error in handleHTTPGet: " + err);
 	}
 }
 

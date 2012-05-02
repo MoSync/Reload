@@ -8,13 +8,18 @@
 </filter>
 </criteria>
 <properties>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib, yajlD.lib, NotificationD.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="Accelerometer Bluetooth Calendar Camera Compass Contacts File\ Storage Gyroscope Internet\ Access Location Location/Coarse Location/Fine Orientation Power\ Management Proximity Push\ Notifications SMS Vibration"/>
+<property key="build.prefs:extra.link.sw/Debug" value="-master-dump"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:memory.data/Debug" value="4096"/>
 <property key="build.prefs:memory.data/Release" value="8192"/>
@@ -25,6 +30,7 @@
 <property key="build.prefs:project.type" value=""/>
 <property key="com.mobilesorcery.sdk.html5.support" value="true"/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.html5.hybrid"/>

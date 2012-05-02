@@ -54,7 +54,11 @@ using namespace Wormhole; // Wormhole library.
 /**
  * The application class.
  */
-class ReloadClient : public WebAppMoblet, ConnectionListener, DownloadListener
+class ReloadClient :
+	public WebAppMoblet,
+	public ConnectionListener,
+	public DownloadListener,
+	public LogMessageListener
 {
 public:
 	ReloadClient();
@@ -175,6 +179,18 @@ public:
 
 	void connReadFinished(Connection *conn, int result){}
 
+	/**
+	 * Set the url to be used for remote log messages.
+	 * @param url The url to use for the remote logging service,
+	 * for example: "http://localhost:8282/log/"
+	 */
+	void setRemoteLogURL(const MAUtil::String& url);
+
+	/**
+	 * Method in interface LogMessageListener.
+	 */
+	void onLogMessage(const char* message, const char* url);
+
 private:
 	Connection mSocket;
 	bool hasPage;
@@ -224,8 +240,6 @@ private:
 	 */
 	Downloader *mDownloader;
 
-
-
 	/**
 	 * A placeholder that holds the bundle as it's
 	 * being downloaded
@@ -251,6 +265,11 @@ private:
 	 * The TCP port we are connecting to
 	 */
 	String mPort;
+
+	/**
+	 * Address of url that will receive remote log messages.
+	 */
+	MAUtil::String mRemoteLogURL;
 };
 
 #endif /* RELOADCLIENT_H_ */
