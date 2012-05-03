@@ -13,7 +13,7 @@
 <body onload="prettyPrint()">
 <div id="header_bar">
 		<h1>
-<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.1</h1>
+<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.2</h1>
 		<small>JavaScript API Documentation</small>
 	</div>
 <div id="main_container">
@@ -47,6 +47,8 @@
 <ul>
 <li><a href="mosync-resource.js.html#mosync.resource.loadImage">mosync.resource.loadImage</a></li>
 <li><a href="mosync-resource.js.html#mosync.resource.loadRemoteImage">mosync.resource.loadRemoteImage</a></li>
+<li><a href="mosync-resource.js.html#mosync.resource.sendRemoteLogMessage">mosync.resource.sendRemoteLogMessage</a></li>
+<li><a href="mosync-resource.js.html#mosync.rlog">mosync.rlog</a></li>
 </ul>
 <h1><a name="mosync.resource.loadImage">mosync.resource.loadImage</a></h1>
 
@@ -95,6 +97,30 @@
             myImageButton.setProperty("image", imageHandle);
         });
 </code></pre>
+
+<h1><a name="mosync.resource.sendRemoteLogMessage">mosync.resource.sendRemoteLogMessage</a></h1>
+
+<p>Send a log message to a remote server. This is a useful way
+to display debug info when developing/testing on a device.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>message</strong> The message to be sent, for example "Hello World".</li>
+<li>
+<strong>url</strong> Optional parameter the specifies the remove server
+to handle the log request, for example: "http://localhost:8282/log/".
+If this parameter is not supplied or set to null, "undefined" will
+be passed to the C++ message handler, and the url set in C++
+code will be used.</li>
+</ul>
+<h1><a name="mosync.rlog">mosync.rlog</a></h1>
+
+<p>Short alias for <a href="mosync-resource.js.html#mosync.resource.sendRemoteLogMessage">mosync.resource.sendRemoteLogMessage</a>.
+Set the url of the logging service in C++ code, then
+just use <a href="mosync-resource.js.html#mosync.rlog">mosync.rlog</a>("Hello World") in your JS code.
+"rlog" is short for "remote log".</p>
 
 	</div>
 
