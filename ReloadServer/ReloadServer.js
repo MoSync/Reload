@@ -205,10 +205,10 @@ function bundleApp(projectDir, callback) {
 		  bundleCommand = "bin/linux/Bundle";
 		}
 
-		var command =  bundleCommand + " -in " + rootWorkspacePath +
-			fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
+		var command =  bundleCommand + " -in \"" + rootWorkspacePath +
+			fileSeparator + projectDir + fileSeparator + "LocalFiles\" -out \"" +
 			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
-			"LocalFiles.bin";
+			"LocalFiles.bin\"";
 		exec(command, puts);
 	}
 	catch(err)
@@ -281,7 +281,7 @@ function openProjectFolder(projectFolder)
 		}
 		if((localPlatform.indexOf("darwin") >= 0))
 		{
-			var command = "open " + rootWorkspacePath + fileSeparator + projectFolder + "/LocalFiles";
+			var command = "open " + rootWorkspacePath + fileSeparator + fixPathsUnix(projectFolder) + "/LocalFiles";
 		}
 		else if ((localPlatform.indexOf("linux") >=0))
 		{
@@ -289,16 +289,16 @@ function openProjectFolder(projectFolder)
 			var commandStat = fs.statSync("/usr/bin/nautilus");
 			if(commandStat.isFile())
 			{
-			  var command = "nautilus " + rootWorkspacePath + fileSeparator + projectFolder + "/LocalFiles &";
+			  var command = "nautilus " + rootWorkspacePath + fileSeparator + fixPathsUnix(projectFolder) + "/LocalFiles &";
 			}
 			else
 			{
-			  var command = "dolphin " + rootWorkspacePath + fileSeparator + projectFolder + "/LocalFiles &";
+			  var command = "dolphin " + rootWorkspacePath + fileSeparator + fixPathsUnix(projectFolder) + "/LocalFiles &";
 			}
 		}
 		else
 		{
-			var command = "explorer " + rootWorkspacePath + fileSeparator + projectFolder + "\\LocalFiles";
+			var command = "explorer \"" + rootWorkspacePath + fileSeparator + projectFolder + "\\LocalFiles\"";
 		}
 		exec(command, puts);
 	}
@@ -310,7 +310,18 @@ function openProjectFolder(projectFolder)
 
 function fixPathsUnix(path)
 {
-	return path.replace(" ", "\\ ");
+	var pathTemp = path;
+	while(pathTemp.indexOf(" ") >0)
+	{
+		console.log(pathTemp.indexOf(" "))
+		pathTemp = pathTemp.replace(" ", "%20");
+	}
+	while(pathTemp.indexOf("%20") >0)
+	{
+		console.log(pathTemp.indexOf("%20"))
+		pathTemp = pathTemp.replace("%20", "\\ ");
+	}
+	return pathTemp
 }
 
 /**
@@ -561,7 +572,7 @@ function handleHTTPGet(req, res)
 {
 	try
 	{
-		var page = req.url.replace("%20", " ");
+		var page = unescape(req.url);
 		
 		// A device client requested an app bundle.
 		if (page.slice(page.length-14, page.length) == "LocalFiles.bin")
