@@ -105,6 +105,11 @@ ReloadClient::ReloadClient() :
 		maPanic(0,"Could not read info file");
 	}
 
+	// Set the beep sound. This is defined in the
+	// Resources/Resources.lst file. You can change
+	// this by changing the sound file in that folder.
+	mPhoneGapMessageHandler.setBeepSound(BEEP_WAV);
+
 	// Enable message sending from JavaScript to C++.
 	enableWebViewMessages();
 	// Show the WebView that contains the HTML/CSS UI
