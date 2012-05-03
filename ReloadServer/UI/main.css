@@ -17,6 +17,7 @@
 body {
 	background-color: #434343;
 }
+a img {border: none; }
 
 #HeaderContainer {
 	width: 100%;
