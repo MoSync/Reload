@@ -30,9 +30,11 @@
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="stylesheet" href="main.css"  charset="UTF-8"/>
 		<link rel="stylesheet" href="jquery-ui-1.8.16.custom.css"  charset="UTF-8"/>
+
 		<script language="JavaScript" charset="UTF-8" src="jquery-1.7.1.js"></script>
 		<script language="JavaScript" charset="UTF-8" src="jquery-ui-1.8.16.custom.min.js"></script>
 		<script language="JavaScript" charset="UTF-8">
+
 			$(function() {
 				$(".ui-tabs .ui-tabs-nav li").each(function() {
 					  $(this).prependTo($(this).parent());
@@ -367,6 +369,15 @@
 			}
 
 			function initialize() {
+				var isIEFireFox=navigator.userAgent.match(/(Mozilla)|(MSIE)|(Opera)/gi)
+				if(isIEFireFox)
+				{
+
+					var docframe = document.getElementById("docsFrame");
+					docframe.style.height = '700px';
+					var welcomeframe = document.getElementById("WelcomeFrame");
+					welcomeframe.style.height = '700px';
+				}
 				getVersionInfo();
 				getServerAddress();
 				startUpdatingPorjects();
