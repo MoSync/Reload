@@ -336,7 +336,16 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 		lprintfln("FileURL:%s\n",mBundleAddress);
 		//Reset the app environment (destroy widgets, stop sensors)
         freeHardware();
+
+        // Download the bundle.
         downloadBundle();
+
+        // Use this to use experimental HTML download.
+        // Needs divineprog/LiveApps/FileServer to work
+        // and manual config of BasePath.
+        // Comment out downloadBundle when testing this.
+        //downloadHTML();
+
 		//Set the socket to receive the next TCP message
 		mSocket.recv(mBuffer, 1024);
 	}
@@ -347,6 +356,52 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 		//Go back to the login screen on an error
 		mLoginScreen->show();
 	}
+}
+
+/**
+ * New function called to download index.html from the server.
+ */
+void ReloadClient::downloadHTML()
+{
+	// Clear web view cache.
+	getWebView()->setProperty("cache", "clearall");
+
+	//We do lazy initialization of the NativeUI message handler for the
+	//sake of WP7
+	if (mNativeUIMessageHandler == NULL)
+	{
+		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
+	}
+
+	// Make the WebView visible.
+	showWebView();
+
+	// Set URL (uses experimental port).
+	String url = "http://";
+	url += mServerAddress + ":4042/index.html";
+	lprintfln("downloadHTML: %s", url.c_str());
+
+	// Open the page.
+	getWebView()->openURL(url);
+
+	hasPage = true;
+
+	//Send the Device Screen size to JavaScript
+	MAExtent scrSize = maGetScrSize();
+	int width = EXTENT_X(scrSize);
+	int height = EXTENT_Y(scrSize);
+	char buf[512];
+	sprintf(
+			buf,
+			"{mosyncScreenWidth=%d, mosyncScreenHeight = %d;}",
+			width,
+			height);
+	//lprintfln(buf);
+	callJS(buf);
+
+	// Initialize PhoneGap.
+	mPhoneGapMessageHandler.initializePhoneGap();
+	mRunningApp = true;
 }
 
 void ReloadClient::downloadBundle()
