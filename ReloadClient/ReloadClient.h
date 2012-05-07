@@ -179,6 +179,10 @@ public:
 
 	void connReadFinished(Connection *conn, int result){}
 
+	void clearAppsFolder();
+
+	void deleteFolderRecurse(const char *path);
+
 	/**
 	 * Set the url to be used for remote log messages.
 	 * @param url The url to use for the remote logging service,
@@ -271,6 +275,10 @@ private:
 	 */
 	MAUtil::String mRemoteLogURL;
 
+	/**
+	 * The general folder where app files reside
+	 */
+	String mAppsFolder;
 	/**
 	 * The relative path to the downloaded app folder
 	 */
