@@ -118,6 +118,8 @@ public:
 	//We received a TCP message from the server
 	void connRecvFinished(Connection *conn, int result);
 
+	void downloadHTML();
+
 	//Download the bundle
 	void downloadBundle();
 
@@ -193,6 +195,8 @@ public:
 
 private:
 	Connection mSocket;
+
+	// TODO: Rename to mHasPage.
 	bool hasPage;
 
 	/**
