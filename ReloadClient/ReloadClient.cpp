@@ -35,7 +35,8 @@ ReloadClient::ReloadClient() :
 		hasPage(false),
 		mPhoneGapMessageHandler(getWebView()),
 		mResourceMessageHandler(getWebView()),
-		mPort(":7000")
+		mPort(":7000"),
+		mAppsFolder("apps/")
 {
 	char buffer[64];
 	maGetSystemProperty(
@@ -44,6 +45,14 @@ ReloadClient::ReloadClient() :
 				64);
 	mOS = buffer;
 	mNativeUIMessageHandler = NULL;
+
+	MAHandle appDirHandle = maFileOpen((mFileUtil->getLocalPath() + mAppsFolder).c_str(), MA_ACCESS_READ_WRITE);
+	if(!maFileExists(appDirHandle))
+	{
+		lprintfln("Creating Apps folder:%s", (mFileUtil->getLocalPath() + mAppsFolder).c_str());
+		maFileCreate(appDirHandle);
+	}
+	maFileClose(appDirHandle);
 
 	mLoginScreen = new LoginScreen(this);
 	mLoadingScreen = new LoadingScreen(this);
@@ -360,16 +369,10 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     lprintfln("Completed download");
     //extract the file System
     setCurrentFileSystem(data, 0);
-    MAHandle appDirHandle = maFileOpen((mFileUtil->getLocalPath() + mAppPath).c_str(), MA_ACCESS_READ_WRITE);
-    if(maFileExists(appDirHandle))
-    {
-    	lprintfln("Deleting file");
-    	maFileDelete(appDirHandle);
-    }
+    clearAppsFolder();
     char buf[128];
-    sprintf(buf, "%d", maGetMilliSecondCount());
+    sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
     mAppPath = buf;
-    mAppPath.append("/", 1);
     lprintfln("App Path:%s", mAppPath.c_str());
     int result = MAFS_extractCurrentFileSystem((mFileUtil->getLocalPath() + mAppPath).c_str());
     freeCurrentFileSystem();
@@ -440,7 +443,7 @@ void ReloadClient::freeHardware()
 	{
 		maSensorStop(i);
 	}
-	getWebView()->openURL("about:blank");
+	//getWebView()->openURL("justadummyhtmlfiletofoolthecacheinios5.html");
 }
 
 /**
@@ -554,4 +557,43 @@ void ReloadClient::disconnect()
 	//Close the socket, and show the connect controls again
 	mSocket.close();
 	mLoginScreen->disconnected();
+}
+
+void ReloadClient::clearAppsFolder()
+{
+	deleteFolderRecurse((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+	/*MAHandle appDirHandle = maFileOpen(path, MA_ACCESS_READ_WRITE);
+	if(maFileExists(appDirHandle))
+	{
+		lprintfln("Deleting folder:%s", path);
+		maFileDelete(appDirHandle);
+	}
+	maFileClose(appDirHandle);*/
+}
+
+void ReloadClient::deleteFolderRecurse(const char *path)
+{
+	char fileName[128];
+	char fullPath[256];
+	lprintfln("Deleting contents of folder:%s", path);
+	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
+	int length = maFileListNext(list, fileName, 128);
+	while(length > 0)
+	{
+		lprintfln("Filename:%s", fileName);
+		sprintf(fullPath,"%s%s", path, fileName);
+		if(fileName[length-1] == '/')
+		{
+			deleteFolderRecurse(fullPath);
+		}
+		MAHandle appDirHandle = maFileOpen(fullPath, MA_ACCESS_READ_WRITE);
+		if(maFileExists(appDirHandle))
+		{
+			lprintfln("Deleting file:%s", fileName);
+			maFileDelete(appDirHandle);
+		}
+		maFileClose(appDirHandle);
+		length = maFileListNext(list, fileName, 128);
+	}
+	maFileListClose(list);
 }

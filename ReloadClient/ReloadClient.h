@@ -175,6 +175,10 @@ public:
 
 	void connReadFinished(Connection *conn, int result){}
 
+	void clearAppsFolder();
+
+	void deleteFolderRecurse(const char *path);
+
 private:
 	Connection mSocket;
 	bool hasPage;
@@ -252,6 +256,10 @@ private:
 	 */
 	String mPort;
 
+	/**
+	 * The general folder where app files reside
+	 */
+	String mAppsFolder;
 	/**
 	 * The relative path to the downloaded app folder
 	 */
