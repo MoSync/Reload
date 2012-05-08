@@ -42,6 +42,7 @@ MA 02110-1301, USA.
 
 #include "LoginScreen.h"
 #include "LoadingScreen.h"
+#include "ReloadFile.h"
 
 class LoginScreen;
 class LoadingScreen;
@@ -223,6 +224,11 @@ private:
 	 * Handler for PhoneGap messages.
 	 */
 	PhoneGapMessageHandler mPhoneGapMessageHandler;
+
+	/**
+	 * Special handler for local filesystem messages
+	 */
+	ReloadFile mReloadFile;
 
 	/**
 	 * Handler for NativeUI messages

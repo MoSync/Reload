@@ -64,6 +64,7 @@ ReloadClient::ReloadClient() :
 		mSocket(this),
 		hasPage(false),
 		mPhoneGapMessageHandler(getWebView()),
+		mReloadFile(&mPhoneGapMessageHandler),
 		mResourceMessageHandler(getWebView()),
 		mPort(":7000"),
 		mAppsFolder("apps/")
@@ -215,7 +216,16 @@ void ReloadClient::handleMessageStreamJSON(WebView* webView, MAHandle data)
 		// This detects the PhoneGap protocol.
 		if (message.is("PhoneGap"))
 		{
-			mPhoneGapMessageHandler.handlePhoneGapMessage(message);
+			//The local file system is different from a normal Wormhole app, we need to intervene in the
+			//normal API call
+			if (message.getParam("service") == "File" && message.getParam("action")=="requestFileSystem")
+			{
+				mReloadFile.actionRequestFileSystem(message);
+			}
+			else
+			{
+				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
+			}
 		}
 		// Here we add our own messages. See index.html for
 		// the JavaScript code used to send the message.
@@ -421,7 +431,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
     mAppPath = buf;
     lprintfln("App Path:%s", mAppPath.c_str());
-    int result = MAFS_extractCurrentFileSystem((mFileUtil->getLocalPath() + mAppPath).c_str());
+    String fullPath = mFileUtil->getLocalPath() + mAppPath;
+    int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
+    mReloadFile.setLocalPath(fullPath);
     freeCurrentFileSystem();
     maDestroyPlaceholder(mResourceFile);
     if(result > 0)
