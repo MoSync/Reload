@@ -279,9 +279,15 @@ void LoginScreen::editBoxReturn(EditBox* editBox)
  */
 void LoginScreen::buttonClicked(Widget *button)
 {
+	//Trim the beggining and end of the string of any spaces.
+	int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
+	int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
+	lastCharPos = (lastCharPos != String::npos)?lastCharPos - 1:mServerIPBox->getText().length() - 1;
+	String address = mServerIPBox->getText().substr(firstCharPos, lastCharPos - firstCharPos + 1);
+
 	if(button == mServerConnectButton)
 	{
-		mReloadClient->connectTo(mServerIPBox->getText().c_str());
+		mReloadClient->connectTo(address.c_str());
 		mServerIPBox->hideKeyboard(); //Needed for iOS
 	}
 	else if(button == mServerDisconnectButton)
