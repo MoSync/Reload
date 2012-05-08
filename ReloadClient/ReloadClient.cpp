@@ -494,15 +494,18 @@ void ReloadClient::freeHardware()
 {
 	if(hasPage)
 	{
-		//Currently crashes
-		//callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
+		//We delete the widgets on platforms that are NOT WP7
+		if(mOS.find("Windows", 0) < 0)
+		{
+			callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
+		}
 	}
 	//Try stopping all sensors
 	for(int i= 1; i<=6; i++)
 	{
 		maSensorStop(i);
 	}
-	//getWebView()->openURL("justadummyhtmlfiletofoolthecacheinios5.html");
+
 }
 
 /**
@@ -621,13 +624,6 @@ void ReloadClient::disconnect()
 void ReloadClient::clearAppsFolder()
 {
 	deleteFolderRecurse((mFileUtil->getLocalPath() + mAppsFolder).c_str());
-	/*MAHandle appDirHandle = maFileOpen(path, MA_ACCESS_READ_WRITE);
-	if(maFileExists(appDirHandle))
-	{
-		lprintfln("Deleting folder:%s", path);
-		maFileDelete(appDirHandle);
-	}
-	maFileClose(appDirHandle);*/
 }
 
 void ReloadClient::deleteFolderRecurse(const char *path)
