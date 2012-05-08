@@ -64,8 +64,10 @@ ReloadClient::ReloadClient() :
 		mSocket(this),
 		hasPage(false),
 		mPhoneGapMessageHandler(getWebView()),
+		mReloadFile(&mPhoneGapMessageHandler),
 		mResourceMessageHandler(getWebView()),
-		mPort(":7000")
+		mPort(":7000"),
+		mAppsFolder("apps/")
 {
 	char buffer[64];
 	maGetSystemProperty(
@@ -74,6 +76,14 @@ ReloadClient::ReloadClient() :
 				64);
 	mOS = buffer;
 	mNativeUIMessageHandler = NULL;
+
+	MAHandle appDirHandle = maFileOpen((mFileUtil->getLocalPath() + mAppsFolder).c_str(), MA_ACCESS_READ_WRITE);
+	if(!maFileExists(appDirHandle))
+	{
+		lprintfln("Creating Apps folder:%s", (mFileUtil->getLocalPath() + mAppsFolder).c_str());
+		maFileCreate(appDirHandle);
+	}
+	maFileClose(appDirHandle);
 
 	mLoginScreen = new LoginScreen(this);
 	mLoadingScreen = new LoadingScreen(this);
@@ -201,7 +211,16 @@ void ReloadClient::handleMessageStreamJSON(WebView* webView, MAHandle data)
 		// This detects the PhoneGap protocol.
 		if (message.is("PhoneGap"))
 		{
-			mPhoneGapMessageHandler.handlePhoneGapMessage(message);
+			//The local file system is different from a normal Wormhole app, we need to intervene in the
+			//normal API call
+			if (message.getParam("service") == "File" && message.getParam("action")=="requestFileSystem")
+			{
+				mReloadFile.actionRequestFileSystem(message);
+			}
+			else
+			{
+				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
+			}
 		}
 		// Here we add our own messages. See index.html for
 		// the JavaScript code used to send the message.
@@ -457,7 +476,14 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     lprintfln("Completed download");
     //extract the file System
     setCurrentFileSystem(data, 0);
-    int result = MAFS_extractCurrentFileSystem(mFileUtil->getLocalPath().c_str());
+    clearAppsFolder();
+    char buf[128];
+    sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
+    mAppPath = buf;
+    lprintfln("App Path:%s", mAppPath.c_str());
+    String fullPath = mFileUtil->getLocalPath() + mAppPath;
+    int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
+    mReloadFile.setLocalPath(fullPath);
     freeCurrentFileSystem();
     maDestroyPlaceholder(mResourceFile);
     if(result > 0)
@@ -482,7 +508,7 @@ void ReloadClient::loadSavedApp()
 
 	// Check that index.html is there.
 	int result = mFileUtil->openFileForReading(
-		mFileUtil->getLocalPath() + "index.html");
+		mFileUtil->getLocalPath() + mAppPath + "index.html");
 	if (result < 0)
 	{
 		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
@@ -495,9 +521,8 @@ void ReloadClient::loadSavedApp()
 		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
 	}
 	showWebView();
-
 	// Open the page.
-	getWebView()->openURL("index.html");
+	getWebView()->openURL(mAppPath + "index.html");
 	hasPage = true;
 	//Send the Device Screen size to JavaScript
 	MAExtent scrSize = maGetScrSize();
@@ -525,14 +550,18 @@ void ReloadClient::freeHardware()
 {
 	if(hasPage)
 	{
-		//Currently crashes
-		//callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
+		//We delete the widgets on platforms that are NOT WP7
+		if(mOS.find("Windows", 0) < 0)
+		{
+			callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
+		}
 	}
 	//Try stopping all sensors
 	for(int i= 1; i<=6; i++)
 	{
 		maSensorStop(i);
 	}
+
 }
 
 /**
@@ -648,7 +677,6 @@ void ReloadClient::disconnect()
 	mLoginScreen->disconnected();
 }
 
-
 /**
  * Set the url to be used for remote log messages.
  * @param url The url to use for the remote logging service,
@@ -678,4 +706,36 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 	// Send request to server.
 	RemoteLogConnection* connection = new RemoteLogConnection();
 	connection->get(request.c_str());
+}
+
+void ReloadClient::clearAppsFolder()
+{
+	deleteFolderRecurse((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+}
+
+void ReloadClient::deleteFolderRecurse(const char *path)
+{
+	char fileName[128];
+	char fullPath[256];
+	lprintfln("Deleting contents of folder:%s", path);
+	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
+	int length = maFileListNext(list, fileName, 128);
+	while(length > 0)
+	{
+		lprintfln("Filename:%s", fileName);
+		sprintf(fullPath,"%s%s", path, fileName);
+		if(fileName[length-1] == '/')
+		{
+			deleteFolderRecurse(fullPath);
+		}
+		MAHandle appDirHandle = maFileOpen(fullPath, MA_ACCESS_READ_WRITE);
+		if(maFileExists(appDirHandle))
+		{
+			lprintfln("Deleting file:%s", fileName);
+			maFileDelete(appDirHandle);
+		}
+		maFileClose(appDirHandle);
+		length = maFileListNext(list, fileName, 128);
+	}
+	maFileListClose(list);
 }
