@@ -42,6 +42,7 @@ MA 02110-1301, USA.
 
 #include "LoginScreen.h"
 #include "LoadingScreen.h"
+#include "ReloadFile.h"
 
 class LoginScreen;
 class LoadingScreen;
@@ -193,6 +194,17 @@ public:
 	 */
 	void onLogMessage(const char* message, const char* url);
 
+	/**
+	 * Clears the folder containing the Reloaded app files.
+	 */
+	void clearAppsFolder();
+
+	/**
+	 * Deletes the folder and it's contents
+	 */
+	void deleteFolderRecurse(const char *path);
+
+
 private:
 	Connection mSocket;
 
@@ -223,6 +235,11 @@ private:
 	 * Handler for PhoneGap messages.
 	 */
 	PhoneGapMessageHandler mPhoneGapMessageHandler;
+
+	/**
+	 * Special handler for local filesystem messages
+	 */
+	ReloadFile mReloadFile;
 
 	/**
 	 * Handler for NativeUI messages
@@ -274,6 +291,17 @@ private:
 	 * Address of url that will receive remote log messages.
 	 */
 	MAUtil::String mRemoteLogURL;
+
+	/**
+	 * The general folder where app files reside
+	 */
+
+	String mAppsFolder;
+	/**
+	 * The relative path to the downloaded app folder
+	 */
+	String mAppPath;
+
 };
 
 #endif /* RELOADCLIENT_H_ */
