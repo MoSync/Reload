@@ -277,11 +277,6 @@ private:
 	String mPort;
 
 	/**
-	 * Address of url that will receive remote log messages.
-	 */
-	MAUtil::String mRemoteLogURL;
-
-	/**
 	 * The general folder where app files reside
 	 */
 	String mAppsFolder;
