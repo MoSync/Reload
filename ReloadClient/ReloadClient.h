@@ -276,6 +276,10 @@ private:
 	 */
 	String mPort;
 
+	String mRemoteLogURL;
+
+	bool mNativeUIMessageReceived;
+
 	/**
 	 * The general folder where app files reside
 	 */

@@ -63,6 +63,7 @@ public:
 ReloadClient::ReloadClient() :
 		mSocket(this),
 		hasPage(false),
+		mNativeUIMessageReceived(false),
 		mPhoneGapMessageHandler(getWebView()),
 		mReloadFile(&mPhoneGapMessageHandler),
 		mResourceMessageHandler(getWebView()),
@@ -264,6 +265,19 @@ void ReloadClient::handleMessageStream(WebView* webView, MAHandle data)
 	{
 		if (0 == strcmp(p, "NativeUI"))
 		{
+			//If this is the first NativeUI message we recieve (init), we also hijack the
+			//loadImage function to point to the new relative path
+			if(!mNativeUIMessageReceived)
+			{
+				char buff[256];
+				sprintf(buff,"mosync.resource.loadImageOld = mosync.resource.loadImage;"
+						" mosync.resource.loadImage = function(imagePath, imageID, successCallback)"
+						"{"
+						"mosync.resource.loadImageOld('%s' + imagePath, imageID, successCallback)"
+						"}",mAppPath.c_str());
+				getWebView()->callJS(buff);
+				mNativeUIMessageReceived = true;
+			}
 			//Forward NativeUI messages to the respective message handler
 			mNativeUIMessageHandler->handleMessage(stream);
 		}
@@ -495,11 +509,12 @@ void ReloadClient::freeHardware()
 	if(hasPage)
 	{
 		//We delete the widgets on platforms that are NOT WP7
-		if(mOS.find("Windows", 0) < 0)
+		/*if(mOS.find("Windows", 0) < 0)
 		{
 			callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
-		}
+		}*/
 	}
+	mNativeUIMessageReceived = false;
 	//Try stopping all sensors
 	for(int i= 1; i<=6; i++)
 	{
