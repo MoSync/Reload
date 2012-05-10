@@ -750,7 +750,7 @@ function handleHTTPGet(req, res)
 			//send the new bundle URL to the device clients
 			clientList.forEach(function(client)
 			{
-				var url = page.replace("LocalFiles.html", "LocalFiles.bin");
+				var url = page.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
 				console.log("url: " + url);
 				try
 				{
