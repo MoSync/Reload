@@ -260,6 +260,8 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 
 void LoginScreen::show()
 {
+	mConnectLayout->setVisible(true);
+	mDisconnectLayout->setVisible(false);
 	mLoginScreen->show();
 }
 
