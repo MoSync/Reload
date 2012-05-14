@@ -134,7 +134,7 @@ ReloadClient::ReloadClient() :
 	Environment::getEnvironment().addCustomEventListener(this);
 
 	mRunningApp = false;
-	mLoginScreen->show();
+	mLoginScreen->show(false);
 
 	mResourceMessageHandler.setLogMessageListener(this);
 }
@@ -383,7 +383,7 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 		printf("connRecvFinished result %d", result);
 		showConErrorMessage(result);
 		//Go back to the login screen on an error
-		mLoginScreen->show();
+		mLoginScreen->show(false);
 	}
 }
 
@@ -615,7 +615,7 @@ void ReloadClient::showConErrorMessage(int errorCode)
 void ReloadClient::cancelDownload()
 {
 	mDownloader->cancelDownloading();
-	mLoginScreen->show();
+	mLoginScreen->show(true);
 }
 
 void ReloadClient::connectTo(const char *serverAddress)

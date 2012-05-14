@@ -258,10 +258,18 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mLoginScreen->setMainWidget(mainLayout);
 }
 
-void LoginScreen::show()
+void LoginScreen::show(bool connected)
 {
-	mConnectLayout->setVisible(true);
-	mDisconnectLayout->setVisible(false);
+	if(connected)
+	{
+		mConnectLayout->setVisible(false);
+		mDisconnectLayout->setVisible(true);
+	}
+	else
+	{
+		mConnectLayout->setVisible(true);
+		mDisconnectLayout->setVisible(false);
+	}
 	mLoginScreen->show();
 }
 

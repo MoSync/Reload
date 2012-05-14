@@ -53,7 +53,11 @@ public:
 	 */
 	void editBoxReturn(EditBox* editBox);
 
-	void show();
+	/**
+	 * Show the login screen in the desired state
+	 * @param connected If true, show the "connected" controls
+	 */
+	void show(bool connected);
 
 	void connectedTo(const char *serverAddress);
 
