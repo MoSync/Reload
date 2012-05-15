@@ -744,7 +744,7 @@ function handleHTTPGet(req, res)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
 			console.log("Reloading project");
-			res.writeHead(200, { });
+			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
 
 			//send the new bundle URL to the device clients
