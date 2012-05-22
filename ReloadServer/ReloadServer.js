@@ -746,12 +746,15 @@ function handleHTTPGet(req, res)
 			console.log("Reloading project");
 			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
+			//We will send the file size information together with the command as an extra level of integrity checking.
+			var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
+			var url = page.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
 
 			//send the new bundle URL to the device clients
 			clientList.forEach(function(client)
 			{
-				var url = page.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
-				console.log("url: " + url);
+				
+				console.log("url: " + url + "?filesize=" + data.length);
 				try
 				{
 					// TODO: We need to send length of url.
@@ -763,7 +766,9 @@ function handleHTTPGet(req, res)
 					// in the read operation.
 					// Convert to hex:
 					// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
-					var result = client.write(url, "ascii");
+					
+				
+					var result = client.write(url + "?filesize=" + data.length , "ascii");
 				}
 				catch(err)
 				{
