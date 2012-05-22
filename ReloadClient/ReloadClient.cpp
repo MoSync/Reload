@@ -374,11 +374,13 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 			mBuffer);
 		lprintfln("FileURL:%s\n",mBundleAddress);
 
-		char *sizeIdentifier = "?filesize=";
+		const char *sizeIdentifier = "?filesize=";
+		int identifierLength = strlen(sizeIdentifier);
 		char *sizeStr = strchr(mBundleAddress, '?');
-		if(stricmp(sizeStr,sizeIdentifier) == 0)
+		if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
 		{
-			sizeStr += strlen(sizeIdentifier);
+			mBundleAddress[sizeStr - mBundleAddress] = '\0';
+			sizeStr += identifierLength;
 			mBundleSize = atoi(sizeStr);
 		}
 		else
@@ -452,7 +454,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 {
     lprintfln("Completed download");
     //extract the file System
-    if(maGetDataSize(data) < mBundleSize)
+    int recvSize = maGetDataSize(data);
+    lprintfln("Recieved size:%d, expected size:%d", recvSize, mBundleSize);
+    if(recvSize < mBundleSize)
     {
     	maDestroyPlaceholder(mResourceFile);
     	downloadBundle();
