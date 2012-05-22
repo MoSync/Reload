@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/WebViewMessage.h>
 #include "ReloadClient.h"
+#include "mastdlib.h"
 
 #define SERVER_PORT "8282"
 
@@ -372,6 +373,20 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 			SERVER_PORT,
 			mBuffer);
 		lprintfln("FileURL:%s\n",mBundleAddress);
+
+		const char *sizeIdentifier = "?filesize=";
+		int identifierLength = strlen(sizeIdentifier);
+		char *sizeStr = strchr(mBundleAddress, '?');
+		if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
+		{
+			mBundleAddress[sizeStr - mBundleAddress] = '\0';
+			sizeStr += identifierLength;
+			mBundleSize = atoi(sizeStr);
+		}
+		else
+		{
+			maPanic(0,"File size identifier not found");
+		}
 		//Reset the app environment (destroy widgets, stop sensors)
         freeHardware();
         downloadBundle();
@@ -439,6 +454,13 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 {
     lprintfln("Completed download");
     //extract the file System
+    int recvSize = maGetDataSize(data);
+    lprintfln("Recieved size:%d, expected size:%d", recvSize, mBundleSize);
+    if(recvSize < mBundleSize)
+    {
+    	maDestroyPlaceholder(mResourceFile);
+    	downloadBundle();
+    }
     setCurrentFileSystem(data, 0);
     clearAppsFolder();
     char buf[128];
