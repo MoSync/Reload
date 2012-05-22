@@ -211,6 +211,11 @@ private:
 	char mBundleAddress[256];
 
 	/**
+	 * Buffer for the bundle address
+	 */
+	int mBundleSize;
+
+	/**
 	 * Class that handles the Login Screen UI
 	 */
 	LoginScreen *mLoginScreen;
