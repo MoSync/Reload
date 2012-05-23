@@ -42,12 +42,12 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 
 	int centerH = screenWidth / 2;
 	int buttonWidth = (int)((float)screenWidth * 0.75);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonWidth = (int)((float)screenWidth * 0.4);
 	}
 	int buttonHeight = (int)((float)screenWidth * 0.15);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonHeight = (int)((float)screenWidth * 0.07);
 	}
@@ -57,24 +57,28 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		buttonSpacing = (int)((float)buttonHeight * 0.1);
 	}
 	int editBoxHeight = (int)((float)screenHeight * 0.07);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		editBoxHeight = (int)((float)screenHeight * 0.02);
 	}
 	int logoWidth = (int)((float)screenWidth * 0.75);
 	int layoutTop = (int)((float)screenHeight * 0.3);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		layoutTop = (int)((float)screenHeight * 0.25);
 	}
 	int labelHeight = (int)((float)screenHeight * 0.05);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelHeight = (int)((float)screenHeight * 0.025);
 	}
 	int labelWidth = screenWidth;
+	if(os.find("Android", 0) >= 0)
+	{
+		labelWidth = buttonWidth;
+	}
 	int labelSpacing = (int)((float)screenHeight * 0.02);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelSpacing = (int)((float)labelSpacing * 0.01);
 	}
