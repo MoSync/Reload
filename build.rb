@@ -67,7 +67,7 @@ FileUtils.cd "ReloadLauncher/Mac"
 if File.exist?("Reload.app")
   FileUtils.rm_rf "Reload.app"
 end
-sh "platypus -y -P Reload.platypus ./Reload.app"
+sh "platypus -y -P ./Reload.platypus ./Reload.app"
 
 FileUtils.cd main_dir
 
