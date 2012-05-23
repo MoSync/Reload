@@ -183,6 +183,7 @@ function setRootWorkspacePath(path)
 function bundleApp(projectDir, callback) {
 	try
 	{
+		console.log("bundling the app " + projectDir);
 		var exec = require('child_process').exec;
 
 		function puts(error, stdout, stderr)
@@ -581,9 +582,9 @@ function handleHTTPGet(req, res)
 			// Set path to the project folder.
 			var path = pageSplit[pageSplit.length -2];
 			// Bundle the app.
-			bundleApp(path, function(actualPath){
+		//	bundleApp(path, function(actualPath){
 				// Send the .bin file when bundling is complete.
-				var data = fs.readFileSync(actualPath);
+				var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
 				res.writeHead(200,
 				{
 				  'Content-Length': data.length,
@@ -591,7 +592,7 @@ function handleHTTPGet(req, res)
 				});
 				res.write(data);
 				res.end("");
-			});
+		//	});
 		}
 		//Browser requesting the default page
 		else if((page == "/"))
@@ -746,40 +747,47 @@ function handleHTTPGet(req, res)
 			console.log("Reloading project");
 			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
-			//We will send the file size information together with the command as an extra level of integrity checking.
-			var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
-			var url = page.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
+			var pageSplit = page.split("/");
+			var path = pageSplit[pageSplit.length -2];
+			// Bundle the app.
+			bundleApp(path, function(actualPath){
+				//We will send the file size information together with the command as an extra level of integrity checking.
+				console.log("actualPath: " + actualPath)
+				var data = fs.readFileSync(actualPath);
+				var url = page.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
 
-			//send the new bundle URL to the device clients
-			clientList.forEach(function(client)
-			{
-				
-				console.log("url: " + url + "?filesize=" + data.length);
-				try
+				//send the new bundle URL to the device clients
+				clientList.forEach(function(client)
 				{
-					// TODO: We need to send length of url.
-					// First length as hex 8 didgits, e.g.: "000000F0"
-					// Then string data follows.
-					// Update client to read this format.
-					// Or should we use "number:stringdata", e.g.: "5:Hello" ??
-					// Advantage with hex is that we can read fixed numer of bytes
-					// in the read operation.
-					// Convert to hex:
-					// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
-					
-				
-					var result = client.write(url + "?filesize=" + data.length , "ascii");
-				}
-				catch(err)
-				{
-					console.log("could not send data because : " + err)
-					var index = clientList.indexOf(client);
-					if(index != -1)
+
+					console.log("url: " + url + "?filesize=" + data.length);
+					try
 					{
-						clientList.splice(index, 1);
+						// TODO: We need to send length of url.
+						// First length as hex 8 didgits, e.g.: "000000F0"
+						// Then string data follows.
+						// Update client to read this format.
+						// Or should we use "number:stringdata", e.g.: "5:Hello" ??
+						// Advantage with hex is that we can read fixed numer of bytes
+						// in the read operation.
+						// Convert to hex:
+						// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+
+
+						var result = client.write(url + "?filesize=" + data.length , "ascii");
 					}
-				}
-			});
+					catch(err)
+					{
+						console.log("could not send data because : " + err)
+						var index = clientList.indexOf(client);
+						if(index != -1)
+						{
+							clientList.splice(index, 1);
+						}
+					}
+				});
+
+			});			
 		}
 		// Remote log request.
 		// TODO: Add check for specific index,
