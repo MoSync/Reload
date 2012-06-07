@@ -183,6 +183,7 @@ function setRootWorkspacePath(path)
 function bundleApp(projectDir, callback) {
 	try
 	{
+		console.log("bundling the app " + projectDir);
 		var exec = require('child_process').exec;
 
 		function puts(error, stdout, stderr)
@@ -205,10 +206,10 @@ function bundleApp(projectDir, callback) {
 		  bundleCommand = "bin/linux/Bundle";
 		}
 
-		var command =  bundleCommand + " -in " + rootWorkspacePath +
-			fileSeparator + projectDir + fileSeparator + "LocalFiles -out " +
+		var command =  bundleCommand + " -in \"" + rootWorkspacePath +
+			fileSeparator + projectDir + fileSeparator + "LocalFiles\" -out \"" +
 			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
-			"LocalFiles.bin";
+			"LocalFiles.bin\"";
 		exec(command, puts);
 	}
 	catch(err)
@@ -281,7 +282,7 @@ function openProjectFolder(projectFolder)
 		}
 		if((localPlatform.indexOf("darwin") >= 0))
 		{
-			var command = "open " + rootWorkspacePath + fileSeparator + projectFolder + "/LocalFiles";
+			var command = "open " + rootWorkspacePath + fileSeparator + fixPathsUnix(projectFolder) + "/LocalFiles";
 		}
 		else if ((localPlatform.indexOf("linux") >=0))
 		{
@@ -289,16 +290,16 @@ function openProjectFolder(projectFolder)
 			var commandStat = fs.statSync("/usr/bin/nautilus");
 			if(commandStat.isFile())
 			{
-			  var command = "nautilus " + rootWorkspacePath + fileSeparator + projectFolder + "/LocalFiles &";
+			  var command = "nautilus " + rootWorkspacePath + fileSeparator + fixPathsUnix(projectFolder) + "/LocalFiles &";
 			}
 			else
 			{
-			  var command = "dolphin " + rootWorkspacePath + fileSeparator + projectFolder + "/LocalFiles &";
+			  var command = "dolphin " + rootWorkspacePath + fileSeparator + fixPathsUnix(projectFolder) + "/LocalFiles &";
 			}
 		}
 		else
 		{
-			var command = "explorer " + rootWorkspacePath + fileSeparator + projectFolder + "\\LocalFiles";
+			var command = "explorer \"" + rootWorkspacePath + fileSeparator + projectFolder + "\\LocalFiles\"";
 		}
 		exec(command, puts);
 	}
@@ -310,7 +311,18 @@ function openProjectFolder(projectFolder)
 
 function fixPathsUnix(path)
 {
-	return path.replace(" ", "\\ ");
+	var pathTemp = path;
+	while(pathTemp.indexOf(" ") >0)
+	{
+		console.log(pathTemp.indexOf(" "))
+		pathTemp = pathTemp.replace(" ", "%20");
+	}
+	while(pathTemp.indexOf("%20") >0)
+	{
+		console.log(pathTemp.indexOf("%20"))
+		pathTemp = pathTemp.replace("%20", "\\ ");
+	}
+	return pathTemp
 }
 
 /**
@@ -561,7 +573,7 @@ function handleHTTPGet(req, res)
 {
 	try
 	{
-		var page = req.url.replace("%20", " ");
+		var page = unescape(req.url);
 		
 		// A device client requested an app bundle.
 		if (page.slice(page.length-14, page.length) == "LocalFiles.bin")
@@ -570,9 +582,9 @@ function handleHTTPGet(req, res)
 			// Set path to the project folder.
 			var path = pageSplit[pageSplit.length -2];
 			// Bundle the app.
-			bundleApp(path, function(actualPath){
+		//	bundleApp(path, function(actualPath){
 				// Send the .bin file when bundling is complete.
-				var data = fs.readFileSync(actualPath);
+				var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
 				res.writeHead(200,
 				{
 				  'Content-Length': data.length,
@@ -580,7 +592,7 @@ function handleHTTPGet(req, res)
 				});
 				res.write(data);
 				res.end("");
-			});
+		//	});
 		}
 		//Browser requesting the default page
 		else if((page == "/"))
@@ -733,37 +745,49 @@ function handleHTTPGet(req, res)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
 			console.log("Reloading project");
-			res.writeHead(200, { });
+			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
+			var pageSplit = page.split("/");
+			var path = pageSplit[pageSplit.length -2];
+			// Bundle the app.
+			bundleApp(path, function(actualPath){
+				//We will send the file size information together with the command as an extra level of integrity checking.
+				console.log("actualPath: " + actualPath)
+				var data = fs.readFileSync(actualPath);
+				var url = page.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
 
-			//send the new bundle URL to the device clients
-			clientList.forEach(function(client)
-			{
-				var url = page.replace("LocalFiles.html", "LocalFiles.bin");
-				console.log("url: " + url);
-				try
+				//send the new bundle URL to the device clients
+				clientList.forEach(function(client)
 				{
-					// TODO: We need to send length of url.
-					// First length as hex 8 didgits, e.g.: "000000F0"
-					// Then string data follows.
-					// Update client to read this format.
-					// Or should we use "number:stringdata", e.g.: "5:Hello" ??
-					// Advantage with hex is that we can read fixed numer of bytes
-					// in the read operation.
-					// Convert to hex:
-					// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
-					var result = client.write(url, "ascii");
-				}
-				catch(err)
-				{
-					console.log("could not send data because : " + err)
-					var index = clientList.indexOf(client);
-					if(index != -1)
+
+					console.log("url: " + url + "?filesize=" + data.length);
+					try
 					{
-						clientList.splice(index, 1);
+						// TODO: We need to send length of url.
+						// First length as hex 8 didgits, e.g.: "000000F0"
+						// Then string data follows.
+						// Update client to read this format.
+						// Or should we use "number:stringdata", e.g.: "5:Hello" ??
+						// Advantage with hex is that we can read fixed numer of bytes
+						// in the read operation.
+						// Convert to hex:
+						// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+
+
+						var result = client.write(url + "?filesize=" + data.length , "ascii");
 					}
-				}
-			});
+					catch(err)
+					{
+						console.log("could not send data because : " + err)
+						var index = clientList.indexOf(client);
+						if(index != -1)
+						{
+							clientList.splice(index, 1);
+						}
+					}
+				});
+
+			});			
 		}
 		// Remote log request.
 		// TODO: Add check for specific index,

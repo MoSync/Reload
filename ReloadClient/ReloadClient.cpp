@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/WebViewMessage.h>
 #include "ReloadClient.h"
+#include "mastdlib.h"
 
 #define SERVER_PORT "8282"
 
@@ -63,9 +64,12 @@ public:
 ReloadClient::ReloadClient() :
 		mSocket(this),
 		hasPage(false),
+		mNativeUIMessageReceived(false),
 		mPhoneGapMessageHandler(getWebView()),
+		mReloadFile(&mPhoneGapMessageHandler),
 		mResourceMessageHandler(getWebView()),
-		mPort(":7000")
+		mPort(":7000"),
+		mAppsFolder("apps/")
 {
 	char buffer[64];
 	maGetSystemProperty(
@@ -74,6 +78,14 @@ ReloadClient::ReloadClient() :
 				64);
 	mOS = buffer;
 	mNativeUIMessageHandler = NULL;
+
+	MAHandle appDirHandle = maFileOpen((mFileUtil->getLocalPath() + mAppsFolder).c_str(), MA_ACCESS_READ_WRITE);
+	if(!maFileExists(appDirHandle))
+	{
+		lprintfln("Creating Apps folder:%s", (mFileUtil->getLocalPath() + mAppsFolder).c_str());
+		maFileCreate(appDirHandle);
+	}
+	maFileClose(appDirHandle);
 
 	mLoginScreen = new LoginScreen(this);
 	mLoadingScreen = new LoadingScreen(this);
@@ -105,6 +117,11 @@ ReloadClient::ReloadClient() :
 		maPanic(0,"Could not read info file");
 	}
 
+	// Set the beep sound. This is defined in the
+	// Resources/Resources.lst file. You can change
+	// this by changing the sound file in that folder.
+	mPhoneGapMessageHandler.setBeepSound(BEEP_WAV);
+
 	// Enable message sending from JavaScript to C++.
 	enableWebViewMessages();
 	// Show the WebView that contains the HTML/CSS UI
@@ -118,7 +135,7 @@ ReloadClient::ReloadClient() :
 	Environment::getEnvironment().addCustomEventListener(this);
 
 	mRunningApp = false;
-	mLoginScreen->show();
+	mLoginScreen->show(false);
 
 	mResourceMessageHandler.setLogMessageListener(this);
 }
@@ -201,7 +218,16 @@ void ReloadClient::handleMessageStreamJSON(WebView* webView, MAHandle data)
 		// This detects the PhoneGap protocol.
 		if (message.is("PhoneGap"))
 		{
-			mPhoneGapMessageHandler.handlePhoneGapMessage(message);
+			//The local file system is different from a normal Wormhole app, we need to intervene in the
+			//normal API call
+			if (message.getParam("service") == "File" && message.getParam("action")=="requestFileSystem")
+			{
+				mReloadFile.actionRequestFileSystem(message);
+			}
+			else
+			{
+				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
+			}
 		}
 		// Here we add our own messages. See index.html for
 		// the JavaScript code used to send the message.
@@ -240,6 +266,19 @@ void ReloadClient::handleMessageStream(WebView* webView, MAHandle data)
 	{
 		if (0 == strcmp(p, "NativeUI"))
 		{
+			//If this is the first NativeUI message we recieve (init), we also hijack the
+			//loadImage function to point to the new relative path
+			if(!mNativeUIMessageReceived)
+			{
+				char buff[256];
+				sprintf(buff,"mosync.resource.loadImageOld = mosync.resource.loadImage;"
+						" mosync.resource.loadImage = function(imagePath, imageID, successCallback)"
+						"{"
+						"mosync.resource.loadImageOld('%s' + imagePath, imageID, successCallback)"
+						"}",mAppPath.c_str());
+				getWebView()->callJS(buff);
+				mNativeUIMessageReceived = true;
+			}
 			//Forward NativeUI messages to the respective message handler
 			mNativeUIMessageHandler->handleMessage(stream);
 		}
@@ -334,6 +373,20 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 			SERVER_PORT,
 			mBuffer);
 		lprintfln("FileURL:%s\n",mBundleAddress);
+
+		const char *sizeIdentifier = "?filesize=";
+		int identifierLength = strlen(sizeIdentifier);
+		char *sizeStr = strchr(mBundleAddress, '?');
+		if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
+		{
+			mBundleAddress[sizeStr - mBundleAddress] = '\0';
+			sizeStr += identifierLength;
+			mBundleSize = atoi(sizeStr);
+		}
+		else
+		{
+			maPanic(0,"File size identifier not found");
+		}
 		//Reset the app environment (destroy widgets, stop sensors)
         freeHardware();
 
@@ -354,7 +407,7 @@ void ReloadClient::connRecvFinished(Connection *conn, int result)
 		printf("connRecvFinished result %d", result);
 		showConErrorMessage(result);
 		//Go back to the login screen on an error
-		mLoginScreen->show();
+		mLoginScreen->show(false);
 	}
 }
 
@@ -456,8 +509,22 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 {
     lprintfln("Completed download");
     //extract the file System
+    int recvSize = maGetDataSize(data);
+    lprintfln("Recieved size:%d, expected size:%d", recvSize, mBundleSize);
+    if(recvSize < mBundleSize)
+    {
+    	maDestroyPlaceholder(mResourceFile);
+    	downloadBundle();
+    }
     setCurrentFileSystem(data, 0);
-    int result = MAFS_extractCurrentFileSystem(mFileUtil->getLocalPath().c_str());
+    clearAppsFolder();
+    char buf[128];
+    sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
+    mAppPath = buf;
+    lprintfln("App Path:%s", mAppPath.c_str());
+    String fullPath = mFileUtil->getLocalPath() + mAppPath;
+    int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
+    mReloadFile.setLocalPath(fullPath);
     freeCurrentFileSystem();
     maDestroyPlaceholder(mResourceFile);
     if(result > 0)
@@ -477,13 +544,7 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
-	// Clear web view cache.
-	getWebView()->setProperty("cache", "clearall");
-
-	// Check that index.html is there.
-	int result = mFileUtil->openFileForReading(
-		mFileUtil->getLocalPath() + "index.html");
-	if (result < 0)
+	if(mFileUtil->openFileForReading(mFileUtil->getLocalPath() + mAppPath + "index.html") < 0)
 	{
 		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
@@ -495,9 +556,8 @@ void ReloadClient::loadSavedApp()
 		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
 	}
 	showWebView();
-
 	// Open the page.
-	getWebView()->openURL("index.html");
+	getWebView()->openURL(mAppPath + "index.html");
 	hasPage = true;
 	//Send the Device Screen size to JavaScript
 	MAExtent scrSize = maGetScrSize();
@@ -525,14 +585,19 @@ void ReloadClient::freeHardware()
 {
 	if(hasPage)
 	{
-		//Currently crashes
-		//callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
+		//We delete the widgets on platforms that are NOT WP7
+		/*if(mOS.find("Windows", 0) < 0)
+		{
+			callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
+		}*/
 	}
+	mNativeUIMessageReceived = false;
 	//Try stopping all sensors
 	for(int i= 1; i<=6; i++)
 	{
 		maSensorStop(i);
 	}
+
 }
 
 /**
@@ -627,7 +692,7 @@ void ReloadClient::showConErrorMessage(int errorCode)
 void ReloadClient::cancelDownload()
 {
 	mDownloader->cancelDownloading();
-	mLoginScreen->show();
+	mLoginScreen->show(true);
 }
 
 void ReloadClient::connectTo(const char *serverAddress)
@@ -646,6 +711,38 @@ void ReloadClient::disconnect()
 	//Close the socket, and show the connect controls again
 	mSocket.close();
 	mLoginScreen->disconnected();
+}
+
+void ReloadClient::clearAppsFolder()
+{
+	deleteFolderRecurse((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+}
+
+void ReloadClient::deleteFolderRecurse(const char *path)
+{
+	char fileName[128];
+	char fullPath[256];
+	lprintfln("Deleting contents of folder:%s", path);
+	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
+	int length = maFileListNext(list, fileName, 128);
+	while(length > 0)
+	{
+		lprintfln("Filename:%s", fileName);
+		sprintf(fullPath,"%s%s", path, fileName);
+		if(fileName[length-1] == '/')
+		{
+			deleteFolderRecurse(fullPath);
+		}
+		MAHandle appDirHandle = maFileOpen(fullPath, MA_ACCESS_READ_WRITE);
+		if(maFileExists(appDirHandle))
+		{
+			lprintfln("Deleting file:%s", fileName);
+			maFileDelete(appDirHandle);
+		}
+		maFileClose(appDirHandle);
+		length = maFileListNext(list, fileName, 128);
+	}
+	maFileListClose(list);
 }
 
 

@@ -42,6 +42,7 @@ MA 02110-1301, USA.
 
 #include "LoginScreen.h"
 #include "LoadingScreen.h"
+#include "ReloadFile.h"
 
 class LoginScreen;
 class LoadingScreen;
@@ -181,6 +182,10 @@ public:
 
 	void connReadFinished(Connection *conn, int result){}
 
+	void clearAppsFolder();
+
+	void deleteFolderRecurse(const char *path);
+
 	/**
 	 * Set the url to be used for remote log messages.
 	 * @param url The url to use for the remote logging service,
@@ -210,6 +215,11 @@ private:
 	char mBundleAddress[256];
 
 	/**
+	 * Buffer for the bundle address
+	 */
+	int mBundleSize;
+
+	/**
 	 * Class that handles the Login Screen UI
 	 */
 	LoginScreen *mLoginScreen;
@@ -223,6 +233,11 @@ private:
 	 * Handler for PhoneGap messages.
 	 */
 	PhoneGapMessageHandler mPhoneGapMessageHandler;
+
+	/**
+	 * Special handler for local filesystem messages
+	 */
+	ReloadFile mReloadFile;
 
 	/**
 	 * Handler for NativeUI messages
@@ -270,10 +285,18 @@ private:
 	 */
 	String mPort;
 
+	String mRemoteLogURL;
+
+	bool mNativeUIMessageReceived;
+
 	/**
-	 * Address of url that will receive remote log messages.
+	 * The general folder where app files reside
 	 */
-	MAUtil::String mRemoteLogURL;
+	String mAppsFolder;
+	/**
+	 * The relative path to the downloaded app folder
+	 */
+	String mAppPath;
 };
 
 #endif /* RELOADCLIENT_H_ */

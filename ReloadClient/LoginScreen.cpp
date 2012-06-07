@@ -42,12 +42,12 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 
 	int centerH = screenWidth / 2;
 	int buttonWidth = (int)((float)screenWidth * 0.75);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonWidth = (int)((float)screenWidth * 0.4);
 	}
 	int buttonHeight = (int)((float)screenWidth * 0.15);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonHeight = (int)((float)screenWidth * 0.07);
 	}
@@ -57,24 +57,28 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		buttonSpacing = (int)((float)buttonHeight * 0.1);
 	}
 	int editBoxHeight = (int)((float)screenHeight * 0.07);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		editBoxHeight = (int)((float)screenHeight * 0.02);
 	}
 	int logoWidth = (int)((float)screenWidth * 0.75);
 	int layoutTop = (int)((float)screenHeight * 0.3);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		layoutTop = (int)((float)screenHeight * 0.25);
 	}
 	int labelHeight = (int)((float)screenHeight * 0.05);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelHeight = (int)((float)screenHeight * 0.025);
 	}
 	int labelWidth = screenWidth;
+	if(os.find("Android", 0) >= 0)
+	{
+		labelWidth = buttonWidth;
+	}
 	int labelSpacing = (int)((float)screenHeight * 0.02);
-	if(screenHeight > 1000)
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelSpacing = (int)((float)labelSpacing * 0.01);
 	}
@@ -258,8 +262,18 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mLoginScreen->setMainWidget(mainLayout);
 }
 
-void LoginScreen::show()
+void LoginScreen::show(bool connected)
 {
+	if(connected)
+	{
+		mConnectLayout->setVisible(false);
+		mDisconnectLayout->setVisible(true);
+	}
+	else
+	{
+		mConnectLayout->setVisible(true);
+		mDisconnectLayout->setVisible(false);
+	}
 	mLoginScreen->show();
 }
 
@@ -279,9 +293,15 @@ void LoginScreen::editBoxReturn(EditBox* editBox)
  */
 void LoginScreen::buttonClicked(Widget *button)
 {
+	//Trim the beggining and end of the string of any spaces.
+	int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
+	int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
+	lastCharPos = (lastCharPos != String::npos)?lastCharPos - 1:mServerIPBox->getText().length() - 1;
+	String address = mServerIPBox->getText().substr(firstCharPos, lastCharPos - firstCharPos + 1);
+
 	if(button == mServerConnectButton)
 	{
-		mReloadClient->connectTo(mServerIPBox->getText().c_str());
+		mReloadClient->connectTo(address.c_str());
 		mServerIPBox->hideKeyboard(); //Needed for iOS
 	}
 	else if(button == mServerDisconnectButton)

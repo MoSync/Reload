@@ -12,12 +12,12 @@
 	<string>MoSync AB</string>
 	<key>BundledFiles</key>
 	<array>
-		<string>/Users/ali/Work/Reload/ReloadServer/bin</string>
-		<string>/Users/ali/Work/Reload/ReloadServer/ReloadServer.js</string>
-		<string>/Users/ali/Work/Reload/ReloadServer/templates</string>
-		<string>/Users/ali/Work/Reload/ReloadServer/UI</string>
-		<string>/Users/ali/Work/Reload/ReloadServer/agpl-3.0.txt</string>
-		<string>/Users/ali/Work/Reload/ReloadServer/build.dat</string>
+		<string>/Users/ali/Work/ReloadBuild/ReloadServer/bin</string>
+		<string>/Users/ali/Work/ReloadBuild/ReloadServer/build.dat</string>
+		<string>/Users/ali/Work/ReloadBuild/ReloadServer/ReloadServer.js</string>
+		<string>/Users/ali/Work/ReloadBuild/ReloadServer/templates</string>
+		<string>/Users/ali/Work/ReloadBuild/ReloadServer/UI</string>
+		<string>/Users/ali/Work/ReloadBuild/Licenses</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-4.6</string>
@@ -41,11 +41,11 @@
 		<string>fold</string>
 	</array>
 	<key>IconPath</key>
-	<string>/Users/ali/Downloads/Reload_Icon.icns</string>
+	<string>/Users/ali/Work/ReloadBuild/ReloadLauncher/Mac/Reload_Icon.icns</string>
 	<key>Identifier</key>
 	<string>org.MoSync.Reload</string>
 	<key>Interpreter</key>
-	<string>/bin/bash</string>
+	<string>/bin/sh</string>
 	<key>InterpreterArgs</key>
 	<array/>
 	<key>Name</key>
@@ -63,7 +63,7 @@
 	<key>ScriptArgs</key>
 	<array/>
 	<key>ScriptPath</key>
-	<string>/Users/ali/Work/Reload/ReloadServer/reload</string>
+	<string>/Users/ali/Work/ReloadBuild/ReloadServer/reload</string>
 	<key>Secure</key>
 	<false/>
 	<key>ShowInDock</key>
@@ -92,6 +92,6 @@
 	<key>UseXMLPlistFormat</key>
 	<true/>
 	<key>Version</key>
-	<string>0.1 Beta 2</string>
+	<string>0.1 Beta 3</string>
 </dict>
 </plist>
