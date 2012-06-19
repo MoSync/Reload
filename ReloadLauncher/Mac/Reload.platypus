@@ -9,22 +9,22 @@
 	<key>Authentication</key>
 	<false/>
 	<key>Author</key>
-	<string>MoSync AB</string>
+	<string>Iraklis Rossis</string>
 	<key>BundledFiles</key>
 	<array>
-		<string>/Users/ali/Work/ReloadBuild/ReloadServer/bin</string>
-		<string>/Users/ali/Work/ReloadBuild/ReloadServer/build.dat</string>
-		<string>/Users/ali/Work/ReloadBuild/ReloadServer/ReloadServer.js</string>
-		<string>/Users/ali/Work/ReloadBuild/ReloadServer/templates</string>
-		<string>/Users/ali/Work/ReloadBuild/ReloadServer/UI</string>
-		<string>/Users/ali/Work/ReloadBuild/Licenses</string>
+		<string>../../ReloadServer/bin</string>
+		<string>../../ReloadServer/build.dat</string>
+		<string>../../ReloadServer/ReloadServer.js</string>
+		<string>../../ReloadServer/templates</string>
+		<string>../../ReloadServer/UI</string>
+		<string>../../Licenses</string>
 	</array>
 	<key>Creator</key>
-	<string>Platypus-4.6</string>
+	<string>Platypus-4.7</string>
 	<key>DeclareService</key>
 	<false/>
 	<key>Destination</key>
-	<string>/Users/ali/Desktop/MyPlatypusApp.app</string>
+	<string>/Users/iraklis/Desktop/MyPlatypusApp.app</string>
 	<key>DestinationOverride</key>
 	<false/>
 	<key>DevelopmentVersion</key>
@@ -41,9 +41,9 @@
 		<string>fold</string>
 	</array>
 	<key>IconPath</key>
-	<string>/Users/ali/Work/ReloadBuild/ReloadLauncher/Mac/Reload_Icon.icns</string>
+	<string>/tmp/PlatypusIcon.icns</string>
 	<key>Identifier</key>
-	<string>org.MoSync.Reload</string>
+	<string>org.iraklis.Reload</string>
 	<key>Interpreter</key>
 	<string>/bin/sh</string>
 	<key>InterpreterArgs</key>
@@ -55,7 +55,7 @@
 	<key>OptimizeApplication</key>
 	<true/>
 	<key>Output</key>
-	<string>Text Window</string>
+	<string>Progress Bar</string>
 	<key>RemainRunning</key>
 	<true/>
 	<key>Role</key>
@@ -63,7 +63,7 @@
 	<key>ScriptArgs</key>
 	<array/>
 	<key>ScriptPath</key>
-	<string>/Users/ali/Work/ReloadBuild/ReloadServer/reload</string>
+	<string>../../ReloadServer/reload</string>
 	<key>Secure</key>
 	<false/>
 	<key>ShowInDock</key>
@@ -92,6 +92,6 @@
 	<key>UseXMLPlistFormat</key>
 	<true/>
 	<key>Version</key>
-	<string>0.1 Beta 3</string>
+	<string>1.0</string>
 </dict>
 </plist>
