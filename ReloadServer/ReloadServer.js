@@ -135,19 +135,27 @@ getNetworkIP(function (error, ip)
  */
 function getLatestPath()
 {
+	var defaultPath = homeDir + fileSeparator +	"MoSync_Reload_Projects"
 	try
 	{
 		path.exists('lastWorkspace.dat', function(exists)
 		{
 			if (exists)
 			{
-				var data = fs.readFileSync('lastWorkspace.dat', "utf8");
-				setRootWorkspacePath(String(data));
+				var data = String(fs.readFileSync('lastWorkspace.dat', "utf8"));
+				if(data != "")
+				{
+					setRootWorkspacePath(data);
+				}
+				else
+				{
+					console.log("Error reading last workspace path, reverting to default");
+					setRootWorkspacePath(defaultPath);
+				}
 			}
 			else
 			{
-				setRootWorkspacePath(homeDir + fileSeparator +
-					"MoSync_Reload_Projects");
+				setRootWorkspacePath(defaultPath);
 			}
 		});
 	}
