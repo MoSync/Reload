@@ -103,6 +103,14 @@ ReloadClient::ReloadClient() :
 
 	mLoginScreen->defaultAddress(mServerAddress.c_str());
 
+	success = mFileUtil->readTextFromFile(
+		mFileUtil->getLocalPath() + "LastAppDir.txt",
+		mAppPath);
+	if(!success)
+	{
+		mAppPath = "";
+	}
+
 	int size = maGetDataSize(INFO_TEXT);
 	if(size > 0)
 	{
@@ -529,8 +537,10 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     maDestroyPlaceholder(mResourceFile);
     if(result > 0)
     {
+    	mFileUtil->writeTextToFile(mFileUtil->getLocalPath() + "LastAppDir.txt",mAppPath);
     	//Bundle was extracted, load the new app files
     	loadSavedApp();
+
     }
     else
     {
