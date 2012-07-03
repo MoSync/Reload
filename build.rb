@@ -27,7 +27,7 @@ end
 
 
 #Defince version and timestamp 
-version = "0.1 Beta 3"
+version = "0.1 Beta 4"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 
 #Write the version information to the file for use in the server  and client
@@ -49,6 +49,16 @@ puts "building for timestamp #{time_stamp}"
 FileUtils.cd "ReloadClient"
 
 sh "ruby workfile.rb"
+
+puts "Writing down the debugger file"
+#FileUtils.cp "Clients/iOS/Classes/MoSyncAppDelegate.mm", "Clients/iOS/Classes/MoSyncAppDelegateBackup.mm" 
+initialFile = File.new("Clients/iOS/Classes/MoSyncAppDelegate.mm", "r")
+out = initialFile.read
+initialFile.close
+File.open("Clients/iOS/Classes/MoSyncAppDelegate.mm", "w") do |f|
+  f.write("\#define JSDEBUG 1\n")
+  f.write(out)
+end
 
 FileUtils.cd ".."
 
