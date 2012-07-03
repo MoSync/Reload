@@ -12,12 +12,12 @@
 	<string>MoSync AB</string>
 	<key>BundledFiles</key>
 	<array>
-		<string>ReloadServer/bin</string>
-		<string>ReloadServer/build.dat</string>
-		<string>ReloadServer/ReloadServer.js</string>
-		<string>ReloadServer/templates</string>
-		<string>ReloadServer/UI</string>
-		<string>Licenses</string>
+		<string>../../ReloadServer/bin</string>
+		<string>../../ReloadServer/build.dat</string>
+		<string>../../ReloadServer/ReloadServer.js</string>
+		<string>../../ReloadServer/templates</string>
+		<string>../../ReloadServer/UI</string>
+		<string>../../Licenses</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-4.6</string>
@@ -63,7 +63,7 @@
 	<key>ScriptArgs</key>
 	<array/>
 	<key>ScriptPath</key>
-	<string>ReloadServer/reload</string>
+	<string>../../ReloadServer/reload</string>
 	<key>Secure</key>
 	<false/>
 	<key>ShowInDock</key>
@@ -92,6 +92,6 @@
 	<key>UseXMLPlistFormat</key>
 	<true/>
 	<key>Version</key>
-	<string>0.1 Beta 3</string>
+	<string>0.1 Beta 4</string>
 </dict>
 </plist>

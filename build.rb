@@ -35,6 +35,7 @@ File.open("ReloadServer/build.dat", "w") do |file|
   file.puts("MoSync Reload Version #{version}")
   file.puts(time_stamp);
 end
+
 FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
 
 
@@ -49,6 +50,22 @@ puts "building for timestamp #{time_stamp}"
 FileUtils.cd "ReloadClient"
 
 sh "ruby workfile.rb"
+
+puts "Writing down the debugger info"
+FileUtils.cp "Clients/iOS/Classes/MoSyncAppDelegate.mm", "Clients/iOS/Classes/MoSyncAppDelegateBackup.mm" 
+initialFile = File.new("Clients/iOS/Classes/MoSyncAppDelegate.mm", "w")
+initialFile.puts("\#define JSDEBUG 1")
+File.readlines("Clients/iOS/Classes/MoSyncAppDelegateBackup.mm").each do |line|
+  initialFile.puts(line)
+  if(line.include?("- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {"))
+    initialFile.puts("//Adding the debug support for webkit")
+    initialFile.puts("\#ifdef JSDEBUG")
+  	initialFile.puts("	[NSClassFromString(@\"WebView\") _enableRemoteInspector];")
+  	initialFile.puts("\#endif")
+  end
+end
+initialFile.close
+FileUtils.rm_rf "Clients/iOS/Classes/MoSyncAppDelegateBackup.mm" 
 
 FileUtils.cd ".."
 
