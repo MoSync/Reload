@@ -14,6 +14,7 @@
 	<array>
 		<string>../../ReloadServer/bin</string>
 		<string>../../ReloadServer/build.dat</string>
+		<string>../../ReloadServer/MoSyncVersion.dat</string>
 		<string>../../ReloadServer/ReloadServer.js</string>
 		<string>../../ReloadServer/templates</string>
 		<string>../../ReloadServer/UI</string>
