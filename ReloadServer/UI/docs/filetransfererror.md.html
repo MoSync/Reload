@@ -42,13 +42,30 @@
 
 	</div>
 	<div id="contents_div">
-		<blockquote>
-  <h1><a name="Activity%20Indicator%20properties">Activity Indicator properties</a></h1>
+		<h1><a name="FileTransferError">FileTransferError</a></h1>
 
-<h2>inProgress</h2>
+<p>A <code><a href="filetransfererror.md.html#FileTransferError">FileTransferError</a></code> object is returned via the error callback when an error occurs.</p>
 
-<p>Sets if the indicator is still on or off. If set to false, it doesn't delete the widget just dismisses it.</p>
-</blockquote>
+<h2>Properties</h2>
+
+<ul>
+<li>
+<strong>code</strong> One of the predefined error codes listed below. (int)</li>
+<li>
+<strong>source</strong> URI to the source (string)</li>
+<li>
+<strong>target</strong> URI to the target (string)</li>
+</ul>
+<h2>Constants</h2>
+
+<ul>
+<li><code><a href="filetransfererror.md.html#FileTransferError">FileTransferError</a>.FILE_NOT_FOUND_ERR</code></li>
+<li><code><a href="filetransfererror.md.html#FileTransferError">FileTransferError</a>.INVALID_URL_ERR</code></li>
+<li><code><a href="filetransfererror.md.html#FileTransferError">FileTransferError</a>.CONNECTION_ERR</code></li>
+</ul>
+<h2>Description</h2>
+
+<p>The <code><a href="filetransfererror.md.html#FileTransferError">FileTransferError</a></code> object is returned via the error callback  when an error occurs when uploading a file.</p>
 
 	</div>
 
