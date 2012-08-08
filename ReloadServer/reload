@@ -17,7 +17,7 @@
 #!/bin/bash
 
 
-/usr/local/bin/node ReloadServer.js &
+./bin/mac/node ReloadServer.js &
 sleep 1
 open http://localhost:8282
 wait %1
