@@ -8,6 +8,7 @@
 </filter>
 </criteria>
 <properties>
+<property key="android:version.number" value="4"/>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib"/>
@@ -15,6 +16,8 @@
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="Accelerometer Bluetooth Calendar Camera Compass Contacts File\ Storage Gyroscope Internet\ Access Location Location/Coarse Location/Fine Orientation Power\ Management Proximity Push\ Notifications SMS Vibration"/>
+<property key="build.prefs:app.vendor/Release" value="MoSync SDK"/>
+<property key="build.prefs:app.version/Release" value="1.0.4"/>
 <property key="build.prefs:extra.link.sw/Debug" value="-master-dump"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>

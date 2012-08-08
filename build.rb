@@ -27,7 +27,7 @@ end
 
 
 #Defince version and timestamp 
-version = "0.1 Beta 3"
+version = "0.1 Beta 4"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 
 #Write the version information to the file for use in the server  and client
@@ -35,8 +35,9 @@ File.open("ReloadServer/build.dat", "w") do |file|
   file.puts("MoSync Reload Version #{version}")
   file.puts(time_stamp);
 end
-FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
 
+FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
+FileUtils.cp "/Applications/MoSync/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
 
 #build Output Directory
 FileUtils.mkdir_p "Build/#{time_stamp}"
@@ -50,6 +51,22 @@ FileUtils.cd "ReloadClient"
 
 sh "ruby workfile.rb"
 
+puts "Writing down the debugger info"
+FileUtils.cp "Clients/iOS/Classes/MoSyncAppDelegate.mm", "Clients/iOS/Classes/MoSyncAppDelegateBackup.mm" 
+initialFile = File.new("Clients/iOS/Classes/MoSyncAppDelegate.mm", "w")
+initialFile.puts("\#define JSDEBUG 1")
+File.readlines("Clients/iOS/Classes/MoSyncAppDelegateBackup.mm").each do |line|
+  initialFile.puts(line)
+  if(line.include?("- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {"))
+    initialFile.puts("//Adding the debug support for webkit")
+    initialFile.puts("\#ifdef JSDEBUG")
+  	initialFile.puts("	[NSClassFromString(@\"WebView\") _enableRemoteInspector];")
+  	initialFile.puts("\#endif")
+  end
+end
+initialFile.close
+FileUtils.rm_rf "Clients/iOS/Classes/MoSyncAppDelegateBackup.mm" 
+
 FileUtils.cd ".."
 
 files_to_copy = [
@@ -57,7 +74,9 @@ files_to_copy = [
   "ReloadServer/UI",
   "ReloadServer/bin",
   "ReloadServer/templates",
-  "ReloadServer/build.dat"
+  "ReloadServer/build.dat",
+  "ReloadServer/MoSyncVersion.dat",
+  
   ]
 
 

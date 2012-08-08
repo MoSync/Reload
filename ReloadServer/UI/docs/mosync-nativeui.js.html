@@ -13,7 +13,7 @@
 <body onload="prettyPrint()">
 <div id="header_bar">
 		<h1>
-<a href="index.html"><img src="MoSync_logo.png"></a>MoSync 3.0.2</h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1</h1>
 		<small>JavaScript API Documentation</small>
 	</div>
 <div id="main_container">
@@ -35,6 +35,7 @@
 <li><a href="file.md.html#File">File</a></li>
 <li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
 <li><a href="storage.md.html#Storage">Storage</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
 </ul>
 <p><a href="./_index.html">Keyword Index</a></p>
 
@@ -129,11 +130,12 @@ functions. This class is not used directly see  <a href="mosync-nativeui.js.html
        <a href="name.md.html#name">name</a> of the property</li>
 <li>
 <strong>successCallback</strong> 
-       a function that will be called if the operation is successful.
-       The value and wigetID will be passed to this function</li>
+       a function that will be called if the operation is successful,
+       called with two parameters, property <a href="name.md.html#name">name</a> and property value, for example:
+       function(prop, value) { ... }</li>
 <li>
 <strong>errorCallback</strong> 
-       a function that will be called if an error occurs</li>
+       a function that will be called if an error occurs, takes no parameters</li>
 </ul>
 <h1><a name="mosync.nativeui.NativeWidgetElement.addEventListener">mosync.nativeui.NativeWidgetElement.addEventListener</a></h1>
 
