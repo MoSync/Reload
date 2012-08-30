@@ -57,8 +57,13 @@ void sh(const char* cmd, const char* shownCmdLine=NULL, bool hideOutput=false) {
 
 int main(int argc, const char* argv[])
 {
+	// For some reason, the "cd server" command below no more works.
+	// Using a bat file instead to launch Reload.
 	//sh("cd server");
-	sh("start server\\bin\\win\\node.exe server\\ReloadServer.js");
-	sh("start http://localhost:8282");
+	//sh("start node ReloadServer.js");
+	//sh("start http://localhost:8282");
+
+	sh("ReloadLauncher.bat");
+
 	return 0;
 }
