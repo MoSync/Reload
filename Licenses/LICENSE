@@ -1,0 +1,8 @@
+-----------------------
+Copyright (C) 2012 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
+
+Licenses for MoSync Reload and the third-party libraries and applications included in it are located in the /Licenses subdirectory of your MoSync Reload installation directory:
+
+agpl-3.0.txt covers MoSync Reload Server.
+gpl.txt covers MoSync Reload Client.
+joyent-node-v0.8.8-license.txt covers node.js
