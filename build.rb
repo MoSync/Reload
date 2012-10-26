@@ -27,7 +27,7 @@ end
 
 
 #Defince version and timestamp 
-version = "0.1 Beta 4"
+version = "0.1 Beta 5"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 
 #Write the version information to the file for use in the server  and client
@@ -37,7 +37,7 @@ File.open("ReloadServer/build.dat", "w") do |file|
 end
 
 FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
-FileUtils.cp "/Applications/MoSync/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
+FileUtils.cp ENV['MOSYNCDIR'] + "/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
 
 #build Output Directory
 FileUtils.mkdir_p "Build/#{time_stamp}"
