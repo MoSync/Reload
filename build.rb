@@ -37,7 +37,7 @@ File.open("ReloadServer/build.dat", "w") do |file|
 end
 
 FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
-FileUtils.cp "/Applications/MoSync/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
+FileUtils.cp ENV['MOSYNCDIR'] + "/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
 
 #build Output Directory
 FileUtils.mkdir_p "Build/#{time_stamp}"
