@@ -308,6 +308,9 @@ a img {border: none; }
 	right:10px;
 	left:325px;
 }
+#tabs-api-documentation, #tabs-welcome {
+	height:95%;
+}
 
 #tabs-remote-log {
 	position:fixed;
