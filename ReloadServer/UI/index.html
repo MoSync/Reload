@@ -43,9 +43,11 @@
 
 				$( "#tabs" ).tabs();
 			});
-
+			
+			var selectedProjectID = null;
 			var previousProjectID = null;
 			var currentProjectList = [];
+			
 			$(document).ready(function() {
 				$("#newProjectDialog").dialog({
 					autoOpen : false,
@@ -68,6 +70,40 @@
 							else
 							{
 								alert("Please enter A Project Name!")
+							}
+						},
+						"Cancel" : function() {
+							$(this).dialog("close");
+						}
+					},
+					close : function(event, ui) {
+					}
+				});
+				$("#renameDialog").dialog({
+					autoOpen : false,
+					title : "Rename Project",
+					width : 270,
+					modal : true,
+					buttons : {
+						"Change" : function() {
+							
+							var projectName = document.getElementById("newPrName").value;
+							//check for correct project name
+							var re = new RegExp("^[a-zA-Z]{1}[a-zA-Z0-9_]*$", "g");
+							var match = projectName.match(re);
+							
+							if(match) {
+								
+								if ( $("#"+projectName).size() == 0 ) {
+									console.log("Valid project Name: Renaming Project to " + match);
+									renameProject( projectName );
+									$(this).dialog("close");
+								}
+								else
+									alert("There is already exists a project with name " + projectName);
+							}
+							else {
+								alert("Please enter a valid Project Name!")
 							}
 						},
 						"Cancel" : function() {
@@ -150,7 +186,16 @@
 					}
 				});
 			}
-
+			function renameProject(newPrName) {
+				$.ajax({
+					url : "http://localhost:8282/renameProject?" + selectedProjectID + "?" + newPrName,
+					context : document.body,
+					success : function() {
+						console.log("successfully renamed project " + selectedProjectID + "to " + newPrName);
+						getProjectList();
+					}
+				});
+			}
 			function getWorkspacePath() {
 				console.log("getting workspace path");
 				$.getJSON("http://localhost:8282/getWorkSpacePath", function(data) {
@@ -217,7 +262,8 @@
 							//"<div class='projectIconContainer'> " +
 							//	"<img src='img/MoSync_Project_Icon.png' />" +
 							//"</div>" +
-							"<div class='projectNameContainer' id='" + data[i].name + "'>" + data[i].name + "</div>" +
+							//selectedProjectID = document.getElementById
+							"<div class='projectNameContainer' id='" + data[i].name + "' onclick='createRenameProjectDialog(this.id)'>" + data[i].name + "</div>" +
 							"<div class='projectUpdateContainer'>" +
 								"<a href='#' onclick=\"reloadProject('" + data[i].url + "','" + data[i].name + "')\"><img src='img/ReloadOrange.png' /></a>" +
 							"</div>" +
@@ -347,7 +393,15 @@
 				var dialog = $("#newProjectDialog");
 				dialog.dialog("open");
 			}
-
+			function createRenameProjectDialog(oldProjectName){
+				var dialog = $("#renameDialog");
+				selectedProjectID = oldProjectName;
+				var input = document.getElementById("newPrName");
+				input.value = oldProjectName;
+				input.focus();
+				input.select();
+				dialog.dialog("open");
+			}
 			function createAboutDialog() {
 				var dialog = $("#aboutDialog");
 				dialog.dialog("open");
@@ -370,15 +424,6 @@
 			}
 
 			function initialize() {
-				var isIEFireFox=navigator.userAgent.match(/(Mozilla)|(MSIE)|(Opera)/gi)
-				if(isIEFireFox)
-				{
-
-					var docframe = document.getElementById("docsFrame");
-					//docframe.style.height = '700px';
-					var welcomeframe = document.getElementById("WelcomeFrame");
-					//welcomeframe.style.height = '700px';
-				}
 				getVersionInfo();
 				getServerAddress();
 				startUpdatingPorjects();
@@ -498,6 +543,13 @@
 			<br/>
 			<label>Project Name:</label>
 			<input type="text" name="newProjectName" id="newProjectName" class="text ui-widget-content ui-corner-all"/>
+			<br/>
+		</div>
+		<div id="renameDialog" title="Rename Project">
+			<label>Enter the new Project Name:</label>
+			<br/>
+			<br/>
+			<input type="text" name="newPrName" id="newPrName" class="text ui-widget-content ui-corner-all"	onfocus="this.select();"/>
 			<br/>
 		</div>
 		<div id="ChangeWorkspaceDialog" title="Change Workspace">

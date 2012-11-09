@@ -255,6 +255,7 @@ a img {border: none; }
 	width:120px;
 	overflow: hidden;
 	padding-top: 5px;
+	cursor: pointer;
 }
 
 .projectOpenContainer {
