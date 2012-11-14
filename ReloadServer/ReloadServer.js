@@ -929,3 +929,15 @@ http.createServer(function (req, res) {
 		handleHTTPPost(req,res);
 	}
 }).listen(8282);
+
+console.log("Starting HTTP server for Reload CLient on port: 8283");
+http.createServer(function (req, res) {
+	if(req.method == 'GET')
+	{
+		handleHTTPGet(req, res);
+	}
+	else if (req.method == 'POST')
+	{
+		handleHTTPPost(req,res);
+	}
+}).listen(8283);

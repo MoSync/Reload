@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 #include "ReloadClient.h"
 #include "mastdlib.h"
 
-#define SERVER_PORT "8282"
+#define SERVER_PORT "8283"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
