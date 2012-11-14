@@ -651,12 +651,15 @@ void ReloadClient::sendClientDeviceInfo()
 	// Send the result back to the server as a JSON string
 	sprintf(buffer,
 		"{"
-			"\"type\":\"deviceInfo\","
-			"\"platform\":\"%s\","
-			"\"name\":\"%s\","
-			"\"uuid\":\"%s\","
-			"\"version\":\"%s\","
-			"\"phonegap\":\"1.2.0\""
+			"\"message\":\"clientConnectRequest\","
+			"\"params\": {"
+				"\"type\":\"deviceInfo\","
+				"\"platform\":\"%s\","
+				"\"name\":\"%s\","
+				"\"uuid\":\"%s\","
+				"\"version\":\"%s\","
+				"\"phonegap\":\"1.2.0\""
+			"}"
 		"}",
 		deviceOS,
 		deviceName,

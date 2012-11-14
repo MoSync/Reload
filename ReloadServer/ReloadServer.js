@@ -535,11 +535,11 @@ function saveClient(socket)
 			if (message != undefined);
 			{
 				// The device sent it's info upon connecting.
-				if (message.type == "deviceInfo")
+				if (message.message == "clientConnectRequest")
 				{
 					// Platform, name, uuid, os version, phonegap version.
-					message.type == null;
-					socket.deviceInfo = message;
+					//message.type == null;
+					socket.deviceInfo = message.params;
 					socket.deviceInfo.address = socket.remoteAddress;
 					generateDeviceInfoListJSON();
 					console.log("Client " + socket.remoteAddress +
@@ -914,6 +914,39 @@ function handleHTTPPost(req, res)
 	}
 }
 
+/*function getBundle(page) {
+
+	var pageSplit = page.split("/");
+	// Set path to the project folder.
+	var path = pageSplit[pageSplit.length -2];
+		
+	var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
+	res.writeHead(200, {
+	  'Content-Length': data.length,
+	  'Content-Type': 'binary'
+	});
+	res.write(data);
+	res.end("");
+}
+
+function handleClientHTTPGet(req, res) {
+	
+	try {
+		var jsonObject = JSON.parse( unescape(req.url) );
+
+		if( typeof handle[jsonObject.method] === 'function') {
+			handle[jsonObject.method](jsonObject.url);
+		}
+		else {
+			console.log("Fatal Error: Unsupported method");
+			//Maybe some return here
+		}
+	}
+	catch(err) {
+		console.log("Error in handleClientHTTPGet: " + err);
+	}
+}*/
+
 console.log("Opening TPC socket...");
 var server = net.createServer(saveClient);
 server.listen(7000);
@@ -938,6 +971,6 @@ http.createServer(function (req, res) {
 	}
 	else if (req.method == 'POST')
 	{
-		handleHTTPPost(req,res);
+		console.log("Other types of request are not supported yet.");
 	}
 }).listen(8283);
