@@ -44,6 +44,8 @@ MA 02110-1301, USA.
 #include "LoadingScreen.h"
 #include "ReloadFile.h"
 
+#include <yajl/YAJLDom.h>
+
 class LoginScreen;
 class LoadingScreen;
 
@@ -51,6 +53,7 @@ class LoadingScreen;
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 using namespace Wormhole; // Wormhole library.
+using namespace MAUtil::YAJLDom; //Json Parser
 
 /**
  * The application class.
@@ -117,7 +120,7 @@ public:
 	void connectFinished(Connection *conn, int result);
 
 	//We received a TCP message from the server
-	void connRecvFinished(Connection *conn, int result);
+	void connRecvFinished(Connection *conn, int result){}
 
 	void downloadHTML();
 
@@ -180,7 +183,7 @@ public:
 
 	void connWriteFinished(Connection *conn, int result){}
 
-	void connReadFinished(Connection *conn, int result){}
+	void connReadFinished(Connection *conn, int result);
 
 	void clearAppsFolder();
 
@@ -197,6 +200,14 @@ public:
 	 * Method in interface LogMessageListener.
 	 */
 	void onLogMessage(const char* message, const char* url);
+
+	/**
+	 * This method parses and stores the JSON data received from server
+	 * @param jsonMessage The JSON message received from the server
+	 */
+	void parseJsonClientMessage(MAUtil::String jsonMessage);
+
+
 
 private:
 	Connection mSocket;
@@ -218,6 +229,21 @@ private:
 	 * Buffer for the bundle address
 	 */
 	int mBundleSize;
+
+	/**
+	 * Server Message Command Size
+	 */
+	int mServerCommand;
+
+	/**
+	 * Server Message Size
+	 */
+	int mServerMessageSize;
+
+	/**
+	 * A pointer to a JSON Message Received from the server
+	 */
+	Value* serverMessageJSONRoot;
 
 	/**
 	 * Class that handles the Login Screen UI
@@ -297,6 +323,7 @@ private:
 	 * The relative path to the downloaded app folder
 	 */
 	String mAppPath;
+
 };
 
 #endif /* RELOADCLIENT_H_ */

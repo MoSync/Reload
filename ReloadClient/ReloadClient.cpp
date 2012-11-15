@@ -28,6 +28,8 @@ MA 02110-1301, USA.
 #include "ReloadClient.h"
 #include "mastdlib.h"
 
+#include "Convert.h"
+
 #define SERVER_PORT "8283"
 
 // Namespaces we want to access.
@@ -346,7 +348,6 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 	if (result > 0)
 	{
 		mLoginScreen->connectedTo(mServerAddress.c_str());
-		mSocket.recv(mBuffer,1024);
 
 		// Save the server address.
 		mFileUtil->writeTextToFile(
@@ -359,6 +360,8 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 		setRemoteLogURL(remoteLogURL);
 
 		sendClientDeviceInfo();
+
+		mSocket.read(mBuffer,16);
 	}
 	else
 	{
@@ -367,48 +370,102 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 }
 
 //We received a TCP message from the server
-void ReloadClient::connRecvFinished(Connection *conn, int result)
+void ReloadClient::connReadFinished(Connection *conn, int result)
 {
 	lprintfln("recv result: %d\n", result);
-	if(result > 0)
+
+	// this is a message info data
+	if( mServerCommand == NULL ){
+
+		char command[9], size[9];
+		for( int i=0; i<8;i++ ) {
+			command[i] = mBuffer[i];
+			size[i]	   = mBuffer[8+i];
+		}
+		command[8] = '\0';
+		size[8]    = '\0';
+
+		//Message format example: 0000000200000044
+		mServerCommand     = Convert::hexToInt( command );
+		mServerMessageSize = Convert::hexToInt( size );
+
+		lprintfln("*******MOSYNC: mServerCommand: %d, mServerMessageSize: %d c", mServerCommand, mServerMessageSize);
+
+		//Proccess Message
+		mSocket.read(mBuffer, mServerMessageSize);
+
+	}
+	else if(mServerCommand > 0) //actual a valid command
 	{
-		//Null terminate the string message (it's a URL of the .bin bundle)
-		mBuffer[result] = '\0';
-		sprintf(
-			mBundleAddress,
-			"http://%s:%s%s",
-			mServerAddress.c_str(),
-			SERVER_PORT,
-			mBuffer);
-		lprintfln("FileURL:%s\n",mBundleAddress);
 
-		const char *sizeIdentifier = "?filesize=";
-		int identifierLength = strlen(sizeIdentifier);
-		char *sizeStr = strchr(mBundleAddress, '?');
-		if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
-		{
-			mBundleAddress[sizeStr - mBundleAddress] = '\0';
-			sizeStr += identifierLength;
-			mBundleSize = atoi(sizeStr);
+		if(mServerCommand == 1) { // 1st Command
+
 		}
-		else
+		else if(mServerCommand == 2) // JSON Message
 		{
-			maPanic(0,"File size identifier not found");
+			//Null terminate the string message (it's a URL of the .bin bundle)
+			mBuffer[mServerMessageSize] = '\0';
+
+			maWriteLog(mBuffer, strlen(mBuffer));
+
+			MAUtil::String jsonMessage(mBuffer);
+
+			parseJsonClientMessage(jsonMessage);
+
+			Value* jsonValue = serverMessageJSONRoot->getValueForKey("message");
+			MAUtil::String mMessage	= jsonValue->toString().c_str();
+
+
+			//Routing the command for execution
+
+			if( mMessage == "ReloadBundle" ) { // download bundle
+
+				//creating the url string
+				Value* urlData     = serverMessageJSONRoot->getValueForKey("url");
+
+				MAUtil::String mCommandUrl = "http://" + mServerAddress + ":" + SERVER_PORT + urlData->toString().c_str();
+				for( int i=0; i < mCommandUrl.length()+1; i++ )
+					mBundleAddress[i] = mCommandUrl[i];
+
+				lprintfln("FileURL:%s\n",mBundleAddress);
+
+				const char *sizeIdentifier = "?filesize=";
+				int identifierLength = strlen( sizeIdentifier );
+				char *sizeStr = strchr(mBundleAddress, '?');
+				if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
+				{
+					mBundleAddress[sizeStr - mBundleAddress] = '\0';
+					sizeStr += identifierLength;
+					mBundleSize = atoi(sizeStr);
+				}
+				else
+				{
+					maPanic(0,"File size identifier not found");
+				}
+				//Reset the app environment (destroy widgets, stop sensors)
+				freeHardware();
+
+				// Download the bundle.
+				lprintfln("====> before downloading bundle");
+				downloadBundle();
+
+				// Use this to use experimental HTML download.
+				// Needs divineprog/LiveApps/FileServer to work
+				// and manual config of BasePath.
+				// Comment out downloadBundle when testing this.
+				//downloadHTML();
+
+				// Delete Json tree.
+				YAJLDom::deleteValue(serverMessageJSONRoot);
+			}
 		}
-		//Reset the app environment (destroy widgets, stop sensors)
-        freeHardware();
+		else {
+			maPanic(0,"Unknown message");
+		}
 
-        // Download the bundle.
-        downloadBundle();
-
-        // Use this to use experimental HTML download.
-        // Needs divineprog/LiveApps/FileServer to work
-        // and manual config of BasePath.
-        // Comment out downloadBundle when testing this.
-        //downloadHTML();
-
+		mServerCommand = NULL; // Initiallize the command Token
 		//Set the socket to receive the next TCP message
-		mSocket.recv(mBuffer, 1024);
+		mSocket.read(mBuffer, 16);
 	}
 	else
 	{
@@ -788,4 +845,20 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 	// Send request to server.
 	RemoteLogConnection* connection = new RemoteLogConnection();
 	connection->get(request.c_str());
+}
+
+void ReloadClient::parseJsonClientMessage(MAUtil::String jsonMessage)
+{
+	// Parse Json data.
+	serverMessageJSONRoot = YAJLDom::parse(
+		(const unsigned char*)jsonMessage.c_str(),
+		jsonMessage.size());
+
+	// Check that the root is valid.
+	if ( NULL == serverMessageJSONRoot					 ||
+		 Value::NUL == serverMessageJSONRoot->getType()  ||
+		 Value::MAP != serverMessageJSONRoot->getType() 	) {
+
+		maPanic(0,"The JSON message format is incorrect");
+	}
 }

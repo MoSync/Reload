@@ -27,7 +27,9 @@ var currentWorkingPath = process.cwd();
 
 //Sets debug mode for the server
 var debug = false;
-
+var commandMap = [];
+commandMap['ConnectRequest'] = 1;
+commandMap['JSONMessage']    = 2;
 /**
  * This function will only print on the console if
  * debbuging is on.
@@ -539,7 +541,7 @@ function saveClient(socket)
 				{
 					// Platform, name, uuid, os version, phonegap version.
 					//message.type == null;
-					socket.deviceInfo = message.params;
+					socket.deviceInfo 		  = message.params;
 					socket.deviceInfo.address = socket.remoteAddress;
 					generateDeviceInfoListJSON();
 					console.log("Client " + socket.remoteAddress +
@@ -781,8 +783,19 @@ function handleHTTPGet(req, res)
 						// Convert to hex:
 						// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
+						// creating message for th client
+						var jsonMessage = {};
+						jsonMessage.message = 'ReloadBundle';
+						jsonMessage.url = url + "?filesize=" + data.length;
 
-						var result = client.write(url + "?filesize=" + data.length , "ascii");
+						console.log(toHex8Byte( commandMap['JSONMessage'] )		   +
+													toHex8Byte(JSON.stringify(jsonMessage).length) +
+													JSON.stringify(jsonMessage));
+
+						var result = client.write(  toHex8Byte( commandMap['JSONMessage'] )		   +
+													toHex8Byte(JSON.stringify(jsonMessage).length) +
+													JSON.stringify(jsonMessage), "ascii");
+						//var result = client.write(url + "?filesize=" + data.length , "ascii");
 					}
 					catch(err)
 					{
@@ -974,3 +987,20 @@ http.createServer(function (req, res) {
 		console.log("Other types of request are not supported yet.");
 	}
 }).listen(8283);
+
+
+/**
+ * Utility Functions
+ */
+
+/**
+ * Function that converts a hex to 8 byte hex string
+ */
+ function toHex8Byte(decimal){
+ 	var finalHex  = decimal.toString(16);
+ 	
+ 	while (finalHex.length < 8)
+		finalHex = "0"+finalHex;
+
+	return finalHex;
+ }
