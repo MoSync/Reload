@@ -388,6 +388,45 @@ function createNewProject(projectName, projectType)
 		console.log("Error in createNewProject: " + err);
 	}
 }
+/**
+ * Renames the project. Changes the project name in .project file and the project folder name
+ */
+function renameProject(oldName, newName) {
+	try {
+		console.log("Renaming Project from " + oldName + " to " + newName );
+		
+		var exec = require('child_process').exec;
+		
+		function resultCommand(error, stdout, stderr) {
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			if (error)
+			{
+				console.log("error: " + error);
+			}
+			var file = require("fs");
+			var projectData = file.readFileSync(rootWorkspacePath + fileSeparator + newName + fileSeparator + ".project", 'utf8');
+			var newData = projectData.replace(oldName, newName);
+			file.writeFileSync(rootWorkspacePath + fileSeparator + newName + fileSeparator + ".project", newData	, 'utf8');
+ 		}
+		
+		if((localPlatform.indexOf("darwin") >= 0) ||(localPlatform.indexOf("linux") >=0))
+		{
+			var command = "mv " + fixPathsUnix(rootWorkspacePath) + fixPathsUnix(fileSeparator) + fixPathsUnix(oldName) + 
+						  " " + fixPathsUnix(rootWorkspacePath) + fixPathsUnix(fileSeparator) + fixPathsUnix(newName);
+		}
+		else
+		{
+			var command = "rename " + rootWorkspacePath + fileSeparator + oldName + 
+						  " " + newName;
+		}
+		console.log("Command: " + command);
+		exec(command, resultCommand);
+	}
+	catch(err) {
+		console.log("Error in renameProject(" + oldname + ", " + newName + "): " + err);
+	}
+}
 
 var adb; //The Android adb tool used for debugging on Android clients
 var clearData = false;
@@ -749,6 +788,12 @@ function handleHTTPGet(req, res)
 
 			var pageSplit = page.split("?");
 			createNewProject(pageSplit[1], pageSplit[2]);
+		}
+		//Editing page asks the server to rename a project
+		else if ( page.indexOf("renameProject") != -1 ) {
+			var pageSplit = page.split("?");
+			console.log(pageSplit);
+			renameProject(pageSplit[1], pageSplit[2]);
 		}
 		//Editing page asks the server to reload a project
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)

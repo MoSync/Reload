@@ -255,6 +255,7 @@ a img {border: none; }
 	width:120px;
 	overflow: hidden;
 	padding-top: 5px;
+	cursor: pointer;
 }
 
 .projectOpenContainer {
@@ -307,6 +308,9 @@ a img {border: none; }
 	top:141px;
 	right:10px;
 	left:325px;
+}
+#tabs-api-documentation, #tabs-welcome {
+	height:95%;
 }
 
 #tabs-remote-log {
