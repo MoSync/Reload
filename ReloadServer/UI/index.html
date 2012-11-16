@@ -45,10 +45,13 @@
 			});
 			
 			var selectedProjectID = null;
+
 			var previousProjectID = null;
 			var currentProjectList = [];
 			
 			$(document).ready(function() {
+				$( "#weinreContainer" ).resizable({handles:"n"});
+
 				$("#newProjectDialog").dialog({
 					autoOpen : false,
 					title : "Create New Project",
@@ -154,6 +157,7 @@
 					close : function(event, ui) {
 					}
 				});
+
 			})
 
 			function getVersionInfo() {
@@ -527,7 +531,14 @@
 					</div>
 				</div>
 			</div>
+			
 		</div>
+		<div id="weinreContainer" style="width: 100%; height:20em; background-color: #272727; clear:both; position:fixed; bottom:0px; left:0px; border-top: 5px solid #434343;">
+				<iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe>
+		</div>
+
+		
+
 		<div id="newProjectDialog" title="New widget">
 			<label>Project Type:</label>
 			<br/>
