@@ -50,7 +50,16 @@
 			var currentProjectList = [];
 			
 			$(document).ready(function() {
-				$( "#weinreContainer" ).resizable({handles:"n"});
+				//$( "#weinreContainer" ).resizable({handles:"n"});
+				if ( !($.browser.webkit) ) {
+
+
+					$("#tabs").tabs( "remove" , "#tabs-weinre");
+					$("#tabs-weinre").remove();
+				    /*$("#tabList").append('<li class="tabNameContainer"><a href="#tabs-weinre">Weinre</a></li>');
+
+				    $("#tabContainer").append('<div id="tabs-weinre"><iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe></div>');		*/
+				}
 
 				$("#newProjectDialog").dialog({
 					autoOpen : false,
@@ -91,7 +100,10 @@
 						"Change" : function() {
 							
 							var projectName = document.getElementById("newPrName").value;
-							//check for correct project name
+							/* check for correct project name
+							 * Valid project names must begin with a letter 
+							 * followed by zero or more alphanumeric values
+							 */
 							var re = new RegExp("^[a-zA-Z]{1}[a-zA-Z0-9_]*$", "g");
 							var match = projectName.match(re);
 							
@@ -496,9 +508,13 @@
 							<li class="tabNameContainer">
 								<a href="#tabs-welcome">Welcome</a>
 							</li>
+							<li class="tabNameContainer">
+								<a href="#tabs-weinre">Weinre</a>
+							</li>
 						</ul>
 					</div>
 					<div id="tabContainer">
+						
 						<div id="tabs-remote-log">
 							<div id="RemoteLogTitle">
 								Client Log&nbsp;&nbsp;(use <code>mosync.rlog("Log message")</code> in JavaScript)
@@ -528,14 +544,19 @@
 						<div id="tabs-welcome">
 							<iframe id="WelcomeFrame" src="welcome/index.html"></iframe>
 						</div>
+						<div id="tabs-weinre">
+							<iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe>
+						</div>
+						
 					</div>
 				</div>
 			</div>
 			
 		</div>
-		<div id="weinreContainer" style="width: 100%; height:20em; background-color: #272727; clear:both; position:fixed; bottom:0px; left:0px; border-top: 5px solid #434343;">
+		<!--div id="weinreContainer" style="width: 100%; height:35px; background-color: #434343; clear:both; position:fixed; bottom:0px; left:0px; border-top: 5px solid #434343;">
+				<img src="img/button_expand.png"/>
 				<iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe>
-		</div>
+		</div-->
 
 		
 

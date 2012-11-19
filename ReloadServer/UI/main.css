@@ -313,6 +313,12 @@ a img {border: none; }
 	height:95%;
 }
 
+#tabs-weinre {
+	width:98%;
+	height:95%;
+	border:none;
+}
+
 #tabs-remote-log {
 	position:fixed;
 	bottom: 0px;
@@ -338,6 +344,11 @@ a img {border: none; }
 }
 
 #docsFrame {
+	width:100%;
+	height:95%;
+}
+
+#weinreFrame {
 	width:100%;
 	height:95%;
 }
