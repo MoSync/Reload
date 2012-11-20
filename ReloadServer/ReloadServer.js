@@ -27,7 +27,9 @@ var currentWorkingPath = process.cwd();
 
 //Sets debug mode for the server
 var debug = false;
-
+var commandMap = [];
+commandMap['ConnectRequest'] = 1;
+commandMap['JSONMessage']    = 2;
 /**
  * This function will only print on the console if
  * debbuging is on.
@@ -386,6 +388,45 @@ function createNewProject(projectName, projectType)
 		console.log("Error in createNewProject: " + err);
 	}
 }
+/**
+ * Renames the project. Changes the project name in .project file and the project folder name
+ */
+function renameProject(oldName, newName) {
+	try {
+		console.log("Renaming Project from " + oldName + " to " + newName );
+		
+		var exec = require('child_process').exec;
+		
+		function resultCommand(error, stdout, stderr) {
+			console.log("stdout: " + stdout);
+			console.log("stderr: " + stderr);
+			if (error)
+			{
+				console.log("error: " + error);
+			}
+			var file = require("fs");
+			var projectData = file.readFileSync(rootWorkspacePath + fileSeparator + newName + fileSeparator + ".project", 'utf8');
+			var newData = projectData.replace(oldName, newName);
+			file.writeFileSync(rootWorkspacePath + fileSeparator + newName + fileSeparator + ".project", newData	, 'utf8');
+ 		}
+		
+		if((localPlatform.indexOf("darwin") >= 0) ||(localPlatform.indexOf("linux") >=0))
+		{
+			var command = "mv " + fixPathsUnix(rootWorkspacePath) + fixPathsUnix(fileSeparator) + fixPathsUnix(oldName) + 
+						  " " + fixPathsUnix(rootWorkspacePath) + fixPathsUnix(fileSeparator) + fixPathsUnix(newName);
+		}
+		else
+		{
+			var command = "rename " + rootWorkspacePath + fileSeparator + oldName + 
+						  " " + newName;
+		}
+		console.log("Command: " + command);
+		exec(command, resultCommand);
+	}
+	catch(err) {
+		console.log("Error in renameProject(" + oldname + ", " + newName + "): " + err);
+	}
+}
 
 var adb; //The Android adb tool used for debugging on Android clients
 var clearData = false;
@@ -535,11 +576,11 @@ function saveClient(socket)
 			if (message != undefined);
 			{
 				// The device sent it's info upon connecting.
-				if (message.type == "deviceInfo")
+				if (message.message == "clientConnectRequest")
 				{
 					// Platform, name, uuid, os version, phonegap version.
-					message.type == null;
-					socket.deviceInfo = message;
+					//message.type == null;
+					socket.deviceInfo 		  = message.params;
 					socket.deviceInfo.address = socket.remoteAddress;
 					generateDeviceInfoListJSON();
 					console.log("Client " + socket.remoteAddress +
@@ -573,6 +614,68 @@ function generateDeviceInfoListJSON()
 	deviceInfoListJSON = JSON.stringify(infoListJSON);
 }
 
+
+/**
+ * Function that handles HTTP requests for the Reload Client.
+ */
+function handleReloadClientHTTPGet(request, respose)
+{
+	try
+	{
+		var page = unescape(request.url);
+		var jsonRPC = {};
+
+		//console.log("REQUEST: " + page);
+
+		// +9 to trim the GET variable from url eg: http:localhost:8282/proccess?jsonRPC=  
+		// "jsonRPC=".length() = 9
+		if (page.indexOf('proccess') != -1)
+		{
+			jsonRPC = JSON.parse(page.substr( page.indexOf('?') + 9));
+			console.log("JSON request BUNDLE:" + JSON.stringify(jsonRPC));
+		}
+		else
+		{
+			jsonRPC.message = "none";
+		}
+		
+		// A device client requested an app bundle.
+		if (jsonRPC.message == "getBundle")
+		{
+			// Set path to the project folder.
+			console.log("MOSYNC: " + jsonRPC.message + "Bundle Path" + jsonRPC.params.bundlePath);
+			var data = fs.readFileSync(rootWorkspacePath + jsonRPC.params.bundlePath);
+			respose.writeHead(200,
+			{
+			  'Content-Length': data.length,
+			  'Content-Type': 'binary'
+			});
+			respose.write(data);
+			respose.end("");
+		}
+		// Remote log request.
+		// TODO: Add check for specific index,
+		// once we know the format of "page" data.
+		else if (jsonRPC.message == "remoteLog")
+		{
+			var message = jsonRPC.params.logMessage;
+			console.log("CLIENT LOG: " + message);
+			gRemoteLogData.push(message);
+			res.writeHead(200, { });
+			res.end();
+		}
+		else // No handling for jsonRPC.message
+		{
+			res.writeHead(404);
+			res.end("");
+		}
+	}
+	catch(err)
+	{
+		console.log("Error in handleReloadClientHTTPGet: " + err);
+	}
+}
+
 /**
  * Function that handles HTTP requests.
  * Jumbo sized for your convenience.
@@ -582,31 +685,13 @@ function handleHTTPGet(req, res)
 	try
 	{
 		var page = unescape(req.url);
-		
-		// A device client requested an app bundle.
-		if (page.slice(page.length-14, page.length) == "LocalFiles.bin")
-		{
-			var pageSplit = page.split("/");
-			// Set path to the project folder.
-			var path = pageSplit[pageSplit.length -2];
-			// Bundle the app.
-		//	bundleApp(path, function(actualPath){
-				// Send the .bin file when bundling is complete.
-				var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
-				res.writeHead(200,
-				{
-				  'Content-Length': data.length,
-				  'Content-Type': 'binary'
-				});
-				res.write(data);
-				res.end("");
-		//	});
-		}
+
 		//Browser requesting the default page
-		else if((page == "/"))
+		if (page == "/")
 		{
 			console.log("Sending interface to browser");
-			findProjects(function(projects){
+			findProjects(function(projects)
+			{
 				//Sending the page that redirects to the real interface
 				var html = generateHTML(projects);
 				res.writeHead(200, 
@@ -620,7 +705,7 @@ function handleHTTPGet(req, res)
 			});
 		}
 		//Editing page is polling for adb debug logs
-		else if(page == "/getDebugData")
+		else if (page == "/getDebugData")
 		{
 			var data = getDebugData();
 			res.writeHead(200, {
@@ -748,6 +833,12 @@ function handleHTTPGet(req, res)
 			var pageSplit = page.split("?");
 			createNewProject(pageSplit[1], pageSplit[2]);
 		}
+		//Editing page asks the server to rename a project
+		else if ( page.indexOf("renameProject") != -1 ) {
+			var pageSplit = page.split("?");
+			console.log(pageSplit);
+			renameProject(pageSplit[1], pageSplit[2]);
+		}
 		//Editing page asks the server to reload a project
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
@@ -781,8 +872,20 @@ function handleHTTPGet(req, res)
 						// Convert to hex:
 						// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
+						// creating message for th client
+						var jsonMessage 	 = {};
+						jsonMessage.message  = 'ReloadBundle';
+						jsonMessage.url 	 = url;// + "?filesize=" + data.length;
+						jsonMessage.fileSize = data.length;
 
-						var result = client.write(url + "?filesize=" + data.length , "ascii");
+						console.log(toHex8Byte( commandMap['JSONMessage'] )		   +
+													toHex8Byte(JSON.stringify(jsonMessage).length) +
+													JSON.stringify(jsonMessage));
+
+						var result = client.write(  toHex8Byte( commandMap['JSONMessage'] )		   +
+													toHex8Byte(JSON.stringify(jsonMessage).length) +
+													JSON.stringify(jsonMessage), "ascii");
+						//var result = client.write(url + "?filesize=" + data.length , "ascii");
 					}
 					catch(err)
 					{
@@ -914,11 +1017,44 @@ function handleHTTPPost(req, res)
 	}
 }
 
+/*function getBundle(page) {
+
+	var pageSplit = page.split("/");
+	// Set path to the project folder.
+	var path = pageSplit[pageSplit.length -2];
+		
+	var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
+	res.writeHead(200, {
+	  'Content-Length': data.length,
+	  'Content-Type': 'binary'
+	});
+	res.write(data);
+	res.end("");
+}
+
+function handleClientHTTPGet(req, res) {
+	
+	try {
+		var jsonObject = JSON.parse( unescape(req.url) );
+
+		if( typeof handle[jsonObject.method] === 'function') {
+			handle[jsonObject.method](jsonObject.url);
+		}
+		else {
+			console.log("Fatal Error: Unsupported method");
+			//Maybe some return here
+		}
+	}
+	catch(err) {
+		console.log("Error in handleClientHTTPGet: " + err);
+	}
+}*/
+
 console.log("Opening TPC socket...");
 var server = net.createServer(saveClient);
 server.listen(7000);
 
-console.log("Starting HTTP server...");
+console.log("Starting HTTP server for WebUI on port: 8282");
 http.createServer(function (req, res) {
 	if(req.method == 'GET')
 	{
@@ -929,3 +1065,32 @@ http.createServer(function (req, res) {
 		handleHTTPPost(req,res);
 	}
 }).listen(8282);
+
+console.log("Starting HTTP server for Reload Client on port: 8283");
+http.createServer(function (req, res) {
+	if(req.method == 'GET')
+	{
+		handleReloadClientHTTPGet(req, res);
+	}
+	else if (req.method == 'POST')
+	{
+		console.log("Other types of request are not supported yet.");
+	}
+}).listen(8283);
+
+
+/**
+ * Utility Functions
+ */
+
+/**
+ * Function that converts a hex to 8 byte hex string
+ */
+ function toHex8Byte(decimal){
+ 	var finalHex  = decimal.toString(16);
+ 	
+ 	while (finalHex.length < 8)
+		finalHex = "0"+finalHex;
+
+	return finalHex;
+ }

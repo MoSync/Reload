@@ -25,10 +25,15 @@ MA 02110-1301, USA.
 
 #include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/WebViewMessage.h>
+#include <Wormhole/Encoder.h>
+
 #include "ReloadClient.h"
 #include "mastdlib.h"
 
-#define SERVER_PORT "8282"
+#include "Convert.h"
+
+
+#define SERVER_PORT "8283"
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
@@ -346,19 +351,15 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 	if (result > 0)
 	{
 		mLoginScreen->connectedTo(mServerAddress.c_str());
-		mSocket.recv(mBuffer,1024);
 
 		// Save the server address.
 		mFileUtil->writeTextToFile(
 			mFileUtil->getLocalPath() + "LastServerAddress.txt",
 			mServerAddress);
 
-		// Set URL for remote log service.
-		MAUtil::String remoteLogURL = "http://";
-		remoteLogURL += mServerAddress + ":" + SERVER_PORT + "/remoteLogMessage/";
-		setRemoteLogURL(remoteLogURL);
-
 		sendClientDeviceInfo();
+
+		mSocket.read(mBuffer,16);
 	}
 	else
 	{
@@ -367,48 +368,121 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 }
 
 //We received a TCP message from the server
-void ReloadClient::connRecvFinished(Connection *conn, int result)
+void ReloadClient::connReadFinished(Connection *conn, int result)
 {
 	lprintfln("recv result: %d\n", result);
-	if(result > 0)
+
+	// this is a message info data
+	if( mServerCommand == NULL ){
+
+		char command[9], size[9];
+		for( int i=0; i<8;i++ ) {
+			command[i] = mBuffer[i];
+			size[i]	   = mBuffer[8+i];
+		}
+		command[8] = '\0';
+		size[8]    = '\0';
+
+		//Message format example: 0000000200000044
+		mServerCommand     = Convert::hexToInt( command );
+		mServerMessageSize = Convert::hexToInt( size );
+
+		lprintfln("*******MOSYNC: mServerCommand: %d, mServerMessageSize: %d c", mServerCommand, mServerMessageSize);
+
+		//Proccess Message
+		mSocket.read(mBuffer, mServerMessageSize);
+
+	}
+	else if(mServerCommand > 0) //actual a valid command
 	{
-		//Null terminate the string message (it's a URL of the .bin bundle)
-		mBuffer[result] = '\0';
-		sprintf(
-			mBundleAddress,
-			"http://%s:%s%s",
-			mServerAddress.c_str(),
-			SERVER_PORT,
-			mBuffer);
-		lprintfln("FileURL:%s\n",mBundleAddress);
 
-		const char *sizeIdentifier = "?filesize=";
-		int identifierLength = strlen(sizeIdentifier);
-		char *sizeStr = strchr(mBundleAddress, '?');
-		if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
-		{
-			mBundleAddress[sizeStr - mBundleAddress] = '\0';
-			sizeStr += identifierLength;
-			mBundleSize = atoi(sizeStr);
+		if(mServerCommand == 1) { // 1st Command
+
 		}
-		else
+		else if(mServerCommand == 2) // JSON Message
 		{
-			maPanic(0,"File size identifier not found");
+			//Null terminate the string message (it's a URL of the .bin bundle)
+			mBuffer[mServerMessageSize] = '\0';
+
+			maWriteLog(mBuffer, strlen(mBuffer));
+
+			MAUtil::String jsonMessage(mBuffer);
+
+			parseJsonClientMessage(jsonMessage);
+
+			Value* jsonValue = serverMessageJSONRoot->getValueForKey("message");
+			MAUtil::String mMessage	= jsonValue->toString().c_str();
+
+
+			//Routing the command for execution
+
+			if( mMessage == "ReloadBundle" ) { // download bundle
+
+
+				Value* urlData     = serverMessageJSONRoot->getValueForKey("url");
+				Value* fileSize	   = serverMessageJSONRoot->getValueForKey("fileSize");
+
+				//Creating the request
+				MAUtil::String json("{"
+					"\"message\":  \"getBundle\","
+					"\"params\" : {   "
+						"\"bundlePath\": \"" + urlData->toString() + "\""
+						"}"
+					"}");
+
+				MAUtil::String commandUrl =
+					"http://" + mServerAddress + ":" + SERVER_PORT +
+					"/proccess?jsonRPC=" + Encoder::escape(json);
+
+				for( int i=0; i < commandUrl.length()+1; i++ )
+					mBundleAddress[i] = commandUrl[i];
+
+				if( atoi(fileSize->toString().c_str()) < 0 )
+					maPanic(0,"File size identifier not found");
+				else {
+					//mBundleAddress[mCommandUrl.length()] = '\0';
+					mBundleSize = atoi(fileSize->toString().c_str());
+				}
+				/*
+				lprintfln("FileURL:%s\n",mBundleAddress);
+
+				const char *sizeIdentifier = "?filesize=";
+				int identifierLength = strlen( sizeIdentifier );
+				char *sizeStr = strchr(mBundleAddress, '?');
+				if(strnicmp(sizeStr, sizeIdentifier, identifierLength) == 0)
+				{
+					mBundleAddress[sizeStr - mBundleAddress] = '\0';
+					sizeStr += identifierLength;
+					mBundleSize = atoi(sizeStr);
+				}
+				else
+				{
+					maPanic(0,"File size identifier not found");
+				}*/
+				//Reset the app environment (destroy widgets, stop sensors)
+				freeHardware();
+
+				// Download the bundle.
+				lprintfln("====> before downloading bundle: mBundleAddress=%s mBundleSize=%d",mBundleAddress,mBundleSize);
+				downloadBundle();
+
+				// Use this to use experimental HTML download.
+				// Needs divineprog/LiveApps/FileServer to work
+				// and manual config of BasePath.
+				// Comment out downloadBundle when testing this.
+				//downloadHTML();
+
+				// Delete Json tree.
+				YAJLDom::deleteValue(serverMessageJSONRoot);
+			}
 		}
-		//Reset the app environment (destroy widgets, stop sensors)
-        freeHardware();
+		else {
+			maPanic(0,"Unknown message");
+		}
 
-        // Download the bundle.
-        downloadBundle();
-
-        // Use this to use experimental HTML download.
-        // Needs divineprog/LiveApps/FileServer to work
-        // and manual config of BasePath.
-        // Comment out downloadBundle when testing this.
-        //downloadHTML();
-
+		mServerCommand = NULL; // Initiallize the command Token
 		//Set the socket to receive the next TCP message
-		mSocket.recv(mBuffer, 1024);
+		mSocket.read(mBuffer, 16);
 	}
 	else
 	{
@@ -477,7 +551,7 @@ void ReloadClient::downloadBundle()
 	int res = mDownloader->beginDownloading(mBundleAddress, mResourceFile);
 	if(res > 0)
 	{
-		printf("Downloading Started with %d\n", res);
+		lprintfln("Downloading Started with %d\n", res);
 		//Show the loading screen during downloading
 		mLoadingScreen->show();
 	}
@@ -651,12 +725,15 @@ void ReloadClient::sendClientDeviceInfo()
 	// Send the result back to the server as a JSON string
 	sprintf(buffer,
 		"{"
-			"\"type\":\"deviceInfo\","
-			"\"platform\":\"%s\","
-			"\"name\":\"%s\","
-			"\"uuid\":\"%s\","
-			"\"version\":\"%s\","
-			"\"phonegap\":\"1.2.0\""
+			"\"message\":\"clientConnectRequest\","
+			"\"params\": {"
+				"\"type\":\"deviceInfo\","
+				"\"platform\":\"%s\","
+				"\"name\":\"%s\","
+				"\"uuid\":\"%s\","
+				"\"version\":\"%s\","
+				"\"phonegap\":\"1.2.0\""
+			"}"
 		"}",
 		deviceOS,
 		deviceName,
@@ -755,34 +832,55 @@ void ReloadClient::deleteFolderRecurse(const char *path)
 	maFileListClose(list);
 }
 
-
-/**
- * Set the url to be used for remote log messages.
- * @param url The url to use for the remote logging service,
- * for example: "http://localhost:8282/log/"
- */
-void ReloadClient::setRemoteLogURL(const MAUtil::String& url)
-{
-	mRemoteLogURL = url;
-}
-
 void ReloadClient::onLogMessage(const char* message, const char* url)
 {
-	String remoteLogURL = url;
-
-	// If the url is set to "undefined", we should
-	// use a previously set url.
+	// If the url is set to "undefined", we will use JsonRPC to send the log message
+	// to the Reload server. Otherwise, we just call the url supplied using a REST
+	// convention.
 	if (0 == strcmp("undefined", url))
 	{
-		// If the url is not passed from JavaScript,
-		// use the one set earlier.
-		remoteLogURL = mRemoteLogURL;
+		// Set URL for remote log service.
+		MAUtil::String messageString = message;
+		MAUtil::String json("{"
+							"\"message\":  \"remoteLog\","
+							"\"params\" : {   "
+								"\"logMessage\": \"" + messageString + "\""
+								"}"
+							"}");
+
+		MAUtil::String commandUrl =
+			"http://" + mServerAddress + ":" + SERVER_PORT +
+			"/proccess?jsonRPC=" + Encoder::escape(json);
+
+		// Send request to server.
+		RemoteLogConnection* connection = new RemoteLogConnection();
+		connection->get(commandUrl.c_str());
 	}
+	else
+	{
+		MAUtil::String urlString = url;
 
-	// Escape ("percent encode") the message.
-	MAUtil::String request = remoteLogURL + WebViewMessage::escape(message);
+		// Escape ("percent encode") the message.
+		MAUtil::String request = urlString + WebViewMessage::escape(message);
 
-	// Send request to server.
-	RemoteLogConnection* connection = new RemoteLogConnection();
-	connection->get(request.c_str());
+		// Send request to server.
+		RemoteLogConnection* connection = new RemoteLogConnection();
+		connection->get(request.c_str());
+	}
+}
+
+void ReloadClient::parseJsonClientMessage(MAUtil::String jsonMessage)
+{
+	// Parse Json data.
+	serverMessageJSONRoot = YAJLDom::parse(
+		(const unsigned char*)jsonMessage.c_str(),
+		jsonMessage.size());
+
+	// Check that the root is valid.
+	if ( NULL == serverMessageJSONRoot					 ||
+		 Value::NUL == serverMessageJSONRoot->getType()  ||
+		 Value::MAP != serverMessageJSONRoot->getType() 	) {
+
+		maPanic(0,"The JSON message format is incorrect");
+	}
 }
