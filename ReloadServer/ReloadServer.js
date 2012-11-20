@@ -614,6 +614,68 @@ function generateDeviceInfoListJSON()
 	deviceInfoListJSON = JSON.stringify(infoListJSON);
 }
 
+
+/**
+ * Function that handles HTTP requests for the Reload Client.
+ */
+function handleReloadClientHTTPGet(request, respose)
+{
+	try
+	{
+		var page = unescape(request.url);
+		var jsonRPC = {};
+
+		//console.log("REQUEST: " + page);
+
+		// +9 to trim the GET variable from url eg: http:localhost:8282/proccess?jsonRPC=  
+		// "jsonRPC=".length() = 9
+		if (page.indexOf('proccess') != -1)
+		{
+			jsonRPC = JSON.parse(page.substr( page.indexOf('?') + 9));
+			console.log("JSON request BUNDLE:" + JSON.stringify(jsonRPC));
+		}
+		else
+		{
+			jsonRPC.message = "none";
+		}
+		
+		// A device client requested an app bundle.
+		if (jsonRPC.message == "getBundle")
+		{
+			// Set path to the project folder.
+			console.log("MOSYNC: " + jsonRPC.message + "Bundle Path" + jsonRPC.params.bundlePath);
+			var data = fs.readFileSync(rootWorkspacePath + jsonRPC.params.bundlePath);
+			respose.writeHead(200,
+			{
+			  'Content-Length': data.length,
+			  'Content-Type': 'binary'
+			});
+			respose.write(data);
+			respose.end("");
+		}
+		// Remote log request.
+		// TODO: Add check for specific index,
+		// once we know the format of "page" data.
+		else if (jsonRPC.message == "remoteLog")
+		{
+			var message = jsonRPC.params.logMessage;
+			console.log("CLIENT LOG: " + message);
+			gRemoteLogData.push(message);
+			res.writeHead(200, { });
+			res.end();
+		}
+		else // No handling for jsonRPC.message
+		{
+			res.writeHead(404);
+			res.end("");
+		}
+	}
+	catch(err)
+	{
+		console.log("Error in handleReloadClientHTTPGet: " + err);
+	}
+}
+
 /**
  * Function that handles HTTP requests.
  * Jumbo sized for your convenience.
@@ -623,31 +685,13 @@ function handleHTTPGet(req, res)
 	try
 	{
 		var page = unescape(req.url);
-		
-		// A device client requested an app bundle.
-		if (page.slice(page.length-14, page.length) == "LocalFiles.bin")
-		{
-			var pageSplit = page.split("/");
-			// Set path to the project folder.
-			var path = pageSplit[pageSplit.length -2];
-			// Bundle the app.
-		//	bundleApp(path, function(actualPath){
-				// Send the .bin file when bundling is complete.
-				var data = fs.readFileSync(rootWorkspacePath + page.replace("LocalFiles.html", "LocalFiles.bin"));
-				res.writeHead(200,
-				{
-				  'Content-Length': data.length,
-				  'Content-Type': 'binary'
-				});
-				res.write(data);
-				res.end("");
-		//	});
-		}
+
 		//Browser requesting the default page
-		else if((page == "/"))
+		if (page == "/")
 		{
 			console.log("Sending interface to browser");
-			findProjects(function(projects){
+			findProjects(function(projects)
+			{
 				//Sending the page that redirects to the real interface
 				var html = generateHTML(projects);
 				res.writeHead(200, 
@@ -661,7 +705,7 @@ function handleHTTPGet(req, res)
 			});
 		}
 		//Editing page is polling for adb debug logs
-		else if(page == "/getDebugData")
+		else if (page == "/getDebugData")
 		{
 			var data = getDebugData();
 			res.writeHead(200, {
@@ -829,9 +873,10 @@ function handleHTTPGet(req, res)
 						// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
 						// creating message for th client
-						var jsonMessage = {};
-						jsonMessage.message = 'ReloadBundle';
-						jsonMessage.url = url + "?filesize=" + data.length;
+						var jsonMessage 	 = {};
+						jsonMessage.message  = 'ReloadBundle';
+						jsonMessage.url 	 = url;// + "?filesize=" + data.length;
+						jsonMessage.fileSize = data.length;
 
 						console.log(toHex8Byte( commandMap['JSONMessage'] )		   +
 													toHex8Byte(JSON.stringify(jsonMessage).length) +
@@ -1009,7 +1054,7 @@ console.log("Opening TPC socket...");
 var server = net.createServer(saveClient);
 server.listen(7000);
 
-console.log("Starting HTTP server...");
+console.log("Starting HTTP server for WebUI on port: 8282");
 http.createServer(function (req, res) {
 	if(req.method == 'GET')
 	{
@@ -1021,11 +1066,11 @@ http.createServer(function (req, res) {
 	}
 }).listen(8282);
 
-console.log("Starting HTTP server for Reload CLient on port: 8283");
+console.log("Starting HTTP server for Reload Client on port: 8283");
 http.createServer(function (req, res) {
 	if(req.method == 'GET')
 	{
-		handleHTTPGet(req, res);
+		handleReloadClientHTTPGet(req, res);
 	}
 	else if (req.method == 'POST')
 	{

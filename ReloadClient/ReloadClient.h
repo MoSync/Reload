@@ -311,8 +311,6 @@ private:
 	 */
 	String mPort;
 
-	String mRemoteLogURL;
-
 	bool mNativeUIMessageReceived;
 
 	/**
