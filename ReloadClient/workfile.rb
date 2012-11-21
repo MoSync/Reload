@@ -25,7 +25,7 @@ xgccPath = ENV['MOSYNCDIR'] + "/bin/xgcc"
 libs = "mastd.lib MAUtil.lib NativeUI.lib MAFS.lib Wormhole.lib yajl.lib Notification.lib"
 outputPath = "Output/Release/"
 commonPath = outputPath + "common/"
-androidPath = outputPath + "Android/2.x/"
+androidPath = outputPath + "Android/Android/"
 wp7Path = outputPath + "WindowsPhone/7/"
 iOSPath = outputPath + "iOS/iPhone/"
 
