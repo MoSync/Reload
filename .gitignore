@@ -15,6 +15,11 @@ ReloadClient/Output
 ReloadClient/Clients
 ReloadClient/ReleasePackages
 
+ReloadClient/.mosyncproject.local
+
+ReloadServer/ReloadLauncher.bat
+ReloadServer/lastWorkspace.dat
+
 ReloadLauncher/Mac/Reload.app
 
 Build
