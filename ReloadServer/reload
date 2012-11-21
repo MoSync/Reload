@@ -18,6 +18,7 @@
 
 
 ./bin/mac/node ReloadServer.js &
+./bin/mac/node node_modules/weinre/weinre &
 sleep 1
 open http://localhost:8282
 wait %1
