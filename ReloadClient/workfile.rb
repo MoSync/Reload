@@ -43,6 +43,8 @@ programName = "ReloadClient"
 for fileName in projectFiles do
 	if(File.extname(fileName) == ".cpp")
 		cFiles.push(fileName)
+	elsif(File.extname(fileName) == ".c")
+		cFiles.push(fileName)
 	elsif(File.extname(fileName) == ".h")
 		hFiles.push(fileName)
 	elsif(File.extname(fileName) == ".icon")
