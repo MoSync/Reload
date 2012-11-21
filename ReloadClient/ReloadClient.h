@@ -120,7 +120,28 @@ public:
 	void connectFinished(Connection *conn, int result);
 
 	//We received a TCP message from the server
-	void connRecvFinished(Connection *conn, int result){}
+	void connRecvFinished(Connection *conn, int result) {}
+
+	/**
+	 * Helper function to get command and size from
+	 * the message header (two 32 bit numbers as
+	 * a hex string).
+	 * Header example: 0000000200000044
+	 * Command: 00000002
+	 * Size: 00000044
+	 * @param buffer
+	 * @param command
+	 * @param size
+	 */
+	void getMessageCommandAndSize(
+		const char* buffer,
+		int* command,
+		int* size);
+
+	/**
+	 * Process a JSON message
+	 */
+	void processJSONMessage(const MAUtil::String& jsonString);
 
 	void downloadHTML();
 
@@ -181,7 +202,7 @@ public:
 
     void disconnect();
 
-	void connWriteFinished(Connection *conn, int result){}
+	void connWriteFinished(Connection *conn, int result) {}
 
 	void connReadFinished(Connection *conn, int result);
 
@@ -207,51 +228,57 @@ public:
 	 */
 	void parseJsonClientMessage(MAUtil::String jsonMessage);
 
-
-
 private:
+	/**
+	 * The TCP socket used for registering with the server
+	 * and listening for commands from the server.
+	 */
 	Connection mSocket;
 
-	// TODO: Rename to mHasPage.
-	bool hasPage;
-
 	/**
-	 * Buffer for TCP messages
+	 * TODO: Document what this variable is used for.
 	 */
-	char mBuffer[1024];
+	bool mHasPage;
 
 	/**
-	 * Buffer for the bundle address
+	 * Buffer for TCP messages.
+	 * TODO: Should be allocated dynamically,
+	 * based on message size.
 	 */
-	char mBundleAddress[256];
+	char mBuffer[4096];
 
 	/**
-	 * Buffer for the bundle address
+	 * Buffer for the bundle address.
+	 */
+	char mBundleAddress[512];
+
+	/**
+	 * Buffer for the bundle address.
 	 */
 	int mBundleSize;
 
 	/**
-	 * Server Message Command Size
+	 * Server Message Command Size.
 	 */
 	int mServerCommand;
 
 	/**
-	 * Server Message Size
+	 * Server Message Size.
 	 */
 	int mServerMessageSize;
 
 	/**
-	 * A pointer to a JSON Message Received from the server
+	 * A pointer to a JSON Message Received from the server.
 	 */
 	Value* serverMessageJSONRoot;
 
 	/**
-	 * Class that handles the Login Screen UI
+	 * Class that handles the Login Screen UI.
 	 */
 	LoginScreen *mLoginScreen;
 
 	/**
-	 * Class that handles the Loading screen UI
+	 * Class that handles the Loading screen UI.
 	 */
 	LoadingScreen *mLoadingScreen;
 
@@ -261,12 +288,12 @@ private:
 	PhoneGapMessageHandler mPhoneGapMessageHandler;
 
 	/**
-	 * Special handler for local filesystem messages
+	 * Special handler for local filesystem messages.
 	 */
 	ReloadFile mReloadFile;
 
 	/**
-	 * Handler for NativeUI messages
+	 * Handler for NativeUI messages.
 	 */
 	NativeUIMessageHandler *mNativeUIMessageHandler;
 
@@ -276,49 +303,49 @@ private:
 	ResourceMessageHandler mResourceMessageHandler;
 
 	/**
-	 * true when an app is running, false if on the login screen
+	 * true when an app is running, false if on the login screen.
 	 */
 	bool mRunningApp;
 
 	/**
-	 * Used to download the app bundles
+	 * Used to download the app bundles.
 	 */
 	Downloader *mDownloader;
 
 	/**
 	 * A placeholder that holds the bundle as it's
-	 * being downloaded
+	 * being downloaded.
 	 */
 	MAHandle mResourceFile;
 
 	/**
-	 * The platform the client is running on
+	 * The platform the client is running on.
 	 */
 	String mOS;
 
 	/**
-	 * The client information (version, timestamp)
+	 * The client information (version, timestamp).
 	 */
 	String mInfo;
 
 	/**
-	 * The address of the server we are connected to
+	 * The address of the server we are connected to.
 	 */
 	String mServerAddress;
 
 	/**
-	 * The TCP port we are connecting to
+	 * The TCP port we are connecting to.
 	 */
 	String mPort;
 
 	bool mNativeUIMessageReceived;
 
 	/**
-	 * The general folder where app files reside
+	 * The general folder where app files reside.
 	 */
 	String mAppsFolder;
 	/**
-	 * The relative path to the downloaded app folder
+	 * The relative path to the downloaded app folder.
 	 */
 	String mAppPath;
 
