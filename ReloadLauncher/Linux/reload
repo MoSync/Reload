@@ -16,4 +16,6 @@
 
 #!/bin/bash
 cd server/
+./bin/linux/node node_modules/weinre/weinre &
 ./bin/linux/node ReloadServer.js 
+
