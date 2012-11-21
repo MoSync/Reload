@@ -35,6 +35,7 @@ iOSPackagePath = packagePath + "iOS/"
 wp7PackagePath = packagePath + "WindowsPhone/"
 
 projectFiles = Dir.entries(".")
+cppFiles = []
 cFiles = []
 hFiles = []
 iconFile = ""
@@ -42,7 +43,7 @@ programName = "ReloadClient"
 
 for fileName in projectFiles do
 	if(File.extname(fileName) == ".cpp")
-		cFiles.push(fileName)
+		cppFiles.push(fileName)
 	elsif(File.extname(fileName) == ".c")
 		cFiles.push(fileName)
 	elsif(File.extname(fileName) == ".h")
@@ -55,8 +56,14 @@ end
 FileUtils.mkpath([commonPath, androidPath + "package/", iOSPath + "package/", wp7Path + "package/", androidPackagePath, iOSPackagePath, wp7PackagePath]);
 system(pipeToolPath + " -appcode=DSFN -R -depend=" + commonPath + "resources.deps "+ commonPath +"resources Resources/Resources.lst")
 
-for fileName in cFiles do
+for fileName in cppFiles do
+	puts "Compiling file " + File.basename(fileName);
 	system(xgccPath + " -o " + commonPath + File.basename(fileName,".cpp") + ".s -S -g -MMD -MF " + commonPath + File.basename(fileName,".cpp") + ".s.deps -DMAPIP -O2 -DPLATFORM_IOS -DVARIANT_IOS_IPHONE " + fileName + " -I" + ENV['MOSYNCDIR'] + "/include -I" + commonPath)
+end
+
+for fileName in cFiles do
+	puts "Compiling file " + File.basename(fileName);
+	system(xgccPath + " -o " + commonPath + File.basename(fileName,".c") + ".s -S -g -MMD -MF " + commonPath + File.basename(fileName,".c") + ".s.deps -DMAPIP -O2 -DPLATFORM_IOS -DVARIANT_IOS_IPHONE " + fileName + " -I" + ENV['MOSYNCDIR'] + "/include -I" + commonPath)
 end
 
 sFileListString = ""
@@ -65,14 +72,17 @@ for fileName in Dir.entries(commonPath) do
 		sFileListString += Dir.getwd + "/" + commonPath + fileName + " "
 	end
 end
+puts sFileListString;
 
 #Android
+puts "Compiling for Android";
 system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B " + Dir.getwd + "/" + commonPath + "program " + sFileListString + libs)
-system(packagerPath + " -t platform -p " + Dir.getwd + "/" + commonPath + "program -r " + Dir.getwd + "/" + commonPath + "resources -i " + iconFile + " -d " + Dir.getwd + "/" + androidPath + "package -m Android/2.x --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 1")
+system(packagerPath + " -t platform -p " + Dir.getwd + "/" + commonPath + "program -r " + Dir.getwd + "/" + commonPath + "resources -i " + iconFile + " -d " + Dir.getwd + "/" + androidPath + "package -m Android/Android --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 1")
 FileUtils.cp_r androidPath + "package/" + programName + ".apk", androidPackagePath, :verbose => true
 
 oldWD = Dir.getwd;
 #WP7
+puts "Compiling for WP7";
 Dir.chdir(wp7Path);
 system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cs " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
 Dir.chdir(oldWD);
@@ -80,6 +90,7 @@ system(packagerPath + " -t platform -p " + commonPath + "program -r " + commonPa
 FileUtils.cp_r Dir.glob(wp7Path + "package/project/*"), wp7PackagePath, :verbose => true
 
 #iOS
+puts "Compiling for iOS";
 Dir.chdir(iOSPath);
 system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cpp " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
 Dir.chdir(oldWD);
