@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,20 +17,11 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file main.cpp
+ * @file Log.cpp
  *
- *  Created on: Feb 8, 2012
- *  Author: Ali Sarrafi, Iraklis Rossis
+ * @author Mikael Kindborg
+ *
+ * Functions for logging.
  */
 
-#include <MAUtil/Moblet.h>
-#include "ReloadClient.h"
-
-/**
- * Main function that is called when the program starts.
- */
-extern "C" int MAMain()
-{
-	Moblet::run(new ReloadClient());
-	return 0;
-}
+// We only use macros for now, defined in Log.h

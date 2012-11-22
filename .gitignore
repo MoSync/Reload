@@ -1,4 +1,3 @@
-
 .DS_Store
 
 ReloadLauncher/Windows/ReloadLauncher.vcxproj.user
@@ -14,8 +13,8 @@ ReloadLauncher/Windows/ReloadLauncher.aps
 ReloadClient/Output
 ReloadClient/Clients
 ReloadClient/ReleasePackages
-
 ReloadClient/.mosyncproject.local
+ReloadClient/Resources/LocalFiles.bin
 
 ReloadServer/ReloadLauncher.bat
 ReloadServer/lastWorkspace.dat
