@@ -134,9 +134,9 @@ public:
 	 * @param size
 	 */
 	void getMessageCommandAndSize(
-		const char* buffer,
-		int* command,
-		int* size);
+		char* buffer,
+		int& command,
+		int& size);
 
 	/**
 	 * Process a JSON message

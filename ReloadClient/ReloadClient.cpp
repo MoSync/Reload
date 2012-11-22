@@ -88,6 +88,7 @@ ReloadClient::ReloadClient() :
 	// Initialize the server command.
 	mServerCommand = 0;
 
+	// Create folder where apps are unpacked.
 	MAHandle appDirHandle = maFileOpen(
 		(mFileUtil->getLocalPath() + mAppsFolder).c_str(),
 		MA_ACCESS_READ_WRITE);
@@ -395,7 +396,12 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 	// command and size data.
 	if (mServerCommand == 0)
 	{
-		getMessageCommandAndSize(mBuffer, &mServerCommand, &mServerMessageSize);
+		// Last two parameters are passed by reference to return
+		// the values for command and size.
+		getMessageCommandAndSize(
+			mBuffer,
+			mServerCommand,
+			mServerMessageSize);
 
 		LOG("@@@ RELOAD: connReadFinished "
 			"mServerCommand: %d, mServerMessageSize: %d",
@@ -455,24 +461,19 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
  * @param size
  */
 void ReloadClient::getMessageCommandAndSize(
-	const char* buffer,
-	int* command,
-	int* size)
+	char* buffer,
+	int& command,
+	int& size)
 {
-	char commandBuf[9];
-	char sizeBuf[9];
+	char c = buffer[8];
+	buffer[8] = '\0';
+	command = Convert::hexToInt(buffer);
+	buffer[8] = c;
 
-	for (int i = 0; i < 8; ++i)
-	{
-		commandBuf[i] = buffer[i];
-		sizeBuf[i] = buffer[8+i];
-	}
-
-	commandBuf[8] = '\0';
-	sizeBuf[8] = '\0';
-
-	*command = Convert::hexToInt(commandBuf);
-	*size = Convert::hexToInt(sizeBuf);
+	c = buffer[16];
+	buffer[16] = '\0';
+	size = Convert::hexToInt(buffer+8);
+	buffer[16] = c;
 }
 
 /**
@@ -485,7 +486,7 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 
 	// Get the message field.
 	Value* jsonValue = serverMessageJSONRoot->getValueForKey("message");
-	MAUtil::String message	= jsonValue->toString().c_str();
+	MAUtil::String message = jsonValue->toString().c_str();
 
 	// Download a bundle.
 	if (message == "ReloadBundle")
@@ -601,14 +602,14 @@ void ReloadClient::downloadBundle()
 	int result = mDownloader->beginDownloading(mBundleAddress, mResourceFile);
 	if (result > 0)
 	{
-		LOG("@@@RELOAD: downloadBundle started with result: %d\n", result);
+		LOG("@@@ RELOAD: downloadBundle started with result: %d\n", result);
 
 		// Show the loading screen during downloading.
 		mLoadingScreen->show();
 	}
 	else
 	{
-		LOG("@@@RELOAD: downloadBundle ERROR: %d\n", result);
+		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
 		showConErrorMessage(result);
 	}
 }
@@ -640,11 +641,11 @@ void ReloadClient::error(Downloader* downloader, int code)
  */
 void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 {
-    LOG("@@@RELOAD: finishedDownloading Completed download");
+    LOG("@@@ RELOAD: finishedDownloading Completed download");
 
-    // Extract the file System.
+    // Check that we have the expected bundle size.
     int dataSize = maGetDataSize(data);
-    lprintfln("Recieved size: %d, expected size: %d", dataSize, mBundleSize);
+    LOG("@@@ RELOAD: Received size: %d, expected size: %d", dataSize, mBundleSize);
     if (dataSize < mBundleSize)
     {
     	maDestroyPlaceholder(mResourceFile);
@@ -654,22 +655,33 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 
     	return;
     }
-    setCurrentFileSystem(data, 0);
 
-    // TODO: Comment what this code does.
+    // Clear old files.
     clearAppsFolder();
-    char buf[128];
+
+    // Set new app path.
+    char buf[512];
     sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
     mAppPath = buf;
-    lprintfln("App Path:%s", mAppPath.c_str());
     String fullPath = mFileUtil->getLocalPath() + mAppPath;
-    int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
     mReloadFile.setLocalPath(fullPath);
+
+    LOG("@@@ RELOAD: finishedDownloading mAppPath: %s", mAppPath.c_str());
+    LOG("@@@ RELOAD: finishedDownloading fullPath: %s", fullPath.c_str());
+
+    // Extract files.
+    setCurrentFileSystem(data, 0);
+    int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
     freeCurrentFileSystem();
     maDestroyPlaceholder(mResourceFile);
+
+    // Load the app on success.
     if (result > 0)
     {
-    	mFileUtil->writeTextToFile(mFileUtil->getLocalPath() + "LastAppDir.txt", mAppPath);
+    	// Save location of last loaded app.
+    	mFileUtil->writeTextToFile(
+    		mFileUtil->getLocalPath() + "LastAppDir.txt",
+    		mAppPath);
 
     	// Bundle was extracted, load the new app files.
     	loadSavedApp();
@@ -677,6 +689,8 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     else
     {
     	// App failed to extract, download it again.
+    	// TODO: Should we have a limit here to avoid
+    	// infinite download loop?
     	downloadBundle();
 
     	return;
@@ -688,11 +702,16 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
-	if (mFileUtil->openFileForReading(mFileUtil->getLocalPath() + mAppPath + "index.html") < 0)
+	String fullAppPath = mFileUtil->getLocalPath() + mAppPath;
+
+	// Check that index.html exists.
+	MAHandle file = mFileUtil->openFileForReading(fullAppPath + "index.html");
+	if (file < 0)
 	{
 		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
 	}
+	maFileClose(file);
 
 	// We do lazy initialization of the NativeUI message handler for the
 	// sake of WP7.
@@ -701,13 +720,18 @@ void ReloadClient::loadSavedApp()
 		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
 	}
 
-	showWebView();
+	//LOG("@@@ RELOAD: mAppPath: %s", mAppPath.c_str());
+	//LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
 
 	// Open the page.
-	getWebView()->openURL(mAppPath + "index.html");
+	showWebView();
+	getWebView()->setBaseUrl(fullAppPath);
+	getWebView()->openURL("index.html");
+
 	mHasPage = true;
 
 	// TODO: Replace this with with new Wormhole protocol.
+
 	// Send the Device Screen size to JavaScript.
 	MAExtent scrSize = maGetScrSize();
 	int width = EXTENT_X(scrSize);
@@ -718,7 +742,6 @@ void ReloadClient::loadSavedApp()
 		"{mosyncScreenWidth=%d, mosyncScreenHeight = %d;}",
 		width,
 		height);
-	lprintfln(buf);
 	callJS(buf);
 
 	// Initialize PhoneGap.
@@ -882,13 +905,12 @@ void ReloadClient::deleteFolderRecurse(const char *path)
 {
 	char fileName[128];
 	char fullPath[256];
-	LOG("@@@ RELOAD: Deleting contents of folder: %s", path);
+	LOG("@@@ RELOAD: Deleting files in folder: %s", path);
 	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
 	int length = maFileListNext(list, fileName, 128);
-	while(length > 0)
+	while (length > 0)
 	{
-		LOG("@@@ RELOAD: Deleting file: %s", fileName);
-		sprintf(fullPath,"%s%s", path, fileName);
+		sprintf(fullPath, "%s%s", path, fileName);
 		if (fileName[length-1] == '/')
 		{
 			deleteFolderRecurse(fullPath);
@@ -896,7 +918,7 @@ void ReloadClient::deleteFolderRecurse(const char *path)
 		MAHandle appDirHandle = maFileOpen(fullPath, MA_ACCESS_READ_WRITE);
 		if (maFileExists(appDirHandle))
 		{
-			lprintfln("Deleting file:%s", fileName);
+			//LOG("@@@ RELOAD: Deleting: %s", fileName);
 			maFileDelete(appDirHandle);
 		}
 		maFileClose(appDirHandle);
