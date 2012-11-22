@@ -76,6 +76,7 @@ files_to_copy = [
   "ReloadServer/templates",
   "ReloadServer/build.dat",
   "ReloadServer/MoSyncVersion.dat",
+  "ReloadServer/node_modules",
   
   ]
 
