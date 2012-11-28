@@ -2,6 +2,7 @@ var http = require('http'),
 	rpc  = require('./jsonrpc');
 	url  = require('url');
 
+
 var debug = true;
 
 var emptyRPCRequest = "?jsonRPC={}";

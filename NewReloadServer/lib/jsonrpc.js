@@ -66,7 +66,6 @@ var JSONRPC = {
             }
         }
         JSONRPC.trace('***', 'exposing module: ' + mod + ' [funcs: ' + funcs.join(', ') + ']');
-        console.log('***' + 'exposing module: ' + mod + ' [funcs: ' + funcs.join(', ') + ']');
     },
 
     /**
@@ -118,7 +117,7 @@ var JSONRPC = {
 
 	    // Build our success handler
 	    var onSuccess = function(funcResp) {
-	    	JSONRPC.trace('-->', 'response (id ' + message.id + '): ' + funcResp);
+	    	JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
 
 	      	return {
 				'id': message.id,
@@ -145,6 +144,7 @@ var JSONRPC = {
 
 	    try {
 	    	var resp = method.apply(null, message.params);
+	    	console.log("AFTER APPLY:----->", resp);
       		return onSuccess(resp);
 	    }
 	    catch(err) {

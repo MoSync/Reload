@@ -1,5 +1,5 @@
-var rpc  = require('../lib/jsonrpc');
-
+var rpc = require('../lib/jsonrpc');
+var net = require('net');
 /**
  * The functions that are available for remote calling
  */
@@ -10,15 +10,20 @@ var rpcFunctions = {
 		return r;
 	},
 
-	getNetworkIP: function(callback) {
+	getNetworkIP: function() {
+
 		var socket = net.createConnection(80, "www.google.com");
 		socket.on('connect', function()
 		{
-			callback(undefined, socket.address().address);
+			var ipAddress = socket.address().address;
 			socket.end();
+			console.log(ipAddress);
+			return(ipAddress);
+			
 		});
 		socket.on('error', function(e) {
-			callback(e, 'error');
+			console.log("Error on socket");
+			return "";
 		});
 	},
 
