@@ -951,6 +951,10 @@ function handleHTTPGet(req, res)
 			var pageSplit = page.split("?");
 			console.log(pageSplit);
 			renameProject(pageSplit[1], pageSplit[2]);
+			res.writeHead(302, {
+	  			'Location': '/UI/index.html'
+			});
+			res.end();
 		}
 		//Editing page asks the server to delete a project
 		else if ( page.indexOf("deleteProject") != -1 ) {
@@ -958,6 +962,10 @@ function handleHTTPGet(req, res)
 			console.log(pageSplit);
 			console.log(rootWorkspacePath + fileSeparator + pageSplit[1]);
 			deleteProject( rootWorkspacePath + fileSeparator + pageSplit[1] );
+			res.writeHead(302, {
+	  			'Location': '/UI/index.html'
+			});
+			res.end();
 		}
 		//Editing page asks the server to reload a project
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
