@@ -428,6 +428,119 @@ function renameProject(oldName, newName) {
 	}
 }
 
+function deleteProject(projectPath) {
+
+	var fs = require('fs');
+
+	fs.removeRecursive = function(path,cb){
+		var self = this;
+
+	    fs.stat(path, function(err, stats) {
+	    	if(err)
+	    	{
+	        	cb(err,stats);
+	        	return;
+	      	}
+	      	if(stats.isFile())
+	      	{
+	        	fs.unlink(path, function(err) {
+	          	if(err) 
+	          	{
+	            	cb(err,null);
+	          	}
+	          	else
+	          	{
+	            	cb(null,true);
+	          	}
+	          	return;
+	        	});
+	      	}
+	      	else if(stats.isDirectory())
+	      	{
+	        	// A folder may contain files
+	        	// We need to delete the files first
+	        	// When all are deleted we could delete the
+	        	// dir itself
+		        fs.readdir(path, function(err, files) {
+		        	if(err)
+		        	{
+		            	cb(err,null);
+		            	return;
+		          	}
+		          	
+		          	var f_length = files.length;
+		          	var f_delete_index = 0;
+
+		          	// Check and keep track of deleted files
+		          	// Delete the folder itself when the files are deleted
+
+		          	var checkStatus = function() {
+
+		            	// We check the status
+		            	// and count till we r done
+		            	if(f_length===f_delete_index)
+		            	{
+		              		fs.rmdir(path, function(err) {
+		                		if(err)
+		                		{
+		                  			cb(err,null);
+		                		}
+		                		else
+		                		{
+		                  			cb(null,true);
+		                		}
+		              		});
+		              		return true;
+		            	}
+		            	return false;
+		          	};
+
+		          	if(!checkStatus())
+		          	{
+		            	for(var i=0;i<f_length;i++)
+		            	{
+		              		// Create a local scope for filePath
+		              		// Not really needed, but just good practice
+		              		// (as strings arn't passed by reference)
+			            	(function(){
+			                	var filePath = path + fileSeparator + files[i];
+			                	// Add a named function as callback
+			                	// just to enlighten debugging
+			                	fs.removeRecursive(filePath,function removeRecursiveCB(err,status){
+			                  		if(!err)
+			                  		{
+			                    		f_delete_index ++;
+			                    		checkStatus();
+			                  		}
+			                  		else
+			                  		{
+			                    		cb(err,null);
+			                    		return;
+			                  		}
+			                	});
+			    
+			            	})()
+		            	}
+		          	}
+		        });
+	      	}
+	    });
+	};
+
+	fs.removeRecursive(projectPath, function(error, status){
+		if(!error)
+		{
+			console.log("Succesfull deletion of directory " + projectPath);
+		}
+		else 
+		{
+			console.log("Error in deletion of directory " + projectPath);
+			console.log("ERROR: " + error);
+		}
+		
+	});
+}
+
 var adb; //The Android adb tool used for debugging on Android clients
 var clearData = false;
 //We are using two buffers in order to avoid any problems
@@ -685,7 +798,7 @@ function handleHTTPGet(req, res)
 	try
 	{
 		var page = unescape(req.url);
-
+		if( page.indexOf("deleteProject") != -1 ) console.log(page);
 		//Browser requesting the default page
 		if (page == "/")
 		{
@@ -838,6 +951,13 @@ function handleHTTPGet(req, res)
 			var pageSplit = page.split("?");
 			console.log(pageSplit);
 			renameProject(pageSplit[1], pageSplit[2]);
+		}
+		//Editing page asks the server to delete a project
+		else if ( page.indexOf("deleteProject") != -1 ) {
+			var pageSplit = page.split("?");
+			console.log(pageSplit);
+			console.log(rootWorkspacePath + fileSeparator + pageSplit[1]);
+			deleteProject( rootWorkspacePath + fileSeparator + pageSplit[1] );
 		}
 		//Editing page asks the server to reload a project
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
