@@ -194,7 +194,6 @@
 			}
 
 			function createNewProject(projectName, projectType) {
-				//projectInProccess.push(projectName);
 
 				$.ajax({
 					url : "http://localhost:8282/createProject?" + projectName + "?" + projectType,
@@ -207,7 +206,6 @@
 				});
 			}
 			function renameProject(newPrName) {
-				projectInProccess.push(projectName);
 				$.ajax({
 					url : "http://localhost:8282/renameProject?" + selectedProjectID + "?" + newPrName,
 					context : document.body,
