@@ -29,7 +29,7 @@ var JSONRPC = {
 		console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
 		response.writeHead(200, {
 					  'Content-Length': JSON.stringify(responseObject).length,
-					  'Content-Type': 'html',
+					  'Content-Type': 'application/json',
 					  'Pragma': 'no-cache',
 					  'Cache-Control': 'no-cache',
 					  'Expires': '-1'
