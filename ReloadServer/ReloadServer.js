@@ -190,9 +190,40 @@ function setRootWorkspacePath(path)
  * Uses the Bundle program provided with the Reload package,
  * which is also used by the MoSync build system.
  */
-function bundleApp(projectDir, callback) {
+function bundleApp(projectDir, weinreDebug, callback) {
 	try
 	{
+		// WEINRE injection
+		// The script is injected only in the bundle. 
+		// The user is unaware of the injection in hiw source files
+		//Checking if weinreDebug is enabled
+		/*if(weinreDebug) {
+			//INJECT WEINRE SCRIPT
+			//<script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
+			
+			
+			var fs = require("fs");
+			var injectedScript = "<script src=\"http://" + localAddress + 
+								 ":8080/target/target-script-min.js\"></script>";
+			
+			var pathOfIndexHTML = rootWorkspacePath + fileSeparator + 
+							  projectDir + fileSeparator + 
+							  "LocalFiles" + fileSeparator + "index.html";
+
+			console.log("INDEX.HTML PATH: " + pathOfIndexHTML);
+			var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
+			
+			// Keep backup of index.html to restore it after bundling				
+			//fs.writeFileSync(originalIndexHTMLData, ".index.html", "utf8" );
+
+
+			injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
+			//fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+
+			console.log("WEINRE successfully inexted");						 
+
+		}*/
+
 		console.log("bundling the app " + projectDir);
 		var exec = require('child_process').exec;
 
@@ -221,6 +252,9 @@ function bundleApp(projectDir, callback) {
 			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
 			"LocalFiles.bin\"";
 		exec(command, puts);
+
+		// Revert index.html to it previous state
+		//fs.writeFileSync(pathOfIndexHTML, originalIndexHTMLData, "utf8" );
 	}
 	catch(err)
 	{
@@ -971,13 +1005,17 @@ function handleHTTPGet(req, res)
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
+			// TODO: the weinre debug should be passed as parameter from json RPC object
+			var weinreDebug = true;
+
 			console.log("Reloading project");
 			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
 			var pageSplit = page.split("/");
 			var path = pageSplit[pageSplit.length -2];
 			// Bundle the app.
-			bundleApp(path, function(actualPath){
+			bundleApp(path, weinreDebug, function(actualPath){
+				
 				//We will send the file size information together with the command as an extra level of integrity checking.
 				console.log("actualPath: " + actualPath)
 				var data = fs.readFileSync(actualPath);
