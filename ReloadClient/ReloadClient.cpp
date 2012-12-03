@@ -68,26 +68,81 @@ public:
 };
 
 ReloadClient::ReloadClient() :
-		mSocket(this),
-		mHasPage(false),
-		mNativeUIMessageReceived(false),
-		mPhoneGapMessageHandler(getWebView()),
-		mReloadFile(&mPhoneGapMessageHandler),
-		mResourceMessageHandler(getWebView()),
-		mPort(SERVER_TCP_PORT),
-		mAppsFolder("apps/")
+	mSocket(this)
 {
+	maWriteLog("@@@ 0", 5);
+	// Initialize application.
+	// Order of calls are important as data needed by
+	// later calls are created in earlier calls.
+	initializeWebView();
+	maWriteLog("@@@ 1", 5);
+	initializeVariables();
+	maWriteLog("@@@ 2", 5);
+	initializeFiles();
+	maWriteLog("@@@ 3", 5);
+	createMessageHandlers();
+	maWriteLog("@@@ 4", 5);
+	createDownloader();
+	maWriteLog("@@@ 5", 5);
+	createScreens();
+	maWriteLog("@@@ 6", 5);
+
+	// Show first screen.
+	// TODO: Why false as param?!
+	mLoginScreen->show(false);
+
+	mMessageHandler->mResourceMessageHandler->setLogMessageListener(this);
+}
+
+ReloadClient::~ReloadClient()
+{
+}
+
+void ReloadClient::initializeWebView()
+{
+	maWriteLog("@@q 1", 5);
+
+	// Create WebView widget and message handlers.
+	// This code is from HybridMoblet::initialize().
+	mInitialized = true;
+	createUI();
+	enableWebViewMessages();
+	mMessageHandler->initialize(this);
+
+	maWriteLog("@@q 2", 5);
+
+	// Set the beep sound. This is defined in the
+	// Resources/Resources.lst file. You can change
+	// this by changing the sound file in that folder.
+	setBeepSound(BEEP_WAV);
+	maWriteLog("@@q 3", 5);
+
+	// Show the WebView that contains the HTML/CSS UI
+	// and the JavaScript code.
+	getWebView()->setVisible(true);
+	maWriteLog("@@q 4", 5);
+}
+
+void ReloadClient::initializeVariables()
+{
+	mHasPage = false;
+	mNativeUIMessageReceived = false;
+	mPort = SERVER_TCP_PORT;
+	mAppsFolder = "apps/";
+	mServerCommand = 0;
+	mRunningApp = false;
+
+	// Get the OS we are on.
 	char buffer[64];
 	maGetSystemProperty(
-				"mosync.device.OS",
-				buffer,
-				64);
+		"mosync.device.OS",
+		buffer,
+		64);
 	mOS = buffer;
-	mNativeUIMessageHandler = NULL;
+}
 
-	// Initialize the server command.
-	mServerCommand = 0;
-
+void ReloadClient::initializeFiles()
+{
 	// Create folder where apps are unpacked.
 	MAHandle appDirHandle = maFileOpen(
 		(mFileUtil->getLocalPath() + mAppsFolder).c_str(),
@@ -100,23 +155,8 @@ ReloadClient::ReloadClient() :
 	}
 	maFileClose(appDirHandle);
 
-	mLoginScreen = new LoginScreen(this);
-	mLoadingScreen = new LoadingScreen(this);
-
-	mLoginScreen->initializeScreen(mOS);
-	mLoadingScreen->initializeScreen(mOS);
-
+	// Get the path of the last downloaded app.
 	bool success = mFileUtil->readTextFromFile(
-		mFileUtil->getLocalPath() + "LastServerAddress.txt",
-		mServerAddress);
-	if (!success)
-	{
-		mServerAddress = "localhost";
-	}
-
-	mLoginScreen->defaultAddress(mServerAddress.c_str());
-
-	success = mFileUtil->readTextFromFile(
 		mFileUtil->getLocalPath() + "LastAppDir.txt",
 		mAppPath);
 	if (!success)
@@ -124,6 +164,7 @@ ReloadClient::ReloadClient() :
 		mAppPath = "";
 	}
 
+	// TODO: What is this?
 	int size = maGetDataSize(INFO_TEXT);
 	if (size > 0)
 	{
@@ -138,29 +179,50 @@ ReloadClient::ReloadClient() :
 		maPanic(0, "RELOAD: Could not read info file");
 	}
 
-	// Set the beep sound. This is defined in the
-	// Resources/Resources.lst file. You can change
-	// this by changing the sound file in that folder.
-	mPhoneGapMessageHandler.setBeepSound(BEEP_WAV);
+	// Get the most recently used server ip address.
+	success = mFileUtil->readTextFromFile(
+		mFileUtil->getLocalPath() + "LastServerAddress.txt",
+		mServerAddress);
+	if (!success)
+	{
+		mServerAddress = "localhost";
+	}
+}
 
-	// Enable message sending from JavaScript to C++.
-	enableWebViewMessages();
-	// Show the WebView that contains the HTML/CSS UI
-	// and the JavaScript code.
-	getWebView()->setVisible(true);
+void ReloadClient::createMessageHandlers()
+{
+	// Special handler for local file system messages.
+	// This is needed because applications are unpacked to temporary
+	// directories, and not in the application's root folder.
+	mReloadFileHandler = new ReloadFileHandler(
+		mMessageHandler->mPhoneGapMessageHandler);
+	mMessageHandler->mPhoneGapMessageHandler->
+		setFileHandler(mReloadFileHandler);
+}
 
+void ReloadClient::createDownloader()
+{
+	// Create downloader object.
 	mDownloader = new Downloader();
 	mDownloader->addDownloadListener(this);
 	mDownloader->addDownloadListener(mLoadingScreen);
-
-	Environment::getEnvironment().addCustomEventListener(this);
-
-	mRunningApp = false;
-	mLoginScreen->show(false);
-
-	mResourceMessageHandler.setLogMessageListener(this);
 }
 
+void ReloadClient::createScreens()
+{
+	// Create login screen and loading screen.
+	mLoginScreen = new LoginScreen(this);
+	mLoginScreen->initializeScreen(mOS);
+	mLoadingScreen = new LoadingScreen(this);
+	mLoadingScreen->initializeScreen(mOS);
+
+	// Set the most recently used server ip address.
+	mLoginScreen->defaultAddress(mServerAddress.c_str());
+}
+/**
+ * Get client info.
+ * @return String with client info.
+ */
 MAUtil::String ReloadClient::getInfo()
 {
 	return mInfo;
@@ -175,7 +237,7 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	if (mRunningApp)
 	{
 		// Forward to PhoneGap MessageHandler.
-		mPhoneGapMessageHandler.processKeyEvent(keyCode, nativeCode);
+		mMessageHandler->keyPressEvent(keyCode, nativeCode);
 	}
 	else
 	{
@@ -187,174 +249,25 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 }
 
 /**
- * This method handles messages sent from the WebView.
- *
- * Note that the data object will be valid only during
- * the life-time of the call of this method, then it
- * will be deallocated.
- *
- * @param webView The WebView that sent the message.
- * @param urlData Data object that holds message content.
+ * Called from JavaScript when a Wormhole app has been loaded.
  */
-void ReloadClient::handleWebViewMessage(WebView* webView, MAHandle data)
+void ReloadClient::openWormhole(MAHandle webViewHandle)
 {
-	// Uncomment to print message data for debugging.
-	// You need to build the project in debug mode for
-	// the log output to be displayed.
-	//printMessage(data);
+	// Call super class method to handler initialization.
+	HybridMoblet::openWormhole(webViewHandle);
 
-	// Check the message protocol.
-	MessageProtocol protocol(data);
-	if (protocol.isMessageStreamJSON())
-	{
-		handleMessageStreamJSON(webView, data);
-	}
-	else if (protocol.isMessageStream())
-	{
-		handleMessageStream(webView, data);
-	}
-	else
-	{
-		LOG("@@@ RELOAD: Undefined message protocol");
-	}
-}
-
-/**
- * Handles JSON messages. This is used by PhoneGap.
- *
- * You can send your own messages from JavaScript and handle them here.
- *
- * @param webView A pointer to the web view posting this message.
- * @param data The raw encoded JSON message array.
- */
-void ReloadClient::handleMessageStreamJSON(WebView* webView, MAHandle data)
-{
-	// Create the message object. This parses the message data.
-	// The message object contains one or more messages.
-	JSONMessage message(webView, data);
-
-	// Loop through messages.
-	while (message.next())
-	{
-		// This detects the PhoneGap protocol.
-		if (message.is("PhoneGap"))
-		{
-			// The local file system is different from a normal Wormhole app,
-			// we need to intervene in the normal API call.
-			if (message.getParam("service") == "File"
-				&& message.getParam("action")=="requestFileSystem")
-			{
-				mReloadFile.actionRequestFileSystem(message);
-			}
-			else
-			{
-				mPhoneGapMessageHandler.handlePhoneGapMessage(message);
-			}
-		}
-		// Here we add our own messages. See index.html for
-		// the JavaScript code used to send the message.
-		else if (message.is("Custom"))
-		{
-			String command = message.getParam("command");
-			if (command == "vibrate")
-			{
-				int duration = message.getParamInt("duration");
-				maVibrate(duration);
-			}
-		}
-	}
-}
-
-/**
- * Handles string stream messages (generally faster than JSON messages).
- * This is used by the JavaScript NativeUI system.
- *
- * You can send your own messages from JavaScript and handle them here.
- *
- * @param webView A pointer to the web view posting this message.
- * @param data The raw encoded stream of string messages.
- */
-void ReloadClient::handleMessageStream(WebView* webView, MAHandle data)
-{
-	// Create a message stream object. This parses the message data.
-	// The message object contains one or more strings.
-	MessageStream stream(webView, data);
-
-	// Pointer to a string in the message stream.
-	const char* p;
-
-	// Process messages while there are strings left in the stream.
-	while (p = stream.getNext())
-	{
-		if (0 == strcmp(p, "NativeUI"))
-		{
-			// If this is the first NativeUI message we receive (init), we also hijack the
-			// loadImage function to point to the new relative path
-			if (!mNativeUIMessageReceived)
-			{
-				char buff[512];
-				sprintf(
-					buff,
-					"mosync.resource.loadImageOld = mosync.resource.loadImage;"
-					" mosync.resource.loadImage = function(imagePath, imageID, successCallback)"
-					"{"
-					"mosync.resource.loadImageOld('%s' + imagePath, imageID, successCallback)"
-					"}",
-					mAppPath.c_str());
-				getWebView()->callJS(buff);
-				mNativeUIMessageReceived = true;
-			}
-
-			// Forward NativeUI messages to the respective message handler
-			mNativeUIMessageHandler->handleMessage(stream);
-		}
-		else if (0 == strcmp(p, "Resource"))
-		{
-			//Forward Resource messages to the respective message handler
-			mResourceMessageHandler.handleMessage(stream);
-		}
-		else if (0 == strcmp(p, "close"))
-		{
-			// Close the application (calls method in class Moblet).
-			close();
-		}
-		// Here we add your own messages. See index.html for
-		// the JavaScript code used to send the message.
-		else if (0 == strcmp(p, "Custom"))
-		{
-			const char* command = stream.getNext();
-			if (NULL != command && (0 == strcmp(command, "beep")))
-			{
-				// This is how to play the sound in the resource BEEP_WAV.
-				lprintfln("beeping");
-				maSoundPlay(BEEP_WAV, 0, maGetDataSize(BEEP_WAV));
-			}
-		}
-	}
-}
-
-/**
- * For debugging.
- */
-void ReloadClient::printMessage(MAHandle dataHandle)
-{
-	// Get length of the data, it is not zero terminated.
-	int dataSize = maGetDataSize(dataHandle);
-
-	// Allocate buffer for string data.
-	char* stringData = (char*) malloc(dataSize + 1);
-
-	// Get the data.
-	maReadData(dataHandle, stringData, 0, dataSize);
-
-	// Zero terminate.
-	stringData[dataSize] = 0;
-
-	// Print unparsed message data.
-	maWriteLog("@@@ RELOAD Message:", 19);
-	maWriteLog(stringData, dataSize);
-
-	free(stringData);
+	// Hijack the loadImage function to point to the relative path
+	// of the directory in which the app is unpacked.
+	char buf[512];
+	sprintf(
+		buf,
+		"mosync.resource.loadImageOld = mosync.resource.loadImage;"
+		"mosync.resource.loadImage = function(imagePath, imageID, successCallback)"
+		"{"
+		"mosync.resource.loadImageOld('%s' + imagePath, imageID, successCallback)"
+		"}",
+		mAppPath.c_str());
+	getWebView()->callJS(buf);
 }
 
 /**
@@ -545,22 +458,12 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 
 /**
  * New function called to download index.html from the server.
- * TODO: This is experimental code. Use of remove.
+ * TODO: This is experimental code.
  */
 void ReloadClient::downloadHTML()
 {
 	// Clear web view cache.
 	getWebView()->setProperty("cache", "clearall");
-
-	//We do lazy initialization of the NativeUI message handler for the
-	//sake of WP7
-	if (mNativeUIMessageHandler == NULL)
-	{
-		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
-	}
-
-	// Make the WebView visible.
-	showWebView();
 
 	// Set URL (uses experimental port).
 	String url = "http://";
@@ -568,33 +471,18 @@ void ReloadClient::downloadHTML()
 	lprintfln("downloadHTML: %s", url.c_str());
 
 	// Open the page.
-	getWebView()->openURL(url);
+	showPage(url);
 
 	mHasPage = true;
-
-	//Send the Device Screen size to JavaScript
-	MAExtent scrSize = maGetScrSize();
-	int width = EXTENT_X(scrSize);
-	int height = EXTENT_Y(scrSize);
-	char buf[512];
-	sprintf(
-			buf,
-			"{mosyncScreenWidth=%d, mosyncScreenHeight = %d;}",
-			width,
-			height);
-	//lprintfln(buf);
-	callJS(buf);
-
-	// Initialize PhoneGap.
-	mPhoneGapMessageHandler.initializePhoneGap();
 	mRunningApp = true;
 }
 
 void ReloadClient::downloadBundle()
 {
-	//Prepare a reciever for the download
+	// Create a data object for the downloaded bundle.
 	mResourceFile = maCreatePlaceholder();
-	//Start the bundle download
+
+	// Start the bundle download.
 	if (mDownloader->isDownloading())
 	{
 		mDownloader->cancelDownloading();
@@ -664,7 +552,7 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
     mAppPath = buf;
     String fullPath = mFileUtil->getLocalPath() + mAppPath;
-    mReloadFile.setLocalPath(fullPath);
+    mReloadFileHandler->setLocalPath(fullPath);
 
     LOG("@@@ RELOAD: finishedDownloading mAppPath: %s", mAppPath.c_str());
     LOG("@@@ RELOAD: finishedDownloading fullPath: %s", fullPath.c_str());
@@ -713,39 +601,17 @@ void ReloadClient::loadSavedApp()
 	}
 	maFileClose(file);
 
-	// We do lazy initialization of the NativeUI message handler for the
-	// sake of WP7.
-	if (mNativeUIMessageHandler == NULL)
-	{
-		mNativeUIMessageHandler = new NativeUIMessageHandler(getWebView());
-	}
-
-	//LOG("@@@ RELOAD: mAppPath: %s", mAppPath.c_str());
-	//LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
+	LOG("@@@ RELOAD: mAppPath: %s", mAppPath.c_str());
+	LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
 
 	// Open the page.
-	showWebView();
+	//showWebView();
+	//getWebView()->setBaseUrl(fullAppPath);
+	//getWebView()->openURL("index.html");
 	getWebView()->setBaseUrl(fullAppPath);
-	getWebView()->openURL("index.html");
+	showPage("index.html");
 
 	mHasPage = true;
-
-	// TODO: Replace this with with new Wormhole protocol.
-
-	// Send the Device Screen size to JavaScript.
-	MAExtent scrSize = maGetScrSize();
-	int width = EXTENT_X(scrSize);
-	int height = EXTENT_Y(scrSize);
-	char buf[512];
-	sprintf(
-		buf,
-		"{mosyncScreenWidth=%d, mosyncScreenHeight = %d;}",
-		width,
-		height);
-	callJS(buf);
-
-	// Initialize PhoneGap.
-	mPhoneGapMessageHandler.initializePhoneGap();
 
 	mRunningApp = true;
 }

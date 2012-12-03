@@ -29,14 +29,13 @@ MA 02110-1301, USA.
 #include <Wormhole/Libs/PhoneGap/PhoneGapFile.h>
 #include <Wormhole/Libs/JSONMessage.h>
 
-class ReloadFile: public Wormhole::PhoneGapFile
+class ReloadFileHandler: public Wormhole::PhoneGapFile
 {
 public:
-
 	/**
 	 * Constructor.
 	 */
-	ReloadFile(Wormhole::PhoneGapMessageHandler* messageHandler):Wormhole::PhoneGapFile(messageHandler){};
+	ReloadFileHandler(Wormhole::PhoneGapMessageHandler* messageHandler);
 
 	void setLocalPath(MAUtil::String &path);
 
@@ -45,7 +44,11 @@ public:
 	 */
 	void actionRequestFileSystem(Wormhole::JSONMessage& message);
 
+	/**
+	 * TODO: Implement.
+	 */
 	void actionResolveLocalFileSystemURI(Wormhole::JSONMessage& message);
+
 private:
 	MAUtil::String mLocalPath;
 };
