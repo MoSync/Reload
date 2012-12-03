@@ -195,11 +195,12 @@ function bundleApp(projectDir, weinreDebug, callback) {
 	{
 		// WEINRE injection
 		// The script is injected only in the bundle. 
-		// The user is unaware of the injection in hiw source files
+		// The user is unaware of the injection in his source files
 		//Checking if weinreDebug is enabled
-		/*if(weinreDebug) {
+		if(weinreDebug) {
 			//INJECT WEINRE SCRIPT
-			//<script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
+			//<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
+			//eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
 			
 			
 			var fs = require("fs");
@@ -213,16 +214,12 @@ function bundleApp(projectDir, weinreDebug, callback) {
 			console.log("INDEX.HTML PATH: " + pathOfIndexHTML);
 			var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
 			
-			// Keep backup of index.html to restore it after bundling				
-			//fs.writeFileSync(originalIndexHTMLData, ".index.html", "utf8" );
-
-
 			injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
-			//fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+			fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
 
-			console.log("WEINRE successfully inexted");						 
+			console.log("WEINRE successfully injected in Reload"); 			 
 
-		}*/
+		}
 
 		console.log("bundling the app " + projectDir);
 		var exec = require('child_process').exec;
@@ -234,6 +231,10 @@ function bundleApp(projectDir, weinreDebug, callback) {
 			console.log("error: " + error);
 			callback(rootWorkspacePath + fileSeparator +
 				projectDir + "/LocalFiles.bin");
+
+			// Revert index.html to it previous state without the weinre injection
+			if(weinreDebug)
+				fs.writeFileSync(pathOfIndexHTML, originalIndexHTMLData, "utf8" );
 		}
 
 		var bundleCommand = "bin\\win\\Bundle.exe";
@@ -251,10 +252,7 @@ function bundleApp(projectDir, weinreDebug, callback) {
 			fileSeparator + projectDir + fileSeparator + "LocalFiles\" -out \"" +
 			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
 			"LocalFiles.bin\"";
-		exec(command, puts);
-
-		// Revert index.html to it previous state
-		//fs.writeFileSync(pathOfIndexHTML, originalIndexHTMLData, "utf8" );
+		exec(command, puts);		
 	}
 	catch(err)
 	{
@@ -832,7 +830,7 @@ function handleHTTPGet(req, res)
 	try
 	{
 		var page = unescape(req.url);
-		if( page.indexOf("deleteProject") != -1 ) console.log(page);
+
 		//Browser requesting the default page
 		if (page == "/")
 		{
@@ -990,7 +988,7 @@ function handleHTTPGet(req, res)
 			});
 			res.end();
 		}
-		//Editing page asks the server to delete a project
+		// Editing page asks the server to delete a project
 		else if ( page.indexOf("deleteProject") != -1 ) {
 			var pageSplit = page.split("?");
 			console.log(pageSplit);
@@ -1001,13 +999,35 @@ function handleHTTPGet(req, res)
 			});
 			res.end();
 		}
-		//Editing page asks the server to reload a project
+		// Editing page asks the server to reload a project
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
 			// TODO: the weinre debug should be passed as parameter from json RPC object
-			var weinreDebug = true;
+			/* just for testing
+			var jsonRPC = {};
+			jsonRPC.params = Array();
+			jsonRPC.params["debug"] = true;*/
 
+			var weinreDebug;
+			if(typeof jsonRPC === "undefined")
+			{
+				weinreDebug = false;
+				console.log("WEINRE ENABLED jsonRPC:" + weinreDebug);
+			}
+			else
+			{
+				if(typeof jsonRPC.params["debug"] === "undefined") 
+				{
+					weinreDebug = false;
+					console.log("WEINRE ENABLED jsonRPC.params:" + weinreDebug);
+				}
+				else
+				{
+					weinreDebug = jsonRPC.params["debug"];
+				}
+			}
+			console.log("WEINRE ENABLED:" + weinreDebug);
 			console.log("Reloading project");
 			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
