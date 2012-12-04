@@ -23,13 +23,13 @@ MA 02110-1301, USA.
  *      Author: Ali Sarrafi, Iraklis Rossis
  */
 
+#include "mastdlib.h"
+
 #include <Wormhole/HighLevelHttpConnection.h>
-#include <Wormhole/WebViewMessage.h>
 #include <Wormhole/Encoder.h>
 
 #include "ReloadClient.h"
-#include "mastdlib.h"
-
+#include "ReloadNativeUIMessageHandler.h"
 #include "Convert.h"
 #include "Log.h"
 
@@ -70,28 +70,22 @@ public:
 ReloadClient::ReloadClient() :
 	mSocket(this)
 {
-	maWriteLog("@@@ 0", 5);
 	// Initialize application.
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
 	initializeWebView();
-	maWriteLog("@@@ 1", 5);
 	initializeVariables();
-	maWriteLog("@@@ 2", 5);
 	initializeFiles();
-	maWriteLog("@@@ 3", 5);
-	createMessageHandlers();
-	maWriteLog("@@@ 4", 5);
-	createDownloader();
-	maWriteLog("@@@ 5", 5);
 	createScreens();
-	maWriteLog("@@@ 6", 5);
+	createMessageHandlers();
+	createDownloader();
 
 	// Show first screen.
 	// TODO: Why false as param?!
 	mLoginScreen->show(false);
 
-	mMessageHandler->mResourceMessageHandler->setLogMessageListener(this);
+	// TODO: Add call to HybridMoblet and other classes.
+	// setLogMessageListener(this);
 }
 
 ReloadClient::~ReloadClient()
@@ -100,27 +94,24 @@ ReloadClient::~ReloadClient()
 
 void ReloadClient::initializeWebView()
 {
-	maWriteLog("@@q 1", 5);
-
 	// Create WebView widget and message handlers.
 	// This code is from HybridMoblet::initialize().
 	mInitialized = true;
 	createUI();
 	enableWebViewMessages();
-	mMessageHandler->initialize(this);
 
-	maWriteLog("@@q 2", 5);
+	// Initialize the message handler.
+	getMessageHandler()->initialize(this);
+	getMessageHandler()->nativeUIEventsOff();
 
 	// Set the beep sound. This is defined in the
 	// Resources/Resources.lst file. You can change
 	// this by changing the sound file in that folder.
 	setBeepSound(BEEP_WAV);
-	maWriteLog("@@q 3", 5);
 
 	// Show the WebView that contains the HTML/CSS UI
 	// and the JavaScript code.
 	getWebView()->setVisible(true);
-	maWriteLog("@@q 4", 5);
 }
 
 void ReloadClient::initializeVariables()
@@ -195,9 +186,13 @@ void ReloadClient::createMessageHandlers()
 	// This is needed because applications are unpacked to temporary
 	// directories, and not in the application's root folder.
 	mReloadFileHandler = new ReloadFileHandler(
-		mMessageHandler->mPhoneGapMessageHandler);
-	mMessageHandler->mPhoneGapMessageHandler->
+		getMessageHandler()->getPhoneGapMessageHandler());
+	(getMessageHandler()->getPhoneGapMessageHandler())->
 		setFileHandler(mReloadFileHandler);
+
+	// Set our custom Native UI message handler.
+	getMessageHandler()->setNativeUIMessageHandler(
+		new ReloadNativeUIMessageHandler(getWebView()));
 }
 
 void ReloadClient::createDownloader()
@@ -348,8 +343,11 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 		// Reset server command.
 		mServerCommand = 0;
 
+		LOG("@@@ ReloadClient::connReadFinished 1");
 		// Read the next TCP message header.
 		mSocket.read(mBuffer, 16);
+
+		LOG("@@@ ReloadClient::connReadFinished 2");
 	}
 	else
 	{
@@ -360,6 +358,7 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 		// Go back to the login screen on an error.
 		mLoginScreen->show(false);
 	}
+	LOG("@@@ ReloadClient::connReadFinished END");
 }
 
 /**
@@ -441,6 +440,7 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 		// Download the bundle.
 		downloadBundle();
 
+		LOG("@@@ ReloadClient::processJSONMessage 1");
 		// Use this to use experimental HTML download.
 		// Needs divineprog/LiveApps/FileServer to work
 		// and manual config of BasePath.
@@ -454,6 +454,7 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 	{
 		maPanic(0,"RELOAD: Unknown server message");
 	}
+	LOG("@@@ ReloadClient::processJSONMessage END");
 }
 
 /**
@@ -500,6 +501,7 @@ void ReloadClient::downloadBundle()
 		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
 		showConErrorMessage(result);
 	}
+	LOG("@@@ ReloadClient::downloadBundle END");
 }
 
 /**
@@ -604,6 +606,11 @@ void ReloadClient::loadSavedApp()
 	LOG("@@@ RELOAD: mAppPath: %s", mAppPath.c_str());
 	LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
 
+	// We want NativeUI events.
+	getMessageHandler()->nativeUIEventsOn();
+
+	// TODO: How to find out if the app uses native ui!
+
 	// Open the page.
 	//showWebView();
 	//getWebView()->setBaseUrl(fullAppPath);
@@ -633,9 +640,11 @@ void ReloadClient::freeHardware()
 		}*/
 	}
 
+	// TODO: We need to handler detection of native ui apps.
 	mNativeUIMessageReceived = false;
 
 	// Try stopping all sensors.
+	// TODO: Replace hard coded number "6" with symbolic value.
 	for (int i = 1; i <= 6; ++i)
 	{
 		maSensorStop(i);

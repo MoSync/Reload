@@ -17,10 +17,11 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ReloadClient.h
+ * @file ReloadFile.h
  *
  * This is a simple subclassing of PhoneGapFile, in order to bypass the
- * original local file system path, and supply the correct one used by Reloaded apps
+ * original local file system path, and supply the correct one used
+ * by Reloaded apps.
  *
  *  Created on: May 8, 2012
  *      Author: Ali Sarrafi, Iraklis Rossis
@@ -37,17 +38,25 @@ public:
 	 */
 	ReloadFileHandler(Wormhole::PhoneGapMessageHandler* messageHandler);
 
+	/**
+	 * Destructor.
+	 */
+	virtual ~ReloadFileHandler();
+
+	/**
+	 * Set the path to be used as the local root path.
+	 */
 	void setLocalPath(MAUtil::String &path);
 
 	/**
 	 * Return a FileSystem object.
 	 */
-	void actionRequestFileSystem(Wormhole::JSONMessage& message);
+	virtual void actionRequestFileSystem(Wormhole::JSONMessage& message);
 
 	/**
 	 * TODO: Implement.
 	 */
-	void actionResolveLocalFileSystemURI(Wormhole::JSONMessage& message);
+	virtual void actionResolveLocalFileSystemURI(Wormhole::JSONMessage& message);
 
 private:
 	MAUtil::String mLocalPath;

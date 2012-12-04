@@ -56,7 +56,10 @@ MA 02110-1301, USA.
 ReloadFileHandler::ReloadFileHandler(Wormhole::PhoneGapMessageHandler* messageHandler)
 	: Wormhole::PhoneGapFile(messageHandler)
 {
+}
 
+ReloadFileHandler::~ReloadFileHandler()
+{
 }
 
 void ReloadFileHandler::setLocalPath(MAUtil::String &path)
