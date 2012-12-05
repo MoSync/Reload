@@ -20,23 +20,30 @@ var JSONRPC = {
 	* @param Socket socket The websocket object to observe.
 	*
 	* @type void
-	*/    
+	*/  
 	listen : function(message, response){
 		var self = this;
-		console.log(message);
-		var responseObject = self.handleMessage( message );
+		this.response = response;
 
-		console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
-		response.writeHead(200, {
-					  'Content-Length': JSON.stringify(responseObject).length,
-					  'Content-Type': 'application/json',
-					  'Pragma': 'no-cache',
-					  'Cache-Control': 'no-cache',
-					  'Expires': '-1'
-					});
-		response.write( JSON.stringify(responseObject) );
-		response.end("");
-				
+		console.log(message);
+		self.handleMessage( message, function(data) {
+			
+			var responseObject = {
+				'id': 0,
+	        	'result': data,
+	        	'error': null
+	      	};
+			console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
+			self.response.writeHead(200, {
+						  'Content-Length': JSON.stringify(responseObject).length,
+						  'Content-Type': 'application/json',
+						  'Pragma': 'no-cache',
+						  'Cache-Control': 'no-cache',
+						  'Expires': '-1'
+						});
+			self.response.write( JSON.stringify(responseObject) );
+			self.response.end("");
+		});
 	},
 
     /**
@@ -92,10 +99,31 @@ var JSONRPC = {
         sys.puts('   ' + direction + '   ' + message);
     },
  
-    handleMessage: function(message) {
-	
+    handleMessage: function( message, callback ) {
+
+		var newParams = [];
 		JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
-	
+		
+		/**
+		 * Figuring out if one of the parameters are function and add 
+		 * the function in the param list
+		 */
+		message.params.forEach( function (element, index, array){
+
+		    var regexp = /\bfunction[\s\S]/;
+		    
+		    if( element.indexOf("function") != -1 ) {
+		        
+		        callbackString = element.replace(regexp,"function cb");
+		        eval(callbackString);
+		        newParams.push(cb);
+		    }
+		    else if(this.functions.hasOwnProperty(element) ) {
+		        newParams.push( this.functions[element] );
+		    }
+		}, this);
+		message.params = newParams;
+
 	    // Check for the required fields, and if they aren't there, then
 	    // dispatch to the handleInvalidRequest function.
 	    if(!(message.method && message.params)) {
@@ -105,8 +133,7 @@ var JSONRPC = {
 	        	'error': 'Invalid Request'
 	      	};
 	    }
-	    console.log( this.functions );
-	    console.log("### " + this.functions.hasOwnProperty(message.method));
+
 	    if(!this.functions.hasOwnProperty(message.method)) {
 	    	return {
 		    	'id': message.id,
@@ -143,9 +170,9 @@ var JSONRPC = {
 	    var method = this.functions[message.method];
 
 	    try {
-	    	var resp = method.apply(null, message.params);
-	    	console.log("AFTER APPLY:----->", resp);
-      		return onSuccess(resp);
+
+	    	message.params.push(callback);
+	    	method.apply(null, message.params);
 	    }
 	    catch(err) {
 	    	return onFailure(err);

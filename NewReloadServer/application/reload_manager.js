@@ -4,26 +4,29 @@ var net = require('net');
  * The functions that are available for remote calling
  */
 var rpcFunctions = {
-	add: function (a, b) {
-
+	add: function (a,b) {
 		var r = a + b;
+
 		return r;
 	},
 
-	getNetworkIP: function() {
+	setIP: function(ip, sendResponse) {
+		this.IP = ip;
+		console.log("THE IP IS:"+ip);
+		sendResponse( ip );
+	},
+
+	getNetworkIP: function(callback, sendResponse) {
 
 		var socket = net.createConnection(80, "www.google.com");
-		socket.on('connect', function()
-		{
-			var ipAddress = socket.address().address;
-			socket.end();
-			console.log(ipAddress);
-			return(ipAddress);
+		socket.on('connect', function() {
 			
+			socket.end();
+			//sendResponse( socket.address().address );
+			callback(socket.address().address, sendResponse);
 		});
 		socket.on('error', function(e) {
-			console.log("Error on socket");
-			return "";
+			return 50;
 		});
 	},
 
@@ -41,6 +44,8 @@ var rpcFunctions = {
 
 		return html;
 	}
+
+
 };
 
 rpc.exposeModule('manager', rpcFunctions);
