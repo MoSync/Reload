@@ -60,5 +60,6 @@ bool ReloadNativeUIMessageHandler::reset()
 bool ReloadNativeUIMessageHandler::handleMessage(Wormhole::MessageStream& message)
 {
 	mIsUsingNativeUI = true;
+
 	Wormhole::NativeUIMessageHandler::handleMessage(message);
 }

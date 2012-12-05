@@ -140,7 +140,6 @@ void LoadingScreen::buttonClicked(Widget *button)
  */
 void LoadingScreen::notifyProgress(Downloader *downloader, int downloadedBytes, int totalBytes)
 {
-	LOG("@@@ LoadingScreen::notifyProgress");
 	mProgressBar->setProgress((int)(((float)downloadedBytes / totalBytes) * 100));
 }
 
@@ -151,7 +150,6 @@ void LoadingScreen::notifyProgress(Downloader *downloader, int downloadedBytes, 
  */
 void LoadingScreen::finishedDownloading(Downloader* downloader, MAHandle data)
 {
-	LOG("@@@ LoadingScreen::finishedDownloading");
 	mIndicator->hide(); //Needed for android to animate correctly
 }
 
@@ -176,11 +174,7 @@ void LoadingScreen::error(Downloader* downloader, int code)
 
 void LoadingScreen::show()
 {
-	LOG("@@@ LoadingScreen::show 1");
 	mSplashScreen->show();
-	LOG("@@@ LoadingScreen::show 2");
 	mIndicator->show(); //Needed for Android indicator to animate
-	LOG("@@@ LoadingScreen::show 3");
 	mProgressBar->setProgress(50);
-	LOG("@@@ LoadingScreen::show 4");
 }

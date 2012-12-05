@@ -83,9 +83,6 @@ ReloadClient::ReloadClient() :
 	// Show first screen.
 	// TODO: Why false as param?!
 	mLoginScreen->show(false);
-
-	// TODO: Add call to HybridMoblet and other classes.
-	// setLogMessageListener(this);
 }
 
 ReloadClient::~ReloadClient()
@@ -102,7 +99,7 @@ void ReloadClient::initializeWebView()
 
 	// Initialize the message handler.
 	getMessageHandler()->initialize(this);
-	getMessageHandler()->nativeUIEventsOff();
+	//getMessageHandler()->nativeUIEventsOff();
 
 	// Set the beep sound. This is defined in the
 	// Resources/Resources.lst file. You can change
@@ -185,14 +182,13 @@ void ReloadClient::createMessageHandlers()
 	// Special handler for local file system messages.
 	// This is needed because applications are unpacked to temporary
 	// directories, and not in the application's root folder.
-	mReloadFileHandler = new ReloadFileHandler(
+	/*mReloadFileHandler = new ReloadFileHandler(
 		getMessageHandler()->getPhoneGapMessageHandler());
 	(getMessageHandler()->getPhoneGapMessageHandler())->
-		setFileHandler(mReloadFileHandler);
+		setFileHandler(mReloadFileHandler);*/
 
-	// Set our custom Native UI message handler.
-	getMessageHandler()->setNativeUIMessageHandler(
-		new ReloadNativeUIMessageHandler(getWebView()));
+	// Set the log message listener.
+	getMessageHandler()->setLogMessageListener(this);
 }
 
 void ReloadClient::createDownloader()
@@ -248,21 +244,73 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
  */
 void ReloadClient::openWormhole(MAHandle webViewHandle)
 {
-	// Call super class method to handler initialization.
-	HybridMoblet::openWormhole(webViewHandle);
-
 	// Hijack the loadImage function to point to the relative path
 	// of the directory in which the app is unpacked.
-	char buf[512];
+	char buf[2048];
 	sprintf(
 		buf,
-		"mosync.resource.loadImageOld = mosync.resource.loadImage;"
-		"mosync.resource.loadImage = function(imagePath, imageID, successCallback)"
+		//"try{"
+		"mosync.resource.loadImageOld=mosync.resource.loadImage;"
+		"mosync.resource.loadImage=function(imagePath,imageID,successCallback)"
 		"{"
-		"mosync.resource.loadImageOld('%s' + imagePath, imageID, successCallback)"
-		"}",
+			"mosync.resource.loadImageOld('%s'+imagePath,imageID,successCallback)"
+		"};"
+		"console.log('@@@ Redefined loadImage');",
+		//"}catch(e){}",
 		mAppPath.c_str());
 	getWebView()->callJS(buf);
+
+	// Update maWidgetSetProperty to add app path to urls.
+	sprintf(
+		buf,
+		//"try{"
+		"mosync.nativeui.maWidgetSetPropertyOld=mosync.nativeui.maWidgetSetProperty;"
+		"mosync.nativeui.maWidgetSetProperty=function("
+			"widgetID,property,value,successCallback,errorCallback,processedCallback)"
+		"{"
+			"console.log('@@@ maWidgetSetProperty: '+property+'='+value+' - %s');"
+			"mosync.nativeui.maWidgetSetPropertyOld("
+				"widgetID,property,value,successCallback,errorCallback,processedCallback);"
+		"};"
+		"console.log('@@@ Redefined maWidgetSetProperty');",
+		//"}catch(e){}",
+		mAppPath.c_str());
+	getWebView()->callJS(buf);
+
+	// Update the PhoneGap function LocalFileSystem.prototype._castFS
+	// to use the temporary path of the app.
+	sprintf(
+		buf,
+		//"try{"
+		"LocalFileSystem.prototype._castFSOld=LocalFileSystem.prototype._castFS;"
+		"LocalFileSystem.prototype._castFS=function(pluginResult)"
+		"{"
+			"pluginResult.message.root.fullPath+='/%s';"
+			"LocalFileSystem.prototype._castFSOld(pluginResult);"
+		"};"
+		"console.log('@@@ Redefined _castFS');",
+		//"}catch(e){}",
+		mAppPath.c_str());
+	getWebView()->callJS(buf);
+
+	// Update the PhoneGap function LocalFileSystem.prototype._castEntry
+	// to use the temporary path of the app.
+	sprintf(
+		buf,
+		//"try{"
+		"LocalFileSystem.prototype._castEntryOld=LocalFileSystem.prototype._castEntry;"
+		"LocalFileSystem.prototype._castEntry=function(pluginResult)"
+		"{"
+			"pluginResult.message.fullPath+='/%s';"
+			"LocalFileSystem.prototype._castFSOld(pluginResult);"
+		"};"
+		"console.log('@@@ Redefined _castEntry');",
+		//"}catch(e){}",
+		mAppPath.c_str());
+	getWebView()->callJS(buf);
+
+	// Call super class method to handler initialization.
+	HybridMoblet::openWormhole(webViewHandle);
 }
 
 /**
@@ -271,8 +319,6 @@ void ReloadClient::openWormhole(MAHandle webViewHandle)
  */
 void ReloadClient::connectFinished(Connection *conn, int result)
 {
-	LOG("@@@ RELOAD: connectFinished result: %d\n", result);
-
 	if (result > 0)
 	{
 		mLoginScreen->connectedTo(mServerAddress.c_str());
@@ -298,8 +344,6 @@ void ReloadClient::connectFinished(Connection *conn, int result)
  */
 void ReloadClient::connReadFinished(Connection *conn, int result)
 {
-	LOG("@@@ RELOAD connReadFinished result: %d\n", result);
-
 	// If the command is zero, we have a new header with
 	// command and size data.
 	if (mServerCommand == 0)
@@ -343,11 +387,9 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 		// Reset server command.
 		mServerCommand = 0;
 
-		LOG("@@@ ReloadClient::connReadFinished 1");
 		// Read the next TCP message header.
 		mSocket.read(mBuffer, 16);
 
-		LOG("@@@ ReloadClient::connReadFinished 2");
 	}
 	else
 	{
@@ -358,7 +400,6 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 		// Go back to the login screen on an error.
 		mLoginScreen->show(false);
 	}
-	LOG("@@@ ReloadClient::connReadFinished END");
 }
 
 /**
@@ -531,8 +572,6 @@ void ReloadClient::error(Downloader* downloader, int code)
  */
 void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 {
-    LOG("@@@ RELOAD: finishedDownloading Completed download");
-
     // Check that we have the expected bundle size.
     int dataSize = maGetDataSize(data);
     LOG("@@@ RELOAD: Received size: %d, expected size: %d", dataSize, mBundleSize);
@@ -607,7 +646,7 @@ void ReloadClient::loadSavedApp()
 	LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
 
 	// We want NativeUI events.
-	getMessageHandler()->nativeUIEventsOn();
+	//getMessageHandler()->nativeUIEventsOn();
 
 	// TODO: How to find out if the app uses native ui!
 
@@ -760,7 +799,6 @@ void ReloadClient::connectTo(const char *serverAddress)
 	sprintf(mBuffer, "socket://%s:%s",
 		mServerAddress.c_str(),
 		mPort.c_str());
-	LOG("@@@ RELOAD connectTo: %s", mBuffer);
 	mSocket.connect(mBuffer);
 }
 
@@ -780,7 +818,7 @@ void ReloadClient::deleteFolderRecurse(const char *path)
 {
 	char fileName[128];
 	char fullPath[256];
-	LOG("@@@ RELOAD: Deleting files in folder: %s", path);
+	//LOG("@@@ RELOAD: Deleting files in folder: %s", path);
 	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
 	int length = maFileListNext(list, fileName, 128);
 	while (length > 0)
