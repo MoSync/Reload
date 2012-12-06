@@ -32,17 +32,17 @@ create = function(port) {
 	app.use(express.session());
 	app.use(express.bodyParser());
 
-	app.get('/', function(req, res){
-		res.send('hello');
+	app.get('/', function(request, response){
+
+		//console.log(request.query.jsonRPC);
+		rpc.listen(JSON.parse(request.query.jsonRPC), response);
 	});
 
 	app.post('/', function( request, response ){
 		
 		console.dlog("REQUEST TYPE: " + request.method);
-		
 		console.log("request.body: " + request.body);
 		rpc.listen(request.body, response);
-		
 	});
 
 	app.listen(port);

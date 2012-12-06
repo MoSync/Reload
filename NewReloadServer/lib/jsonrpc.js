@@ -25,7 +25,6 @@ var JSONRPC = {
 		var self = this;
 		this.response = response;
 
-		console.log(message);
 		self.handleMessage( message, function(data) {
 			
 			var responseObject = {
@@ -100,29 +99,7 @@ var JSONRPC = {
     },
  
     handleMessage: function( message, callback ) {
-
-		var newParams = [];
 		JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
-		
-		/**
-		 * Figuring out if one of the parameters are function and add 
-		 * the function in the param list
-		 */
-		message.params.forEach( function (element, index, array){
-
-		    var regexp = /\bfunction[\s\S]/;
-		    
-		    if( element.indexOf("function") != -1 ) {
-		        
-		        callbackString = element.replace(regexp,"function cb");
-		        eval(callbackString);
-		        newParams.push(cb);
-		    }
-		    else if(this.functions.hasOwnProperty(element) ) {
-		        newParams.push( this.functions[element] );
-		    }
-		}, this);
-		message.params = newParams;
 
 	    // Check for the required fields, and if they aren't there, then
 	    // dispatch to the handleInvalidRequest function.

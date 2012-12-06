@@ -3,11 +3,14 @@ var net = require('net');
 /**
  * The functions that are available for remote calling
  */
-var rpcFunctions = {
-	add: function (a,b) {
-		var r = a + b;
 
-		return r;
+ var globals = require('./globals');
+
+var rpcFunctions = {
+	add: function (a, b, sendResponse) {
+		var r = a + b;
+		console.log(globals.rootWorkspacePath);
+		sendResponse(r);
 	},
 
 	setIP: function(ip, sendResponse) {
