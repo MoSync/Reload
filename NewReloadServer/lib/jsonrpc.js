@@ -13,48 +13,48 @@ var JSONRPC = {
     
     functions: {},
 
-	/**
-	* Opens a JSON rpc server on the given websocket by listening to messages.
-	*
-	* @name listen
-	* @param Socket socket The websocket object to observe.
-	*
-	* @type void
-	*/  
-	listen : function(message, response){
-		var self = this;
-		this.response = response;
+    /**
+    * Opens a JSON rpc server on the given websocket by listening to messages.
+    *
+    * @name listen
+    * @param Socket socket The websocket object to observe.
+    *
+    * @type void
+    */  
+    listen : function(message, response){
+        var self = this;
+        this.response = response;
 
-		console.log(message);
-		self.handleMessage( message, function(data) {
-			
-			var responseObject = {
-				'id': 0,
-	        	'result': data,
-	        	'error': null
-	      	};
-			console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
-			self.response.writeHead(200, {
-						  'Content-Length': JSON.stringify(responseObject).length,
-						  'Content-Type': 'application/json',
-						  'Pragma': 'no-cache',
-						  'Cache-Control': 'no-cache',
-						  'Expires': '-1'
-						});
-			self.response.write( JSON.stringify(responseObject) );
-			self.response.end("");
-		});
-	},
+        console.log(message);
+        self.handleMessage( message, function(data) {
+            
+            var responseObject = {
+                'id': 0,
+                'result': data,
+                'error': null
+            };
+            console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
+            self.response.writeHead(200, {
+                          'Content-Length': JSON.stringify(responseObject).length,
+                          'Content-Type': 'application/json',
+                          'Pragma': 'no-cache',
+                          'Cache-Control': 'no-cache',
+                          'Expires': '-1'
+                        });
+            self.response.write( JSON.stringify(responseObject) );
+            self.response.end("");
+        });
+    },
 
     /**
     * Finds all function entries defined in the given model to exposes them via rpc.
     *
     * @example 
-	*    var TestModule = {
-	*      add: function (a, b) { return a + b }
-	*    }
-	*    rpc.exposeModule('rpc', TestModule);
-	*
+    *    var TestModule = {
+    *      add: function (a, b) { return a + b }
+    *    }
+    *    rpc.exposeModule('rpc', TestModule);
+    *
     * @result Exposes the given module with the given prefix. Remote functioname 'rpc.add'
     *
     * @name exposeModule
@@ -79,9 +79,9 @@ var JSONRPC = {
     * Exposes the given function via rpc.
     *
     * @example 
-	*    function add(a, b) { return a + b }
-	*    rpc.expose('add', add);
-	*
+    *    function add(a, b) { return a + b }
+    *    rpc.expose('add', add);
+    *
     * @result Exposes the given function under the given name . Remote functioname 'add'
     *
     * @name expose
@@ -91,92 +91,71 @@ var JSONRPC = {
     * @type void
     */   
     expose: function(name, func) {
-    	JSONRPC.trace('***', 'exposing: ' + name);
+        JSONRPC.trace('***', 'exposing: ' + name);
         this.functions[name] = func;
     },
-    
+
     trace: function(direction, message) {
         sys.puts('   ' + direction + '   ' + message);
     },
- 
+
     handleMessage: function( message, callback ) {
 
-		var newParams = [];
-		JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
-		
-		/**
-		 * Figuring out if one of the parameters are function and add 
-		 * the function in the param list
-		 */
-		message.params.forEach( function (element, index, array){
+        JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
 
-		    var regexp = /\bfunction[\s\S]/;
-		    
-		    if( element.indexOf("function") != -1 ) {
-		        
-		        callbackString = element.replace(regexp,"function cb");
-		        eval(callbackString);
-		        newParams.push(cb);
-		    }
-		    else if(this.functions.hasOwnProperty(element) ) {
-		        newParams.push( this.functions[element] );
-		    }
-		}, this);
-		message.params = newParams;
+        // Check for the required fields, and if they aren't there, then
+        // dispatch to the handleInvalidRequest function.
+        if(!(message.method && message.params)) {
+            return {
+                'id': message.id,
+                'result': null,
+                'error': 'Invalid Request'
+            };
+        }
 
-	    // Check for the required fields, and if they aren't there, then
-	    // dispatch to the handleInvalidRequest function.
-	    if(!(message.method && message.params)) {
-	    	return {
-	    		'id': message.id,
-	    		'result': null,
-	        	'error': 'Invalid Request'
-	      	};
-	    }
+        if(!this.functions.hasOwnProperty(message.method)) {
+            return {
+                'id': message.id,
+                'result': null,
+                'error': 'Function not found'
+            };
+        }
 
-	    if(!this.functions.hasOwnProperty(message.method)) {
-	    	return {
-		    	'id': message.id,
-	        	'result': null,
-	        	'error': 'Function not found'
-	      	};
-	    }
+        // Build our success handler
+        var onSuccess = function(funcResp) {
+            JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
 
-	    // Build our success handler
-	    var onSuccess = function(funcResp) {
-	    	JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
+            return {
+                'id': message.id,
+                'result': funcResp,
+                'error': null
+            };
+        };
 
-	      	return {
-				'id': message.id,
-	        	'result': funcResp,
-	        	'error': null
-	      	};
-	    };
+        // Build our failure handler (note that error must not be null)
+        var onFailure = function(failure) {
+            JSONRPC.trace('-->', 'failure: ' + failure);
 
-	    // Build our failure handler (note that error must not be null)
-	    var onFailure = function(failure) {
-	    	JSONRPC.trace('-->', 'failure: ' + failure);
+            return {
+                'id': message.id,
+                'result': null,
+                'error': failure || 'Unspecified Failure'
+            };
+        };
 
-	      	return {
-	         	'id': message.id,
-		    	'result': null,
-			 	'error': failure || 'Unspecified Failure'
-	      	};
-	    };
+        JSONRPC.trace('<--', 'request (id ' + message.id + '): ' + message.method + '(' + message.params.join(', ') + ')');
 
-	    JSONRPC.trace('<--', 'request (id ' + message.id + '): ' + message.method + '(' + message.params.join(', ') + ')');
+        // Try to call the method, but intercept errors and call our onFailure handler.
+        var method = this.functions[message.method];
 
-	    // Try to call the method, but intercept errors and call our onFailure handler.
-	    var method = this.functions[message.method];
+        try {
 
-	    try {
-
-	    	message.params.push(callback);
-	    	method.apply(null, message.params);
-	    }
-	    catch(err) {
-	    	return onFailure(err);
-	    }
+            message.params.push(callback);
+            method.apply(null, message.params);
+        }
+        catch(err) {
+            return onFailure(err);
+        }
     }
 }
 

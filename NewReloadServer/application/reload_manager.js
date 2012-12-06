@@ -15,7 +15,6 @@ var rpcFunctions = {
 
         var socket = net.createConnection(80, "www.google.com");
         socket.on('connect', function() {
-            
             socket.end();
             //sendResponse( socket.address().address );
             callback(socket.address().address, sendResponse);
@@ -38,11 +37,11 @@ var rpcFunctions = {
         </HTML>";
 
         return html;
-    }
+    },
 
-    add: function (a, b) {
+    add: function (a, b, send) {
         var r = a + b;
-        return r;
+        send(r);
     },
 
     getVersionInfo: function() {
