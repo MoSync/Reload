@@ -2,7 +2,8 @@ var http    = require('http'),
     rpc     = require('./jsonrpc'),
     url     = require('url'),
     express = require('../express/');
-    
+    path = require('path');
+
 var debug           = true,
     app             = express(),
     emptyRPCRequest = "?jsonRPC={}";
@@ -20,10 +21,11 @@ console.dlog = function (logOutput) {
 var errorResponse = function (response, content) {
     response.writeHead(404);
     response.end(content);
-}
+};
 
 
 create = function(port) {
+    console.log(path.resolve(__dirname, '../UI'));
 
     //console.log(express.json());
     app.use(express.favicon());
@@ -31,10 +33,8 @@ create = function(port) {
     app.use(express.cookieParser('foobar'));
     app.use(express.session());
     app.use(express.bodyParser());
+    app.use('/', express.static(path.resolve(__dirname, '../UI')));
 
-    app.get('/', function(req, res){
-        res.send('hello');
-    });
 
     app.post('/', function( request, response ){
 
