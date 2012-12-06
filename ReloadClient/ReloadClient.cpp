@@ -239,75 +239,42 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	}
 }
 
+static String SysLoadStringResource(MAHandle data)
+{
+	// Get size of data.
+    int size = maGetDataSize(data);
+
+    // Allocate space for text plus zero termination character.
+    char* text = (char*) malloc(size + 1);
+    if (NULL == text)
+    {
+    	return NULL;
+    }
+
+    // Read data.
+    maReadData(data, text, 0, size);
+
+    // Zero terminate string.
+    text[size] = 0;
+
+    String s = text;
+
+    free(text);
+
+    return s;
+}
+
 /**
  * Called from JavaScript when a Wormhole app has been loaded.
  */
 void ReloadClient::openWormhole(MAHandle webViewHandle)
 {
-	// Hijack the loadImage function to point to the relative path
-	// of the directory in which the app is unpacked.
-	char buf[2048];
-	sprintf(
-		buf,
-		//"try{"
-		"mosync.resource.loadImageOld=mosync.resource.loadImage;"
-		"mosync.resource.loadImage=function(imagePath,imageID,successCallback)"
-		"{"
-			"mosync.resource.loadImageOld('%s'+imagePath,imageID,successCallback)"
-		"};"
-		"console.log('@@@ Redefined loadImage');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
+	LOG("@@@@@@ OpenWormhole webViewHandle: %i", webViewHandle);
 
-	// Update maWidgetSetProperty to add app path to urls.
-	sprintf(
-		buf,
-		//"try{"
-		"mosync.nativeui.maWidgetSetPropertyOld=mosync.nativeui.maWidgetSetProperty;"
-		"mosync.nativeui.maWidgetSetProperty=function("
-			"widgetID,property,value,successCallback,errorCallback,processedCallback)"
-		"{"
-			"console.log('@@@ maWidgetSetProperty: '+property+'='+value+' - %s');"
-			"mosync.nativeui.maWidgetSetPropertyOld("
-				"widgetID,property,value,successCallback,errorCallback,processedCallback);"
-		"};"
-		"console.log('@@@ Redefined maWidgetSetProperty');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
-
-	// Update the PhoneGap function LocalFileSystem.prototype._castFS
-	// to use the temporary path of the app.
-	sprintf(
-		buf,
-		//"try{"
-		"LocalFileSystem.prototype._castFSOld=LocalFileSystem.prototype._castFS;"
-		"LocalFileSystem.prototype._castFS=function(pluginResult)"
-		"{"
-			"pluginResult.message.root.fullPath+='/%s';"
-			"LocalFileSystem.prototype._castFSOld(pluginResult);"
-		"};"
-		"console.log('@@@ Redefined _castFS');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
-
-	// Update the PhoneGap function LocalFileSystem.prototype._castEntry
-	// to use the temporary path of the app.
-	sprintf(
-		buf,
-		//"try{"
-		"LocalFileSystem.prototype._castEntryOld=LocalFileSystem.prototype._castEntry;"
-		"LocalFileSystem.prototype._castEntry=function(pluginResult)"
-		"{"
-			"pluginResult.message.fullPath+='/%s';"
-			"LocalFileSystem.prototype._castFSOld(pluginResult);"
-		"};"
-		"console.log('@@@ Redefined _castEntry');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
+	// Apply customizations to functions loaded in wormhole.js.
+	String script = SysLoadStringResource(CUSTOM_JS);
+	script += "('" + mAppPath + "')";
+	callJS(webViewHandle, script.c_str());
 
 	// Call super class method to handler initialization.
 	HybridMoblet::openWormhole(webViewHandle);
@@ -481,7 +448,6 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 		// Download the bundle.
 		downloadBundle();
 
-		LOG("@@@ ReloadClient::processJSONMessage 1");
 		// Use this to use experimental HTML download.
 		// Needs divineprog/LiveApps/FileServer to work
 		// and manual config of BasePath.
@@ -495,7 +461,6 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 	{
 		maPanic(0,"RELOAD: Unknown server message");
 	}
-	LOG("@@@ ReloadClient::processJSONMessage END");
 }
 
 /**
@@ -542,7 +507,6 @@ void ReloadClient::downloadBundle()
 		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
 		showConErrorMessage(result);
 	}
-	LOG("@@@ ReloadClient::downloadBundle END");
 }
 
 /**
@@ -648,12 +612,11 @@ void ReloadClient::loadSavedApp()
 	// We want NativeUI events.
 	//getMessageHandler()->nativeUIEventsOn();
 
-	// TODO: How to find out if the app uses native ui!
-
 	// Open the page.
 	//showWebView();
 	//getWebView()->setBaseUrl(fullAppPath);
 	//getWebView()->openURL("index.html");
+	mFileUtil->setAppPath(fullAppPath);
 	getWebView()->setBaseUrl(fullAppPath);
 	showPage("index.html");
 
