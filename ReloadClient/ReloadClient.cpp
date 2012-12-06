@@ -592,13 +592,15 @@ void ReloadClient::downloadHTML()
 
 void ReloadClient::downloadBundle()
 {
+	//Start the bundle download
+	if (mDownloader->isDownloading() )
+	{
+		return;
+		//mDownloader->cancelDownloading();
+	}
+
 	//Prepare a reciever for the download
 	mResourceFile = maCreatePlaceholder();
-	//Start the bundle download
-	if (mDownloader->isDownloading())
-	{
-		mDownloader->cancelDownloading();
-	}
 	int result = mDownloader->beginDownloading(mBundleAddress, mResourceFile);
 	if (result > 0)
 	{
@@ -651,7 +653,7 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     	maDestroyPlaceholder(mResourceFile);
 
     	// Download again.
-    	downloadBundle();
+    	// downloadBundle();
 
     	return;
     }
@@ -691,9 +693,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     	// App failed to extract, download it again.
     	// TODO: Should we have a limit here to avoid
     	// infinite download loop?
-    	downloadBundle();
+    	// downloadBundle();
 
-    	return;
+    	// return;
     }
 }
 

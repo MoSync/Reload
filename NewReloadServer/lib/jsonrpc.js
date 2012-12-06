@@ -45,15 +45,16 @@ var JSONRPC = {
 		});
 	},
 
+
     /**
     * Finds all function entries defined in the given model to exposes them via rpc.
     *
     * @example 
-	*    var TestModule = {
-	*      add: function (a, b) { return a + b }
-	*    }
-	*    rpc.exposeModule('rpc', TestModule);
-	*
+    *    var TestModule = {
+    *      add: function (a, b) { return a + b }
+    *    }
+    *    rpc.exposeModule('rpc', TestModule);
+    *
     * @result Exposes the given module with the given prefix. Remote functioname 'rpc.add'
     *
     * @name exposeModule
@@ -78,9 +79,9 @@ var JSONRPC = {
     * Exposes the given function via rpc.
     *
     * @example 
-	*    function add(a, b) { return a + b }
-	*    rpc.expose('add', add);
-	*
+    *    function add(a, b) { return a + b }
+    *    rpc.expose('add', add);
+    *
     * @result Exposes the given function under the given name . Remote functioname 'add'
     *
     * @name expose
@@ -90,14 +91,14 @@ var JSONRPC = {
     * @type void
     */   
     expose: function(name, func) {
-    	JSONRPC.trace('***', 'exposing: ' + name);
+        JSONRPC.trace('***', 'exposing: ' + name);
         this.functions[name] = func;
     },
-    
+
     trace: function(direction, message) {
         sys.puts('   ' + direction + '   ' + message);
     },
- 
+
     handleMessage: function( message, callback ) {
 		JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
 

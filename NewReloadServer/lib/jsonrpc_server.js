@@ -1,25 +1,25 @@
-var http 	= require('http'),
-	rpc  	= require('./jsonrpc'),
-	url  	= require('url'),
-	express = require('../express/');
-	
-var debug 			= true,
-	app   			= express(),
-	emptyRPCRequest = "?jsonRPC={}";
+var http    = require('http'),
+    rpc     = require('./jsonrpc'),
+    url     = require('url'),
+    express = require('../express/');
+    
+var debug           = true,
+    app             = express(),
+    emptyRPCRequest = "?jsonRPC={}";
 
 /**
  * We do not override console.log because it can 
  * be used for normal server output.
  */
 console.dlog = function (logOutput) {
-	if( debug ) {
-		console.log( logOutput );
-	}
+    if( debug ) {
+        console.log( logOutput );
+    }
 }
 
 var errorResponse = function (response, content) {
-	response.writeHead(404);
-	response.end(content);
+    response.writeHead(404);
+    response.end(content);
 }
 
 
