@@ -31,6 +31,6 @@ MA 02110-1301, USA.
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new ReloadClient());
+	(new ReloadClient())->enterEventLoop();
 	return 0;
 }
