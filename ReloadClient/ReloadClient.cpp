@@ -81,8 +81,7 @@ ReloadClient::ReloadClient() :
 	createDownloader();
 
 	// Show first screen.
-	// TODO: Why false as param?!
-	mLoginScreen->show(false);
+	mLoginScreen->showNotConnectedScreen();
 }
 
 ReloadClient::~ReloadClient()
@@ -234,8 +233,28 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	{
 		if (MAK_BACK == keyCode)
 		{
-			maExit(0);
+			exit();
 		}
+	}
+}
+
+/**
+ * We want to quit the ReloadClient only if an app is not running.
+ * This method is called from the WOrmhole library when a JavaScript
+ * application requests to exit.
+ */
+void ReloadClient::exit()
+{
+	if (mRunningApp)
+	{
+		// Close the running app and show the start screen.
+		mRunningApp = false;
+		mLoginScreen->showConnectedScreen();
+	}
+	else
+	{
+		// Exit the ReloadClient.
+		exitEventLoop();
 	}
 }
 
@@ -365,7 +384,7 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 		showConErrorMessage(result);
 
 		// Go back to the login screen on an error.
-		mLoginScreen->show(false);
+		mLoginScreen->showNotConnectedScreen();
 	}
 }
 
@@ -642,7 +661,7 @@ void ReloadClient::freeHardware()
 		}*/
 	}
 
-	// TODO: We need to handler detection of native ui apps.
+	// TODO: We need to handle detection of native ui apps ?? Do we?
 	mNativeUIMessageReceived = false;
 
 	// Try stopping all sensors.
@@ -750,7 +769,7 @@ void ReloadClient::showConErrorMessage(int errorCode)
 void ReloadClient::cancelDownload()
 {
 	mDownloader->cancelDownloading();
-	mLoginScreen->show(true);
+	mLoginScreen->showConnectedScreen();
 }
 
 void ReloadClient::connectTo(const char *serverAddress)
