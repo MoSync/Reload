@@ -113,7 +113,6 @@ void ReloadClient::initializeWebView()
 void ReloadClient::initializeVariables()
 {
 	mHasPage = false;
-	mNativeUIMessageReceived = false;
 	mPort = SERVER_TCP_PORT;
 	mAppsFolder = "apps/";
 	mServerCommand = 0;
@@ -136,8 +135,6 @@ void ReloadClient::initializeFiles()
 		MA_ACCESS_READ_WRITE);
 	if (!maFileExists(appDirHandle))
 	{
-		LOG("@@@ RELOAD: Creating Apps folder: %s",
-			(mFileUtil->getLocalPath() + mAppsFolder).c_str());
 		maFileCreate(appDirHandle);
 	}
 	maFileClose(appDirHandle);
@@ -288,8 +285,6 @@ static String SysLoadStringResource(MAHandle data)
  */
 void ReloadClient::openWormhole(MAHandle webViewHandle)
 {
-	LOG("@@@@@@ OpenWormhole webViewHandle: %i", webViewHandle);
-
 	// Apply customizations to functions loaded in wormhole.js.
 	String script = SysLoadStringResource(CUSTOM_JS);
 	script += "('" + mAppPath + "')";
@@ -562,8 +557,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     {
     	maDestroyPlaceholder(mResourceFile);
 
-    	// Download again.
-    	downloadBundle();
+    	// TODO: Show LoginScreen or error message?
+    	// We should not try to download again, because
+    	// this could case an infinite download loop.
 
     	return;
     }
@@ -572,14 +568,11 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     clearAppsFolder();
 
     // Set new app path.
-    char buf[512];
+    char buf[1024];
     sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
     mAppPath = buf;
     String fullPath = mFileUtil->getLocalPath() + mAppPath;
     mReloadFileHandler->setLocalPath(fullPath);
-
-    LOG("@@@ RELOAD: finishedDownloading mAppPath: %s", mAppPath.c_str());
-    LOG("@@@ RELOAD: finishedDownloading fullPath: %s", fullPath.c_str());
 
     // Extract files.
     setCurrentFileSystem(data, 0);
@@ -600,12 +593,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     }
     else
     {
-    	// App failed to extract, download it again.
-    	// TODO: Should we have a limit here to avoid
-    	// infinite download loop?
-    	downloadBundle();
-
-    	return;
+    	// TODO: Show LoginScreen or error message?
+    	// We should not try to download again, because
+    	// this could case an infinite download loop.
     }
 }
 
@@ -620,13 +610,10 @@ void ReloadClient::loadSavedApp()
 	MAHandle file = mFileUtil->openFileForReading(fullAppPath + "index.html");
 	if (file < 0)
 	{
-		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
+		maAlert("Reload: No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
 	}
 	maFileClose(file);
-
-	LOG("@@@ RELOAD: mAppPath: %s", mAppPath.c_str());
-	LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
 
 	// We want NativeUI events.
 	//getMessageHandler()->nativeUIEventsOn();
@@ -660,9 +647,6 @@ void ReloadClient::freeHardware()
 			callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
 		}*/
 	}
-
-	// TODO: We need to handle detection of native ui apps ?? Do we?
-	mNativeUIMessageReceived = false;
 
 	// Try stopping all sensors.
 	// TODO: Replace hard coded number "6" with symbolic value.

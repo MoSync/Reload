@@ -300,8 +300,6 @@ private:
 	 */
 	String mPort;
 
-	bool mNativeUIMessageReceived;
-
 	/**
 	 * The general folder where app files reside.
 	 */
