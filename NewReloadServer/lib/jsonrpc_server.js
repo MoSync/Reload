@@ -1,113 +1,58 @@
-var http = require('http'),
-	rpc  = require('./jsonrpc');
-	url  = require('url');
+var http    = require('http'),
+    rpc     = require('./jsonrpc'),
+    url     = require('url'),
+    express = require('../express/');
+    path    = require('path');
 
-var debug = true;
+var debug           = true,
+    app             = express(),
+    emptyRPCRequest = "?jsonRPC={}";
 
-var emptyRPCRequest = "?jsonRPC={}";
 /**
  * We do not override console.log because it can 
  * be used for normal server output.
  */
 console.dlog = function (logOutput) {
-	if( debug ) {
-		console.log( logOutput );
-	}
+    if( debug ) {
+        console.log( logOutput );
+    }
 }
 
 var errorResponse = function (response, content) {
-	response.writeHead(404);
-	response.end(content);
-}
+    response.writeHead(404);
+    response.end(content);
+};
 
-var create = function() {
 
-	var server = http.createServer(function(request, response) {
+create = function(port) {
+    console.log(path.resolve(__dirname, '../UI'));
 
-		console.dlog("SERVER: Request Received.");
-		console.dlog("SERVER: Request Path: " + url.parse(request.url).pathname);
+    //console.log(express.json());
+    app.use(express.favicon());
+    app.use(express.logger('dev'));
+    app.use(express.cookieParser('foobar'));
+    app.use(express.session());
+    app.use(express.bodyParser());
+    app.use('/', express.static(path.resolve(__dirname, '../UI')));
 
-		var message = "";
-		/**
-		 * GET JSON-rpc request handling
-		 * path format: <server address, port>/proccess?jsonRPC={}
-		 * eg. 
-		 * localhost:8283/something?jsonRPC={"id":1302294821045,"method":"rpc.add","params":[10,20]}
-		 */
-		if(request.method == "GET") {
+    app.get('/', function(request, response){
 
-			/** 
-			 * Check if request has query string
-			 */
-			if(! (query = url.parse(request.url).search) )
-				query = emptyRPCRequest;
-			/** 
-			 * Check if request is an RPC Request
-			 */
-			console.dlog("REQUEST TYPE: " + request.method);
-			console.dlog("REQUEST  URL: " + query);
-
-			var queryClean = unescape( query.substr(query.indexOf("?jsonRPC=") + "?jsonRPC=".length) );
-			var rpcObject = {};
-			try {
-				rpcObject = JSON.parse(queryClean);
-			}
-			catch(error) {
-				console.log("ERROR: Invalid json format in request");
-			}
-
-			/**
-			 * Check if the request is an json-RPC
-			 * The format of the RPC is checked within listen method
-			 */
-			if( rpcObject.id && rpcObject.method && rpcObject.params ) {
-				rpc.listen(rpcObject, response);
-			}
-			else {
-				/**
-				 * Handling other kind of requests maybe throw an exception
-				 */
-			} 	
-			
-		}
-		else if (request.method == "POST") {
-			
-			console.dlog("REQUEST TYPE: " + request.method);
-			console.dlog("REQUEST  URL: " + url.parse(request.url).pathname);
-
-			var postData = "";
-			var pathname = url.parse(request.url).pathname;
-
-			request.setEncoding("utf8");
-
-			request.addListener("data", function(postDataChunk) {
-
-	      		postData += postDataChunk;
-	    	});
-
-	    	request.addListener("end", function() {
-
-				console.dlog("REQUEST POST: " + postData);
-	    		
-	    		try {
-					message = JSON.parse( postData );
-				}
-				catch(error) {
-					console.log("ERROR: Invalid json format in request");
-				}
-	    		
-	    		rpc.listen(message, response);
-	    	});
-
-		}
-		else {
-			errorResponse(response, "The request method is not supported.");
-			console.log(request.method + " type of request is not supported.");
-		}
+		//console.log(request.query.jsonRPC);
+		rpc.listen(JSON.parse(request.query.jsonRPC), response);
 	});
 
-	return server;
-};
+    app.post('/', function( request, response ){
+
+        console.dlog("REQUEST TYPE: " + request.method);
+
+        console.log(request.body);
+        console.log("request.body: " + request.body);
+        rpc.listen(request.body, response);
+    });
+
+    app.listen(port);
+    console.log('Server started listening on port: ' + port);
+}
 
 exports.create = create;
 

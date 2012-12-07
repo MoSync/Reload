@@ -1,5 +1,7 @@
 .DS_Store
 
+node_modules
+
 ReloadLauncher/Windows/ReloadLauncher.vcxproj.user
 ReloadLauncher/Windows/Debug
 ReloadLauncher/Windows/ipch

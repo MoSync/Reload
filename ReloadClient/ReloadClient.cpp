@@ -206,6 +206,7 @@ void ReloadClient::createScreens()
 	// Set the most recently used server ip address.
 	mLoginScreen->defaultAddress(mServerAddress.c_str());
 }
+
 /**
  * Get client info.
  * @return String with client info.
@@ -506,8 +507,12 @@ void ReloadClient::downloadBundle()
 	// Start the bundle download.
 	if (mDownloader->isDownloading())
 	{
-		mDownloader->cancelDownloading();
+		return;
+		//mDownloader->cancelDownloading();
 	}
+
+	//Prepare a reciever for the download
+	mResourceFile = maCreatePlaceholder();
 	int result = mDownloader->beginDownloading(mBundleAddress, mResourceFile);
 	if (result > 0)
 	{

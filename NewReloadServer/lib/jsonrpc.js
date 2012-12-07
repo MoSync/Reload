@@ -9,9 +9,12 @@
 */
 var sys = require('sys');
 
+
 var JSONRPC = {
     
     functions: {},
+
+    modules: {},
 
 	/**
 	* Opens a JSON rpc server on the given websocket by listening to messages.
@@ -20,34 +23,41 @@ var JSONRPC = {
 	* @param Socket socket The websocket object to observe.
 	*
 	* @type void
-	*/    
+	*/  
 	listen : function(message, response){
 		var self = this;
-		console.log(message);
-		var responseObject = self.handleMessage( message );
+		this.response = response;
 
-		console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
-		response.writeHead(200, {
-					  'Content-Length': JSON.stringify(responseObject).length,
-					  'Content-Type': 'html',
-					  'Pragma': 'no-cache',
-					  'Cache-Control': 'no-cache',
-					  'Expires': '-1'
-					});
-		response.write( JSON.stringify(responseObject) );
-		response.end("");
-				
+		self.handleMessage( message, function(data) {
+			
+			var responseObject = {
+				'id': 0,
+	        	'result': data,
+	        	'error': null
+	      	};
+			console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
+			self.response.writeHead(200, {
+						  'Content-Length': JSON.stringify(responseObject).length,
+						  'Content-Type': 'application/json',
+						  'Pragma': 'no-cache',
+						  'Cache-Control': 'no-cache',
+						  'Expires': '-1'
+						});
+			self.response.write( JSON.stringify(responseObject) );
+			self.response.end("");
+		});
 	},
+
 
     /**
     * Finds all function entries defined in the given model to exposes them via rpc.
     *
     * @example 
-	*    var TestModule = {
-	*      add: function (a, b) { return a + b }
-	*    }
-	*    rpc.exposeModule('rpc', TestModule);
-	*
+    *    var TestModule = {
+    *      add: function (a, b) { return a + b }
+    *    }
+    *    rpc.exposeModule('rpc', TestModule);
+    *
     * @result Exposes the given module with the given prefix. Remote functioname 'rpc.add'
     *
     * @name exposeModule
@@ -65,17 +75,18 @@ var JSONRPC = {
                 funcs.push(funcName);
             }
         }
+        this.modules[mod] = object;
+
         JSONRPC.trace('***', 'exposing module: ' + mod + ' [funcs: ' + funcs.join(', ') + ']');
-        console.log('***' + 'exposing module: ' + mod + ' [funcs: ' + funcs.join(', ') + ']');
     },
 
     /**
     * Exposes the given function via rpc.
     *
     * @example 
-	*    function add(a, b) { return a + b }
-	*    rpc.expose('add', add);
-	*
+    *    function add(a, b) { return a + b }
+    *    rpc.expose('add', add);
+    *
     * @result Exposes the given function under the given name . Remote functioname 'add'
     *
     * @name expose
@@ -85,18 +96,17 @@ var JSONRPC = {
     * @type void
     */   
     expose: function(name, func) {
-    	JSONRPC.trace('***', 'exposing: ' + name);
+        JSONRPC.trace('***', 'exposing: ' + name);
         this.functions[name] = func;
     },
-    
+
     trace: function(direction, message) {
         sys.puts('   ' + direction + '   ' + message);
     },
- 
-    handleMessage: function(message) {
-	
+
+    handleMessage: function( message, callback ) {
 		JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
-	
+
 	    // Check for the required fields, and if they aren't there, then
 	    // dispatch to the handleInvalidRequest function.
 	    if(!(message.method && message.params)) {
@@ -106,8 +116,7 @@ var JSONRPC = {
 	        	'error': 'Invalid Request'
 	      	};
 	    }
-	    console.log( this.functions );
-	    console.log("### " + this.functions.hasOwnProperty(message.method));
+
 	    if(!this.functions.hasOwnProperty(message.method)) {
 	    	return {
 		    	'id': message.id,
@@ -118,7 +127,7 @@ var JSONRPC = {
 
 	    // Build our success handler
 	    var onSuccess = function(funcResp) {
-	    	JSONRPC.trace('-->', 'response (id ' + message.id + '): ' + funcResp);
+	    	JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
 
 	      	return {
 				'id': message.id,
@@ -144,8 +153,13 @@ var JSONRPC = {
 	    var method = this.functions[message.method];
 
 	    try {
-	    	var resp = method.apply(null, message.params);
-      		return onSuccess(resp);
+	    	// Check for the function module to set the appropriate 
+	    	// context to apply
+	    	var functionCall = message.method.split('.');
+	    	var moduleName = functionCall[0];
+
+	    	message.params.push(callback);
+	    	method.apply(this.modules[moduleName], message.params);
 	    }
 	    catch(err) {
 	    	return onFailure(err);

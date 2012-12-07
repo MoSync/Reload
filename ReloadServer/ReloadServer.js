@@ -190,9 +190,37 @@ function setRootWorkspacePath(path)
  * Uses the Bundle program provided with the Reload package,
  * which is also used by the MoSync build system.
  */
-function bundleApp(projectDir, callback) {
+function bundleApp(projectDir, weinreDebug, callback) {
 	try
 	{
+		// WEINRE injection
+		// The script is injected only in the bundle. 
+		// The user is unaware of the injection in his source files
+		//Checking if weinreDebug is enabled
+		if(weinreDebug) {
+			//INJECT WEINRE SCRIPT
+			//<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
+			//eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
+			
+			
+			var fs = require("fs");
+			var injectedScript = "<script src=\"http://" + localAddress + 
+								 ":8080/target/target-script-min.js\"></script>";
+			
+			var pathOfIndexHTML = rootWorkspacePath + fileSeparator + 
+							  projectDir + fileSeparator + 
+							  "LocalFiles" + fileSeparator + "index.html";
+
+			console.log("INDEX.HTML PATH: " + pathOfIndexHTML);
+			var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
+			
+			injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
+			fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+
+			console.log("WEINRE successfully injected in Reload"); 			 
+
+		}
+
 		console.log("bundling the app " + projectDir);
 		var exec = require('child_process').exec;
 
@@ -203,6 +231,10 @@ function bundleApp(projectDir, callback) {
 			console.log("error: " + error);
 			callback(rootWorkspacePath + fileSeparator +
 				projectDir + "/LocalFiles.bin");
+
+			// Revert index.html to it previous state without the weinre injection
+			if(weinreDebug)
+				fs.writeFileSync(pathOfIndexHTML, originalIndexHTMLData, "utf8" );
 		}
 
 		var bundleCommand = "bin\\win\\Bundle.exe";
@@ -220,7 +252,7 @@ function bundleApp(projectDir, callback) {
 			fileSeparator + projectDir + fileSeparator + "LocalFiles\" -out \"" +
 			rootWorkspacePath + fileSeparator + projectDir  + fileSeparator +
 			"LocalFiles.bin\"";
-		exec(command, puts);
+		exec(command, puts);		
 	}
 	catch(err)
 	{
@@ -426,6 +458,119 @@ function renameProject(oldName, newName) {
 	catch(err) {
 		console.log("Error in renameProject(" + oldname + ", " + newName + "): " + err);
 	}
+}
+
+function deleteProject(projectPath) {
+
+	var fs = require('fs');
+
+	fs.removeRecursive = function(path,cb){
+		var self = this;
+
+	    fs.stat(path, function(err, stats) {
+	    	if(err)
+	    	{
+	        	cb(err,stats);
+	        	return;
+	      	}
+	      	if(stats.isFile())
+	      	{
+	        	fs.unlink(path, function(err) {
+	          	if(err) 
+	          	{
+	            	cb(err,null);
+	          	}
+	          	else
+	          	{
+	            	cb(null,true);
+	          	}
+	          	return;
+	        	});
+	      	}
+	      	else if(stats.isDirectory())
+	      	{
+	        	// A folder may contain files
+	        	// We need to delete the files first
+	        	// When all are deleted we could delete the
+	        	// dir itself
+		        fs.readdir(path, function(err, files) {
+		        	if(err)
+		        	{
+		            	cb(err,null);
+		            	return;
+		          	}
+		          	
+		          	var f_length = files.length;
+		          	var f_delete_index = 0;
+
+		          	// Check and keep track of deleted files
+		          	// Delete the folder itself when the files are deleted
+
+		          	var checkStatus = function() {
+
+		            	// We check the status
+		            	// and count till we r done
+		            	if(f_length===f_delete_index)
+		            	{
+		              		fs.rmdir(path, function(err) {
+		                		if(err)
+		                		{
+		                  			cb(err,null);
+		                		}
+		                		else
+		                		{
+		                  			cb(null,true);
+		                		}
+		              		});
+		              		return true;
+		            	}
+		            	return false;
+		          	};
+
+		          	if(!checkStatus())
+		          	{
+		            	for(var i=0;i<f_length;i++)
+		            	{
+		              		// Create a local scope for filePath
+		              		// Not really needed, but just good practice
+		              		// (as strings arn't passed by reference)
+			            	(function(){
+			                	var filePath = path + fileSeparator + files[i];
+			                	// Add a named function as callback
+			                	// just to enlighten debugging
+			                	fs.removeRecursive(filePath,function removeRecursiveCB(err,status){
+			                  		if(!err)
+			                  		{
+			                    		f_delete_index ++;
+			                    		checkStatus();
+			                  		}
+			                  		else
+			                  		{
+			                    		cb(err,null);
+			                    		return;
+			                  		}
+			                	});
+			    
+			            	})()
+		            	}
+		          	}
+		        });
+	      	}
+	    });
+	};
+
+	fs.removeRecursive(projectPath, function(error, status){
+		if(!error)
+		{
+			console.log("Succesfull deletion of directory " + projectPath);
+		}
+		else 
+		{
+			console.log("Error in deletion of directory " + projectPath);
+			console.log("ERROR: " + error);
+		}
+		
+	});
 }
 
 var adb; //The Android adb tool used for debugging on Android clients
@@ -838,18 +983,59 @@ function handleHTTPGet(req, res)
 			var pageSplit = page.split("?");
 			console.log(pageSplit);
 			renameProject(pageSplit[1], pageSplit[2]);
+			res.writeHead(302, {
+	  			'Location': '/UI/index.html'
+			});
+			res.end();
 		}
-		//Editing page asks the server to reload a project
+		// Editing page asks the server to delete a project
+		else if ( page.indexOf("deleteProject") != -1 ) {
+			var pageSplit = page.split("?");
+			console.log(pageSplit);
+			console.log(rootWorkspacePath + fileSeparator + pageSplit[1]);
+			deleteProject( rootWorkspacePath + fileSeparator + pageSplit[1] );
+			res.writeHead(302, {
+	  			'Location': '/UI/index.html'
+			});
+			res.end();
+		}
+		// Editing page asks the server to reload a project
 		// TODO: Why using name "LocalFiles.html"? (Rather than "LocalFiles.bin"?)
 		else if (page.slice(page.length-15, page.length) == "LocalFiles.html")
 		{
+			// TODO: the weinre debug should be passed as parameter from json RPC object
+			/* just for testing
+			var jsonRPC = {};
+			jsonRPC.params = Array();
+			jsonRPC.params["debug"] = true;*/
+
+			var weinreDebug;
+			if(typeof jsonRPC === "undefined")
+			{
+				weinreDebug = false;
+				console.log("WEINRE ENABLED jsonRPC:" + weinreDebug);
+			}
+			else
+			{
+				if(typeof jsonRPC.params["debug"] === "undefined") 
+				{
+					weinreDebug = false;
+					console.log("WEINRE ENABLED jsonRPC.params:" + weinreDebug);
+				}
+				else
+				{
+					weinreDebug = jsonRPC.params["debug"];
+				}
+			}
+			console.log("WEINRE ENABLED:" + weinreDebug);
 			console.log("Reloading project");
 			res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
 			res.end();
 			var pageSplit = page.split("/");
 			var path = pageSplit[pageSplit.length -2];
 			// Bundle the app.
-			bundleApp(path, function(actualPath){
+			bundleApp(path, weinreDebug, function(actualPath){
+				
 				//We will send the file size information together with the command as an extra level of integrity checking.
 				console.log("actualPath: " + actualPath)
 				var data = fs.readFileSync(actualPath);

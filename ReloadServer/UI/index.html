@@ -48,6 +48,7 @@
 
 			var previousProjectID = null;
 			var currentProjectList = [];
+			var projectInProccess = [];
 			
 			$(document).ready(function() {
 				//$( "#weinreContainer" ).resizable({handles:"n"});
@@ -193,10 +194,12 @@
 			}
 
 			function createNewProject(projectName, projectType) {
+
 				$.ajax({
 					url : "http://localhost:8282/createProject?" + projectName + "?" + projectType,
 					context : document.body,
 					success : function() {
+						projectInProccess.pop(projectName);
 						console.log("successfully created new project");
 						getProjectList();
 					}
@@ -207,10 +210,28 @@
 					url : "http://localhost:8282/renameProject?" + selectedProjectID + "?" + newPrName,
 					context : document.body,
 					success : function() {
+						projectInProccess.pop(projectName);
 						console.log("successfully renamed project " + selectedProjectID + "to " + newPrName);
 						getProjectList();
 					}
 				});
+			}
+			function deleteProject(projectName) {
+				if( projectInProccess.indexOf(projectName) < 0 ) {
+					projectInProccess.push(projectName);
+					console.log("DELETING PROJECT: " + projectName);
+					$.ajax({
+						url : "http://localhost:8282/deleteProject?" + projectName,
+						success : function() {
+							projectInProccess.pop(projectName);
+							console.log("successfully deleted project " + projectName);
+							projectInProccess.pop(projectName);
+							//getProjectList();
+						}
+					});	
+				}
+				else
+					alert("The project is reserved for another procedure");
 			}
 			function getWorkspacePath() {
 				console.log("getting workspace path");
@@ -285,6 +306,7 @@
 							"</div>" +
 							"<div class='projectOpenContainer'>" +
 								"<a href='#' onclick=\"openProjectFolder('" + data[i].name + "')\"><img src='img/Magnifying_Glass.png'/></a>" +
+								"<a href='#' onclick=\"deleteProject('" + data[i].name + "')\" style=\"margin-left:10px;\"><img src='img/delete.png'/></a>" +
 							"</div>" +
 						"</div>";
 				}
@@ -430,13 +452,13 @@
 
 			function startUpdatingPorjects() {
 
-				window.setInterval(getProjectList, 100);
+				window.setInterval(getProjectList, 1100);
 			}
 
 			function startGettingData() {
-				window.setInterval(getDebugData, 500);
-				window.setInterval(getClientsInfo, 500);
-				window.setInterval(getRemoteLogData, 200);
+				window.setInterval(getDebugData, 1500);
+				window.setInterval(getClientsInfo, 1500);
+				window.setInterval(getRemoteLogData, 1200);
 			}
 
 			function initialize() {
