@@ -262,18 +262,24 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mLoginScreen->setMainWidget(mainLayout);
 }
 
-void LoginScreen::show(bool connected)
+/**
+ * Show the login screen in the connected state
+ * with the "connected" controls visible.
+ */
+void LoginScreen::showConnectedScreen()
 {
-	if(connected)
-	{
-		mConnectLayout->setVisible(false);
-		mDisconnectLayout->setVisible(true);
-	}
-	else
-	{
-		mConnectLayout->setVisible(true);
-		mDisconnectLayout->setVisible(false);
-	}
+	mConnectLayout->setVisible(false);
+	mDisconnectLayout->setVisible(true);
+	mLoginScreen->show();
+}
+
+/**
+ * Show the login screen in the not connected state.
+ */
+void LoginScreen::showNotConnectedScreen()
+{
+	mConnectLayout->setVisible(true);
+	mDisconnectLayout->setVisible(false);
 	mLoginScreen->show();
 }
 

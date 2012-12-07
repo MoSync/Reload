@@ -82,6 +82,13 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
+	 * We want to quit the ReloadClient only if an app is not running.
+	 * This method is called from the WOrmhole library when a JavaScript
+	 * application requests to exit.
+	 */
+	void ReloadClient::exit();
+
+	/**
 	 * Called from JavaScript when a Wormhole app has been loaded.
 	 */
 	void openWormhole(MAHandle webViewHandle);

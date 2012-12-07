@@ -17,4 +17,7 @@
 .res INFO_TEXT
 .ubin
 .include "information"
+.res CUSTOM_JS
+.ubin
+.include "custom.js"
 .eof
