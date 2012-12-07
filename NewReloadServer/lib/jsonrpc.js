@@ -9,9 +9,12 @@
 */
 var sys = require('sys');
 
+
 var JSONRPC = {
     
     functions: {},
+
+    modules: {},
 
 	/**
 	* Opens a JSON rpc server on the given websocket by listening to messages.
@@ -72,6 +75,8 @@ var JSONRPC = {
                 funcs.push(funcName);
             }
         }
+        this.modules[mod] = object;
+
         JSONRPC.trace('***', 'exposing module: ' + mod + ' [funcs: ' + funcs.join(', ') + ']');
     },
 
@@ -148,9 +153,13 @@ var JSONRPC = {
 	    var method = this.functions[message.method];
 
 	    try {
+	    	// Check for the function module to set the appropriate 
+	    	// context to apply
+	    	var functionCall = message.method.split('.');
+	    	var moduleName = functionCall[0];
 
 	    	message.params.push(callback);
-	    	method.apply(null, message.params);
+	    	method.apply(this.modules[moduleName], message.params);
 	    }
 	    catch(err) {
 	    	return onFailure(err);

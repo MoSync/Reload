@@ -14,7 +14,6 @@ var rpcFunctions = {
 	 */
 	add: function (a, b, sendResponse) {
 		var r = a + b + 3;
-		globals.rootWorkspacePath = "test";
 		sendResponse(r);
 	},
 
@@ -25,7 +24,7 @@ var rpcFunctions = {
 
 		// Set path to the project folder.
 		console.log("MOSYNC: Bundle Path" + bundlePath);
-		var data = fs.readFileSync(rootWorkspacePath + bundlePath);
+		var data = fs.readFileSync(globals.rootWorkspacePath + bundlePath);
 		
 		sendResponse(data);
 	},
@@ -36,7 +35,7 @@ var rpcFunctions = {
 	 */
 	remoteLog: function (logMessage, sendResponse) {
 		
-		console.log("CLIENT LOG: " + message);
+		console.log("CLIENT LOG: " + logMessage);
 		gRemoteLogData.push(logMessage);
 		sendResponse("");
 	}
