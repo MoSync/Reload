@@ -30,6 +30,8 @@
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
+
+
         <div id="main">
             <div id="header">
                 <div id="header-left"><img src="img/Reload-logo-top.png"></div>
@@ -39,7 +41,7 @@
                     class="server-info"
                     data-rpc-method=""
                     data-rpc-params="[a, b, c]">
-                    SERVER IP: 192.168.1.26</div>
+                    SERVER IP: </div>
             </div>
 
 
@@ -48,7 +50,7 @@
                 <header id="content-nav">
                     <ul>
                         <li><a href="#">EDITOR</a></li>
-                        <li><a href="#">DEBBUG</a></li>
+                        <li><a href="#">DEBUG</a></li>
                         <li><a href="#">DEVICES</a></li>
                         <li><a href="#">LOG</a></li>
                         <li><a href="#">DOCS</a></li>
@@ -73,9 +75,9 @@
 
             <section id="right-bar">
                 <a href="#" title="Reload your project"><img id="reload-button" src="img/Reload-button.png"></a>
-                <div id="switch-debbug">
-                    <p id="debugg-label">Debbug</p>
-                    <label id="checkbox-debbug" title="Activate/Deactivate debbug" class="checkbox toggle candy orange" onclick="" style="width: 100px">
+                <div id="switch-debug">
+                    <p id="debugg-label">Debug</p>
+                    <label id="checkbox-debug" title="Activate/Deactivate debug" class="checkbox toggle candy orange" onclick="" style="width: 100px">
                     <input id="view" type="checkbox" />
                     <p>
                         <span>On</span>
@@ -84,12 +86,22 @@
                     <a class="slide-button"></a>
                 </label>
                 </div>
+        <div id="project-list-container">
+       </div>
+                <div>
+                    <a id="change-workspace" href="#">Change workspace</a><br />
+                </div>
                 <div id="file-options">
+
                         <ul>
-                            <li><a href="#" title="Add project"><img src="img/folder.png"></a></li>
+                            <li><a id="add-project" href="#" title="Add project"><img src="img/folder.png"></a></li>
+
+                            <!--
                             <li><a href="#" title="Add file"><img src="img/add-file.png"></a></li>
                             <li><a href="#" title=""><img src="img/add-file.png"></a></li>
-                            <li><a href="#" title=""><img src="img/refresh.png"></a></li>
+                           -->
+
+                            <li><a id="update-project-list" href="#" title=""><img src="img/refresh.png"></a></li>
                             <li><a href="#" title=""><img src="img/delete.png"></a></li>
                         </ul>
                 </div>
@@ -111,8 +123,24 @@
             </section>
 
         </div>
+
+        <div id="change-workspace-dialog" title="Change Workspace">
+            <label>Paste Workspace path here:</label>
+            <br/>
+            <br/>
+            <input type="text" name="workspacePath" id="workspacePath" class="text ui-widget-content ui-corner-all" />
+            <br/>
+        </div>
+
+        <!--
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.1.js"><\/script>')</script>
+        -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.3.min.js"><\/script>')</script>
+
+        <!-- jQuery Dialog -->
+        <script src="js/vendor/jquery-ui-1.8.16.custom.min.js"></script>
+        <link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
 
         <!-- Underscore -->
         <script src="js/vendor/underscore-1.4.3.min.js"></script>

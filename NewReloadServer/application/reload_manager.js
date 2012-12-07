@@ -11,15 +11,15 @@ var path = require('path');
 
 var rpcFunctions = {
 
-	add: function (a, b, sendResponse) {
-		var r = a + b;
-		sendResponse(r);
-	},
+    add: function (a, b, sendResponse) {
+        var r = a + b;
+        sendResponse(r);
+    },
 
     // Helping function for internal use
     getIpFromSocket: function (sendResponse) {
 
-    	var socket = net.createConnection(80, "www.google.com");
+        var socket = net.createConnection(80, "www.google.com");
 
         socket.on('connect', function() {
             
@@ -35,23 +35,23 @@ var rpcFunctions = {
 
     getNetworkIP: function (sendResponse) {
 
-    	if(globals.ip == null) {
-    		this.getIpFromSocket(sendResponse);
-    	}
-    	else {
-    		sendResponse(globals.ip);
-    	}
+        if(globals.ip == null) {
+            this.getIpFromSocket(sendResponse);
+        }
+        else {
+            sendResponse(globals.ip);
+        }
     },
 
     getVersionInfo: function (sendResponse) {
 
         var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
-		var versionInfoJSON = JSON.stringify({"version":versionInfo[0], 
-											  "timestamp": versionInfo[1]});
-		console.log(versionInfoJSON);
-		
-		sendResponse(versionInfoJSON);
+        var versionInfoJSON = JSON.stringify({"version":versionInfo[0], 
+                                              "timestamp": versionInfo[1]});
+        console.log(versionInfoJSON);
+        
+        sendResponse(versionInfoJSON);
     },
 
     getProjectList: function (sendResponse) {
@@ -73,49 +73,49 @@ var rpcFunctions = {
 
     // internal function
     findProjects: function (callback, sendResponse) {
-    	try {
+        try {
 
-			path.exists( globals.rootWorkspacePath, function(exist) {
+            path.exists( globals.rootWorkspacePath, function(exist) {
 
-				if(!exist) {
-					console.log("Creating the workspace directory " + 
-								globals.rootWorkspacePath);
-					fs.mkdirSync(globals.rootWorkspacePath, 0755);
-				}
+                if(!exist) {
+                    console.log("Creating the workspace directory " + 
+                                globals.rootWorkspacePath);
+                    fs.mkdirSync(globals.rootWorkspacePath, 0755);
+                }
 
-				// Now, check for projects in it
-				files = fs.readdirSync(globals.rootWorkspacePath);
+                // Now, check for projects in it
+                files = fs.readdirSync(globals.rootWorkspacePath);
 
-				var projects = [];
+                var projects = [];
 
-				for (var key in files) {
+                for (var key in files) {
 
-					var file = files[key];
-					var stat = fs.statSync(globals.rootWorkspacePath + 
-										   globals.fileSeparator +  
-										   file);
-					
-					if(stat && stat.isDirectory()) {
-						try {
-							
-							var LocalfileStat = fs.lstatSync(globals.rootWorkspacePath + 
-												globals.fileSeparator +  file + "/LocalFiles");
-							
-							if(LocalfileStat && LocalfileStat.isDirectory()) {
-								projects.push(file);
-							}
-						}
-						catch(e) {
-							//do nothing
-						}
-					}
-				}
-				callback(sendResponse);
-			});
-		}
-		catch (err) {
-			console.log("Error in findProjects: " + err);
-		}
+                    var file = files[key];
+                    var stat = fs.statSync(globals.rootWorkspacePath + 
+                                           globals.fileSeparator +  
+                                           file);
+                    
+                    if(stat && stat.isDirectory()) {
+                        try {
+                            
+                            var LocalfileStat = fs.lstatSync(globals.rootWorkspacePath + 
+                                                globals.fileSeparator +  file + "/LocalFiles");
+                            
+                            if(LocalfileStat && LocalfileStat.isDirectory()) {
+                                projects.push(file);
+                            }
+                        }
+                        catch(e) {
+                            //do nothing
+                        }
+                    }
+                }
+                callback(sendResponse);
+            });
+        }
+        catch (err) {
+            console.log("Error in findProjects: " + err);
+        }
     },
 
     createNewProject: function (projectName, projectType, sendResponse) {
