@@ -405,12 +405,12 @@ var rpcFunctions = {
                     jsonMessage.url      = url;// + "?filesize=" + data.length;
                     jsonMessage.fileSize = data.length;
 
-                    console.log(toHex8Byte( commandMap['JSONMessage'] )        +
-                                                toHex8Byte(JSON.stringify(jsonMessage).length) +
+                    console.log(this.toHex8Byte( globals.commandMap['JSONMessage'] )        +
+                                                this.toHex8Byte(JSON.stringify(jsonMessage).length) +
                                                 JSON.stringify(jsonMessage));
 
-                    var result = client.write(  toHex8Byte( commandMap['JSONMessage'] )        +
-                                                toHex8Byte(JSON.stringify(jsonMessage).length) +
+                    var result = client.write(  this.toHex8Byte( globals.commandMap['JSONMessage'] )        +
+                                                this.toHex8Byte(JSON.stringify(jsonMessage).length) +
                                                 JSON.stringify(jsonMessage), "ascii");
                     //var result = client.write(url + "?filesize=" + data.length , "ascii");
                 }
@@ -653,7 +653,7 @@ var rpcFunctions = {
     },
 
     // internal functions
-    fixPathsUnix: function(path) {
+    fixPathsUnix: function (path) {
         var pathTemp = path;
 
         while(pathTemp.indexOf(" ") > 0) {
@@ -669,7 +669,18 @@ var rpcFunctions = {
         }
 
         return pathTemp;
+    },
+
+    toHex8Byte: function (decimal) {
+
+        var finalHex  = decimal.toString(16);
+        
+        while (finalHex.length < 8)
+            finalHex = "0"+finalHex;
+
+        return finalHex;
     }
+
 };
 
 rpc.exposeModule('manager', rpcFunctions);

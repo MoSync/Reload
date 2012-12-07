@@ -1,16 +1,19 @@
-var server  = require("./lib/jsonrpc_server");
-var manager = require("./application/reload_manager");
-var client  = require("./application/client_manager");
-var globals = require("./application/globals");
+var server  = require("./lib/jsonrpc_server"),
+	tcp     = require("./lib/tcp_server");
 
-var os = require('os');
+var manager = require("./application/reload_manager"),
+	client  = require("./application/client_manager"),
+	globals = require("./application/globals");
 
-// initializations
+
+var os  = require('os'),
+	net = require('net');
+
+/** 
+ * initializations of some global vars
+ */
 globals.localPlatform = os.platform();
 globals.currentWorkingPath = process.cwd();
-
-//globals.commandMap.ConnectRequest = 1;
-//globals.commandMap.JSONMessage    = 2;
 
 //Platform specific considerations for getting the home directory
 if((globals.localPlatform.indexOf("darwin") >= 0) ||
@@ -31,5 +34,10 @@ process.on('exit', function(){
 	global.adb.kill("-9"); //Kill adb when the server dies
 });
 
-webUI = server.create(8282);
-client = server.create(8283);
+
+/**
+ * Starting the http and TCP Services
+ */
+webUI     = server.create(8282);
+client    = server.create(8283);
+tcpSocket = tcp.create(7000);
