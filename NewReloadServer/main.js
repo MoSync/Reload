@@ -1,10 +1,7 @@
 var server  = require("./lib/jsonrpc_server"),
 	tcp     = require("./lib/tcp_server");
 
-var manager = require("./application/reload_manager"),
-	client  = require("./application/client_manager"),
-	globals = require("./application/globals");
-
+var	vars    = require("./application/globals");
 
 var os  = require('os'),
 	net = require('net');
@@ -12,28 +9,34 @@ var os  = require('os'),
 /** 
  * initializations of some global vars
  */
-globals.localPlatform = os.platform();
-globals.currentWorkingPath = process.cwd();
+vars.globals.localPlatform = os.platform();
+vars.globals.currentWorkingPath = process.cwd();
 
 //Platform specific considerations for getting the home directory
-if((globals.localPlatform.indexOf("darwin") >= 0) ||
-   (globals.localPlatform.indexOf("linux") >=0)) {
+if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||
+   (vars.globals.localPlatform.indexOf("linux") >=0)) {
 
-	globals.homeDir = process.env.HOME;
+	vars.globals.homeDir = process.env.HOME;
 }
 else {
 
-	globals.homeDir = process.env.USERPROFILE;
+	vars.globals.homeDir = process.env.USERPROFILE;
 }
 
 //Platform specific considerations for getting the directory separator
-globals.fileSeparator = ((globals.localPlatform.indexOf("darwin") >=0) ||
-						 (globals.localPlatform.indexOf("linux") >=0))?"/" : "\\";
+vars.globals.fileSeparator = ((vars.globals.localPlatform.indexOf("darwin") >=0) ||
+						 (vars.globals.localPlatform.indexOf("linux") >=0))?"/" : "\\";
 
 process.on('exit', function(){
-	global.adb.kill("-9"); //Kill adb when the server dies
+	vars.globals.adb.kill("-9"); //Kill adb when the server dies
 });
 
+
+/**
+ * Include and execute the modules of the rpc
+ */
+var manager = require("./application/reload_manager"),
+	client  = require("./application/client_manager");
 
 /**
  * Starting the http and TCP Services
