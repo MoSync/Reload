@@ -402,7 +402,7 @@ function createNewProject(projectName, projectType)
 			var newData = projectData.replace(templateName, projectName);
 			file.writeFileSync(rootWorkspacePath + fileSeparator + projectName + fileSeparator + ".project", newData	, 'utf8');
  		}
-		if((localPlatform.indexOf("darwin") >= 0) ||(localPlatform.indexOf("linux") >=0))
+		if((localPlatform.indexOf("win") >= 0) ||(localPlatform.indexOf("linux") >=0))
 		{
 			var command = "cp -r " + fixPathsUnix(currentWorkingPath) + "/templates/" + fixPathsUnix(templateName) +
 							" " + fixPathsUnix(rootWorkspacePath) + fixPathsUnix(fileSeparator) + fixPathsUnix(projectName);

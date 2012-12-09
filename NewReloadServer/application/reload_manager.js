@@ -265,7 +265,7 @@ var rpcFunctions = {
                                 // Not really needed, but just good practice
                                 // (as strings arn't passed by reference)
                                 (function(){
-                                    var filePath = path + fileSeparator + files[i];
+                                    var filePath = path + vars.globals.fileSeparator + files[i];
                                     // Add a named function as callback
                                     // just to enlighten debugging
                                     fs.removeRecursive(filePath, function removeRecursiveCB(err,status) {
@@ -303,12 +303,13 @@ var rpcFunctions = {
         });
     },
 
-    renameProject: function (oldName, newName) {
+    renameProject: function (oldName, newName, sendResponse) {
         try {
             console.log("Renaming Project from " + oldName + " to " + newName );
             
             var exec = require('child_process').exec;
-            
+            var respond = sendResponse;
+
             function resultCommand(error, stdout, stderr) {
                 console.log("stdout: " + stdout);
                 console.log("stderr: " + stderr);
@@ -329,7 +330,7 @@ var rpcFunctions = {
                                  newName + 
                                  vars.globals.fileSeparator + 
                                  ".project", newData, 'utf8');
-                sendResponse(newName);
+                respond(newName);
             }
             
             if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
