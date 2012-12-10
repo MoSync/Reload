@@ -628,9 +628,7 @@ var rpcFunctions = {
 
     getWorkspacePath: function (sendResponse) {
 
-        var workspaceJSON = JSON.stringify({"path":vars.globals.rootWorkspacePath})
-        
-        sendResponse(workspaceJSON);
+        sendResponse({"path":vars.globals.rootWorkspacePath});
     },
 
     changeWorkspacePath: function (newWorkspacePath, sendResponse) {
@@ -656,6 +654,7 @@ var rpcFunctions = {
         sendResponse("");
     },
 
+    // internal only used for initialization
     getLatestPath : function () {
 
         self = this;
@@ -725,6 +724,7 @@ var rpcFunctions = {
         return pathTemp;
     },
 
+    //internal function
     toHex8Byte: function (decimal) {
 
         var finalHex  = decimal.toString(16);
