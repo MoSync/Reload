@@ -1,35 +1,46 @@
-var server  = require("./lib/jsonrpc_server");
-var manager = require("./application/reload_manager");
-var client  = require("./application/client_manager");
-var globals = require("./application/globals");
+var server  = require("./lib/jsonrpc_server"),
+	tcp     = require("./lib/tcp_server");
 
-var os = require('os');
+var	vars    = require("./application/globals");
 
-// initializations
-globals.localPlatform = os.platform();
-globals.currentWorkingPath = process.cwd();
+var os  = require('os'),
+	net = require('net');
 
-//globals.commandMap.ConnectRequest = 1;
-//globals.commandMap.JSONMessage    = 2;
+/** 
+ * initializations of some global vars
+ */
+vars.globals.localPlatform = os.platform();
+vars.globals.currentWorkingPath = process.cwd();
 
 //Platform specific considerations for getting the home directory
-if((globals.localPlatform.indexOf("darwin") >= 0) ||
-   (globals.localPlatform.indexOf("linux") >=0)) {
+if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||
+   (vars.globals.localPlatform.indexOf("linux") >=0)) {
 
-	globals.homeDir = process.env.HOME;
+	vars.globals.homeDir = process.env.HOME;
 }
 else {
 
-	globals.homeDir = process.env.USERPROFILE;
+	vars.globals.homeDir = process.env.USERPROFILE;
 }
 
 //Platform specific considerations for getting the directory separator
-globals.fileSeparator = ((globals.localPlatform.indexOf("darwin") >=0) ||
-						 (globals.localPlatform.indexOf("linux") >=0))?"/" : "\\";
+vars.globals.fileSeparator = ((vars.globals.localPlatform.indexOf("darwin") >=0) ||
+						 (vars.globals.localPlatform.indexOf("linux") >=0))?"/" : "\\";
 
 process.on('exit', function(){
-	global.adb.kill("-9"); //Kill adb when the server dies
+	vars.globals.adb.kill("-9"); //Kill adb when the server dies
 });
 
-webUI = server.create(8282);
-client = server.create(8283);
+
+/**
+ * Include and execute the modules of the rpc
+ */
+var manager = require("./application/reload_manager"),
+	client  = require("./application/client_manager");
+
+/**
+ * Starting the http and TCP Services
+ */
+webUI     = server.create(8282);
+client    = server.create(8283);
+tcpSocket = tcp.create(7000);

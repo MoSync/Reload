@@ -81,8 +81,7 @@ ReloadClient::ReloadClient() :
 	createDownloader();
 
 	// Show first screen.
-	// TODO: Why false as param?!
-	mLoginScreen->show(false);
+	mLoginScreen->showNotConnectedScreen();
 }
 
 ReloadClient::~ReloadClient()
@@ -114,7 +113,6 @@ void ReloadClient::initializeWebView()
 void ReloadClient::initializeVariables()
 {
 	mHasPage = false;
-	mNativeUIMessageReceived = false;
 	mPort = SERVER_TCP_PORT;
 	mAppsFolder = "apps/";
 	mServerCommand = 0;
@@ -137,8 +135,6 @@ void ReloadClient::initializeFiles()
 		MA_ACCESS_READ_WRITE);
 	if (!maFileExists(appDirHandle))
 	{
-		LOG("@@@ RELOAD: Creating Apps folder: %s",
-			(mFileUtil->getLocalPath() + mAppsFolder).c_str());
 		maFileCreate(appDirHandle);
 	}
 	maFileClose(appDirHandle);
@@ -210,6 +206,7 @@ void ReloadClient::createScreens()
 	// Set the most recently used server ip address.
 	mLoginScreen->defaultAddress(mServerAddress.c_str());
 }
+
 /**
  * Get client info.
  * @return String with client info.
@@ -234,9 +231,54 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	{
 		if (MAK_BACK == keyCode)
 		{
-			maExit(0);
+			exit();
 		}
 	}
+}
+
+/**
+ * We want to quit the ReloadClient only if an app is not running.
+ * This method is called from the WOrmhole library when a JavaScript
+ * application requests to exit.
+ */
+void ReloadClient::exit()
+{
+	if (mRunningApp)
+	{
+		// Close the running app and show the start screen.
+		mRunningApp = false;
+		mLoginScreen->showConnectedScreen();
+	}
+	else
+	{
+		// Exit the ReloadClient.
+		exitEventLoop();
+	}
+}
+
+static String SysLoadStringResource(MAHandle data)
+{
+	// Get size of data.
+    int size = maGetDataSize(data);
+
+    // Allocate space for text plus zero termination character.
+    char* text = (char*) malloc(size + 1);
+    if (NULL == text)
+    {
+    	return NULL;
+    }
+
+    // Read data.
+    maReadData(data, text, 0, size);
+
+    // Zero terminate string.
+    text[size] = 0;
+
+    String s = text;
+
+    free(text);
+
+    return s;
 }
 
 /**
@@ -244,70 +286,10 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
  */
 void ReloadClient::openWormhole(MAHandle webViewHandle)
 {
-	// Hijack the loadImage function to point to the relative path
-	// of the directory in which the app is unpacked.
-	char buf[2048];
-	sprintf(
-		buf,
-		//"try{"
-		"mosync.resource.loadImageOld=mosync.resource.loadImage;"
-		"mosync.resource.loadImage=function(imagePath,imageID,successCallback)"
-		"{"
-			"mosync.resource.loadImageOld('%s'+imagePath,imageID,successCallback)"
-		"};"
-		"console.log('@@@ Redefined loadImage');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
-
-	// Update maWidgetSetProperty to add app path to urls.
-	sprintf(
-		buf,
-		//"try{"
-		"mosync.nativeui.maWidgetSetPropertyOld=mosync.nativeui.maWidgetSetProperty;"
-		"mosync.nativeui.maWidgetSetProperty=function("
-			"widgetID,property,value,successCallback,errorCallback,processedCallback)"
-		"{"
-			"console.log('@@@ maWidgetSetProperty: '+property+'='+value+' - %s');"
-			"mosync.nativeui.maWidgetSetPropertyOld("
-				"widgetID,property,value,successCallback,errorCallback,processedCallback);"
-		"};"
-		"console.log('@@@ Redefined maWidgetSetProperty');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
-
-	// Update the PhoneGap function LocalFileSystem.prototype._castFS
-	// to use the temporary path of the app.
-	sprintf(
-		buf,
-		//"try{"
-		"LocalFileSystem.prototype._castFSOld=LocalFileSystem.prototype._castFS;"
-		"LocalFileSystem.prototype._castFS=function(pluginResult)"
-		"{"
-			"pluginResult.message.root.fullPath+='/%s';"
-			"LocalFileSystem.prototype._castFSOld(pluginResult);"
-		"};"
-		"console.log('@@@ Redefined _castFS');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
-
-	// Update the PhoneGap function LocalFileSystem.prototype._castEntry
-	// to use the temporary path of the app.
-	sprintf(
-		buf,
-		//"try{"
-		"LocalFileSystem.prototype._castEntryOld=LocalFileSystem.prototype._castEntry;"
-		"LocalFileSystem.prototype._castEntry=function(pluginResult)"
-		"{"
-			"pluginResult.message.fullPath+='/%s';"
-			"LocalFileSystem.prototype._castFSOld(pluginResult);"
-		"};"
-		"console.log('@@@ Redefined _castEntry');",
-		//"}catch(e){}",
-		mAppPath.c_str());
-	getWebView()->callJS(buf);
+	// Apply customizations to functions loaded in wormhole.js.
+	String script = SysLoadStringResource(CUSTOM_JS);
+	script += "('" + mAppPath + "')";
+	callJS(webViewHandle, script.c_str());
 
 	// Call super class method to handler initialization.
 	HybridMoblet::openWormhole(webViewHandle);
@@ -398,7 +380,7 @@ void ReloadClient::connReadFinished(Connection *conn, int result)
 		showConErrorMessage(result);
 
 		// Go back to the login screen on an error.
-		mLoginScreen->show(false);
+		mLoginScreen->showNotConnectedScreen();
 	}
 }
 
@@ -481,7 +463,6 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 		// Download the bundle.
 		downloadBundle();
 
-		LOG("@@@ ReloadClient::processJSONMessage 1");
 		// Use this to use experimental HTML download.
 		// Needs divineprog/LiveApps/FileServer to work
 		// and manual config of BasePath.
@@ -495,7 +476,6 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 	{
 		maPanic(0,"RELOAD: Unknown server message");
 	}
-	LOG("@@@ ReloadClient::processJSONMessage END");
 }
 
 /**
@@ -546,7 +526,6 @@ void ReloadClient::downloadBundle()
 		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
 		showConErrorMessage(result);
 	}
-	LOG("@@@ ReloadClient::downloadBundle END");
 }
 
 /**
@@ -583,8 +562,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     {
     	maDestroyPlaceholder(mResourceFile);
 
-    	// Download again.
-    	// downloadBundle();
+    	// TODO: Show LoginScreen or error message?
+    	// We should not try to download again, because
+    	// this could case an infinite download loop.
 
     	return;
     }
@@ -593,14 +573,11 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     clearAppsFolder();
 
     // Set new app path.
-    char buf[512];
+    char buf[1024];
     sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
     mAppPath = buf;
     String fullPath = mFileUtil->getLocalPath() + mAppPath;
     mReloadFileHandler->setLocalPath(fullPath);
-
-    LOG("@@@ RELOAD: finishedDownloading mAppPath: %s", mAppPath.c_str());
-    LOG("@@@ RELOAD: finishedDownloading fullPath: %s", fullPath.c_str());
 
     // Extract files.
     setCurrentFileSystem(data, 0);
@@ -621,12 +598,9 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
     }
     else
     {
-    	// App failed to extract, download it again.
-    	// TODO: Should we have a limit here to avoid
-    	// infinite download loop?
-    	// downloadBundle();
-
-    	// return;
+    	// TODO: Show LoginScreen or error message?
+    	// We should not try to download again, because
+    	// this could case an infinite download loop.
     }
 }
 
@@ -641,23 +615,19 @@ void ReloadClient::loadSavedApp()
 	MAHandle file = mFileUtil->openFileForReading(fullAppPath + "index.html");
 	if (file < 0)
 	{
-		maAlert("No App", "No app has been loaded yet", "Back", NULL, NULL);
+		maAlert("Reload: No App", "No app has been loaded yet", "Back", NULL, NULL);
 		return;
 	}
 	maFileClose(file);
 
-	LOG("@@@ RELOAD: mAppPath: %s", mAppPath.c_str());
-	LOG("@@@ RELOAD: fullAppPath: %s", fullAppPath.c_str());
-
 	// We want NativeUI events.
 	//getMessageHandler()->nativeUIEventsOn();
-
-	// TODO: How to find out if the app uses native ui!
 
 	// Open the page.
 	//showWebView();
 	//getWebView()->setBaseUrl(fullAppPath);
 	//getWebView()->openURL("index.html");
+	mFileUtil->setAppPath(fullAppPath);
 	getWebView()->setBaseUrl(fullAppPath);
 	showPage("index.html");
 
@@ -682,9 +652,6 @@ void ReloadClient::freeHardware()
 			callJS("try {mosync.nativeui.destroyAll()}catch(err){}");
 		}*/
 	}
-
-	// TODO: We need to handler detection of native ui apps.
-	mNativeUIMessageReceived = false;
 
 	// Try stopping all sensors.
 	// TODO: Replace hard coded number "6" with symbolic value.
@@ -791,7 +758,7 @@ void ReloadClient::showConErrorMessage(int errorCode)
 void ReloadClient::cancelDownload()
 {
 	mDownloader->cancelDownloading();
-	mLoginScreen->show(true);
+	mLoginScreen->showConnectedScreen();
 }
 
 void ReloadClient::connectTo(const char *serverAddress)
