@@ -65,14 +65,14 @@ public:
      * Called when a download operation is canceled
      * @param downloader The downloader that was canceled
      */
-    void downloadCancelled(Downloader* downloader){}
+    void downloadCancelled(Downloader* downloader);
 
     /**
      * Method displays error code in case of error in downloading.
      * @param downloader The downloader that got the error
      * @param code The error code that was returned
      */
-    void error(Downloader* downloader, int code){}
+    void error(Downloader* downloader, int code);
 
     void show();
 

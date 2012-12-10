@@ -53,16 +53,29 @@ MA 02110-1301, USA.
 #define FILEERROR_TYPE_MISMATCH_ERR "11"
 #define FILEERROR_PATH_EXISTS_ERR "12"
 
+ReloadFileHandler::ReloadFileHandler(Wormhole::PhoneGapMessageHandler* messageHandler)
+	: Wormhole::PhoneGapFile(messageHandler)
+{
+}
 
-void ReloadFile::setLocalPath(MAUtil::String &path)
+ReloadFileHandler::~ReloadFileHandler()
+{
+}
+
+void ReloadFileHandler::setLocalPath(MAUtil::String &path)
 {
 	mLocalPath = path;
+}
+
+void ReloadFileHandler::actionResolveLocalFileSystemURI(Wormhole::JSONMessage& message)
+{
+	// TODO: Implement.
 }
 
 /**
  * Return a FileSystem object.
  */
-void ReloadFile::actionRequestFileSystem(Wormhole::JSONMessage& message)
+void ReloadFileHandler::actionRequestFileSystem(Wormhole::JSONMessage& message)
 {
 	MAUtil::String callbackID = message.getParam("PhoneGapCallBackId");
 
