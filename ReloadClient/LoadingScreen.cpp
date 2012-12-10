@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include "LoadingScreen.h"
+#include "Log.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -152,9 +153,28 @@ void LoadingScreen::finishedDownloading(Downloader* downloader, MAHandle data)
 	mIndicator->hide(); //Needed for android to animate correctly
 }
 
+/**
+ * Called when a download operation is canceled
+ * @param downloader The downloader that was canceled
+ */
+void LoadingScreen::downloadCancelled(Downloader* downloader)
+{
+	LOG("@@@ LoadingScreen::downloadCancelled");
+}
+
+/**
+ * Method displays error code in case of error in downloading.
+ * @param downloader The downloader that got the error
+ * @param code The error code that was returned
+ */
+void LoadingScreen::error(Downloader* downloader, int code)
+{
+	LOG("@@@ LoadingScreen::error");
+}
+
 void LoadingScreen::show()
 {
 	mSplashScreen->show();
-	mIndicator->show(); //Needed for android indicator to animate
-	mProgressBar->setProgress(0);
+	mIndicator->show(); //Needed for Android indicator to animate
+	mProgressBar->setProgress(50);
 }

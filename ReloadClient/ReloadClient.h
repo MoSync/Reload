@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 #ifndef RELOADCLIENT_H_
 #define RELOADCLIENT_H_
 
-#include <Wormhole/WebAppMoblet.h>
+#include <Wormhole/HybridMoblet.h>
 #include <Wormhole/MessageProtocol.h>
 #include <Wormhole/MessageStream.h>
 #include <Wormhole/Libs/JSONMessage.h>
@@ -59,18 +59,21 @@ using namespace MAUtil::YAJLDom; //Json Parser
  * The application class.
  */
 class ReloadClient :
-	public WebAppMoblet,
+	public HybridMoblet,
 	public ConnectionListener,
 	public DownloadListener,
 	public LogMessageListener
 {
 public:
 	ReloadClient();
+	virtual ~ReloadClient();
 
-	virtual ~ReloadClient()
-	{
-		// Add cleanup code as needed.
-	}
+	void initializeWebView();
+	void initializeVariables();
+	void initializeFiles();
+	void createMessageHandlers();
+	void createDownloader();
+	void createScreens();
 
 	/**
 	 * This method is called when a key is pressed.
@@ -79,42 +82,16 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
-	 * This method handles messages sent from the WebView.
-	 *
-	 * Note that the data object will be valid only during
-	 * the life-time of the call of this method, then it
-	 * will be deallocated.
-	 *
-	 * @param webView The WebView that sent the message.
-	 * @param urlData Data object that holds message content.
+	 * We want to quit the ReloadClient only if an app is not running.
+	 * This method is called from the WOrmhole library when a JavaScript
+	 * application requests to exit.
 	 */
-	void handleWebViewMessage(WebView* webView, MAHandle data);
+	void ReloadClient::exit();
 
 	/**
-	 * Handles JSON messages. This is used by PhoneGap.
-	 *
-	 * You can send your own messages from JavaScript and handle them here.
-	 *
-	 * @param webView A pointer to the web view posting this message.
-	 * @param data The raw encoded JSON message array.
+	 * Called from JavaScript when a Wormhole app has been loaded.
 	 */
-	void handleMessageStreamJSON(WebView* webView, MAHandle data);
-
-	/**
-	 * Handles string stream messages (generally faster than JSON messages).
-	 * This is used by the JavaScript NativeUI system.
-	 *
-	 * You can send your own messages from JavaScript and handle them here.
-	 *
-	 * @param webView A pointer to the web view posting this message.
-	 * @param data The raw encoded stream of string messages.
-	 */
-	void handleMessageStream(WebView* webView, MAHandle data);
-
-	/**
-	 * For debugging.
-	 */
-	void printMessage(MAHandle dataHandle);
+	void openWormhole(MAHandle webViewHandle);
 
 	//The socket->connect() operation has finished
 	void connectFinished(Connection *conn, int result);
@@ -179,10 +156,10 @@ public:
      */
     void freeHardware();
 
-	/**
-	 * Get the client information
-	 * @return Client information
-	 */
+    /**
+     * Get client info.
+     * @return String with client info.
+     */
 	MAUtil::String getInfo();
 
     /**
@@ -283,24 +260,9 @@ private:
 	LoadingScreen *mLoadingScreen;
 
 	/**
-	 * Handler for PhoneGap messages.
+	 * Custom handler for PhoneGap File API messages.
 	 */
-	PhoneGapMessageHandler mPhoneGapMessageHandler;
-
-	/**
-	 * Special handler for local filesystem messages.
-	 */
-	ReloadFile mReloadFile;
-
-	/**
-	 * Handler for NativeUI messages.
-	 */
-	NativeUIMessageHandler *mNativeUIMessageHandler;
-
-	/**
-	 * Handler for resource messages used for NativeUI
-	 */
-	ResourceMessageHandler mResourceMessageHandler;
+	ReloadFileHandler* mReloadFileHandler;
 
 	/**
 	 * true when an app is running, false if on the login screen.
@@ -338,12 +300,11 @@ private:
 	 */
 	String mPort;
 
-	bool mNativeUIMessageReceived;
-
 	/**
 	 * The general folder where app files reside.
 	 */
 	String mAppsFolder;
+
 	/**
 	 * The relative path to the downloaded app folder.
 	 */
