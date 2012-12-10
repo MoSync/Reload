@@ -91,32 +91,32 @@
                 <div>
                     <a id="change-workspace" href="#">Change workspace</a><br />
                 </div>
+
                 <div id="file-options">
-
-                        <ul>
-                            <li><a id="add-project" href="#" title="Add project"><img src="img/folder.png"></a></li>
-
-                            <!--
-                            <li><a href="#" title="Add file"><img src="img/add-file.png"></a></li>
-                            <li><a href="#" title=""><img src="img/add-file.png"></a></li>
-                           -->
-
-                            <li><a id="update-project-list" href="#" title=""><img src="img/refresh.png"></a></li>
-                            <li><a href="#" title=""><img src="img/delete.png"></a></li>
-                        </ul>
+                <script type="text/template" id="workspace-controls-template">
+                    <ul>
+                        <li><a id="add-project" href="#" title="Add project"><img src="img/folder.png"></a></li>
+                        <li><a id="update-project-list" href="#" title=""><img src="img/refresh.png"></a></li>
+                    </ul>
+                </script>
                 </div>
+
                 <div id="projects">
                     <div id="projectListContainer">
-                        <div class="projectContainerEven" id="project2">
-                            <div class="projectNameContainer" id="Prueba" onclick="createRenameProjectDialog(this.id)">Prueba</div>
-                            <div class="projectUpdateContainer"><a href="#" onclick="reloadProject('http://localhost:8282/Prueba/LocalFiles.html','Prueba')"><img src="img/Reload-project.png"></a></div>
-                            <div class="projectOpenContainer"><a href="#" onclick="openProjectFolder('Prueba')"><img src="img/Reload-folder.png"></a></div>
-                        </div>
-                        <div class="projectContainerEven" id="project2"> 
-                            <div class="projectNameContainer" id="PruebaWeb" onclick="createRenameProjectDialog(this.id)">PruebaWeb</div>
-                            <div class="projectUpdateContainer"><a href="#" onclick="reloadProject('http://localhost:8282/PruebaWeb/LocalFiles.html','PruebaWeb')"><img src="img/Reload-project.png"></a></div>
-                            <div class="projectOpenContainer"><a href="#" onclick="openProjectFolder('PruebaWeb')"><img src="img/Reload-folder.png"></a></div>
-                        </div>
+
+                        <script type="text/template" id="project-template">
+                            <div class="<%= className %>">
+                                <div class="projectNameContainer"><a href="#" data-id="<%= id %>"><%= name %></a></div>
+                            </div>
+                        </script>
+
+                        <script type="text/template" id="project-controls-template">
+<div class="projectControls<%= className %>">
+                            <div class="projectUpdateContainer"><a href="#"><img src="img/Reload-project.png"></a></div>
+                            <div class="projectOpenContainer"><a href="#"><img src="img/Reload-folder.png"></a></div>
+                            <div class="projectDeleteContainer"><a href="#"><img src="img/delete.png"></a></div>
+</div>
+                        </script>
                     </div>
 
                 </div>
@@ -129,6 +129,24 @@
             <br/>
             <br/>
             <input type="text" name="workspacePath" id="workspacePath" class="text ui-widget-content ui-corner-all" />
+            <br/>
+        </div>
+
+        <div id="new-project-dialog" title="New widget">
+            <label>Project Type:</label>
+            <br/>
+            <br/>
+            <input type="radio" name="projectType" id="projectType" value="native" />
+            NativeUI Based
+            <br/>
+            <br/>
+            <input type="radio" name="projectType" id="projectType" checked="true" value="web" />
+            Web based
+            <br/>
+            <br/>
+            <br/>
+            <label>Project Name:</label>
+            <input type="text" name="newProjectName" id="newProjectName" class="text ui-widget-content ui-corner-all"/>
             <br/>
         </div>
 

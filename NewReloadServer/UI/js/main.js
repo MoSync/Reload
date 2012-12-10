@@ -1,25 +1,105 @@
 (function($){
+    /*
+     * Project model.
+     */
     var Project = Backbone.Model.extend({
-        initialize: function() {
-            console.log('p');
+    });
+
+    /*
+     * A single row within workspace column.
+     */
+    var ProjectView = Backbone.View.extend({
+        projectTpl: $('#project-template').html(),
+
+        initialize: function(options) {
+            _.bindAll(this, 'render');
+
+            this.controls = new ProjectControlsView({
+                model: this.model,
+                parent: this
+            });
+
+            var self = this;
+            this.model.on('change', function(){
+                if(this.get('visible')) {
+                    self.controls.show();
+                } else {
+                    self.controls.hide();
+                }
+            });
+
+            this.render();
+        },
+        render: function() {
+            // Parse template and set values
+            var id = (this.model.id !== undefined)? this.model.id: this.model.cid;
+            this.className = 'projectContainerEven'+id;
+            var t = _.template(this.projectTpl, { name: this.model.get('name'), id: id, className: this.className });
+            this.container = t; // keep internal element reference for call from controls.
+            this.$el.append(t);
+        },
+    });
+
+    var ProjectControlsView = Backbone.View.extend({
+        template: $('#project-controls-template').html(),
+
+        initialize: function(options) {
+            this.parent = options.parent;
+            _.bindAll(this, 'render', 'hide', 'show');
+            this.render();
         },
 
-        defaults: {
-            part1: 'Project',
-            part2: 'world'
+        render: function() {
+        },
+
+        show: function() {
+            var t = _.template(this.template, { className: this.model.cid});
+            $('.'+this.parent.className).append(t);
+        },
+
+        hide: function() {
+            $('.projectControls' + this.model.cid).remove();
         }
     });
 
-    var Workspace = Backbone.Collection.extend({
-        initialize: function() {
-            console.log('collection');
+    var WorkspaceControlsView = Backbone.View.extend({
+        template: $('#workspace-controls-template').html(),
+
+        events: {
+            'click a#add-project': 'addProject'
         },
+
+        initialize: function(options) {
+            _.bindAll(this, 'render', 'addProject');
+            this.workspace = options.workspace;
+            this.render();
+        },
+
+        render: function() {
+            console.log(this.template);
+            var t = _.template(this.template);
+            this.$el.append(t);
+        },
+
+        addProject: function() {
+            console.log('add project');
+            this.workspace.addProject();
+        }
+    });
+
+    /*
+     * A collection of projects within given directory.
+     */
+    var Workspace = Backbone.Collection.extend({
         model: Project
     });
 
+    /*
+     * A view of projects withing a workspace.
+     */
     var WorkspaceView = Backbone.View.extend({
         events: {
-            'click #add': 'addProject'
+            'click a': 'selectProject'
         },
 
         initialize: function() {
@@ -27,31 +107,114 @@
 
             this.collection = new Workspace();
             this.collection.bind('add', this.appendProject);
+
             this.render();
         },
 
         render: function() {
+            console.log('render workspace view');
             var self = this;
-            $('#project-list-container').append("<button id='add'>Add list item</button>");
-            this.appendProject(new Project());
             _(this.collection.models).each(function(project){
                 self.appendProject(project);
             }, this);
         },
 
         addProject: function () {
-            console.log('addproj');
+            var self = this;
+
             var project = new Project();
-            project.set({part1: 'mynewName'});
-            this.collection.add(project);
+            // Add project to the workspace collection only when name is set from the dialog.
+            project.on('change', function() {
+                self.collection.add(project);
+            });
+
+            // Open dialog and ask for project name and type.
+            var apdv = new AddProjectDialogView(project);
+
         },
 
         appendProject: function(project) {
-            console.log('appended');
-            $('#project-list-container').append(project.get('part1') + '<br />');
+            var pv = new ProjectView({
+                model: project,
+                el: this.el
+            });
+
+            this.$el.append(pv);
+        },
+
+        selectProject: function(e) {
+            var id = $(e.target).data('id');
+            var project = this.collection.getByCid(id);
+
+            // Hide all controls first.
+            _(this.collection.models).each(function(project){
+                project.set({visible: false});
+            });
+
+            // Reveal controls for a specific project row.
+            project.set({visible: true});
+
         }
     });
-    var w = new WorkspaceView();
+
+    var AddProjectDialogView = Backbone.View.extend({
+        el: $("#new-project-dialog"),
+
+        initialize: function(project) {
+            this.project = project;
+            _.bindAll(this, 'render');
+            this.render();
+        },
+
+        render: function() {
+            var context = this;
+            // Show dialog
+            this.$el.dialog({
+                autoOpen : false,
+                title : "Create New Project",
+                width : 450,
+                modal : true,
+                buttons : {
+                    "Create" : function() {
+                        var type = "web";
+                        var rdolist = document.getElementsByName("projectType");
+                        var newProjectName = document.getElementById("newProjectName");
+
+                        if(rdolist[0].checked) {
+                            type = "native";
+                        }
+
+                        if(newProjectName.value !== "") {
+
+                            context.project.set({ name: newProjectName.value });
+                            context.project.set({ type: type });
+
+                            $(this).dialog("close");
+                        } else {
+                            alert("Please enter A Project Name!");
+                        }
+                    },
+                    "Cancel" : function() {
+                        $(this).dialog("close");
+                    }
+                },
+                close : function(event, ui) {
+                }
+            }).dialog('open');
+        },
+    });
+
+    /*
+     * Init workspace and workspace controls.
+     */
+    var workspace = new WorkspaceView({
+        el: $('#projectListContainer')
+    });
+
+    var workspaceControls = new WorkspaceControlsView({
+        el: $('#file-options'),
+        workspace: workspace
+    });
 
 
     var ChangeWorkspaceDialog = Backbone.View.extend({
@@ -124,7 +287,7 @@
         },
 
         addProject: function() {
-            console.log('add project');
+            //console.log('add project');
         },
 
         getProjectList: function() {
