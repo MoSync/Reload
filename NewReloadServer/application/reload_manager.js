@@ -360,8 +360,10 @@ var rpcFunctions = {
 
     reloadProject: function (projectPath, debug, sendResponse) {
         
-        var weinreDebug;
+        var self = this;
 
+        var weinreDebug;
+        
         if( typeof debug !== "boolean" || typeof debug === "undefined") {
             weinreDebug = false;
             console.log("WEINRE ENABLED jsonRPC:" + weinreDebug);
@@ -381,7 +383,8 @@ var rpcFunctions = {
         //var path = pageSplit[pageSplit.length -2];
         
         // Bundle the app.
-        bundleApp(projectPath, weinreDebug, function (actualPath) {
+        this.bundleApp(projectPath, weinreDebug, function (actualPath) {
+            
             
             // We will send the file size information together with the command as 
             // an extra level of integrity checking.
@@ -410,12 +413,12 @@ var rpcFunctions = {
                     jsonMessage.url      = url;// + "?filesize=" + data.length;
                     jsonMessage.fileSize = data.length;
 
-                    console.log(this.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
-                                                this.toHex8Byte(JSON.stringify(jsonMessage).length) +
+                    console.log(self.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
+                                                self.toHex8Byte(JSON.stringify(jsonMessage).length) +
                                                 JSON.stringify(jsonMessage));
 
-                    var result = client.write(  this.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
-                                                this.toHex8Byte(JSON.stringify(jsonMessage).length) +
+                    var result = client.write(  self.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
+                                                self.toHex8Byte(JSON.stringify(jsonMessage).length) +
                                                 JSON.stringify(jsonMessage), "ascii");
                     //var result = client.write(url + "?filesize=" + data.length , "ascii");
                 }
@@ -432,7 +435,7 @@ var rpcFunctions = {
         });
     },
 
-    bundleApp: function (projectDir, winreDebug, callback) {
+    bundleApp: function (projectDir, weinreDebug, callback) {
 
         try {
             // WEINRE injection
@@ -492,6 +495,7 @@ var rpcFunctions = {
                 vars.globals.fileSeparator + "LocalFiles\" -out \"" +
                 vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  + 
                 vars.globals.fileSeparator + "LocalFiles.bin\"";
+                
             exec(command, puts);        
         }
         catch(err)
@@ -633,25 +637,27 @@ var rpcFunctions = {
 
     changeWorkspacePath: function (newWorkspacePath, sendResponse) {
         
+        var self = this;
+
         console.log("Changing workspace to " + newWorkspacePath);
-        var path = require('path');
+
         path.exists(newWorkspacePath, function(exists) {
 
             if(exists) {
 
-                this.setRootWorkspacePath(newWorkspacePath);
-                this.findProjects(function(){}, sendResponse);
+                self.setRootWorkspacePath(newWorkspacePath);
+                self.findProjects(function(){}, sendResponse);
             }
             else {
 
                 console.log("workspace does not exist");
                 fs.mkdirSync(newWorkspacePath);
-                this.setRootWorkspacePath(newWorkspacePath);
-                this.findProjects(function(){},sendResponse);
+                self.setRootWorkspacePath(newWorkspacePath);
+                self.findProjects(function(){},sendResponse);
             }
         });
 
-        sendResponse("");
+        sendResponse(newWorkspacePath);
     },
 
     // internal only used for initialization

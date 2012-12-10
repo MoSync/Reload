@@ -2,7 +2,7 @@ var rpc = require('../lib/jsonrpc');
 var net = require('net');
 var fs = require('fs');
 
-var globals = require('./globals');
+var vars = require('./globals');
 
 /**
  * The functions that are available for remote calling
@@ -23,8 +23,13 @@ var rpcFunctions = {
 	getBundle: function(bundlePath, sendResponse) {
 
 		// Set path to the project folder.
-		console.log("MOSYNC: Bundle Path" + bundlePath);
-		var data = fs.readFileSync(globals.rootWorkspacePath + bundlePath);
+		console.log("MOSYNC: Bundle Path: " + bundlePath);
+
+		var data = fs.readFileSync(vars.globals.rootWorkspacePath + 
+								   vars.globals.fileSeparator +
+								   bundlePath +
+								   vars.globals.fileSeparator +
+								   "LocalFiles.bin");
 		
 		sendResponse(data);
 	},

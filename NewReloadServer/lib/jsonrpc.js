@@ -35,16 +35,30 @@ var JSONRPC = {
 	        	'result': data,
 	        	'error': null
 	      	};
-			console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
-			self.response.writeHead(200, {
-						  'Content-Length': JSON.stringify(responseObject).length,
-						  'Content-Type': 'application/json',
+	      	
+	      	if(message.id == 1){
+	      		self.response.writeHead(200, {
+						  'Content-Length': data.length,
+						  'Content-Type': 'binary',
 						  'Pragma': 'no-cache',
 						  'Cache-Control': 'no-cache',
 						  'Expires': '-1'
 						});
-			self.response.write( JSON.stringify(responseObject) );
-			self.response.end("");
+				self.response.write( data );
+				self.response.end("");
+	      	}
+	      	else {
+				//console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
+				self.response.writeHead(200, {
+							  'Content-Length': JSON.stringify(responseObject).length,
+							  'Content-Type': 'application/json',
+							  'Pragma': 'no-cache',
+							  'Cache-Control': 'no-cache',
+							  'Expires': '-1'
+							});
+				self.response.write( JSON.stringify(responseObject) );
+				self.response.end("");
+			}
 		});
 	},
 
