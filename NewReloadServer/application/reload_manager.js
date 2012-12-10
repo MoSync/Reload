@@ -22,7 +22,7 @@ var rpcFunctions = {
         var socket = net.createConnection(80, "www.google.com");
 
         socket.on('connect', function() {
-            
+
             vars.globals.ip = socket.address().address;
             sendResponse(vars.globals.ip);
             socket.end();
@@ -47,10 +47,10 @@ var rpcFunctions = {
 
         var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
-        var versionInfoJSON = JSON.stringify({"version":versionInfo[0], 
+        var versionInfoJSON = JSON.stringify({"version":versionInfo[0],
                                               "timestamp": versionInfo[1]});
         console.log(versionInfoJSON);
-        
+
         sendResponse(versionInfoJSON);
     },
 
@@ -82,7 +82,7 @@ var rpcFunctions = {
             fs.exists( vars.globals.rootWorkspacePath, function(exist) {
 
                 if(!exist) {
-                    console.log("Creating the workspace directory " + 
+                    console.log("Creating the workspace directory " +
                                 vars.globals.rootWorkspacePath);
                     fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);
                 }
@@ -95,16 +95,16 @@ var rpcFunctions = {
                 for (var key in files) {
 
                     var file = files[key];
-                    var stat = fs.statSync(vars.globals.rootWorkspacePath + 
-                                           vars.globals.fileSeparator +  
+                    var stat = fs.statSync(vars.globals.rootWorkspacePath +
+                                           vars.globals.fileSeparator +
                                            file);
-                    
+
                     if(stat && stat.isDirectory()) {
                         try {
-                            
-                            var LocalfileStat = fs.lstatSync(vars.globals.rootWorkspacePath + 
+
+                            var LocalfileStat = fs.lstatSync(vars.globals.rootWorkspacePath +
                                                 vars.globals.fileSeparator +  file + "/LocalFiles");
-                            
+
                             if(LocalfileStat && LocalfileStat.isDirectory()) {
                                 projects.push(file);
                             }
@@ -125,7 +125,7 @@ var rpcFunctions = {
     createNewProject: function (projectName, projectType, sendResponse) {
         try {
             console.log(
-                "Creating new project: " + projectName + 
+                "Creating new project: " + projectName +
                 ", of type " + projectType);
 
             var templateName = "ReloadTemplate";
@@ -151,19 +151,19 @@ var rpcFunctions = {
                     console.log("error: " + error);
                 }
 
-                var projectData = fs.readFileSync(vars.globals.rootWorkspacePath + 
-                                                  vars.globals.fileSeparator + 
-                                                  projectName + 
-                                                  vars.globals.fileSeparator + 
+                var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
+                                                  vars.globals.fileSeparator +
+                                                  projectName +
+                                                  vars.globals.fileSeparator +
                                                   ".project", 'utf8');
 
                 //TODO: Very bad way to change the project name in file
                 var newData = projectData.replace(templateName, projectName);
 
-                fs.writeFileSync(vars.globals.rootWorkspacePath + 
-                                 vars.globals.fileSeparator + 
-                                 projectName + 
-                                 vars.globals.fileSeparator + 
+                fs.writeFileSync(vars.globals.rootWorkspacePath +
+                                 vars.globals.fileSeparator +
+                                 projectName +
+                                 vars.globals.fileSeparator +
                                  ".project", newData    , 'utf8');
 
                 sendResponse(projectName);
@@ -171,19 +171,19 @@ var rpcFunctions = {
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
             {
-                var command = "cp -r " + this.fixPathsUnix(vars.globals.currentWorkingPath) + 
-                                         "/templates/" + 
+                var command = "cp -r " + this.fixPathsUnix(vars.globals.currentWorkingPath) +
+                                         "/templates/" +
                                          this.fixPathsUnix(templateName) +
-                                   " " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + 
-                                         this.fixPathsUnix(vars.globals.fileSeparator) + 
+                                   " " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
+                                         this.fixPathsUnix(vars.globals.fileSeparator) +
                                          this.fixPathsUnix(projectName);
             }
             else
             {
-                var command = "xcopy /e /I \"" + vars.globals.currentWorkingPath + 
+                var command = "xcopy /e /I \"" + vars.globals.currentWorkingPath +
                                                  "\\templates\\" + templateName +
-                                       "\" \"" + vars.globals.rootWorkspacePath + 
-                                                 vars.globals.fileSeparator + 
+                                       "\" \"" + vars.globals.rootWorkspacePath +
+                                                 vars.globals.fileSeparator +
                                                  projectName + "\"";
             }
             console.log("Command: " + command);
@@ -231,7 +231,7 @@ var rpcFunctions = {
                             cb(err,null);
                             return;
                         }
-                        
+
                         var f_length = files.length;
                         var f_delete_index = 0;
 
@@ -280,7 +280,7 @@ var rpcFunctions = {
                                             return;
                                         }
                                     });
-                    
+
                                 })()
                             }
                         }
@@ -299,14 +299,14 @@ var rpcFunctions = {
                 console.log("ERROR: " + error);
                 sendResponse("");
             }
-            
+
         });
     },
 
     renameProject: function (oldName, newName, sendResponse) {
         try {
             console.log("Renaming Project from " + oldName + " to " + newName );
-            
+
             var exec = require('child_process').exec;
             var respond = sendResponse;
 
@@ -318,35 +318,35 @@ var rpcFunctions = {
                     console.log("error: " + error);
                 }
 
-                var projectData = fs.readFileSync(vars.globals.rootWorkspacePath + 
-                                                  vars.globals.fileSeparator + 
-                                                  newName + 
-                                                  vars.globals.fileSeparator + 
+                var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
+                                                  vars.globals.fileSeparator +
+                                                  newName +
+                                                  vars.globals.fileSeparator +
                                                   ".project", 'utf8');
 
                 var newData = projectData.replace(oldName, newName);
-                fs.writeFileSync(vars.globals.rootWorkspacePath + 
-                                 vars.globals.fileSeparator + 
-                                 newName + 
-                                 vars.globals.fileSeparator + 
+                fs.writeFileSync(vars.globals.rootWorkspacePath +
+                                 vars.globals.fileSeparator +
+                                 newName +
+                                 vars.globals.fileSeparator +
                                  ".project", newData, 'utf8');
                 respond(newName);
             }
-            
+
             if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
             {
-                var command = "mv " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + 
-                                      this.fixPathsUnix(vars.globals.fileSeparator) + 
-                                      this.fixPathsUnix(oldName) + 
-                              " "   + this.fixPathsUnix(vars.globals.rootWorkspacePath) + 
-                                      this.fixPathsUnix(vars.globals.fileSeparator) + 
+                var command = "mv " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
+                                      this.fixPathsUnix(vars.globals.fileSeparator) +
+                                      this.fixPathsUnix(oldName) +
+                              " "   + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
+                                      this.fixPathsUnix(vars.globals.fileSeparator) +
                                       this.fixPathsUnix(newName);
             }
             else
             {
-                var command = "rename " + vars.globals.rootWorkspacePath + 
-                                          vars.globals.fileSeparator + 
-                                          oldName + 
+                var command = "rename " + vars.globals.rootWorkspacePath +
+                                          vars.globals.fileSeparator +
+                                          oldName +
                               " " + newName;
             }
             console.log("Command: " + command);
@@ -359,7 +359,7 @@ var rpcFunctions = {
     },
 
     reloadProject: function (projectPath, debug, sendResponse) {
-        
+
         var weinreDebug;
 
         if( typeof debug !== "boolean" || typeof debug === "undefined") {
@@ -372,18 +372,18 @@ var rpcFunctions = {
 
         console.log("WEINRE ENABLED:" + weinreDebug);
         console.log("Reloading project");
-        
+
         sendResponse("");
         //res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
         //res.end();
 
         //var pageSplit = page.split("/");
         //var path = pageSplit[pageSplit.length -2];
-        
+
         // Bundle the app.
         bundleApp(projectPath, weinreDebug, function (actualPath) {
-            
-            // We will send the file size information together with the command as 
+
+            // We will send the file size information together with the command as
             // an extra level of integrity checking.
             console.log("actualPath: " + actualPath);
             var data = fs.readFileSync(actualPath);
@@ -436,24 +436,24 @@ var rpcFunctions = {
 
         try {
             // WEINRE injection
-            // The script is injected only in the bundle. 
+            // The script is injected only in the bundle.
             // The user is unaware of the injection in his source files
             //Checking if weinreDebug is enabled
             if(weinreDebug) {
                 //INJECT WEINRE SCRIPT
                 //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
                 //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
-                
-                var injectedScript = "<script src=\"http://" + vars.globals.ip + 
+
+                var injectedScript = "<script src=\"http://" + vars.globals.ip +
                                      ":8080/target/target-script-min.js\"></script>";
-                
-                var pathOfIndexHTML = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + 
-                                      projectDir + vars.globals.fileSeparator + 
+
+                var pathOfIndexHTML = vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                                      projectDir + vars.globals.fileSeparator +
                                       "LocalFiles" + vars.globals.fileSeparator + "index.html";
 
                 console.log("INDEX.HTML PATH: " + pathOfIndexHTML);
                 var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
-                
+
                 injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
                 fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
 
@@ -477,7 +477,7 @@ var rpcFunctions = {
             }
 
             var bundleCommand = "bin\\win\\Bundle.exe";
-            
+
             if (vars.globals.localPlatform.indexOf("darwin") >=0)
             {
               bundleCommand = "bin/mac/Bundle";
@@ -488,11 +488,11 @@ var rpcFunctions = {
             }
 
             var command =  bundleCommand + " -in \"" + vars.globals.rootWorkspacePath +
-                vars.globals.fileSeparator + projectDir + 
+                vars.globals.fileSeparator + projectDir +
                 vars.globals.fileSeparator + "LocalFiles\" -out \"" +
-                vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  + 
+                vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  +
                 vars.globals.fileSeparator + "LocalFiles.bin\"";
-            exec(command, puts);        
+            exec(command, puts);
         }
         catch(err)
         {
@@ -508,10 +508,10 @@ var rpcFunctions = {
                 console.log("stderr: " + stderr);
                 console.log("error: " + error);
             }
-            
+
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
 
-                var command = "open " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator + 
+                var command = "open " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
                                         this.fixPathsUnix(projectFolder) + "/LocalFiles";
             }
             else if ((vars.globals.localPlatform.indexOf("linux") >=0)) {
@@ -519,17 +519,17 @@ var rpcFunctions = {
                 var commandStat = fs.statSync("/usr/bin/nautilus");
                 if(commandStat.isFile()) {
 
-                  var command = "nautilus " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator + 
+                  var command = "nautilus " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
                                               this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
                 else {
 
-                  var command = "dolphin " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator + 
+                  var command = "dolphin " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
                                              this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
             }
             else {
-                var command = "explorer \"" + vars.globals.rootWorkspacePath + vars.globals.fileSeparator + 
+                var command = "explorer \"" + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
                                               projectFolder + "\\LocalFiles\"";
             }
             exec(command, puts);
@@ -578,12 +578,12 @@ var rpcFunctions = {
         }
     },
 
-    // Internal function 
+    // Internal function
     startDebugging: function () {
         try {
 
             vars.globals.isDebuggingStarted = true;
-            
+
             var util = require('util');
             var spawn = require('child_process').spawn;
 
@@ -602,7 +602,7 @@ var rpcFunctions = {
 
             adb.stdout.setEncoding("utf8");
             adb.stdout.on('data', function (data) {
-                
+
                 if(vars.globals.useSecondaryBuffer) {
 
                     vars.globals.logCatData.push(data);
@@ -632,7 +632,7 @@ var rpcFunctions = {
     },
 
     changeWorkspacePath: function (newWorkspacePath, sendResponse) {
-        
+
         console.log("Changing workspace to " + newWorkspacePath);
         var path = require('path');
         path.exists(newWorkspacePath, function(exists) {
@@ -694,7 +694,7 @@ var rpcFunctions = {
 
         vars.globals.rootWorkspacePath = path;
         console.log("Using workspace at :" + path);
-        
+
         try {
 
             fs.writeFile('lastWorkspace.dat', path, function (err) { });
@@ -728,7 +728,7 @@ var rpcFunctions = {
     toHex8Byte: function (decimal) {
 
         var finalHex  = decimal.toString(16);
-        
+
         while (finalHex.length < 8)
             finalHex = "0"+finalHex;
 

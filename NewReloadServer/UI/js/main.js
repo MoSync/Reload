@@ -1,8 +1,14 @@
 (function($){
+    //Backbone.emulateHTTP = true;
+    //Backbone.emulateJSON = true;
+    Backbone.sync = function(method, model){
+        console.log(method + ': ' + JSON.stringify(model));
+    };
     /*
      * Project model.
      */
     var Project = Backbone.Model.extend({
+        url: '/'
     });
 
     /*
@@ -125,6 +131,7 @@
             var project = new Project();
             // Add project to the workspace collection only when name is set from the dialog.
             project.on('change', function() {
+                project.save();
                 self.collection.add(project);
             });
 
@@ -186,8 +193,10 @@
 
                         if(newProjectName.value !== "") {
 
-                            context.project.set({ name: newProjectName.value });
-                            context.project.set({ type: type });
+                            context.project.set({
+                                name: newProjectName.value,
+                                type: type
+                            });
 
                             $(this).dialog("close");
                         } else {
