@@ -13,7 +13,7 @@ buster.testCase("RPC", {
     tearDown: function() {
     },
 
-    "add": function (done) {
+    "//add": function (done) {
         var message = {
             "method":   "manager.add",
             "params":   [1,1],
@@ -39,31 +39,55 @@ buster.testCase("RPC", {
         }, callback );
     },
 
-    "changeWorkspacePath": function(done) {
-        // Change workspace path
-        var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
-        var newWorkspacePath = home + '/newWorkspace';
+    "//changeWorkspacePath": function(done) {
+        // TODO: remove created workspace directory on cleanup.
+
+        // Current workspace path to switch back to.
         request.post({
             headers: {'content-type' : 'application/json'},
             url: 'http://localhost:8283',
-            body: JSON.stringify({ "method":"manager.changeWorkspacePath", "params":[newWorkspacePath], "id":null })
+            body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
         }, function(error, response, body){
+
+            var oldWorkspacePath = JSON.parse(body).result.path;
+
+            // Change workspace path to new one
+            var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+            var newWorkspacePath = home + '/newWorkspace';
+
             request.post({
                 headers: {'content-type' : 'application/json'},
                 url: 'http://localhost:8283',
-                body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
+                body: JSON.stringify({ "method":"manager.changeWorkspacePath", "params":[newWorkspacePath], "id":null })
             }, function(error, response, body){
 
-                console.log(JSON.parse(body).result.path);
+                // Get workspace path for confirmation
+                request.post({
+                    headers: {'content-type' : 'application/json'},
+                    url: 'http://localhost:8283',
+                    body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
+                }, function(error, response, body){
+
+                    var expected = newWorkspacePath;
+                    var result = JSON.parse(body).result.path;
+                    assert.equals(expected, result);
+
+                    // Change back workspace path
+                    request.post({
+                        headers: {'content-type' : 'application/json'},
+                        url: 'http://localhost:8283',
+                        body: JSON.stringify({ "method":"manager.changeWorkspacePath", "params":[oldWorkspacePath], "id":null })
+                    }, function(error, response, body){
+                        done();
+                    });
+
+                });
             });
         });
-        // Get Workspace path
-        // Change back workspace path
-        // Remove created workspace path
 
     },
 
-    "getVersionInfo": function(done) {
+    "//getVersionInfo": function(done) {
         var message = {
             "method":   "manager.getVersionInfo",
             "params":   [],
@@ -75,6 +99,7 @@ buster.testCase("RPC", {
 
         var callback = function(error, response, body) {
             result = JSON.parse(body).result;
+            buster.log(result);
             assert.equals(expected, result);
             done();
         };
@@ -86,7 +111,7 @@ buster.testCase("RPC", {
         }, callback );
     },
 
-    "getServerAddress": function(done) {
+    "//getServerAddress": function(done) {
         var expected;
         var result;
 
@@ -102,6 +127,7 @@ buster.testCase("RPC", {
             }, function(error, response, body) {
 
                 result = JSON.parse(body).result;
+                buster.log(result);
                 assert.equals(expected, result);
                 done();
 
@@ -109,7 +135,8 @@ buster.testCase("RPC", {
         });
     },
 
-    "getProjectList": function(done) {
+    // TODO: Change workspace to new workspace to perform test there.
+    "//getProjectList": function(done) {
         // Create project.
         var projectName = 'My_Project';
         var projectType = 'web';
@@ -117,20 +144,19 @@ buster.testCase("RPC", {
             headers: {'content-type' : 'application/json'},
             url: 'http://localhost:8283',
             body: JSON.stringify({ "method":"manager.createNewProject", "params":[projectName, projectType], "id":null })
-        }, function(error, response, body){
+        }, function(error, response, body) {
 
             // Get project list.
             request.post({
                 headers: {'content-type' : 'application/json'},
                 url: 'http://localhost:8283',
-                body: JSON.stringify({ "method":"manager.removeProject", "params":[projectPath], "id":null })
+                body: JSON.stringify({ "method":"manager.getProjectList", "params":[], "id":null })
             }, function(error, response, body){
 
                 var expected = [{"url":"http://localhost:8282/" + projectName + "/LocalFiles.html", "name": projectName}];
-                console.log(expected);
-                console.log(JSON.parse(body).result);
-                //assert.equals(projectPath ,JSON.parse(body).result);
-
+                var result = JSON.parse(JSON.parse(body).result);
+                buster.log(result);
+                assert.equals(expected, result);
 
                 // Remove project.
                 // Get workspace path for cleanup.
@@ -140,7 +166,8 @@ buster.testCase("RPC", {
                     body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
                 }, function(error, response, body){
 
-                    var projectPath = JSON.parse(body).result.path + '/' + projectName;
+                    var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+                    var projectPath = home + '/' + JSON.parse(body).result.path + '/' + projectName;
 
                     // Remove project.
                     request.post({
@@ -149,7 +176,6 @@ buster.testCase("RPC", {
                         body: JSON.stringify({ "method":"manager.removeProject", "params":[projectPath], "id":null })
                     }, function(error, response, body){
 
-                        assert.equals(projectPath ,JSON.parse(body).result);
                         done();
 
                     });
@@ -157,56 +183,52 @@ buster.testCase("RPC", {
             });
 
         });
-        // Get project list.
     },
 
     "createNewProject": function(done) {
         var projectName = 'My_Project';
         var projectType = 'web';
 
-        var message = {
-            "method":   "manager.createNewProject",
-            "params":   [projectName, projectType],
-            "id"    :   null
-        };
-
         var expected = projectName;
         var result = '';
 
-        var callback = function(error, response, body) {
+        request.post({
+            headers: {'content-type' : 'application/json'},
+            url: 'http://localhost:8283',
+            body: JSON.stringify({ "method":"manager.createNewProject", "params":[projectName, projectType], "id":null })
+        }, function(error, response, body) {
+
             result = JSON.parse(body).result;
+            buster.log(result);
             assert.equals(expected, result);
 
-            // CLEANUP
-            // Get workspace path for cleanup.
-            request.post({
-                headers: {'content-type' : 'application/json'},
-                url: 'http://localhost:8283',
-                body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
-            }, function(error, response, body){
+            //// CLEANUP
+            //// Get workspace path for cleanup.
+            //request.post({
+                //headers: {'content-type' : 'application/json'},
+                //url: 'http://localhost:8283',
+                //body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
+            //}, function(error, response, body){
 
-                var projectPath = JSON.parse(body).result.path + '/' + projectName;
+                //var home = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+                //var workspacePath = JSON.parse(body).result.path;
+                //var projectPath =  home + '/' + workspacePath + '/' + projectName;
 
-                // Remove project.
-                request.post({
-                    headers: {'content-type' : 'application/json'},
-                    url: 'http://localhost:8283',
-                    body: JSON.stringify({ "method":"manager.removeProject", "params":[projectPath], "id":null })
-                }, function(error, response, body){
-                    done();
-                });
-            });
-        };
+                //// Remove project.
+                //request.post({
+                    //headers: {'content-type' : 'application/json'},
+                    //url: 'http://localhost:8283',
+                    //body: JSON.stringify({ "method":"manager.removeProject", "params":[projectPath], "id":null })
+                //}, function(error, response, body){
 
-        request.post({
-            headers: this.headers,
-            url: this.url,
-            body: JSON.stringify(message)
-        }, callback );
+                    //done();
 
+                //});
+            //});
+        });
     },
 
-    "removeProject": function(done) {
+    "//removeProject": function(done) {
         // Create project.
         var projectName = 'My_Project';
         var projectType = 'web';
@@ -241,32 +263,134 @@ buster.testCase("RPC", {
         });
     },
 
-    "renameProject": function(done) {
+    "//renameProject": function(done) {
+        var oldProjectName = 'oldProjectName';
+        var oldProjectType = '';
+        var newProjectName = 'newProjectName';
+
+        // Create new project.
+        request.post({
+            headers: {'content-type' : 'application/json'},
+            url: 'http://localhost:8283',
+            body: JSON.stringify({ "method":"manager.createNewProject", "params":[oldProjectName, 'web'], "id":null })
+        }, function(error, response, body){
+
+            // Rename project.
+            request.post({
+                headers: {'content-type' : 'application/json'},
+                url: 'http://localhost:8283',
+                body: JSON.stringify({ "method":"manager.renameProject", "params":[oldProjectName, newProjectName], "id":null })
+            }, function(error, response, body){
+
+                var result = JSON.parse(body).result;
+                var expected = newProjectName;
+                buster.log('Renamed from: ' + oldProjectName + ' to ' + result);
+                assert.equals(expected, result);
+
+                request.post({
+                    headers: {'content-type' : 'application/json'},
+                    url: 'http://localhost:8283',
+                    body: JSON.stringify({ "method":"manager.removeProject", "params":[newProjectName], "id":null })
+                }, function(error, response, body){
+
+                    done();
+
+                });
+
+            });
+        });
+    },
+
+    "//reloadProject": function(done) {
         done();
     },
 
-    "reloadProject": function(done) {
-        done();
+    "//openProjectFolder": function(done) {
+        var projectName = 'My_Project';
+        var projectType = 'web';
+
+        var expected = projectName;
+        var result = '';
+
+        request.post({
+            headers: {'content-type' : 'application/json'},
+            url: 'http://localhost:8283',
+            body: JSON.stringify({ "method":"manager.createNewProject", "params":[projectName, projectType], "id":null })
+        }, function(error, response, body) {
+
+                var result = JSON.parse(body).result;
+                buster.log(result);
+
+            request.post({
+                headers: {'content-type' : 'application/json'},
+                url: 'http://localhost:8283',
+                body: JSON.stringify({ "method":"manager.openProjectForlder", "params":[projectName], "id":null })
+            }, function(error, response, body){
+
+                buster.log('Please remove creted project manually.');
+                done();
+
+            });
+
+        });
     },
 
-    "openProjectFolder": function(done) {
-        done();
+    "//getClientInfo": function(done) {
+        request.post({
+            headers: {'content-type' : 'application/json'},
+            url: 'http://localhost:8283',
+            body: JSON.stringify({ "method":"manager.getClientInfo", "params":[], "id":null })
+        }, function(error, response, body){
+
+            var expected = [{
+                type:     "",
+                platform: "",
+                name:     "",
+                uuid:     "",
+                version:  "",
+                phonegap: "",
+                address:  ""
+            }];
+
+            var result = JSON.parse(JSON.parse(body).result);
+            buster.log(result);
+            assert.match(result, expected);
+            done();
+        });
     },
 
-    "getClientInfo": function(done) {
-        done();
+    "//getDebugData": function(done) {
+        request.post({
+            headers: {'content-type' : 'application/json'},
+            url: 'http://localhost:8283',
+            body: JSON.stringify({ "method":"manager.getDebugData", "params":[], "id":null })
+        }, function(error, response, body){
+
+            result = JSON.parse(body).result;
+            buster.log(result);
+            //assert.equals(expected, result);
+            done();
+
+        });
     },
 
-    "getDebugData": function(done) {
-        done();
+    "//getRemoteLogData": function(done) {
+        request.post({
+            headers: {'content-type' : 'application/json'},
+            url: 'http://localhost:8283',
+            body: JSON.stringify({ "method":"manager.getRemoteLogData", "params":[], "id":null })
+        }, function(error, response, body){
+
+            result = JSON.parse(body).result;
+            buster.log(result);
+            //assert.equals(expected, result);
+            done();
+
+        });
     },
 
-    "getRemoteLogData": function(done) {
-        done();
-    },
-
-    "getWorkspacePath": function(done) {
-        var expected = { path: '/Users/igor/MoSync_Reload_Projects' };
+    "//getWorkspacePath": function(done) {
+        var expected = { path: 'MoSync_Reload_Projects' };
         var result;
 
         request.post({
@@ -274,9 +398,12 @@ buster.testCase("RPC", {
             url: 'http://localhost:8283',
             body: JSON.stringify({ "method":"manager.getWorkspacePath", "params":[], "id":null })
         }, function(error, response, body){
-                console.log(JSON.parse(body).result.path);
-                result = JSON.parse(body).result.path;
-                assert.equals(expected.path, result);
+
+                result = JSON.parse(body).result;
+                buster.log(result);
+                assert.equals(expected, result);
+                done();
+
         });
     }
 
