@@ -24,12 +24,12 @@ var rpcFunctions = {
         socket.on('connect', function() {
             
             vars.globals.ip = socket.address().address;
-            sendResponse(vars.globals.ip);
+            if(sendResponse !== undefined) sendResponse(vars.globals.ip);
             socket.end();
         });
 
         socket.on('error', function(e) {
-            sendResponse("");
+            if(sendResponse !== undefined) sendResponse("");
         });
     },
 
@@ -39,7 +39,7 @@ var rpcFunctions = {
     		this.getIpFromSocket(sendResponse);
     	}
     	else {
-    		sendResponse(vars.globals.ip);
+    		if(sendResponse !== undefined) sendResponse(vars.globals.ip);
     	}
     },
 
@@ -449,7 +449,7 @@ var rpcFunctions = {
                 
                 var injectedScript = "<script src=\"http://" + vars.globals.ip + 
                                      ":8080/target/target-script-min.js\"></script>";
-                
+
                 var pathOfIndexHTML = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + 
                                       projectDir + vars.globals.fileSeparator + 
                                       "LocalFiles" + vars.globals.fileSeparator + "index.html";
@@ -743,7 +743,8 @@ var rpcFunctions = {
 
 };
 
-// This one is called for initialization
+// These one is called for initialization
 rpcFunctions.getLatestPath();
+rpcFunctions.getNetworkIP();
 
 rpc.exposeModule('manager', rpcFunctions);

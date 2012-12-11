@@ -41,7 +41,7 @@ var rpcFunctions = {
 	remoteLog: function (logMessage, sendResponse) {
 		
 		console.log("CLIENT LOG: " + logMessage);
-		gRemoteLogData.push(logMessage);
+		vars.globals.gRemoteLogData.push(logMessage);
 		sendResponse("");
 	}
 	
