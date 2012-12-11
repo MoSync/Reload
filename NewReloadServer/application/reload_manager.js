@@ -654,7 +654,7 @@ var rpcFunctions = {
             }
         });
 
-        sendResponse(newWorkspacePath);
+        if(sendResponse !== undefined) sendResponse(newWorkspacePath);
     },
 
     // internal only used for initialization
@@ -677,12 +677,13 @@ var rpcFunctions = {
 
                         console.log("Error reading last workspace path, reverting to default");
                         self.setRootWorkspacePath(defaultPath);
+                        self.changeWorkspacePath(defaultPath);
                     }
                 }
                 else {
 
                     self.setRootWorkspacePath(defaultPath);
-
+                    self.changeWorkspacePath(defaultPath);
                 }
             });
         }
