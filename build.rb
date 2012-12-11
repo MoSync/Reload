@@ -70,13 +70,16 @@ FileUtils.rm_rf "Clients/iOS/Classes/MoSyncAppDelegateBackup.mm"
 FileUtils.cd ".."
 
 files_to_copy = [
-  "ReloadServer/ReloadServer.js",
+  "ReloadServer/main.js",
   "ReloadServer/UI",
   "ReloadServer/bin",
   "ReloadServer/templates",
+  "ReloadServer/application",
+  "ReloadServer/express",
+  "ReloadServer/lib",  
   "ReloadServer/build.dat",
   "ReloadServer/MoSyncVersion.dat",
-  "ReloadServer/node_modules",
+  "ReloadServer/node_modules"
   
   ]
 

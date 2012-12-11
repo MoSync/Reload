@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="geolocationOptions">geolocationOptions</a></h1>
+
+<p>Optional parameters to customize the retrieval of the geolocation.</p>
+
+<pre class="prettyprint"><code>{ maximumAge: 3000, timeout: 5000, enableHighAccuracy: true };
+</code></pre>
+
+<h2>Options</h2>
+
+<ul>
+<li>
+<strong>frequency:</strong> How often to retrieve the position in milliseconds. This option is not part of the W3C spec and will be removed in the future. maximumAge should be used instead. <em>(Number)</em> (Default: 10000)</li>
+<li>
+<strong>enableHighAccuracy:</strong> Provides a hint that the application would like to receive the best possible results. <em>(Boolean)</em>
+</li>
+<li>
+<strong>timeout:</strong> The maximum length of time (msec) that is allowed to pass from the call to <code><a href="geolocation.getCurrentPosition.md.html#geolocation.getCurrentPosition">geolocation.getCurrentPosition</a></code> or <code><a href="geolocation.watchPosition.md.html#geolocation.watchPosition">geolocation.watchPosition</a></code> until the corresponding <code><a href="geolocationSuccess.md.html#geolocationSuccess">geolocationSuccess</a></code> callback is invoked. <em>(Number)</em>
+</li>
+<li>
+<strong>maximumAge:</strong> Accept a cached position whose age is no greater than the specified time in milliseconds. <em>(Number)</em>
+</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

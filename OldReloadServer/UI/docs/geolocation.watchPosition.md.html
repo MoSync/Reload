@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="geolocation.watchPosition">geolocation.watchPosition</a></h1>
+
+<p>Watches for changes to the device's current position.</p>
+
+<pre class="prettyprint"><code>var watchId = navigator.<a href="geolocation.watchPosition.md.html#geolocation.watchPosition">geolocation.watchPosition</a>(
+    <a href="geolocationSuccess.md.html#geolocationSuccess">geolocationSuccess</a>,
+    [<a href="geolocationError.md.html#geolocationError">geolocationError</a>],
+    [<a href="geolocation.options.md.html#geolocationOptions">geolocationOptions</a>]);
+</code></pre>
+
+<h2>Parameters</h2>
+
+<ul>
+<li>
+<strong><a href="geolocationSuccess.md.html#geolocationSuccess">geolocationSuccess</a></strong>: The callback that is called with the current position.</li>
+<li>
+<strong><a href="geolocationError.md.html#geolocationError">geolocationError</a></strong>: (Optional) The callback that is called if there was an error.</li>
+<li>
+<strong><a href="geolocation.options.md.html#geolocationOptions">geolocationOptions</a></strong>: (Optional) The geolocation options.</li>
+</ul>
+<h2>Returns</h2>
+
+<ul>
+<li>
+<strong>String</strong>: returns a watch id that references the watch position interval. The watch id can be used with <code><a href="geolocation.clearWatch.md.html#geolocation.clearWatch">geolocation.clearWatch</a></code> to stop watching for changes in position.</li>
+</ul>
+<h2>Description</h2>
+
+<p>Function <code><a href="geolocation.watchPosition.md.html#geolocation.watchPosition">geolocation.watchPosition</a></code> is an asynchronous function. It returns the device's current position when a change in position has been detected.  When the device has retrieved a new location, the <code><a href="geolocationSuccess.md.html#geolocationSuccess">geolocationSuccess</a></code> callback is invoked with a <code><a href="position.md.html#Position">Position</a></code> object as the parameter.  If there is an error, the <code><a href="geolocationError.md.html#geolocationError">geolocationError</a></code> callback is invoked with a <code><a href="positionError.md.html#PositionError">PositionError</a></code> object.</p>
+
+<h2>Quick Example</h2>
+
+<pre class="prettyprint"><code>// onSuccess Callback
+//   This method accepts a `<a href="position.md.html#Position">Position</a>` object, which contains
+//   the current GPS coordinates
+//
+function onSuccess(position) {
+    var element = document.getElementById('geolocation');
+    element.innerHTML = 'Latitude: '  + position.coords.latitude + '&lt;br /&gt;' +
+                        'Longitude: ' + position.coords.longitude + '&lt;br /&gt;' +
+                        '&lt;hr /&gt;' + element.innerHTML;
+}
+
+// onError Callback receives a <a href="positionError.md.html#PositionError">PositionError</a> object
+//
+function onError(error) {
+    alert('code: ' + error.code + '\n' +
+        'message: ' + error.message + '\n');
+}
+
+// Options: retrieve the location every 3 seconds
+//
+var watchID = navigator.<a href="geolocation.watchPosition.md.html#geolocation.watchPosition">geolocation.watchPosition</a>(onSuccess, onError, { frequency: 3000 });
+</code></pre>
+
+<h2>Full Example</h2>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;<a href="device.md.html#Device">Device</a> Properties Example&lt;/title&gt;
+
+    &lt;script type="text/javascript" charset="utf-8" src="js/wormhole.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" charset="utf-8"&gt;
+
+    // Wait for Wormhole to load
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    var watchID = null;
+
+    // Wormhole is ready
+    //
+    function onDeviceReady() {
+        // Update every 3 seconds
+        var options = { frequency: 3000 };
+        watchID = navigator.<a href="geolocation.watchPosition.md.html#geolocation.watchPosition">geolocation.watchPosition</a>(onSuccess, onError, options);
+    }
+
+    // onSuccess <a href="geolocation.md.html#Geolocation">Geolocation</a>
+    //
+    function onSuccess(position) {
+        var element = document.getElementById('geolocation');
+        element.innerHTML = 'Latitude: '  + position.coords.latitude + '&lt;br /&gt;' +
+                            'Longitude: ' + position.coords.longitude + '&lt;br /&gt;' +
+                            '&lt;hr /&gt;' + element.innerHTML;
+    }
+
+    // onError Callback receives a <a href="positionError.md.html#PositionError">PositionError</a> object
+    //
+    function onError(error) {
+        alert('code: ' + error.code + '\n' +
+            'message: ' + error.message + '\n');
+    }
+
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p id="geolocation"&gt;Watching geolocation...&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+	</div>
+
+</div>
+</body>
+</html>
