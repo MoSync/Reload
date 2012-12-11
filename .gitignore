@@ -23,4 +23,7 @@ ReloadServer/lastWorkspace.dat
 
 ReloadLauncher/Mac/Reload.app
 
+/NewReloadServer/MoSync_Reload_Projects/
+/NewReloadServer/lastWorkspace.dat
+
 Build
