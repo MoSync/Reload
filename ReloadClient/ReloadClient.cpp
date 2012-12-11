@@ -438,11 +438,16 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 
 		// Create the request.
 		MAUtil::String jsonRequest("{"
-			"\"message\":  \"getBundle\","
-			"\"params\" : {   "
-				"\"bundlePath\": \"" + urlData + "\""
-				"}"
+			"\"method\":  \"client.getBundle\","
+			"\"params\" : [   "
+				 "\"" + urlData + "\""
+				"],"
+			"\"id\": 1"
 			"}");
+
+		LOG("@@@ RELOAD urlData: %s", urlData.c_str() );
+		LOG("@@@ RELOAD jsonRequest: %s", jsonRequest.c_str() );
+
 		MAUtil::String commandUrl =
 			"http://" + mServerAddress + ":" + SERVER_HTTP_PORT +
 			"/proccess?jsonRPC=" + Encoder::escape(jsonRequest);
@@ -822,10 +827,11 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 		MAUtil::String messageString = message;
 		MAUtil::String json(
 			"{"
-			"\"message\":  \"remoteLog\","
-			"\"params\" : {   "
-				"\"logMessage\": \"" + messageString + "\""
-				"}"
+			"\"method\":  \"client.remoteLog\","
+			"\"params\": [   "
+				"\"" + messageString + "\""
+				"],"
+			"\"id\": 0"
 			"}");
 
 		MAUtil::String commandUrl =

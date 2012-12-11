@@ -1,4 +1,4 @@
-var globals = require('../application/globals');
+var vars = require('../application/globals');
 
 create = function (port) {
 
@@ -8,19 +8,19 @@ create = function (port) {
 
 		var infoListJSON = [];
 
-		globals.clientList.forEach(function(c){
+		vars.globals.clientList.forEach(function(c){
 
 			infoListJSON.push(c.deviceInfo);
 		});
 
-		globals.deviceInfoListJSON = JSON.stringify(infoListJSON);
+		vars.globals.deviceInfoListJSON = JSON.stringify(infoListJSON);
 	}
 
 	function saveClient(socket) {
 
 		try {
 
-			globals.clientList.push(socket);
+			vars.globals.clientList.push(socket);
 
 			// We only transfer text messages over the TCP connection.
 			socket.setEncoding('utf8');
@@ -39,11 +39,11 @@ create = function (port) {
 					address + " (" +
 					socket.deviceInfo.name +
 					") has disconnected.");
-				for (var i = 0; i < globals.clientList.length ; i++) {
+				for (var i = 0; i < vars.globals.clientList.length ; i++) {
 
-					if (globals.clientList[i].remoteAddress == socket.remoteAddress) {
+					if (vars.globals.clientList[i].remoteAddress == socket.remoteAddress) {
 
-						globals.clientList.splice(i,1);
+						vars.globals.clientList.splice(i,1);
 						generateDeviceInfoListJSON();
 						break;
 					}

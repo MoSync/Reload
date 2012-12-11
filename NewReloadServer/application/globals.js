@@ -35,8 +35,6 @@ var globals = {
 	},
 
 	homeDir: "",
-
-
 }
 
 exports.globals = globals;
