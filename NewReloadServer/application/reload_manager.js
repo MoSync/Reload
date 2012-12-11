@@ -589,11 +589,11 @@ var rpcFunctions = {
             var util = require('util');
             var spawn = require('child_process').spawn;
 
-            if((localPlatform.indexOf("darwin") >= 0)) {
+            if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
 
                 adb = spawn('bin/mac/android/adb', ['logcat']);
             }
-            else if((localPlatform.indexOf("linux") >=0)) {
+            else if((vars.globals.localPlatform.indexOf("linux") >=0)) {
 
                 adb = spawn('bin/linux/android/adb', ['logcat']);
             }
