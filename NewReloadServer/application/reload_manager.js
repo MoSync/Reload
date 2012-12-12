@@ -196,7 +196,11 @@ var rpcFunctions = {
         }
     },
 
-    removeProject: function (projectPath, sendResponse) {
+    removeProject: function (projectName, sendResponse) {
+
+        var projectPath = vars.globals.rootWorkspacePath +
+                          vars.globals.fileSeparator +
+                          projectName;
 
         fs.removeRecursive = function (path,cb) {
             var self = this;
@@ -292,7 +296,7 @@ var rpcFunctions = {
         fs.removeRecursive(projectPath, function (error, status){
             if(!error) {
                 console.log("Succesfull deletion of directory " + projectPath);
-                sendResponse(projectPath);
+                sendResponse(projectName);
             }
             else {
                 console.log("Error in deletion of directory " + projectPath);

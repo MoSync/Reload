@@ -28,7 +28,7 @@ var JSONRPC = {
 		var self = this;
 		this.response = response;
 
-		self.handleMessage( message, function(data) {
+		self.handleMessage(message, function(data) {
 			
 			var responseObject = {
 				'id': 0,
@@ -36,6 +36,7 @@ var JSONRPC = {
 	        	'error': null
 	      	};
 	      	
+	      	// using id attribute for sending respons in binary format
 	      	if(message.id == 1){
 	      		self.response.writeHead(200, {
 						  'Content-Length': data.length,
@@ -124,19 +125,44 @@ var JSONRPC = {
 	    // Check for the required fields, and if they aren't there, then
 	    // dispatch to the handleInvalidRequest function.
 	    if(!(message.method && message.params)) {
-	    	return {
+	    	var responseObject = {
 	    		'id': message.id,
 	    		'result': null,
 	        	'error': 'Invalid Request'
 	      	};
+
+	      	this.response.writeHead(200, {
+						  'Content-Length': JSON.stringify(responseObject).length,
+						  'Content-Type': 'application/json',
+						  'Pragma': 'no-cache',
+						  'Cache-Control': 'no-cache',
+						  'Expires': '-1'
+						});
+			this.response.write( JSON.stringify(responseObject) );
+			this.response.end("");
+
+	    	return this;
 	    }
 
 	    if(!this.functions.hasOwnProperty(message.method)) {
-	    	return {
-		    	'id': message.id,
+
+	    	var responseObject = {
+				'id': message.id,
 	        	'result': null,
 	        	'error': 'Function not found'
 	      	};
+
+	      	this.response.writeHead(200, {
+						  'Content-Length': JSON.stringify(responseObject).length,
+						  'Content-Type': 'application/json',
+						  'Pragma': 'no-cache',
+						  'Cache-Control': 'no-cache',
+						  'Expires': '-1'
+						});
+			this.response.write( JSON.stringify(responseObject) );
+			this.response.end("");
+
+			return this;
 	    }
 
 	    // Build our success handler
