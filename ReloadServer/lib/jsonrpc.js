@@ -28,24 +28,33 @@ var JSONRPC = {
 		var self = this;
 		this.response = response;
 
-		self.handleMessage(message, function(data) {
+		self.handleMessage(message, function(processingResult) {
 			
+			//console.log(processingResult);
+
 			var responseObject = {
 				'id': 0,
-	        	'result': data,
+	        	'result': null,
 	        	'error': null
 	      	};
+
+	      	if( processingResult.hasError ) {
+	      		responseObject.error = processingResult.data;
+	      	}
+	      	else {
+	      		responseObject.result = processingResult.data;
+	      	}
 	      	
-	      	// using id attribute for sending respons in binary format
-	      	if(message.id == 1){
+	      	// using id attribute for sending response in binary format
+	      	if((message.id == 1) && (!processingResult.hasError)) {
 	      		self.response.writeHead(200, {
-						  'Content-Length': data.length,
+						  'Content-Length': processingResult.data.length,
 						  'Content-Type': 'binary',
 						  'Pragma': 'no-cache',
 						  'Cache-Control': 'no-cache',
 						  'Expires': '-1'
 						});
-				self.response.write( data );
+				self.response.write( processingResult.data );
 				self.response.end("");
 	      	}
 	      	else {
@@ -199,7 +208,27 @@ var JSONRPC = {
 	    	var moduleName = functionCall[0];
 
 	    	message.params.push(callback);
-	    	method.apply(this.modules[moduleName], message.params);
+
+	    	var executionResult = method.apply(this.modules[moduleName], message.params);
+
+	    	if( executionResult === false) {
+	    		var responseObject = {
+					'id': message.id,
+		        	'result': null,
+		        	'error': 'Invalid Parameters passed to function'
+		      	};
+
+		      	this.response.writeHead(200, {
+							  'Content-Length': JSON.stringify(responseObject).length,
+							  'Content-Type': 'application/json',
+							  'Pragma': 'no-cache',
+							  'Cache-Control': 'no-cache',
+							  'Expires': '-1'
+							});
+				this.response.write( JSON.stringify(responseObject) );
+				this.response.end("");
+	    	}
+
 	    }
 	    catch(err) {
 	    	return onFailure(err);

@@ -12,8 +12,11 @@ var vars = require('./globals');
 var rpcFunctions = {
 
     add: function (a, b, sendResponse) {
+        
+        if(typeof sendResponse !== 'function') return false;
+
         var r = a + b;
-        sendResponse(r);
+        sendResponse({hasError: false, data: r});
     },
 
     // Helping function for internal use
@@ -24,26 +27,32 @@ var rpcFunctions = {
         socket.on('connect', function() {
 
             vars.globals.ip = socket.address().address;
-            if(sendResponse !== undefined) sendResponse(vars.globals.ip);
+            if(sendResponse !== undefined) sendResponse({hasError: false, data: vars.globals.ip});
             socket.end();
         });
 
         socket.on('error', function(e) {
-            if(sendResponse !== undefined) sendResponse("");
+            if(sendResponse !== undefined) sendResponse({hasError: true, data: "Error in socket"});
         });
     },
 
     getNetworkIP: function (sendResponse) {
+        //check if parameter passing was correct
+        if( (typeof sendResponse !== 'function') && 
+            (sendResponse !== undefined) ) return false;
 
     	if(vars.globals.ip == null) {
     		this.getIpFromSocket(sendResponse);
     	}
     	else {
-    		if(sendResponse !== undefined) sendResponse(vars.globals.ip);
+    		if(sendResponse !== undefined) sendResponse({hasError: false, data: vars.globals.ip});
     	}
     },
 
     getVersionInfo: function (sendResponse) {
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
 
         var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
@@ -51,10 +60,13 @@ var rpcFunctions = {
                                               "timestamp": versionInfo[1]});
         console.log(versionInfoJSON);
 
-        sendResponse(versionInfoJSON);
+        sendResponse({hasError: false, data: versionInfoJSON});
     },
 
     getProjectList: function (sendResponse) {
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
 
         this.findProjects( function (projects) {
 
@@ -71,7 +83,7 @@ var rpcFunctions = {
 
             });
 
-            sendResponse(JSON.stringify(projectListJSON));
+            sendResponse({hasError: false, data: JSON.stringify(projectListJSON)});
         });
     },
 
@@ -123,6 +135,10 @@ var rpcFunctions = {
     },
 
     createNewProject: function (projectName, projectType, sendResponse) {
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         try {
             console.log(
                 "Creating new project: " + projectName +
@@ -166,7 +182,7 @@ var rpcFunctions = {
                                  vars.globals.fileSeparator +
                                  ".project", newData    , 'utf8');
 
-                sendResponse(projectName);
+                sendResponse({hasError: false, data: projectName});
             }
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
@@ -192,11 +208,14 @@ var rpcFunctions = {
         catch(err)
         {
             console.log("Error in createNewProject: " + err);
-            sendResponse("");
+            sendResponse({hasError: true, data: "Error in createNewProject: " + err});
         }
     },
 
     removeProject: function (projectName, sendResponse) {
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
 
         var projectPath = vars.globals.rootWorkspacePath +
                           vars.globals.fileSeparator +
@@ -296,18 +315,22 @@ var rpcFunctions = {
         fs.removeRecursive(projectPath, function (error, status){
             if(!error) {
                 console.log("Succesfull deletion of directory " + projectPath);
-                sendResponse(projectName);
+                sendResponse({hasError: false, data: "Succesfull deletion of project " + projectName});
             }
             else {
                 console.log("Error in deletion of directory " + projectPath);
-                console.log("ERROR: " + error);
-                sendResponse("");
+                console.log("Error deleting project: " + error);
+                sendResponse({hasError: true, data: "Error deleting project: " + error});
             }
 
         });
     },
 
     renameProject: function (oldName, newName, sendResponse) {
+        
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         try {
             console.log("Renaming Project from " + oldName + " to " + newName );
 
@@ -334,7 +357,7 @@ var rpcFunctions = {
                                  newName +
                                  vars.globals.fileSeparator +
                                  ".project", newData, 'utf8');
-                respond(newName);
+                respond({hasError: false, data: newName});
             }
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
@@ -358,11 +381,15 @@ var rpcFunctions = {
         }
         catch(err) {
             console.log("Error in renameProject(" + oldname + ", " + newName + "): " + err);
-            sendResponse(oldName);
+            sendResponse({hasError: true, data: "Error in renameProject(" + oldname + ", " + newName + "): " + err});
         }
     },
 
     reloadProject: function (projectPath, debug, sendResponse) {
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         var self = this;
 
         var weinreDebug;
@@ -378,12 +405,7 @@ var rpcFunctions = {
         console.log("WEINRE ENABLED:" + weinreDebug);
         console.log("Reloading project");
 
-        sendResponse("");
-        //res.writeHead(200, { 'CACHE-CONTROL': 'no-cache'});
-        //res.end();
-
-        //var pageSplit = page.split("/");
-        //var path = pageSplit[pageSplit.length -2];
+        sendResponse({hasError: false, data: ""});
 
         // Bundle the app.
         this.bundleApp(projectPath, weinreDebug, function (actualPath) {
@@ -438,6 +460,7 @@ var rpcFunctions = {
         });
     },
 
+    //internal function
     bundleApp: function (projectDir, weinreDebug, callback) {
 
         try {
@@ -449,7 +472,7 @@ var rpcFunctions = {
                 //INJECT WEINRE SCRIPT
                 //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
                 //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
-
+                console.log("IP: "+vars.globals.ip);
                 var injectedScript = "<script src=\"http://" + vars.globals.ip +
                                      ":8080/target/target-script-min.js\"></script>";
 
@@ -507,6 +530,10 @@ var rpcFunctions = {
     },
 
     openProjectFolder: function (projectFolder, sendResponse) {
+        
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         try {
             var exec = require('child_process').exec;
             function puts(error, stdout, stderr) {
@@ -539,24 +566,31 @@ var rpcFunctions = {
                                               projectFolder + "\\LocalFiles\"";
             }
             exec(command, puts);
-            sendResponse("");
+            sendResponse({hasError: false, data: ""});
         }
         catch(err) {
             console.log("Error in openProjectFolder: " + err);
-            sendResponse("");
+            sendResponse({hasError: true, data: "Error in openProjectFolder: " + err});
         }
     },
 
     getClientInfo: function (sendResponse) {
-        sendResponse(vars.globals.deviceInfoListJSON);
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
+        sendResponse({hasError: false, data: vars.globals.deviceInfoListJSON});
     },
 
     getDebugData: function (sendResponse) {
 
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         if(!vars.globals.isDebuggingStarted) {
             //Initialize debugging
             this.startDebugging();
-            sendResponse("");
+            sendResponse({hasError: false, data: ""});
         }
         else {
 
@@ -567,19 +601,19 @@ var rpcFunctions = {
                     vars.globals.useSecondaryBuffer = false;
                     var dataString  = JSON.stringify(vars.globals.logCatData);
                     vars.globals.logCatData = [];
-                    sendResponse(dataString);
+                    sendResponse({hasError: false, data: dataString});
                 }
                 else {
 
                     vars.globals.useSecondaryBuffer = true;
                     var dataString  = JSON.stringify(vars.globals.logCatData2);
                     vars.globals.logCatData2 = [];
-                    sendResponse(dataString);
+                    sendResponse({hasError: false, data: dataString});
                 }
             }
             else {
 
-                sendResponse("");
+                sendResponse({hasError: false, data: ""});
             }
         }
     },
@@ -627,17 +661,28 @@ var rpcFunctions = {
 
     getRemoteLogData: function (sendResponse) {
 
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         var dataString  = JSON.stringify(vars.globals.gRemoteLogData);
         vars.globals.gRemoteLogData = [];
-        sendResponse(dataString);
+
+        sendResponse({hasError: false, data: dataString});
     },
 
     getWorkspacePath: function (sendResponse) {
 
-        sendResponse({"path":vars.globals.rootWorkspacePath});
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
+        sendResponse({hasError: false, data: {"path":vars.globals.rootWorkspacePath}});
     },
 
     changeWorkspacePath: function (newWorkspacePath, sendResponse) {
+
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
         var self = this;
 
         console.log("Changing workspace to " + newWorkspacePath);
@@ -658,7 +703,10 @@ var rpcFunctions = {
             }
         });
 
-        if(sendResponse !== undefined) sendResponse(newWorkspacePath);
+        if(sendResponse !== undefined) {
+
+            sendResponse({hasError: false, data: newWorkspacePath});
+        } 
     },
 
     // internal only used for initialization

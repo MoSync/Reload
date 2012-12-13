@@ -37,15 +37,16 @@ create = function(port) {
 
     app.get('/proccess', function(request, response){
 
-		//console.log(request.query.jsonRPC);
+		console.log(request.query.jsonRPC);
 		rpc.listen(JSON.parse(request.query.jsonRPC), response);
 	});
+
+
 
     app.post('/', function( request, response ){
 
         console.dlog("REQUEST TYPE: " + request.method);
 
-        console.log(request.body);
         console.log("request.body: " + request.body);
         rpc.listen(request.body, response);
     });
