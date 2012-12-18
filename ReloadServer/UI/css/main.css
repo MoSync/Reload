@@ -113,7 +113,7 @@ padding: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
-#checkbox-debbug{
+#checkbox-debug{
     margin: 0 auto;
 }
 #file-options{
@@ -207,8 +207,8 @@ margin-top: auto;
 }
 #text-editor{
     min-height: 100%;
-    font-size: 3em;
-    text-align: center;
+    font-size: 2em;
+    padding: 0 50px 0 50px;
 }
 
 
