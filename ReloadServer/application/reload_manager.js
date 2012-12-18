@@ -77,13 +77,15 @@ var rpcFunctions = {
                 var projectInfo = {
 
                     url: "http://localhost:8282/" + p + "/LocalFiles.html",
-                    name: p
+                    name: p,
+                    path: vars.globals.rootWorkspacePath + 
+                          vars.globals.fileSeparator + p 
                 }
                 projectListJSON.push(projectInfo);
 
             });
 
-            sendResponse({hasError: false, data: JSON.stringify(projectListJSON)});
+            sendResponse({hasError: false, data: projectListJSON});
         });
     },
 
