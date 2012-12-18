@@ -115,7 +115,7 @@
             options.rpcMsg  = {
                 method: 'manager.reloadProject',
                 params: [this.model.get('name'), debug],
-                id: null
+                id: 0
             };
 
             options.success = function (resp) {
@@ -330,10 +330,12 @@
      * View of projects withing a workspace.
      */
     var WorkspaceView = Backbone.View.extend({
-        debugSwitch: $('#checkbox-debug'),
+        debugSwitch: $('#debug-switch'),
         bigReload: $('#big-reload'),
 
-        selectedProject: {},
+        debug: false,
+
+        selectedProject: null,
         events: {
             'click a.select-project': 'selectProject'
         },
@@ -346,13 +348,13 @@
                       'appendProject',
                       'populate',
                       'clear',
-                      'switchDebug'
+                      'switchDebug',
+                      'reload'
                      );
 
-            this.debugSwitch.bind('mouseup', this.switchDebug);
-            this.bigReload.bind('mouseup', function () {
-                console.log('reload');
-            });
+            this.debugSwitch.bind('click', this.switchDebug);
+
+            this.bigReload.bind('click', this.reload);
 
             this.collection = new Workspace();
 
@@ -373,12 +375,36 @@
         },
 
         switchDebug: function () {
-            console.log('switch');
-            var value = this.debugSwitch.find('#view').val();
-            if (value === 'on') {
-                // Set debug flug
+            this.debug = this.debugSwitch.is(':checked');
+            console.log(this.debug);
+        },
+
+        reload: function () {
+            console.log('reload from big button');
+            if (this.selectedProject === null) {
+                alert('Select a project first.');
+            } else {
+                var options     = {};
+                options.url     = 'http://localhost:8283';
+                options.rpcMsg  = {
+                    method: 'manager.reloadProject',
+                    params: [this.selectedProject.get('name'), this.debug],
+                    id: null
+                };
+
+                options.success = function (resp) {
+                    console.log('reload successful!');
+                    console.log(resp);
+                };
+
+                options.error   = function (resp) {
+                    console.log('could not reload project.');
+                    console.log(resp);
+                };
+
+                this.selectedProject.rpc(options);
+
             }
-            console.log(value);
         },
 
         clear: function () {
