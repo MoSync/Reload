@@ -3,168 +3,360 @@
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Reload</title>
-        <link rel="icon" href="icon.png">
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Reload</title>
+<link rel="icon" href="icon.png">
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="css/normalize.min.css">
-        <link rel="stylesheet" href="css/main.css">
-        <link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
-        <!-- Toggle Switch -->
-        <link rel="stylesheet" href="css/toggle-switch.css">
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+<!-- Toggle Switch -->
+<link rel="stylesheet" href="css/toggle-switch.css">
 
-        <!-- Prism Syntax Highlighter -->
-        <link rel="stylesheet" href="lib/prism/prism.css">
-        <script src="lib/prism/prism.js"></script>
+<!-- Prism Syntax Highlighter -->
+<link rel="stylesheet" href="lib/prism/prism.css">
+<script src="lib/prism/prism.js"></script>
 
-        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+<script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 
 
 
-    </head>
-    <body>
-        <!--[if lt IE 7]>
+</head>
+<body>
+<!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
 
-        <div id="main">
-            <div id="header">
-                <div id="header-left"><img src="img/Reload-logo-top.png"></div>
-                <div id="header-right"><a href="http://www.mosync.com" target="_blank" title="MoSync's website"><img src="img/MoSync-logo-top.png"></a></div>
-                <div
-                    id="header-center"
-                    class="server-info"
-                    data-rpc-method=""
-                    data-rpc-params="[a, b, c]">
-                    SERVER IP: </div>
+<div id="main">
+    <div id="header">
+        <div id="header-left"><img src="img/Reload-logo-top.png"></div>
+        <div id="header-right"><a href="http://www.mosync.com" target="_blank" title="MoSync's website"><img src="img/MoSync-logo-top.png"></a></div>
+        <div
+            id="header-center"
+            class="server-info"
+            data-rpc-method=""
+            data-rpc-params="[a, b, c]">
+            SERVER IP: </div>
+    </div>
+
+
+
+    <section id="content">
+        <header id="content-nav">
+            <ul>
+                <li><a href="#">EDITOR</a></li>
+                <li><a href="#">DEBUG</a></li>
+                <li><a href="#">DEVICES</a></li>
+                <li><a href="#">LOG</a></li>
+                <li><a href="#">DOCS</a></li>
+            </ul>
+        </header>
+        <div id="text-editor">
+
+
+
+
+            <style type="text/css">
+ol {
+    margin: 0;
+    padding: 0
+}
+p {
+    margin: 0
+}
+.c6 {
+    max-width: 600pt;
+    background-color: #272727;
+    padding: 22pt 72pt 72pt 72pt
+}
+.c11 {
+    list-style-type: square;
+    margin: 0;
+    padding: 0
+}
+.c0 {
+    color: #ff0000;
+    font-weight: bold
+}
+.c2 {
+    height: 11pt;
+    direction: ltr
+}
+.c5 {
+    color: orange;
+    text-decoration: none
+}
+.c7 {
+    color: #1155cc;
+    text-decoration: underline
+}
+.c8 {
+    padding-left: 0pt;
+    margin-left: 36pt
+}
+.c4 {
+    font-size: 14pt
+}
+.c1 {
+    font-weight: bold
+}
+.c9 {
+    font-family: Courier New
+}
+.c10 {
+    font-style: italic
+}
+.title {
+    padding-top: 24pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #000000;
+    font-size: 36pt;
+    font-family: Arial;
+    font-weight: bold;
+    padding-bottom: 6pt
+}
+.subtitle {
+    padding-top: 18pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #666666;
+    font-style: italic;
+    font-size: 24pt;
+    font-family: Georgia;
+    padding-bottom: 4pt
+}
+h1 {
+    padding-top: 24pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #FFFFFF;
+    font-size: 18pt;
+    font-family: Arial;
+    font-weight: bold;
+    padding-bottom: 6pt
+}
+h2 {
+    padding-top: 18pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #FFFFFF;
+    font-size: 14pt;
+    font-family: Arial;
+    font-weight: bold;
+    padding-bottom: 4pt
+}
+h3 {
+    padding-top: 14pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #FFFFFF;
+    font-size: 12pt;
+    font-family: Arial;
+    font-weight: bold;
+    padding-bottom: 4pt
+}
+h4 {
+    padding-top: 12pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #FFFFFF;
+    font-style: italic;
+    font-size: 11pt;
+    font-family: Arial;
+    padding-bottom: 2pt
+}
+h5 {
+    padding-top: 11pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #FFFFFF;
+    font-size: 10pt;
+    font-family: Arial;
+    font-weight: bold;
+    padding-bottom: 2pt
+}
+h6 {
+    padding-top: 10pt;
+    line-height: 1.15;
+    text-align: left;
+    color: #FFFFFF;
+    font-style: italic;
+    font-size: 10pt;
+    font-family: Arial;
+    padding-bottom: 2pt
+}
+            </style>
+
+            <h1 class="c3"><a name="h.4wbvbd7j7578"></a><span>Welcome to MoSync Reload!</span></h1>
+
+
+            <p class="c3">
+            <span><b>Quick Start:</b> Launch the ReloadClient on your device, enter the server IP-address shown under tab "Network Info", and connect. Send debug messages from JavaScript using: <code>mosync.rlog("Hello World");</code> Messages appear under tab "Remote Log".</span>
+            </p>
+            <p class="c3">
+            <span>MoSync Reload is a tool for rapid development of mobile applications in HTML5 and JavaScript for iOS, Android and Windows Phone.</span>
+            </p>
+        </div>
+
+
+        <footer id="footer">
+            <div id="footer-widget">
+                <div id="mobiles"><img src="img/Reload-mobiles.png"></div>
+                <div id="footer-msg">
+                    <p>Edit your code</p>
+                    <p>Hit RELOAD</p>
+                    <p>See your changes</p>
+                </div>
             </div>
+        </footer>
+
+    </section>
 
 
+    <section id="right-bar">
+        <a href="#" id="big-reload" title="Reload your project">
+            <img id="reload-button" src="img/Reload-button.png" alt="Reload">
+        </a>
 
-            <section id="content">
-                <header id="content-nav">
-                    <ul>
-                        <li><a href="#">EDITOR</a></li>
-                        <li><a href="#">DEBUG</a></li>
-                        <li><a href="#">DEVICES</a></li>
-                        <li><a href="#">LOG</a></li>
-                        <li><a href="#">DOCS</a></li>
-                    </ul>
-                </header>
-                <div id="text-editor">TEXT EDITOR HERE</div>
-
-
-                <footer id="footer">
-                    <div id="footer-widget">
-                        <div id="mobiles"><img src="img/Reload-mobiles.png"></div>
-                        <div id="footer-msg">
-                            <p>Edit your code</p>
-                            <p>Hit RELOAD</p>
-                            <p>See your changes</p>
-                        </div>
-                    </div>
-                </footer>
-
-            </section>
-
-
-            <section id="right-bar">
-                <a href="#" title="Reload your project"><img id="reload-button" src="img/Reload-button.png"></a>
-                <div id="switch-debug">
-                    <p id="debugg-label">Debug</p>
-                    <label id="checkbox-debug" title="Activate/Deactivate debug" class="checkbox toggle candy orange" onclick="" style="width: 100px">
-                    <input id="view" type="checkbox" />
-                    <p>
-                        <span>On</span>
-                        <span>Off</span>
-                    </p>
-                    <a class="slide-button"></a>
-                </label>
-                </div>
+        <div id="switch-debug">
+            <p id="debugg-label">Debug</p>
+            <label id="checkbox-debug" title="Activate/Deactivate debug" class="checkbox toggle candy orange" style="width: 100px">
+                <input id="view" type="checkbox" />
+                <p>
+                <span>On</span>
+                <span>Off</span>
+                </p>
+                <a class="slide-button"></a>
+            </label>
+        </div>
         <div id="project-list-container">
-       </div>
-                <div>
-                    <a id="change-workspace" href="#">Change workspace</a><br />
-                </div>
+        </div>
 
-                <div id="file-options">
-                <script type="text/template" id="workspace-controls-template">
-                    <ul>
-                        <li><a id="add-project" href="#" title="Add project"><img src="img/folder.png"></a></li>
-                        <li><a id="update-project-list" href="#" title=""><img src="img/refresh.png"></a></li>
+
+        <div id="file-options">
+            <script type="text/template" id="workspace-controls-template">
+<ul>
+                        <li><a id="change-workspace" href="#" title="Change workspace"><img src="img/change-workspace.png" width="36" height="38" onmouseover="this.src='img/change-workspaceh.png'" onmouseout="this.src='img/change-workspace.png'"></a></li>
+                        <li><a id="add-project" href="#" title="Add project"><img src="img/open-files.png" width="36" height="38" onmouseover="this.src='img/open-filesh.png'" onmouseout="this.src='img/open-files.png'"></a></li>
+                        <li><a id="update-project-list" href="#" title="Refresh files"><img src="img/refresh-files.png" width="36" height="38" onmouseover="this.src='img/refresh-filesh.png'" onmouseout="this.src='img/refresh-files.png'"></a></li>
                     </ul>
-                </script>
-                </div>
+            </script>
+        </div>
 
-                <div id="projects">
-                    <div id="projectListContainer">
-
-                        <script type="text/template" id="project-template">
-                            <div class="<%= className %>">
-                                <div class="projectNameContainer"><a href="#" data-id="<%= id %>"><%= name %></a></div>
-                            </div>
-                        </script>
-
-                        <script type="text/template" id="project-controls-template">
-<div class="projectControls<%= className %>">
-                            <div class="projectUpdateContainer"><a href="#"><img src="img/Reload-project.png"></a></div>
-                            <div class="projectOpenContainer"><a href="#"><img src="img/Reload-folder.png"></a></div>
-                            <div class="projectDeleteContainer"><a href="#"><img src="img/delete.png"></a></div>
-</div>
-                        </script>
+        <div id="projects">
+            <div id="projectListContainer">
+            </div>
+            <script type="text/template" id="project-template">
+                <div class="<%= className %>">
+                    <div class="projectNameContainer">
+                        <a href="#" class="select-project" data-id="<%= id %>">
+                            <%= name %>
+                        </a>
                     </div>
 
+            </script>
+            <script type="text/template" id="project-controls-template">
+            <!-- TODO: Sprites instead of separate images -->
+            <div class="projectControls<%= className %>">
+                <div class="projectDeleteContainer">
+                    <a class="delete-project" href="#">
+                        <img
+                            data-id="<%= id %>"
+                            data-command="delete"
+                            src="img/project-delete.png"
+                            width="36"
+                            height="38"
+                            title="Delete project"
+                            onmouseover="this.src='img/project-deleteh.png'"
+                            onmouseout="this.src='img/project-delete.png'">
+                    </a>
                 </div>
-            </section>
+
+                <div class="projectOpenContainer">
+                    <a class="open-project-folder" href="#">
+                        <img
+                            data-id="<%= id %>"
+                            data-command="open"
+                            src="img/project-browse.png"
+                            width="36"
+                            height="38"
+                            title="Browse files"
+                            onmouseover="this.src='img/project-browseh.png'"
+                            onmouseout="this.src='img/project-browse.png'">
+                    </a>
+                </div>
+
+                <div class="projectUpdateContainer">
+                    <a class="reload-project-<%= id %>" href="#">
+                        <img
+                            data-id="<%= id %>"
+                            data-command="reload"
+                            src="img/project-reload.png"
+                            width="36"
+                            height="38"
+                            title="Reload project"
+                            onmouseover="this.src='img/project-reloadh.png'"
+                            onmouseout="this.src='img/project-reload.png'">
+                    </a>
+                </div>
+            </div>
+        </div>
+        </script>
 
         </div>
+    </section>
 
-        <div id="change-workspace-dialog" title="Change Workspace">
-            <label>Paste Workspace path here:</label>
-            <br/>
-            <br/>
-            <input type="text" name="workspacePath" id="workspacePath" class="text ui-widget-content ui-corner-all" />
-            <br/>
-        </div>
+</div>
 
-        <div id="new-project-dialog" title="New widget">
-            <label>Project Type:</label>
-            <br/>
-            <br/>
-            <input type="radio" name="projectType" id="projectType" value="native" />
-            NativeUI Based
-            <br/>
-            <br/>
-            <input type="radio" name="projectType" id="projectType" checked="true" value="web" />
-            Web based
-            <br/>
-            <br/>
-            <br/>
-            <label>Project Name:</label>
-            <input type="text" name="newProjectName" id="newProjectName" class="text ui-widget-content ui-corner-all"/>
-            <br/>
-        </div>
+<div id="dialogs" class="hidden">
+    <div id="change-workspace-dialog" title="Change Workspace">
+        <label>Paste Workspace path here:</label>
+        <br/>
+        <br/>
+        <input type="text" name="workspacePath" id="workspacePath" class="text ui-widget-content ui-corner-all" />
+        <br/>
+    </div>
 
-        <!--
+    <div id="new-project-dialog" title="New widget">
+        <label>Project Type:</label>
+        <br/>
+        <br/>
+        <input type="radio" name="projectType" id="projectType" value="native" />
+        NativeUI Based
+        <br/>
+        <br/>
+        <input type="radio" name="projectType" id="projectType" checked="true" value="web" />
+        Web based
+        <br/>
+        <br/>
+        <br/>
+        <label>Project Name:</label>
+        <input type="text" name="newProjectName" id="newProjectName" class="text ui-widget-content ui-corner-all"/>
+        <br/>
+    </div>
+</div>
+
+<!--
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.1.js"><\/script>')</script>
         -->
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.3.min.js"><\/script>')</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')</script>
 
-        <!-- jQuery Dialog -->
-        <script src="js/vendor/jquery-ui-1.8.16.custom.min.js"></script>
-        <link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
+<!-- jQuery Dialog -->
+<script src="js/vendor/jquery-ui-1.8.16.custom.min.js"></script>
+<link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
 
-        <!-- Underscore -->
-        <script src="js/vendor/underscore-1.4.3.min.js"></script>
-        <!-- Backbone -->
-        <script src="js/vendor/backbone-0.9.2.min.js"></script>
+<!-- Underscore -->
+<script src="js/vendor/underscore-1.4.3.min.js"></script>
+<!-- Backbone -->
+<script src="js/vendor/backbone-0.9.2.min.js"></script>
 
-        <script src="js/main.js"></script>
-    </body>
+<script src="js/main.js"></script>
+</body>
 </html>
