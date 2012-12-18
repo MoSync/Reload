@@ -13,14 +13,21 @@ var rpcFunctions = {
 	 * Test function used for testing //TODO: remove after testing
 	 */
 	add: function (a, b, sendResponse) {
+
+		//check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
 		var r = a + b + 3;
-		sendResponse(r);
+		sendResponse({hasError: false, data: r});
 	},
 
 	/**
 	 * Function that send the bundle to the client.
 	 */
 	getBundle: function(bundlePath, sendResponse) {
+		
+		//check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
 
 		// Set path to the project folder.
 		console.log("MOSYNC: Bundle Path: " + bundlePath);
@@ -31,7 +38,7 @@ var rpcFunctions = {
 								   vars.globals.fileSeparator +
 								   "LocalFiles.bin");
 		
-		sendResponse(data);
+		sendResponse({hasError: false, data: data});
 	},
 
 	/**
@@ -40,9 +47,13 @@ var rpcFunctions = {
 	 */
 	remoteLog: function (logMessage, sendResponse) {
 		
+		//check if parameter passing was correct
+        if(typeof sendResponse !== 'function') return false;
+
 		console.log("CLIENT LOG: " + logMessage);
 		vars.globals.gRemoteLogData.push(logMessage);
-		sendResponse("");
+		sendResponse({hasError: false, data: ""});
+
 	}
 	
 };
