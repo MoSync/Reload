@@ -49,7 +49,7 @@ for fileName in projectFiles do
 		iconFile = FileUtils.pwd + "/" + fileName
 	end
 end
-
+puts "Building Stuff............................................"
 FileUtils.mkpath([commonPath, androidPath + "package/", iOSPath + "package/", wp7Path + "package/", androidPackagePath, iOSPackagePath, wp7PackagePath]);
 system(pipeToolPath + " -appcode=DSFN -R -depend=" + commonPath + "resources.deps "+ commonPath +"resources Resources/Resources.lst")
 
@@ -66,7 +66,10 @@ end
 
 #Android
 system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=3145728 -stacksize=524288 -datasize=4194304 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B " + Dir.getwd + "/" + commonPath + "program " + sFileListString + libs)
-system(packagerPath + " -t platform -p " + Dir.getwd + "/" + commonPath + "program -r " + Dir.getwd + "/" + commonPath + "resources -i " + iconFile + " -d " + Dir.getwd + "/" + androidPath + "package -m Android/2.x --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 1")
+puts("pipe-tool ..............................................................")
+system(packagerPath + " -t platform -p " + Dir.getwd + "/" + commonPath + "program -r " + Dir.getwd + "/" + commonPath + "resources -i " + iconFile + " -d " + Dir.getwd + "/" + androidPath + "package -m Android/Android --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 1")
+puts("package ..............................................................")
+
 FileUtils.cp_r androidPath + "package/" + programName + ".apk", androidPackagePath, :verbose => true
 
 oldWD = Dir.getwd;

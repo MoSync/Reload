@@ -59,6 +59,11 @@ void ReloadFile::setLocalPath(MAUtil::String &path)
 	mLocalPath = path;
 }
 
+void ReloadFile::actionResolveLocalFileSystemURI(Wormhole::JSONMessage& message)
+{
+	return;
+}
+
 /**
  * Return a FileSystem object.
  */

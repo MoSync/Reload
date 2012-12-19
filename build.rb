@@ -98,7 +98,7 @@ FileUtils.mkdir_p "Build/#{time_stamp}/MoSync_Reload_BETA_Linux/server"
 FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/Android Client"
 FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/iOS Client"
 FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/WP7 Client"
-FileUtils.cp_r "ReloadLauncher/Mac/Reload.app", "/Volumes/MoSync Reload (BETA)/"
+FileUtils.cp_r "ReloadLauncher/Mac/Reload.app", "/Volumes/MoSync Reload (BETA)/Reload.app"
 
 puts "Copying Clients"
 FileUtils.cp_r "ReloadClient/Clients/Android", "/Volumes/MoSync Reload (BETA)/Android Client"
@@ -130,7 +130,9 @@ sh "cp -rf ReloadAppTemplates/MoSync_Reload_BETA_2_Windows/* Build/#{time_stamp}
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_BETA_2_Linux/* Build/#{time_stamp}/MoSync_Reload_BETA_Linux"
 
 puts "creating final Mac Package"
+sleep(4)
 sh "hdiutil detach /Volumes/MoSync\\ Reload\\ \\(BETA\\)/"
+sleep(4)
 sh "hdiutil convert  ReloadAppTemplates/MoSync_Reload_BETA_Template.dmg -format UDZO -imagekey zlib-level=9 -o  Build/#{time_stamp}/MoSync_Reload_BETA_OSX_#{time_stamp}.dmg"
 
 puts "Creating final Windows Package"
