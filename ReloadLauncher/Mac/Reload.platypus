@@ -42,7 +42,7 @@
 		<string>fold</string>
 	</array>
 	<key>IconPath</key>
-	<string>ReloadLauncher/Mac/Reload_Icon.icns</string>
+	<string>../../ReloadLauncher/Mac/Reload_Icon.icns</string>
 	<key>Identifier</key>
 	<string>org.MoSync.Reload</string>
 	<key>Interpreter</key>
