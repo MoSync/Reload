@@ -27,7 +27,7 @@ end
 
 
 #Defince version and timestamp 
-version = "0.1 Beta 5"
+version = "0.1 Beta 6"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 
 #Write the version information to the file for use in the server  and client
