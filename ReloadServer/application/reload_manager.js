@@ -86,7 +86,7 @@ var rpcFunctions = {
             });
 
             sendResponse({hasError: false, data: projectListJSON});
-        });
+        },sendResponse);
     },
 
     // internal function
