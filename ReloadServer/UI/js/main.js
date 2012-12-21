@@ -1,4 +1,30 @@
-(function ($) {
+require.config({
+    paths: {
+        'jquery':     'vendor/jquery-1.7.2.min',
+        'underscore': 'vendor/underscore-1.4.3.min',
+        'backbone':   'vendor/backbone-0.9.2.min'
+    },
+    // Define non AMD modules
+    shim: {
+        underscore: {
+            exports: '_'
+        },
+        backbone: {
+            deps: ["underscore", "jquery"],
+            exports: "Backbone"
+        }
+    }
+});
+
+require([
+        // Load our app module and pass it to our definition function
+        'reload'
+    ], function (Reload) {
+        // The "reload" dependency is passed in as "Reload"
+        Reload.initialize();
+    });
+
+/*(function ($) {
 
     var rpc = {
         rpc: function (options) {
@@ -31,13 +57,11 @@
         }
     };
 
-    /*
-     * SAMPLE
-     * Model making a RPC call.
-     * Must contain 'url' and 'rcpMsg' fields for Backbone.sync to read and make
-     * ajax call. rpc method takes options argument containing functions for
-     * handling succes and error cases.
-     */
+     SAMPLE
+     //Model making a RPC call.
+     //Must contain 'url' and 'rcpMsg' fields for Backbone.sync to read and make
+     //ajax call. rpc method takes options argument containing functions for
+     //handling succes and error cases.
     var Model = Backbone.Model.extend({
 
         initialize: function () {
@@ -60,15 +84,11 @@
 
     //var m = new Model();
 
-    /*
-     * Project model.
-     */
+    // Project model.
     var Project = Backbone.Model.extend({
     });
 
-    /*
-     * A single row within workspace column.
-     */
+    // A single row within workspace column.
     var ProjectView = Backbone.View.extend({
         projectTpl: $('#project-template').html(),
         controlsTpl: $('#project-controls-template').html(),
@@ -288,9 +308,7 @@
         }
     });
 
-    /*
-     * Collection of projects within given directory.
-     */
+    // Collection of projects within given directory.
     var Workspace = Backbone.Collection.extend({
         model: Project,
         path: '',
@@ -326,9 +344,7 @@
         }
     });
 
-    /*
-     * View of projects withing a workspace.
-     */
+    // View of projects withing a workspace.
     var WorkspaceView = Backbone.View.extend({
         debugSwitch: $('#debug-switch'),
         bigReload: $('#big-reload'),
@@ -634,9 +650,7 @@
         }
     });
 
-    /*
-     * Init workspace and workspace controls.
-     */
+    // Init workspace and workspace controls.
     var workspace = new WorkspaceView({
         el: $('#projectListContainer')
     });
@@ -818,3 +832,4 @@
 
     var ui = new WebUiView();
 })(jQuery);
+*/

@@ -1,0 +1,47 @@
+<!-- TODO: Sprites instead of separate images -->
+<div class="projectControls<%= className %>">
+    <div class="projectDeleteContainer">
+        <a class="delete-project" href="#">
+            <img
+            data-id="<%= id %>"
+            data-command="delete"
+            src="img/project-delete.png"
+            width="36"
+            height="38"
+            title="Delete project"
+            alt=""
+            onmouseover="this.src='img/project-deleteh.png'"
+            onmouseout="this.src='img/project-delete.png'">
+        </a>
+    </div>
+
+    <div class="projectOpenContainer">
+        <a class="open-project-folder" href="#">
+            <img
+            data-id="<%= id %>"
+            data-command="open"
+            src="img/project-browse.png"
+            width="36"
+            height="38"
+            title="Browse files"
+            alt=""
+            onmouseover="this.src='img/project-browseh.png'"
+            onmouseout="this.src='img/project-browse.png'">
+        </a>
+    </div>
+
+    <div class="projectUpdateContainer">
+        <a class="reload-project-<%= id %>" href="#">
+            <img
+            data-id="<%= id %>"
+            data-command="reload"
+            src="img/project-reload.png"
+            width="36"
+            height="38"
+            alt=""
+            title="Reload project"
+            onmouseover="this.src='img/project-reloadh.png'"
+            onmouseout="this.src='img/project-reload.png'">
+        </a>
+    </div>
+</div>
