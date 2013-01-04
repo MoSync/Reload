@@ -39,15 +39,16 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	MAExtent ex = maGetScrSize();
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);
+	bool pad = screenHeight > 1000 && screenWidth != 640 && os.find("Android", 0) < 0;
 
 	int centerH = screenWidth / 2;
 	int buttonWidth = (int)((float)screenWidth * 0.75);
-	if(screenHeight > 1000 && os.find("Android", 0) < 0)
+	if(pad)
 	{
 		buttonWidth = (int)((float)screenWidth * 0.4);
 	}
 	int buttonHeight = (int)((float)screenWidth * 0.15);
-	if(screenHeight > 1000 && os.find("Android", 0) < 0)
+	if(pad)
 	{
 		buttonHeight = (int)((float)screenWidth * 0.07);
 	}
@@ -57,20 +58,24 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		buttonSpacing = (int)((float)buttonHeight * 0.1);
 	}
 	int editBoxHeight = (int)((float)screenHeight * 0.07);
-	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	if(pad)
 	{
 		editBoxHeight = (int)((float)screenHeight * 0.02);
 	}
 	int logoWidth = (int)((float)screenWidth * 0.75);
 	int layoutTop = (int)((float)screenHeight * 0.3);
-	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	if(pad)
 	{
 		layoutTop = (int)((float)screenHeight * 0.25);
 	}
 	int labelHeight = (int)((float)screenHeight * 0.05);
-	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	if(pad)
 	{
 		labelHeight = (int)((float)screenHeight * 0.025);
+	}
+	else if(screenHeight > 1000 && screenWidth == 640) //iPhone 5
+	{
+		labelHeight = (int)((float)screenHeight * 0.04);
 	}
 	int labelWidth = screenWidth;
 	if(os.find("Android", 0) >= 0)
@@ -78,7 +83,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		labelWidth = buttonWidth;
 	}
 	int labelSpacing = (int)((float)screenHeight * 0.02);
-	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	if(pad)
 	{
 		labelSpacing = (int)((float)labelSpacing * 0.01);
 	}
