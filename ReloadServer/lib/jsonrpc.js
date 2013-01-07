@@ -25,10 +25,11 @@ var JSONRPC = {
 	* @type void
 	*/  
 	listen : function(message, response){
-		var self = this;
-		this.response = response;
 
-		self.handleMessage(message, function(processingResult) {
+		/*var self = this;
+		this.response = response;*/
+
+		this.handleMessage(message, function(processingResult) {
 			
 			//console.log(processingResult);
 
@@ -47,27 +48,27 @@ var JSONRPC = {
 	      	
 	      	// using id attribute for sending response in binary format
 	      	if((message.id == 1) && (!processingResult.hasError)) {
-	      		self.response.writeHead(200, {
+	      		response.writeHead(200, {
 						  'Content-Length': processingResult.data.length,
 						  'Content-Type': 'binary',
 						  'Pragma': 'no-cache',
 						  'Cache-Control': 'no-cache',
 						  'Expires': '-1'
 						});
-				self.response.write( processingResult.data );
-				self.response.end("");
+				response.write( processingResult.data );
+				response.end("");
 	      	}
 	      	else {
 				//console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
-				self.response.writeHead(200, {
+				response.writeHead(200, {
 							  'Content-Length': JSON.stringify(responseObject).length,
 							  'Content-Type': 'application/json',
 							  'Pragma': 'no-cache',
 							  'Cache-Control': 'no-cache',
 							  'Expires': '-1'
 							});
-				self.response.write( JSON.stringify(responseObject) );
-				self.response.end("");
+				response.write( JSON.stringify(responseObject) );
+				response.end("");
 			}
 		});
 	},

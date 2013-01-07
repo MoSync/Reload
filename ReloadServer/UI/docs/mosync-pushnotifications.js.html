@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+<p><a class="external" href="http://www.mobilesorcery.com/files/imports/doxygen/latest/html/index.html">C++ API Reference</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="Contents">Contents</a></h1>
+
+<ul>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager">PushNotificationManager</a></li>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager.type">PushNotificationManager.type</a></li>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager.register">PushNotificationManager.register</a></li>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager.unregister">PushNotificationManager.unregister</a></li>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager.types">PushNotificationManager.types</a></li>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager.accountID">PushNotificationManager.accountID</a></li>
+<li><a href="mosync-pushnotifications.js.html#PushNotificationManager.listener">PushNotificationManager.listener</a></li>
+</ul>
+<h1><a name="PushNotificationManager">PushNotificationManager</a></h1>
+
+<p>This class provides access to device <a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a> Service.</p>
+
+<h1><a name="PushNotificationManager.type">PushNotificationManager.type</a></h1>
+
+<p>Constants indicating the types of notifications the application accepts.
+Specific to iOS.</p>
+
+<p>On Android alert type is set by default. Types on iOS include:</p>
+
+<ul>
+<li>badge: The application accepts notifications that badge the application icon.</li>
+<li>sound: The application accepts alert sounds as notifications.</li>
+<li>alert: The application accepts alert messages as notifications.</li>
+</ul>
+<h1><a name="PushNotificationManager.register">PushNotificationManager.register</a></h1>
+
+<p>Asynchronously starts the registration process.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>successCallback</strong> 
+       the function to call when registration data is available.</li>
+<li>
+<strong>errorCallback</strong> 
+       the function to call if an error occured while registering.</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code> // The application has successfuly registered for receiving push notifications.
+ function push_notification_did_registered(token) {};
+
+ // The application did not registered for receiving push notifications.
+ function push_notification_failed_to_register(error) {}
+
+ // Create a push notification manager object.
+ var pushNotificationManager = new <a href="mosync-pushnotifications.js.html#PushNotificationManager">PushNotificationManager</a>();
+ pushNotificationManager.register(
+     push_notification_did_registered,
+     push_notification_failed_to_register);
+</code></pre>
+
+<h1><a name="PushNotificationManager.unregister">PushNotificationManager.unregister</a></h1>
+
+<p>Unregister application for receiving push notifications.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>callback</strong> 
+       the function to call when the application has unregistered.
+       This method is called only on Android platform.</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code> function push_notification_did_unregister() {}
+
+ // Create a push notification manager object.
+ pushNotificationManager.unregister(push_notification_did_unregister);
+</code></pre>
+
+<h1><a name="PushNotificationManager.types">PushNotificationManager.types</a></h1>
+
+<p>Set push notification allowed types.
+Call this method before registering the application for receiving push
+notifications.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>successCallback</strong> 
+      the function to call if the types were set successfuly.</li>
+<li>
+<strong>errorCallback</strong> 
+      the function to call if the types param is invalid.</li>
+<li>
+<strong>types</strong> 
+      types of the notifications accepted by the application.
+      If this param is not specified the application will be registered
+      for receiving all types of notification.</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code>    var typesArray = [<a href="mosync-pushnotifications.js.html#PushNotificationManager.type">PushNotificationManager.type</a>.badge,
+                    <a href="mosync-pushnotifications.js.html#PushNotificationManager.type">PushNotificationManager.type</a>.sound,
+                    <a href="mosync-pushnotifications.js.html#PushNotificationManager.type">PushNotificationManager.type</a>.alert];
+
+ // Create a push notification manager object.
+ var pushNotificationManager = new <a href="mosync-pushnotifications.js.html#PushNotificationManager">PushNotificationManager</a>();
+ pushNotificationManager.types(null, null, typesArray);
+</code></pre>
+
+<h1><a name="PushNotificationManager.accountID">PushNotificationManager.accountID</a></h1>
+
+<p>Set the account ID used for registering the application.
+Call this method before registering the application.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>accountID</strong> 
+        the account id authorized to send messages to the application,
+        typically the email address of an account set up by the
+         application's developer.
+        Use this function only on Android platform.</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code> // Create a push notification manager object.
+ var pushNotificationManager = new <a href="mosync-pushnotifications.js.html#PushNotificationManager">PushNotificationManager</a>();
+ pushNotificationManager.accountID("your_account_id");
+</code></pre>
+
+<h1><a name="PushNotificationManager.listener">PushNotificationManager.listener</a></h1>
+
+<p>Listener for push notification.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>callback</strong> 
+       The function to call when a new push notification is received.</li>
+</ul>
+<h2>Example</h2>
+
+<pre class="prettyprint"><code> function did_receive_push_notification(pushNotification)
+ {
+     alert(pushNotification.message);
+ }
+ // Create a push notification manager object.
+ var pushNotificationManager = new <a href="mosync-pushnotifications.js.html#PushNotificationManager">PushNotificationManager</a>();
+ pushNotificationManager.listener(did_receive_push_notification);
+</code></pre>
+
+	</div>
+
+</div>
+</body>
+</html>
