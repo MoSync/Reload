@@ -12,8 +12,10 @@ var vars = require('./globals');
 var rpcFunctions = {
 
     add: function (a, b, sendResponse) {
-        
-        if(typeof sendResponse !== 'function') return false;
+
+        if (typeof sendResponse !== 'function') {
+            return false;
+        }
 
         var r = a + b;
         sendResponse({hasError: false, data: r});
@@ -24,15 +26,19 @@ var rpcFunctions = {
 
         var socket = net.createConnection(80, "www.google.com");
 
-        socket.on('connect', function() {
+        socket.on('connect', function () {
 
             vars.globals.ip = socket.address().address;
-            if(sendResponse !== undefined) sendResponse({hasError: false, data: vars.globals.ip});
+            if (sendResponse !== undefined) {
+                sendResponse({hasError: false, data: vars.globals.ip});
+            }
             socket.end();
         });
 
-        socket.on('error', function(e) {
-            if(sendResponse !== undefined) sendResponse({hasError: true, data: "Error in socket"});
+        socket.on('error', function (e) {
+            if (sendResponse !== undefined) {
+                sendResponse({hasError: true, data: "Error in socket"});
+            }
         });
     },
 
@@ -41,11 +47,13 @@ var rpcFunctions = {
         if( (typeof sendResponse !== 'function') && 
             (sendResponse !== undefined) ) return false;
 
-    	if(vars.globals.ip == null) {
-    		this.getIpFromSocket(sendResponse);
-    	}
-    	else {
-    		if(sendResponse !== undefined) sendResponse({hasError: false, data: vars.globals.ip});
+        if (vars.globals.ip === null) {
+            this.getIpFromSocket(sendResponse);
+        }
+        else {
+            if(sendResponse !== undefined) {
+                sendResponse({hasError: false, data: vars.globals.ip});
+            }
     	}
     },
 
@@ -506,7 +514,7 @@ var rpcFunctions = {
                 if(weinreDebug)
                     fs.writeFileSync(pathOfIndexHTML, originalIndexHTMLData, "utf8" );
             }
-
+            
             var bundleCommand = "bin\\win\\Bundle.exe";
 
             if (vars.globals.localPlatform.indexOf("darwin") >=0)
@@ -517,7 +525,7 @@ var rpcFunctions = {
             {
               bundleCommand = "bin/linux/Bundle";
             }
-
+            
             var command =  bundleCommand + " -in \"" + vars.globals.rootWorkspacePath +
                 vars.globals.fileSeparator + projectDir +
                 vars.globals.fileSeparator + "LocalFiles\" -out \"" +
