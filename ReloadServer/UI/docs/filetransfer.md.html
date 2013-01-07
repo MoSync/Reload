@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+<p><a class="external" href="http://www.mobilesorcery.com/files/imports/doxygen/latest/html/index.html">C++ API Reference</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="FileTransfer">FileTransfer</a></h1>
+
+<p><a href="filetransfer.md.html#FileTransfer">FileTransfer</a> is an object that allows you to upload files to a server or download files from a server.</p>
+
+<h2>Properties</h2>
+
+<p>N/A</p>
+
+<h2>Methods</h2>
+
+<ul>
+<li>
+<strong>upload</strong>: sends a file to a server. </li>
+</ul>
+<h2>Details</h2>
+
+<p>The <code><a href="filetransfer.md.html#FileTransfer">FileTransfer</a></code> object provides a way to upload files to a remote server using an HTTP multi-part POST request.  Both HTTP and HTTPS protocols are supported.  Optional parameters can be specified by passing a <a href="fileuploadoptions.md.html#FileUploadOptions">FileUploadOptions</a> object to the upload method.  On successful upload, the success callback will be called with a <a href="fileuploadresult.md.html#FileUploadResult">FileUploadResult</a> object. If an error occurs, the error callback will be invoked with a <a href="filetransfererror.md.html#FileTransferError">FileTransferError</a> object.</p>
+
+<h2>Supported Platforms</h2>
+
+<ul>
+<li>Android</li>
+<li>iOS</li>
+<li>Windows Phone 7 ( Mango )</li>
+</ul>
+<h2>upload</h2>
+
+<p><strong>Parameters:</strong></p>
+
+<ul>
+<li>
+<strong>filePath</strong> - Full path of the file on the device</li>
+<li>
+<strong>server</strong> - URL of the server to receive the file</li>
+<li>
+<strong>successCallback</strong> - A callback that is called with a <a href="metadata.md.html#Metadata">Metadata</a> object. <em>(Function)</em>
+</li>
+<li>
+<strong>errorCallback</strong> - A callback that is called if an error occurs retrieving the <a href="metadata.md.html#Metadata">Metadata</a>. Invoked with a <a href="fileerror.md.html#FileError">FileError</a> object. <em>(Function)</em>
+</li>
+<li>
+<strong>options</strong> - Optional parameters such as file <a href="name.md.html#name">name</a> and mimetype</li>
+</ul>
+<p><strong>Quick Example</strong></p>
+
+<pre class="prettyprint"><code>// !! Assumes variable fileURI contains a valid URI to a  text file on the device
+
+var win = function(r) {
+    console.log("Code = " + r.responseCode);
+    console.log("Response = " + r.response);
+    console.log("Sent = " + r.bytesSent);
+}
+
+var fail = function(error) {
+    alert("An error has occurred: Code = " + error.code);
+    console.log("upload error source " + error.source);
+    console.log("upload error target " + error.target);
+}
+
+var options = new <a href="fileuploadoptions.md.html#FileUploadOptions">FileUploadOptions</a>();
+options.fileKey="file";
+options.fileName=fileURI.substr(fileURI.lastIndexOf('/')+1);
+options.mimeType="text/plain";
+</code></pre>
+
+<p>var params = new Object();
+    params.value1 = "test";
+    params.value2 = "param";</p>
+
+<pre class="prettyprint"><code>options.params = params;
+
+var ft = new <a href="filetransfer.md.html#FileTransfer">FileTransfer</a>();
+ft.upload(fileURI, "http://some.server.com/upload.php", win, fail, options);
+</code></pre>
+
+<p><strong>Full Example</strong></p>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta <a href="name.md.html#name">name</a>="viewport" content="width=320, user-scalable=yes"&gt;
+    &lt;title&gt;<a href="file.md.html#File">File</a> Upload Example&lt;/title&gt;
+    &lt;script type="text/javascript" charset="utf-8" src="js/wormhole.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" charset="utf-8"&gt;
+    var app = (function()
+    {
+        var app = {};
+
+        app.snapPhotoAndUpload = function()
+        {
+            navigator.device.<a href="captureImage.md.html#capture.captureImage">capture.captureImage</a>(
+                /**
+                 * Callback that returns the image that was captured.
+                 * @param mediaFiles Array with images.
+                 */
+                function(mediaFiles)
+                {
+                    var fileURL = "file://" + mediaFiles[0].fullPath;
+                    alert("Uploading picture");
+                    app.uploadPhoto(fileURL);
+                },
+                function(error)
+                {
+                    alert("Could not take picture - error: " + error.code);
+                });
+        };
+
+        app.uploadPhoto = function(fileURL)
+        {
+            var options = new <a href="fileuploadoptions.md.html#FileUploadOptions">FileUploadOptions</a>();
+            options.fileKey = "file";
+            options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+            options.mimeType = app.getMimeType(options.fileName);
+            options.params = null;
+
+            var transfer = new <a href="filetransfer.md.html#FileTransfer">FileTransfer</a>();
+            transfer.upload(
+                fileURL,
+                "http://dev.<a href="mosync-bridge.js.html#mosync">mosync</a>.com/mobilelua/PhotoGallery/upload.php",
+                function(result)
+                {
+                    alert("Photo uploaded");
+                    console.log("Code = " + result.responseCode);
+                    console.log("Response = " + result.response);
+                    console.log("Sent = " + result.bytesSent);
+                },
+                function(error)
+                {
+                    alert("Could not upload photo - error: " + error.code);
+                    console.log("Could not upload photo - error: " + error.code);
+                },
+                options);
+        }
+
+        app.getMimeType = function(fileName)
+        {
+            if (/\.jpg$/.test(fileName)) return "image/jpeg";
+            if (/\.jpeg$/.test(fileName)) return "image/jpeg";
+            if (/\.png$/.test(fileName)) return "image/png";
+            return "application/octet-stream";
+        }
+
+        return app;
+    })();
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;<a href="file.md.html#File">File</a> Upload Example&lt;/h1&gt;
+    &lt;div&gt;
+        &lt;input
+            type="button"
+            value="Snap Photo and Upload"
+            onclick="app.snapPhotoAndUpload()"/&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+	</div>
+
+</div>
+</body>
+</html>
