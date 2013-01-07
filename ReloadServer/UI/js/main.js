@@ -1,4 +1,30 @@
-(function ($) {
+require.config({
+    paths: {
+        'jquery':     'vendor/jquery-1.7.2.min',
+        'underscore': 'vendor/underscore-1.4.3.min',
+        'backbone':   'vendor/backbone-0.9.2.min'
+    },
+    // Define non AMD modules
+    shim: {
+        underscore: {
+            exports: '_'
+        },
+        backbone: {
+            deps: ["underscore", "jquery"],
+            exports: "Backbone"
+        }
+    }
+});
+
+require([
+        // Load our app module and pass it to our definition function
+        'reload'
+    ], function (Reload) {
+        // The "reload" dependency is passed in as "Reload"
+        Reload.initialize();
+    });
+
+/*(function ($) {
 
     var rpc = {
         rpc: function (options) {
@@ -31,13 +57,11 @@
         }
     };
 
-    /*
-     * SAMPLE
-     * Model making a RPC call.
-     * Must contain 'url' and 'rcpMsg' fields for Backbone.sync to read and make
-     * ajax call. rpc method takes options argument containing functions for
-     * handling succes and error cases.
-     */
+     SAMPLE
+     //Model making a RPC call.
+     //Must contain 'url' and 'rcpMsg' fields for Backbone.sync to read and make
+     //ajax call. rpc method takes options argument containing functions for
+     //handling succes and error cases.
     var Model = Backbone.Model.extend({
 
         initialize: function () {
@@ -60,15 +84,11 @@
 
     //var m = new Model();
 
-    /*
-     * Project model.
-     */
+    // Project model.
     var Project = Backbone.Model.extend({
     });
 
-    /*
-     * A single row within workspace column.
-     */
+    // A single row within workspace column.
     var ProjectView = Backbone.View.extend({
         projectTpl: $('#project-template').html(),
         controlsTpl: $('#project-controls-template').html(),
@@ -115,7 +135,7 @@
             options.rpcMsg  = {
                 method: 'manager.reloadProject',
                 params: [this.model.get('name'), debug],
-                id: null
+                id: 0
             };
 
             options.success = function (resp) {
@@ -288,9 +308,7 @@
         }
     });
 
-    /*
-     * Collection of projects within given directory.
-     */
+    // Collection of projects within given directory.
     var Workspace = Backbone.Collection.extend({
         model: Project,
         path: '',
@@ -326,14 +344,14 @@
         }
     });
 
-    /*
-     * View of projects withing a workspace.
-     */
+    // View of projects withing a workspace.
     var WorkspaceView = Backbone.View.extend({
-        debugSwitch: $('#checkbox-debug'),
+        debugSwitch: $('#debug-switch'),
         bigReload: $('#big-reload'),
 
-        selectedProject: {},
+        debug: false,
+
+        selectedProject: null,
         events: {
             'click a.select-project': 'selectProject'
         },
@@ -346,13 +364,13 @@
                       'appendProject',
                       'populate',
                       'clear',
-                      'switchDebug'
+                      'switchDebug',
+                      'reload'
                      );
 
-            this.debugSwitch.bind('mouseup', this.switchDebug);
-            this.bigReload.bind('mouseup', function () {
-                console.log('reload');
-            });
+            this.debugSwitch.bind('click', this.switchDebug);
+
+            this.bigReload.bind('click', this.reload);
 
             this.collection = new Workspace();
 
@@ -373,12 +391,36 @@
         },
 
         switchDebug: function () {
-            console.log('switch');
-            var value = this.debugSwitch.find('#view').val();
-            if (value === 'on') {
-                // Set debug flug
+            this.debug = this.debugSwitch.is(':checked');
+            console.log(this.debug);
+        },
+
+        reload: function () {
+            console.log('reload from big button');
+            if (this.selectedProject === null) {
+                alert('Select a project first.');
+            } else {
+                var options     = {};
+                options.url     = 'http://localhost:8283';
+                options.rpcMsg  = {
+                    method: 'manager.reloadProject',
+                    params: [this.selectedProject.get('name'), this.debug],
+                    id: null
+                };
+
+                options.success = function (resp) {
+                    console.log('reload successful!');
+                    console.log(resp);
+                };
+
+                options.error   = function (resp) {
+                    console.log('could not reload project.');
+                    console.log(resp);
+                };
+
+                this.selectedProject.rpc(options);
+
             }
-            console.log(value);
         },
 
         clear: function () {
@@ -608,9 +650,7 @@
         }
     });
 
-    /*
-     * Init workspace and workspace controls.
-     */
+    // Init workspace and workspace controls.
     var workspace = new WorkspaceView({
         el: $('#projectListContainer')
     });
@@ -792,3 +832,4 @@
 
     var ui = new WebUiView();
 })(jQuery);
+*/
