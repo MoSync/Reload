@@ -3,25 +3,36 @@ define([
     'underscore',
     'backbone',
     'views/index/serverip',
-    'views/index/sidebar'
-], function($, _, Backbone, ServerIpView, SidebarView){
+    'views/index/content_nav',
+    'views/index/sidebar',
+    'views/index/content'
+], function($, _, Backbone, ServerIpView, ContentNavView, SidebarView, ContentView){
 
     var IndexView = Backbone.View.extend({
 
-        //el: $('#right-bar'),
+        el: $('#container'),
 
         initialize: function () {
+            _.bindAll(this, 'render', 'close');
+            this.serverIpView = new ServerIpView();
+            this.contentNavView = new ContentNavView();
+            this.sidebarView = new SidebarView();
+            this.contentView = new ContentView();
         },
 
         render: function () {
             console.log('rendering index view');
 
-            var serverIpView = new ServerIpView();
-            serverIpView.render();
+            this.serverIpView.render();
+            this.contentNavView.render();
+            this.sidebarView.render();
+            this.$el.html(this.contentView.render());
+        },
 
-            var sidebarView = new SidebarView();
-            sidebarView.render();
+        close: function () {
+            this.contentView.close();
         }
+
     });
 
     return IndexView;

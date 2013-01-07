@@ -33,7 +33,7 @@ define([
         },
 
         addProject: function (e) {
-e.preventDefault();
+            e.preventDefault();
             console.log('Add project');
 
             var self = this;
@@ -72,7 +72,7 @@ e.preventDefault();
         },
 
         changeWorkspace: function (e) {
-e.preventDefault();
+            e.preventDefault();
 
             var dialog = new ChangeWorkspaceDialog( { projectList: this.projectList } );
             dialog.render();
@@ -80,7 +80,7 @@ e.preventDefault();
 
         updateProjectList: function (e) {
             console.log(e);
-e.preventDefault();
+            e.preventDefault();
 
             console.log('Update project list');
             this.projectList.rePopulate();

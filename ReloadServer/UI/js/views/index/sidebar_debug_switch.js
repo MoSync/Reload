@@ -14,7 +14,8 @@ define([
             'click #debug-switch':  'switchDebug'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.parent = options.parent;
 
             _.bindAll(this, 'render', 'switchDebug');
 
@@ -31,7 +32,12 @@ define([
         },
 
         switchDebug: function () {
-            this.model.set({ debug: this.$(this.debugSwitch).is(':checked') });
+            var debug = this.$(this.debugSwitch).is(':checked');
+
+            this.model.set({ debug: debug });
+            this.parent.debug = debug;
+
+            console.log(this.model.get('debug'));
         }
 
     });

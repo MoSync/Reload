@@ -59,6 +59,7 @@ define([
         },
 
         control: function (e) {
+            e.preventDefault();
             var command = $(e.target).data('command');
             var id = $(e.target).data('id');
 
@@ -81,12 +82,14 @@ define([
         },
 
         reloadProject: function () {
-            var debug = false;
+            console.log('yey');
+            console.log(this.model.get('debug'));
+            console.log(this.model.get('name'));
             var options     = {};
             options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.reloadProject',
-                params: [this.model.get('name'), debug],
+                params: [this.model.get('name'), this.model.get('debug')],
                 id: 0
             };
 

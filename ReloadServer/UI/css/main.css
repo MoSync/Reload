@@ -201,6 +201,10 @@ margin-top: auto;
 #content div{
     clear: both;
 }
+
+#container {
+    padding: 20px;
+}
 #content-nav ul li{
     display: inline-block;
     margin: 20px;

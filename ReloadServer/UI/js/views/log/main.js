@@ -2,20 +2,57 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'models/log/log',
     'text!../../../templates/log/main.html'
-], function($, _, Backbone, logTemplate){
+], function($, _, Backbone, LogModel, logTemplate){
 
     var LogView = Backbone.View.extend({
 
         el: $('#container'),
 
+        timer: null,
+
+        initialize: function () {
+            _.bindAll(this, 'render', 'close', 'updateLog');
+
+            this.model = new LogModel();
+        },
         render: function () {
-            console.log('render Log VIEW');
-            // Using Underscore we can compile our template with data
-            var data = {};
-            var compiledTemplate = _.template( logTemplate, data );
-            // Append our compiled template to this Views "el"
-            this.$el.html( compiledTemplate );
+            var self = this;
+            this.timer = setInterval(function(){
+                self.updateLog();
+            }, 1000);
+        },
+
+        close: function () {
+            ////COMPLETELY UNBIND THE VIEW
+            //this.undelegateEvents();
+            //this.$el.removeData().unbind();
+
+            ////Remove view from DOM
+            //this.remove();
+            //Backbone.View.prototype.remove.call(this);
+
+            clearInterval(this.timer);
+            this.timer = null;
+        },
+
+        updateLog: function() {
+            var self = this;
+            this.model.getLogMsg(function(res) {
+
+                var msgs = $('<div>');
+                _(res).each(function(msg) {
+                    msgs.append(msg + '<br />');
+                });
+
+                //if(res.length !== 0) {
+                    //console.log(res);
+                //}
+
+                var compiledTemplate = _.template( logTemplate, { data: msgs.html() } );
+                self.$el.html( compiledTemplate );
+            });
         }
     });
 
