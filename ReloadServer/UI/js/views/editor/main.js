@@ -16,6 +16,16 @@ define([
             var compiledTemplate = _.template( editorTemplate, data );
             // Append our compiled template to this Views "el"
             this.$el.html( compiledTemplate );
+        },
+
+        close: function () {
+            ////COMPLETELY UNBIND THE VIEW
+            //this.undelegateEvents();
+            //this.$el.removeData().unbind();
+
+            ////Remove view from DOM
+            //this.remove();
+            //Backbone.View.prototype.remove.call(this);
         }
     });
 

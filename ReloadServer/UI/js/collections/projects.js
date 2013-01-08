@@ -27,7 +27,7 @@ define([
             var self = this;
             options.success = function (resp) {
                 console.log('Got project list');
-                _.map(JSON.parse(resp.result), function (p) {
+                _.map(resp.result, function (p) {
                     self.push(new ProjectModel(p));
                 });
             };

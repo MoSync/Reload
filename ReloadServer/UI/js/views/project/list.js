@@ -15,6 +15,7 @@ define([
         initialize: function (options) {
 
             this.projectList = options.projectList;
+            this.parent = options.parent;
 
             _.bindAll(this, 'render', 'appendProjectView');
 
@@ -46,18 +47,24 @@ define([
             pv.render();
         },
 
-        selectProject: function (ev) {
+        selectProject: function (e) {
+            e.preventDefault();
             console.log('project selected');
 
             var self = this;
-            var id = $(ev.target).data('id');
+            var id = $(e.target).data('id');
             var found = this.projectList.getByCid(id);
 
             // Hide all controls first.
             _(this.projectList.models).each(function (project) {
                 if (project === found) {
+                    console.log(self.parent.debug);
+
                     project.set({ showControls: true });
+                    project.set({ debug: self.parent.debug });
+
                     self.selectedProject = project;
+                    self.parent.selectedProject = project;
                 } else {
                     project.set({ showControls: false });
                 }

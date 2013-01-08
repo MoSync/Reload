@@ -11,7 +11,7 @@ define([
             this.getDevices();
         },
 
-        getDevices: function () {
+        getDevices: function (callback) {
 
             var options     = {};
             options.url     = 'http://localhost:8283';
@@ -21,6 +21,10 @@ define([
                 id:     null
             };
 
+            if (this.devices.length > 0) {
+                this.devices = [];
+            }
+
             var self = this;
             options.success = function (resp) {
                 console.log('Got device info ' + resp.result);
@@ -28,6 +32,10 @@ define([
                     self.devices.push(d);
                 });
                 console.log(self.devices);
+
+                if (typeof(callback) === 'function') {
+                    callback(self.devices);
+                }
             };
 
             options.error   = function (resp) {

@@ -2,16 +2,19 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'views/index/sidebar_reload_button',
     'views/index/sidebar_controls',
     'views/index/sidebar_debug_switch',
     'views/project/list',
     'collections/projects',
     'text!../../../templates/index/sidebar.html'
-], function($, _, Backbone, SidebarControls, SidebarDebugSwitchView, ProjectListView, ProjectCollection, sidebarTemplate){
+], function($, _, Backbone, SidebarReloadButtonView, SidebarControls, SidebarDebugSwitchView, ProjectListView, ProjectCollection, sidebarTemplate){
 
     var SidebarView = Backbone.View.extend({
 
         el: $('#right-bar'),
+        debug: false,
+        selectedProject: null,
 
         initialize: function () {
             _.bindAll(this, 'render', 'changePath');
@@ -21,14 +24,20 @@ define([
         },
 
         render: function () {
-            console.log('rendering sidebar');
 
             var data = {};
             var compiledTemplate = _.template( sidebarTemplate, data );
             this.$el.html( compiledTemplate );
 
+            var sidebarReloadButtonView = new SidebarReloadButtonView({
+                el: this.el,
+                parent: this
+            });
+            sidebarReloadButtonView.render();
+
             var sidebarDebugSwitchView = new SidebarDebugSwitchView({
                 el: this.el,
+                parent: this
             });
             sidebarDebugSwitchView.render();
 
@@ -40,7 +49,8 @@ define([
 
             var projectListView = new ProjectListView({
                 el: this.el,
-                projectList: this.collection
+                projectList: this.collection,
+                parent: this
             });
             projectListView.render();
         },

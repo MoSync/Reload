@@ -12,6 +12,11 @@ define([
 ], function ($, _, Backbone, IndexView, EditorView, DebugView, DevicesModel, DevicesView, LogView, DocsView) {
 
     var ReloadRouter = Backbone.Router.extend({
+        initialize: function () {
+            // TODO General view handler.
+            //this.appView = options.appView;
+        },
+
         routes: {
             // Define URL routes
             '':         'index',
@@ -26,44 +31,59 @@ define([
         }
     });
 
-    var indexView = new IndexView();
+
+    var views = {};
+
+    var toggleView = function (target) {
+        _(_.keys(views)).each(function (key) {
+            if (target === key) {
+                views[key].render();
+                console.log('rendered: ' + key);
+            } else {
+                if (typeof(views[key].close) === 'function') {
+                    views[key].close();
+                    console.log('closed: ' + key);
+                }
+            }
+        });
+    };
 
     var initialize = function () {
+
+        // TODO Check if index view is already rendered and draw it
+        // only if it's not initialized.
+
+        views.indexView = new IndexView();
+        views.editorView = new EditorView();
+        views.debugView = new DebugView();
+        views.devicesView = new DevicesView();
+        views.logView = new LogView();
+        views.docsView = new DocsView();
+
         var router = new ReloadRouter();
 
         // Listen to router events.
         router.on('route:index', function () {
-            indexView.render();
+            toggleView('indexView');
         });
 
         router.on('route:showEditor', function () {
-            console.log('show editor route');
-            var editorView = new EditorView();
-            editorView.render();
+            toggleView('editorView');
         });
 
         router.on('route:showDebug', function () {
-            console.log('show debug route');
-            var debugView = new DebugView();
-            debugView.render();
+            toggleView('debugView');
         });
 
-        var devicesModel = new DevicesModel();
         router.on('route:showDevices', function () {
-            console.log('show devices route');
-            console.log(devicesModel.devices);
-            var devicesView = new DevicesView({ model: devicesModel });
-            devicesView.render();
+            toggleView('devicesView');
         });
+
         router.on('route:showLog', function () {
-            console.log('show Log route');
-            var logView = new LogView();
-            logView.render();
+            toggleView('logView');
         });
         router.on('route:showDocs', function () {
-            console.log('show docs route');
-            var docsView = new DocsView();
-            docsView.render();
+            toggleView('docsView');
         });
         router.on('route:defaultAction', function (actions) {
             // We have no matching route, lets just log what the URL was
