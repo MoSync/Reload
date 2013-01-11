@@ -21,6 +21,8 @@ define([
 
             this.projectList = options.projectList;
 
+            this.parent = options.parent;
+
             this.model.on('change', this.toggle);
 
             this.controls = _.template(controlsTemplate, {
@@ -41,7 +43,7 @@ define([
         },
 
         render: function () {
-            this.$el.append(this.$container);
+            return this.$el.html(this.$container);
         },
 
         toggle: function () {
@@ -53,6 +55,7 @@ define([
             } else {
                 // Unbind events from controls
                 this.$controls.off('click', this.control);
+                //this.$controls.removeData().unbind();
                 // Remove controls
                 this.$controls.remove();
             }
@@ -60,6 +63,7 @@ define([
 
         control: function (e) {
             e.preventDefault();
+            console.log('hej');
             var command = $(e.target).data('command');
             var id = $(e.target).data('id');
 
@@ -82,14 +86,12 @@ define([
         },
 
         reloadProject: function () {
-            console.log('yey');
-            console.log(this.model.get('debug'));
             console.log(this.model.get('name'));
             var options     = {};
             options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.reloadProject',
-                params: [this.model.get('name'), this.model.get('debug')],
+                params: [this.model.get('name'), this.parent.debug],
                 id: 0
             };
 
@@ -133,14 +135,14 @@ define([
             options.rpcMsg  = {
                 method: 'manager.removeProject',
                 params: [this.model.get('name')],
-                id: null
+                id: 0
             };
 
             var self = this;
             options.success = function (resp) {
-                console.log('remove success');
                 console.log(resp.result);
                 self.projectList.remove(self.model);
+                self.projectList.rePopulate();
             };
 
             options.error   = function (resp) {

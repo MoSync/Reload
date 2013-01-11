@@ -3,36 +3,42 @@ define([
     'underscore',
     'backbone',
     'views/index/serverip',
+    'views/index/serverinfo',
     'views/index/content_nav',
     'views/index/sidebar',
     'views/index/content'
-], function($, _, Backbone, ServerIpView, ContentNavView, SidebarView, ContentView){
+], function($, _, Backbone, ServerIpView, ServerInfoView, ContentNavView, SidebarView, ContentView){
 
     var IndexView = Backbone.View.extend({
-
-        el: $('#container'),
 
         initialize: function () {
             _.bindAll(this, 'render', 'close');
             this.serverIpView = new ServerIpView();
+            this.serverInfoView = new ServerInfoView();
             this.contentNavView = new ContentNavView();
-            this.sidebarView = new SidebarView();
             this.contentView = new ContentView();
         },
 
         render: function () {
-            console.log('rendering index view');
 
-            this.serverIpView.render();
-            this.contentNavView.render();
-            this.sidebarView.render();
-            this.$el.html(this.contentView.render());
+            $('#header-center').html( this.serverIpView.render() );
+
+            $('#server-info').html( this.serverInfoView.render() );
+
+            // TODO: Keep nav option selected after click event.
+            $('#content-nav').html( this.contentNavView.render() );
+
+            // Sidebar must be reinitialized.
+            this.sidebarView = new SidebarView();
+            $('#right-bar').html( this.sidebarView.render() );
+
+            // Populate current container with a subview.
+            return this.$el.html( this.contentView.render() );
         },
 
         close: function () {
             this.contentView.close();
         }
-
     });
 
     return IndexView;

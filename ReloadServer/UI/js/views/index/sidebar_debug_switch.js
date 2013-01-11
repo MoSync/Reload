@@ -15,29 +15,21 @@ define([
         },
 
         initialize: function (options) {
+
             this.parent = options.parent;
 
             _.bindAll(this, 'render', 'switchDebug');
 
-            this.model = new SidebarDebugSwitchModel();
-
-            var data = {};
-            this.compiledTemplate = _.template( switchTemplate, data );
+            this.compiledTemplate = _.template( switchTemplate, {} );
         },
 
         render: function () {
-            console.log('rendering debug switch');
-
-            this.$el.append( this.compiledTemplate );
+            return this.$el.html( this.compiledTemplate );
         },
 
         switchDebug: function () {
             var debug = this.$(this.debugSwitch).is(':checked');
-
-            this.model.set({ debug: debug });
             this.parent.debug = debug;
-
-            console.log(this.model.get('debug'));
         }
 
     });

@@ -1,0 +1,39 @@
+define([
+   'underscore',
+   'backbone'
+], function(_, Backbone){
+    var ServerInfoModel = Backbone.Model.extend({
+        initialize: function () {
+            _.bindAll(this, 'getServerInfo');
+            this.getServerInfo();
+        },
+
+        getServerInfo: function () {
+
+            var options     = {};
+            options.url     = 'http://localhost:8283';
+            options.rpcMsg  = {
+                method: 'manager.getVersionInfo',
+                params: [],
+                id:     null
+            };
+
+            var self = this;
+            options.success = function (resp) {
+                console.log('Got server info ' + resp.result);
+                var o = JSON.parse(resp.result);
+                self.set({ version: o.version });
+                self.set({ timestamp: o.timestamp });
+            };
+
+            options.error   = function (resp) {
+                console.log('could not get server info');
+                console.log(resp);
+            };
+
+            this.rpc(options);
+        }
+    });
+
+    return ServerInfoModel;
+});

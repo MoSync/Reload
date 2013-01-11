@@ -27,9 +27,8 @@ define([
         render: function () {
             console.log('rendering sidebar controls');
 
-            var data = { };
-            var compiledTemplate = _.template( sidebarControlsTemplate, data );
-            this.$el.append( compiledTemplate );
+            var compiledTemplate = _.template( sidebarControlsTemplate, {} );
+            return this.$el.html( compiledTemplate );
         },
 
         addProject: function (e) {

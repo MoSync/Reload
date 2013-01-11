@@ -15,42 +15,47 @@ define([
         },
 
         initialize: function (options) {
+
             this.parent = options.parent;
 
             _.bindAll(this, 'render', 'reload');
 
             this.model = new SidebarReloadButtonModel();
 
-            var data = {};
-            this.compiledTemplate = _.template( reloadButtonTemplate, data );
+            this.compiledTemplate = _.template( reloadButtonTemplate, {} );
         },
 
         render: function () {
             console.log('rendering jumbo button');
-
-            this.$el.append( this.compiledTemplate );
+            return this.$el.html( this.compiledTemplate );
         },
 
         reload: function () {
-            var options     = {};
-            options.url     = 'http://localhost:8283';
-            options.rpcMsg  = {
-                method: 'manager.reloadProject',
-                params: [this.parent.selectedProject.get('name'), this.parent.debug],
-                id: 0
-            };
 
-            options.success = function (resp) {
-                console.log('reload');
-                console.log(resp.result);
-            };
+            // Check if a project is selected.
+            if (this.parent.selectedProject === null) {
+                alert ('Please select a project first.');
+            } else {
+                var options     = {};
+                options.url     = 'http://localhost:8283';
 
-            options.error   = function (resp) {
-                console.log('could not reload');
-                console.log(resp);
-            };
+                options.rpcMsg  = {
+                    method: 'manager.reloadProject',
+                    params: [this.parent.selectedProject.get('name'), this.parent.debug],
+                    id: 0
+                };
 
-            this.model.rpc(options);
+                options.success = function (resp) {
+                    console.log('reload');
+                    console.log(resp.result);
+                };
+
+                options.error   = function (resp) {
+                    console.log('could not reload');
+                    console.log(resp);
+                };
+                this.model.rpc(options);
+            }
         }
 
     });

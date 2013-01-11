@@ -8,35 +8,40 @@ define([
 
     var DevicesView = Backbone.View.extend({
 
-        el: $('#container'),
-
         timer: null,
 
         initialize: function () {
+
             _.bindAll(this, 'render', 'close', 'updateDeviceList');
 
             this.model = new DevicesModel();
         },
 
-        close: function () {
-            ////COMPLETELY UNBIND THE VIEW
-            //this.undelegateEvents();
-            //this.$el.removeData().unbind();
-
-            ////Remove view from DOM
-            //this.remove();
-            //Backbone.View.prototype.remove.call(this);
-
-            clearInterval(this.timer);
-            this.timer = null;
-        },
-
         render: function () {
+
+            // Update device list instantly on render so we don't have
+            // to wait for interval timer.
+            this.updateDeviceList();
 
             var self = this;
             this.timer = setInterval(function(){
                 self.updateDeviceList();
             }, 2000);
+        },
+
+        close: function () {
+
+            //COMPLETELY UNBIND THE VIEW
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+
+            //Remove view from DOM
+            this.remove();
+            Backbone.View.prototype.remove.call(this);
+
+            // Clear timer.
+            clearInterval(this.timer);
+            this.timer = null;
         },
 
         updateDeviceList: function() {
