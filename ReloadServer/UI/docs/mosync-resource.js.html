@@ -13,7 +13,7 @@
 <body onload="prettyPrint()">
 <div id="header_bar">
 		<h1>
-<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1</h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1.1</h1>
 		<small>JavaScript API Documentation</small>
 	</div>
 <div id="main_container">
@@ -40,6 +40,8 @@
 <p><a href="./_index.html">Keyword Index</a></p>
 
 <p><a href="./licenses.md.html">License</a></p>
+
+<p><a class="external" href="http://www.mobilesorcery.com/files/imports/doxygen/latest/html/index.html">C++ API Reference</a></p>
 
 	</div>
 	<div id="contents_div">
@@ -101,27 +103,36 @@
 
 <h1><a name="mosync.resource.sendRemoteLogMessage">mosync.resource.sendRemoteLogMessage</a></h1>
 
-<p>Send a log message to a remote server. This is a useful way
-to display debug info when developing/testing on a device.</p>
+<p>Send a log message to a remote server. This is useful for
+displaying debug info when developing/testing on a device.</p>
+
+<p>When using Reload, the Reload Client is set up to send log
+messages to the Reload Server. Nothing needs to be written
+or configured in C++ in this case.</p>
+
+<p>If you wish to implement your own logging handler, you do this
+in C++ by creating a subclass of class Wormhole::LogMessageListener,
+implementing method onLogMessage, and then setting the listener
+using Wormhole::ResourceMessageHandler::setLogMessageListener().
+See the implementation of the Reload Client for an example of this.</p>
 
 <p><strong>Parameters:</strong></p>
 
 <ul>
-<li>
-<strong>message</strong> The message to be sent, for example "Hello World".</li>
-<li>
-<strong>url</strong> Optional parameter the specifies the remove server
-to handle the log request, for example: "http://localhost:8282/log/".
+<li><p><strong>message</strong> The message to be sent, for example "Hello World".</p></li>
+<li><p><strong>url</strong> Optional string parameter that specifies url of the
+remote server that should handle the log request, for example:
+"http://localhost:8282/remoteLogMessage/"
 If this parameter is not supplied or set to null, "undefined" will
-be passed to the C++ message handler, and the url set in C++
-code will be used.</li>
+be passed to the C++ log message handler.</p></li>
 </ul>
 <h1><a name="mosync.rlog">mosync.rlog</a></h1>
 
-<p>Short alias for <a href="mosync-resource.js.html#mosync.resource.sendRemoteLogMessage">mosync.resource.sendRemoteLogMessage</a>.
-Set the url of the logging service in C++ code, then
-just use <a href="mosync-resource.js.html#mosync.rlog">mosync.rlog</a>("Hello World") in your JS code.
-"rlog" is short for "remote log".</p>
+<p>Short alias for <a href="mosync-resource.js.html#mosync.resource.sendRemoteLogMessage">mosync.resource.sendRemoteLogMessage</a>
+("rlog" is short for "remote log").
+If you use Reload, you can call <a href="mosync-resource.js.html#mosync.rlog">mosync.rlog</a> like this:
+<a href="mosync-resource.js.html#mosync.rlog">mosync.rlog</a>("Hello World");
+The log message will show up in the Reload user interface.</p>
 
 	</div>
 

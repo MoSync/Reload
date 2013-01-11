@@ -1,623 +1,80 @@
-<!--
-		Copyright (C) 2012  MoSync AB
-
-	  This program is free software: you can redistribute it and/or modify
-	  it under the terms of the GNU Affero General Public License as
-	  published by the Free Software Foundation, either version 3 of the
-	  License, or (at your option) any later version.
-
-	  This program is distributed in the hope that it will be useful,
-	  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	  GNU Affero General Public License for more details.
-
-	  You should have received a copy of the GNU Affero General Public License
-	  along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
-		Remove this if you use the .htaccess -->
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
-		<title>MoSync Reload</title>
-		<meta name="description" content="" />
-		<meta name="author" content="Ali Sarrafi" />
-		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
-		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
-		<link rel="shortcut icon" href="/favicon.ico" />
-		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-		<link rel="stylesheet" href="main.css"  charset="UTF-8"/>
-		<link rel="stylesheet" href="jquery-ui-1.8.16.custom.css"  charset="UTF-8"/>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Reload</title>
+<link rel="icon" href="icon.png">
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width">
 
-		<script language="JavaScript" charset="UTF-8" src="jquery-1.7.1.js"></script>
-		<script language="JavaScript" charset="UTF-8" src="jquery-ui-1.8.16.custom.min.js"></script>
-		<script language="JavaScript" charset="UTF-8">
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+<!-- Toggle Switch -->
+<link rel="stylesheet" href="css/toggle-switch.css">
 
-			$(function() {
-				$(".ui-tabs .ui-tabs-nav li").each(function() {
-					  $(this).prependTo($(this).parent());
-				});
+<!-- Prism Syntax Highlighter -->
+<link rel="stylesheet" href="lib/prism/prism.css">
+<script src="lib/prism/prism.js"></script>
 
-				$( "#tabs" ).tabs();
-			});
-			
-			var selectedProjectID = null;
-
-			var previousProjectID = null;
-			var currentProjectList = [];
-			var projectInProccess = [];
-			
-			$(document).ready(function() {
-				//$( "#weinreContainer" ).resizable({handles:"n"});
-				if ( !($.browser.webkit) ) {
+<script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 
 
-					$("#tabs").tabs( "remove" , "#tabs-weinre");
-					$("#tabs-weinre").remove();
-				    /*$("#tabList").append('<li class="tabNameContainer"><a href="#tabs-weinre">Weinre</a></li>');
 
-				    $("#tabContainer").append('<div id="tabs-weinre"><iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe></div>');		*/
-				}
+<!-- Load the js/main.js as our entry point -->
+<script data-main="js/main" src="js/vendor/require.js"></script>
 
-				$("#newProjectDialog").dialog({
-					autoOpen : false,
-					title : "Create New Project",
-					width : 450,
-					modal : true,
-					buttons : {
-						"Create" : function() {
-							var type = "web";
-							var rdolist = document.getElementsByName("projectType");
-							var newProjectName = document.getElementById("newProjectName");
-							if(rdolist[0].checked) {
-								type = "native";
-							}
-							if(newProjectName.value != "")
-							{
-								createNewProject(newProjectName.value, type);
-								$(this).dialog("close");
-							}
-							else
-							{
-								alert("Please enter A Project Name!")
-							}
-						},
-						"Cancel" : function() {
-							$(this).dialog("close");
-						}
-					},
-					close : function(event, ui) {
-					}
-				});
-				$("#renameDialog").dialog({
-					autoOpen : false,
-					title : "Rename Project",
-					width : 270,
-					modal : true,
-					buttons : {
-						"Change" : function() {
-							
-							var projectName = document.getElementById("newPrName").value;
-							/* check for correct project name
-							 * Valid project names must begin with a letter 
-							 * followed by zero or more alphanumeric values
-							 */
-							var re = new RegExp("^[a-zA-Z]{1}[a-zA-Z0-9_]*$", "g");
-							var match = projectName.match(re);
-							
-							if(match) {
-								
-								if ( $("#"+projectName).size() == 0 ) {
-									console.log("Valid project Name: Renaming Project to " + match);
-									renameProject( projectName );
-									$(this).dialog("close");
-								}
-								else
-									alert("There is already exists a project with name " + projectName);
-							}
-							else {
-								alert("Please enter a valid Project Name!")
-							}
-						},
-						"Cancel" : function() {
-							$(this).dialog("close");
-						}
-					},
-					close : function(event, ui) {
-					}
-				});
-				$("#ChangeWorkspaceDialog").dialog({
-					autoOpen : false,
-					title : "Change Workspace Path",
-					width : 400,
-					modal : true,
-					buttons : {
-						"Change" : function() {
-							var workspacePath = document.getElementById("workspacePath");
-							if(workspacePath.value != "")
-							{
-								changeWorkspace(workspacePath.value);
-								$(this).dialog("close");
-							}
-							else
-							{
-								alert("Please enter a path!")
-							}
-						},
-						"Cancel" : function() {
-							getWorkspacePath()
-							$(this).dialog("close");
-						}
-					},
-					close : function(event, ui) {
-					}
-				});
-				$("#aboutDialog").dialog({
-					autoOpen : false,
-					title : "About Reload",
-					height : 200,
-					width : 350,
-					modal : true,
-					buttons : {
-						"Close" : function() {
-							getWorkspacePath()
-							$(this).dialog("close");
-						}
-					},
-					close : function(event, ui) {
-					}
-				});
-
-			})
-
-			function getVersionInfo() {
-				$.getJSON("http://localhost:8282/getVersionInfo", function(data) {
-						var versionLabel = document.getElementById("reloadVersion");
-						versionLabel.innerHTML = data.version;
-						var timestampLabel = document.getElementById("reloadTimeStamp");
-						timestampLabel.innerHTML = data.timestamp;
-				});
-			}
-
-			function changeWorkspace(workspacePath) {
-				$.ajax({
-					url : "http://localhost:8282/changeWorkspace?" + workspacePath,
-					context : document.body,
-					success : function() {
-						getProjectList();
-						getWorkspacePath();
-					}
-				});
-			}
-
-			function createNewProject(projectName, projectType) {
-
-				$.ajax({
-					url : "http://localhost:8282/createProject?" + projectName + "?" + projectType,
-					context : document.body,
-					success : function() {
-						projectInProccess.pop(projectName);
-						console.log("successfully created new project");
-						getProjectList();
-					}
-				});
-			}
-			function renameProject(newPrName) {
-				$.ajax({
-					url : "http://localhost:8282/renameProject?" + selectedProjectID + "?" + newPrName,
-					context : document.body,
-					success : function() {
-						projectInProccess.pop(projectName);
-						console.log("successfully renamed project " + selectedProjectID + "to " + newPrName);
-						getProjectList();
-					}
-				});
-			}
-			function deleteProject(projectName) {
-				if( projectInProccess.indexOf(projectName) < 0 ) {
-					projectInProccess.push(projectName);
-					console.log("DELETING PROJECT: " + projectName);
-					$.ajax({
-						url : "http://localhost:8282/deleteProject?" + projectName,
-						success : function() {
-							projectInProccess.pop(projectName);
-							console.log("successfully deleted project " + projectName);
-							projectInProccess.pop(projectName);
-							//getProjectList();
-						}
-					});	
-				}
-				else
-					alert("The project is reserved for another procedure");
-			}
-			function getWorkspacePath() {
-				console.log("getting workspace path");
-				$.getJSON("http://localhost:8282/getWorkSpacePath", function(data) {
-						console.log("Worspacepath : " + data.path);
-						var workspacePathDiv = document.getElementById("workspacePath");
-						workspacePathDiv.value = data.path;
-				});
-			}
-			
-			function getServerAddress() {
-				$.ajax({
-					url : "http://localhost:8282/getAddress",
-					context : document.body,
-					success : function(data) {
-						var addressDiv = document.getElementById("ServerAddress");
-						if((data.indexOf("127.0.0.1") <0) &&(data.indexOf("error") < 0))
-						{
-							addressDiv.innerHTML = "Server Address:  " + String(data);
-							document.title = "MoSync Reload  " + String(data);
-						}
-						else
-						{
-							addressDiv.innerHTML = "Could not find the server address, <br> Please read it fro myour operating system.";
-						}
-					}
-				});
-			}
-
-			function reloadProject(projectURL, projectName) {
-				console.log(projectName);
-				$.ajax({
-					url : projectURL,
-					context : document.body,
-					success : function(data) {
-					}
-				});
-				if(previousProjectID != null) {
-					var projectLink = document.getElementById(previousProjectID);
-					projectLink.style.color = "#FFFFFF";
-				}
-				var projectLink = document.getElementById(projectName);
-				projectLink.style.color = "orange";
-				previousProjectID = projectName;
-			}
-
-			function openProjectFolder(projectName) {
-				$.ajax({
-					url : "http://localhost:8282/openProjectFolder?" + projectName,
-					context : document.body,
-					success : function(data) {
-						console.log("successfully openned the folder");
-					}
-				});
-			}
-
-			function updatePorjectList(data) {
-				currentProjectList = data;
-				var projectListContainer = document.getElementById("projectListContainer");
-				projectListContainer.innerHTML = "";
-				for(var i = 0; i < data.length; i++) {
-					var projectNameClass = ((i % 2) == 0) ? "projectContainerEven" : "projectContainerOdd";
-					projectListContainer.innerHTML += " " +
-						"<div class='" + projectNameClass + "' id='project2'> " +
-							//"<div class='projectIconContainer'> " +
-							//	"<img src='img/MoSync_Project_Icon.png' />" +
-							//"</div>" +
-							//selectedProjectID = document.getElementById
-							"<div class='projectNameContainer' id='" + data[i].name + "' onclick='createRenameProjectDialog(this.id)'>" + data[i].name + "</div>" +
-							"<div class='projectUpdateContainer'>" +
-								"<a href='#' onclick=\"reloadProject('" + data[i].url + "','" + data[i].name + "')\"><img src='img/ReloadOrange.png' /></a>" +
-							"</div>" +
-							"<div class='projectOpenContainer'>" +
-								"<a href='#' onclick=\"openProjectFolder('" + data[i].name + "')\"><img src='img/Magnifying_Glass.png'/></a>" +
-								"<a href='#' onclick=\"deleteProject('" + data[i].name + "')\" style=\"margin-left:10px;\"><img src='img/delete.png'/></a>" +
-							"</div>" +
-						"</div>";
-				}
-
-			}
+</head>
+<body>
+<!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
 
 
-			Array.prototype.exists = function(o) {
-				for(var i = 0; i < this.length; i++)
-				if(this[i].name == o.name) {
-					return true;
-				}
-				return false;
-			}
-			function isProjectListupdated(d) {
+<div id="main">
+    <div id="header">
+        <div id="header-left">
+            <a href="#"><img alt="" src="img/Reload-logo-top.png"></a>
+        </div>
+        <div id="header-right"><a alt="" href="http://www.mosync.com" target="_blank" title="MoSync's website"><img src="img/MoSync-logo-top.png"></a></div>
+        <div id="header-center" class="server-info">
+            SERVER IP: </div>
+    </div>
 
-				if((d.length == 0) || (currentProjectList.length == 0)) {
-					return true;
-				}
-				else if(d.length != currentProjectList.length)
-				{
-					return true;
-				}
-				for(var i = 0; i < d.length; i++) {
-					if(!currentProjectList.exists(d[i])) {
 
-						return true;
-					}
-				}
 
-				return false;
-			}
+    <section id="content">
+        <header id="content-nav">
+        </header>
 
-			function getProjectList() {
-				$.getJSON("http://localhost:8282/getProjects.JSON", function(data) {
-					if(isProjectListupdated(data)) {
-						updatePorjectList(data);
-					}
-				});
-			}
+        <div id="container">
 
-			function getClientsInfo()
-			{
-				$.getJSON("http://localhost:8282/getClientsInfo.JSON", function(data) {
-					var clientList = document.getElementById("clientList");
-					clientList.innerHTML = "";
-					if(data)
-					{
+        </div>
 
-						for(var key = 0; key < data.length; key ++)
-						{
-							if(data[key] != undefined)
-							{
-								clientList.innerHTML +=
-									"<div class='clientInfoContainer'>" +
-										"<div class='clientAddressContainer'> Address: " + data[key].address + "</div>" +
-										"<div class='clientPlatofrmContainer'>Platform: " + data[key].platform + "</div>" +
-										"<div class='clientVersionContainer'> Platform Version: " + data[key].version + "</div>" +
-									"</div>";
-							}
-						}
-					}
-				});
-			}
 
-			function getDebugData() {
-				$.getJSON("http://localhost:8282/getDebugData", function(debugdata) {
-					var contentDiv = document.getElementById("JSContentDiv");
-					if(debugdata) {
-						for(var i=0; i <= debugdata.length; i++) {
-							if(debugdata[i] != undefined)
-							{
-								var datasplit = debugdata[i].split("\n");
-								if (datasplit && datasplit.length >0)
-								{
-									for (var key = 0; key <= datasplit.length; key++) {
-										if (datasplit[key] != undefined)
-										{
-											if(datasplit[key].indexOf("Web Console") >= 0) {
-												contentDiv.innerHTML += datasplit[key] + "<br/>";
-												contentDiv.scrollTop += 20;
-											}
-										}
-									}
-								}
-								else
-								{
-									if(debugdata[i].indexOf("Web Console") >= 0) {
-										contentDiv.innerHTML += debugdata[i] + "<br/>";
-										contentDiv.scrollTop += 20;
-									}
-								}
-							}
-						}
-					}
-				});
-			}
 
-			function getRemoteLogData()
-			{
-				$.getJSON("http://localhost:8282/getRemoteLogData", function(logdata)
-				{
-					var contentDiv = document.getElementById("RemoteContentDiv");
-					if (logdata)
-					{
-						for (var i=0; i <= logdata.length; i++)
-						{
-							if (logdata[i] != undefined)
-							{
-								contentDiv.innerHTML += 
-									"<pre class=\"RemoteLogMessage\">" +
-									logdata[i] +
-									"</pre>";
-								contentDiv.scrollTop = contentDiv.scrollHeight;
-							}
-						}
-					}
-				});
-			}
+    </section>
 
-			function createProjectDialog() {
-				var dialog = $("#newProjectDialog");
-				dialog.dialog("open");
-			}
-			function createRenameProjectDialog(oldProjectName){
-				var dialog = $("#renameDialog");
-				selectedProjectID = oldProjectName;
-				var input = document.getElementById("newPrName");
-				input.value = oldProjectName;
-				input.focus();
-				input.select();
-				dialog.dialog("open");
-			}
-			function createAboutDialog() {
-				var dialog = $("#aboutDialog");
-				dialog.dialog("open");
-			}
 
-			function changeWorkspaceDialog() {
-				var dialog = $("#ChangeWorkspaceDialog");
-				dialog.dialog("open");
-			}
+    <section id="right-bar">
+    </section>
 
-			function startUpdatingPorjects() {
+</div>
 
-				window.setInterval(getProjectList, 1100);
-			}
+<!--
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.1.js"><\/script>')</script>
+        -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')</script>
 
-			function startGettingData() {
-				window.setInterval(getDebugData, 1500);
-				window.setInterval(getClientsInfo, 1500);
-				window.setInterval(getRemoteLogData, 1200);
-			}
+<!-- jQuery Dialog -->
+<script src="js/vendor/jquery-ui-1.8.16.custom.min.js"></script>
+<link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
 
-			function initialize() {
-				getVersionInfo();
-				getServerAddress();
-				startUpdatingPorjects();
-				getProjectList();
-				getWorkspacePath();
-				startGettingData();
-			}
-		</script>
-	</head>
-	<body onload="initialize()">
-		<div id="HeaderContainer">
-			<div id="MoSyncLogoContainer">
-				<div id="MoSyncLogoDiv">
-					<img src="img/Reload_Menubar_Logo.png" />
-				</div>
-			</div>
-			<div id="MenuBar">
-				<div id="MoSyncLogo">
-					<img src="img/MoSync_logo.png" width="80px" />
-				</div>
-				<div id="PoweredByDiv">
-					Powered By
-				</div>
-				<div id="infoDiv">
-					<a onclick="createAboutDialog()"><img src="img/info.png" width="48px" height="48px"/></a>
-				</div>
 
-			</div>
-		</div>
-		<div id="MainContainer">
-			<div id="sideBar">
-				<div id="projectsContainer">
-					<div id="projectDiv">
-						Projects
-					</div>
-					<div id="buttonDiv">
-						<a onclick="createProjectDialog()"><img src="img/button_new_project.png" /></a>
-					</div>
-					<div id="changeWorkSpaceContainer">
-						<div id="changeWorkspaceButton"  onclick="changeWorkspaceDialog()">
-							<div id="changeWorkspaceText">
-								Change Workspace
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="projectListContainer"></div>
-			</div>
-			<div id="mainContent">
-				<div id="menuBarShadow"></div>
-				<div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-					<div id="tabListContainer">
-						<ul id="tabList"  class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-							<li class="tabNameContainer">
-								<a href="#tabs-weinre">Weinre</a>
-							</li>
-							<li class="tabNameContainer">
-								<a href="#tabs-remote-log">Client Log</a>
-							</li>
-							<li class="tabNameContainer">
-								<a href="#tabs-js-log">Android Log</a>
-							</li>
-							<li class="tabNameContainer">
-								<a href="#tabs-network-info">Network Info</a>
-							</li>
-							<li class="tabNameContainer">
-								<a href="#tabs-api-documentation">API Docs</a>
-							</li>
-							<li class="tabNameContainer">
-								<a href="#tabs-welcome">Welcome</a>
-							</li>
-						</ul>
-					</div>
-					<div id="tabContainer">
-						
-						<div id="tabs-remote-log">
-							<div id="RemoteLogTitle">
-								Client Log&nbsp;&nbsp;(use <code>mosync.rlog("Log message")</code> in JavaScript)
-							</div>
-							<div id="RemoteContentDiv"></div>
-						</div>
-						<div id="tabs-js-log">
-							<div id="JSLogTitle">
-								Android Web Console Log (logcat):
-							</div>
-							<div id="JSContentDiv"></div>
-						</div>
-						<div id="tabs-network-info">
-							<div id="ServerAddress"></div>
-							<div id="MainClientListContainer">
-								<div id="ClientListTile">
-									Connected Clients:
-								</div>
-								<div id="clientList">
-
-								</div>
-							</div>
-						</div>
-						<div id="tabs-api-documentation">
-							<iframe id="docsFrame" src="docs/index.html"></iframe>
-						</div>
-						<div id="tabs-welcome">
-							<iframe id="WelcomeFrame" src="welcome/index.html"></iframe>
-						</div>
-						<div id="tabs-weinre">
-							<iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe>
-						</div>
-						
-					</div>
-				</div>
-			</div>
-			
-		</div>
-		<!--div id="weinreContainer" style="width: 100%; height:35px; background-color: #434343; clear:both; position:fixed; bottom:0px; left:0px; border-top: 5px solid #434343;">
-				<img src="img/button_expand.png"/>
-				<iframe id="weinreFrame" src="http://localhost:8080/client/" style="width: 100%; height:100%;"></iframe>
-		</div-->
-
-		
-
-		<div id="newProjectDialog" title="New widget">
-			<label>Project Type:</label>
-			<br/>
-			<br/>
-			<input type="radio" name="projectType" id="projectType" value="native" />
-			NativeUI Based
-			<br/>
-			<br/>
-			<input type="radio" name="projectType" id="projectType" checked="true" value="web" />
-			Web based
-			<br/>
-			<br/>
-			<br/>
-			<label>Project Name:</label>
-			<input type="text" name="newProjectName" id="newProjectName" class="text ui-widget-content ui-corner-all"/>
-			<br/>
-		</div>
-		<div id="renameDialog" title="Rename Project">
-			<label>Enter the new Project Name:</label>
-			<br/>
-			<br/>
-			<input type="text" name="newPrName" id="newPrName" class="text ui-widget-content ui-corner-all"	onfocus="this.select();"/>
-			<br/>
-		</div>
-		<div id="ChangeWorkspaceDialog" title="Change Workspace">
-			<label>Paste Workspace path here:</label>
-			<br/>
-			<br/>
-			<input type="text" name="workspacePath" id="workspacePath" class="text ui-widget-content ui-corner-all"	/>
-			<br/>
-		</div>
-		<div id="aboutDialog" title="About Reload">
-			<label id= "reloadVersion">MoSync Reload</label>
-			<br/>
-			<label id= "reloadTimeStamp"></label>
-			<br/>
-		</div>
-	</body>
+</body>
 </html>

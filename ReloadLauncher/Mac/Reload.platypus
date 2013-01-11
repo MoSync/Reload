@@ -15,9 +15,13 @@
 		<string>../../ReloadServer/bin</string>
 		<string>../../ReloadServer/build.dat</string>
 		<string>../../ReloadServer/MoSyncVersion.dat</string>
-		<string>../../ReloadServer/ReloadServer.js</string>
+		<string>../../ReloadServer/main.js</string>
 		<string>../../ReloadServer/templates</string>
 		<string>../../ReloadServer/UI</string>
+		<string>../../ReloadServer/application</string>
+		<string>../../ReloadServer/express</string>
+		<string>../../ReloadServer/lib</string>
+		<string>../../ReloadServer/node_modules</string>
 		<string>../../Licenses</string>
 	</array>
 	<key>Creator</key>
