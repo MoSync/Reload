@@ -755,9 +755,27 @@ void ReloadClient::showConErrorMessage(int errorCode)
 		"An error occurred during SSL negotiation." //SSL = -18;
 	};
 
-	//The errorCode is always a negative number, so we reverse it to
-	//index our C array
-	maAlert("RELOAD Error", errorMessages[-errorCode].c_str(), "OK", NULL, NULL);
+	const char* errorMessage;
+	char errorMessageBuffer[64];
+
+	// Check if the error code is an internal Reload code.
+	// In this case we use the above error messages.
+	if (errorCode <= 0 && errorCode >= -18)
+	{
+		// The errorCode is a negative number,
+		// so we reverse it to index our C array.
+		errorMessage = errorMessages[-errorCode].c_str();
+	}
+	else
+	{
+		// Otherwise, display the error code.
+		sprintf(errorMessageBuffer, "Reload error: %i", errorCode);
+		errorMessage = errorMessageBuffer;
+	}
+
+	LOG("@@@ RELOAD: showConErrorMessage: %s", errorMessage);
+
+	maAlert("RELOAD Error", errorMessage, "OK", NULL, NULL);
 }
 
 void ReloadClient::cancelDownload()
