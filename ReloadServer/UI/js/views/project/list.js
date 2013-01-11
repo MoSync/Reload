@@ -19,37 +19,46 @@ define([
 
             _.bindAll(this, 'render', 'appendProjectView');
 
-            this.compiledTemplate = _.template( projectListTemplate );
-            this.$el.append( this.compiledTemplate );
-
             this.projectList.on('add', this.appendProjectView);
             this.projectList.on('remove', this.render);
             this.projectList.on('reset', this.render);
         },
 
         render: function () {
-            console.log('rendered');
-            $('#projectListContainer').empty();
 
             var self = this;
             _(this.projectList.models).each(function (p) {
                 self.appendProjectView(p);
             }, this);
+
+            this.compiledTemplate = _.template( projectListTemplate );
+            return this.$el.html( this.compiledTemplate );
+        },
+
+        close: function () {
+            console.log('close plv');
+
+            //COMPLETELY UNBIND THE VIEW
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+
+            //Remove view from DOM
+            this.remove();
+            Backbone.View.prototype.remove.call(this);
         },
 
         appendProjectView: function (project) {
             var pv = new ProjectView({
                 model: project,
-                el: $('#projectListContainer'),
-                projectList: this.projectList
+                projectList: this.projectList,
+                parent: this.parent
             });
 
-            pv.render();
+            $('#projectListContainer').append( pv.render() );
         },
 
         selectProject: function (e) {
             e.preventDefault();
-            console.log('project selected');
 
             var self = this;
             var id = $(e.target).data('id');
@@ -61,7 +70,7 @@ define([
                     console.log(self.parent.debug);
 
                     project.set({ showControls: true });
-                    project.set({ debug: self.parent.debug });
+                    //project.set({ debug: self.parent.debug });
 
                     self.selectedProject = project;
                     self.parent.selectedProject = project;

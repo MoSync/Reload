@@ -12,47 +12,58 @@ define([
 
     var SidebarView = Backbone.View.extend({
 
-        el: $('#right-bar'),
         debug: false,
         selectedProject: null,
 
         initialize: function () {
-            _.bindAll(this, 'render', 'changePath');
-            this.collection = new ProjectCollection();
 
+            console.log('sidebar init');
+            _.bindAll(this, 'render', 'changePath');
+
+            this.collection = new ProjectCollection();
             this.collection.on('change:path', this.changePath);
         },
 
         render: function () {
 
-            var data = {};
-            var compiledTemplate = _.template( sidebarTemplate, data );
+            var compiledTemplate = _.template( sidebarTemplate, {} );
             this.$el.html( compiledTemplate );
 
             var sidebarReloadButtonView = new SidebarReloadButtonView({
-                el: this.el,
                 parent: this
             });
-            sidebarReloadButtonView.render();
+            this.$el.append( sidebarReloadButtonView.render() );
 
             var sidebarDebugSwitchView = new SidebarDebugSwitchView({
-                el: this.el,
                 parent: this
             });
-            sidebarDebugSwitchView.render();
+            this.$el.append( sidebarDebugSwitchView.render() );
 
             var sidebarControls = new SidebarControls({
-                el: this.el,
                 projectList: this.collection
             });
-            sidebarControls.render();
+            this.$el.append( sidebarControls.render() );
 
-            var projectListView = new ProjectListView({
-                el: this.el,
+            this.projectListView = new ProjectListView({
                 projectList: this.collection,
                 parent: this
             });
-            projectListView.render();
+            this.$el.append( this.projectListView.render() );
+
+            return this.$el;
+        },
+
+        close: function () {
+
+            this.projectListView.close();
+
+            //COMPLETELY UNBIND THE VIEW
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+
+            //Remove view from DOM
+            this.remove();
+            Backbone.View.prototype.remove.call(this);
         },
 
         changePath: function () {
@@ -78,7 +89,6 @@ define([
             };
 
             this.collection.rpc(options);
-
         }
     });
 

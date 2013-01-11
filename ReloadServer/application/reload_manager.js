@@ -12,8 +12,10 @@ var vars = require('./globals');
 var rpcFunctions = {
 
     add: function (a, b, sendResponse) {
-        
-        if(typeof sendResponse !== 'function') return false;
+
+        if (typeof sendResponse !== 'function') {
+            return false;
+        }
 
         var r = a + b;
         sendResponse({hasError: false, data: r});
@@ -24,15 +26,19 @@ var rpcFunctions = {
 
         var socket = net.createConnection(80, "www.google.com");
 
-        socket.on('connect', function() {
+        socket.on('connect', function () {
 
             vars.globals.ip = socket.address().address;
-            if(sendResponse !== undefined) sendResponse({hasError: false, data: vars.globals.ip});
+            if (sendResponse !== undefined) {
+                sendResponse({hasError: false, data: vars.globals.ip});
+            }
             socket.end();
         });
 
-        socket.on('error', function(e) {
-            if(sendResponse !== undefined) sendResponse({hasError: true, data: "Error in socket"});
+        socket.on('error', function (e) {
+            if (sendResponse !== undefined) {
+                sendResponse({hasError: true, data: "Error in socket"});
+            }
         });
     },
 
@@ -41,11 +47,13 @@ var rpcFunctions = {
         if( (typeof sendResponse !== 'function') && 
             (sendResponse !== undefined) ) return false;
 
-    	if(vars.globals.ip == null) {
-    		this.getIpFromSocket(sendResponse);
-    	}
-    	else {
-    		if(sendResponse !== undefined) sendResponse({hasError: false, data: vars.globals.ip});
+        if (vars.globals.ip === null) {
+            this.getIpFromSocket(sendResponse);
+        }
+        else {
+            if(sendResponse !== undefined) {
+                sendResponse({hasError: false, data: vars.globals.ip});
+            }
     	}
     },
 
@@ -216,24 +224,27 @@ var rpcFunctions = {
 
     removeProject: function (projectName, sendResponse) {
 
+        var responseSent = false;
         //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
+        if ((typeof sendResponse !== 'function') || projectName === "") {
+            return false;
+        }
 
         var projectPath = vars.globals.rootWorkspacePath +
                           vars.globals.fileSeparator +
                           projectName;
 
-        fs.removeRecursive = function (path,cb) {
+        removeRecursive = function (path, cb) {
             var self = this;
 
             fs.stat(path, function (err, stats) {
-                if(err) {
 
+                if (err) {
                     cb(err, stats);
                     return;
                 }
 
-                if(stats.isFile()) {
+                if (stats.isFile()) {
 
                     fs.unlink(path, function (err) {
                         if(err) {
@@ -245,13 +256,14 @@ var rpcFunctions = {
                         return;
                     });
                 }
-                else if(stats.isDirectory()) {
+                else if (stats.isDirectory()) {
                     // A folder may contain files
                     // We need to delete the files first
                     // When all are deleted we could delete the
                     // dir itself
                     fs.readdir(path, function (err, files) {
-                        if(err) {
+
+                        if (err) {
 
                             cb(err,null);
                             return;
@@ -267,10 +279,10 @@ var rpcFunctions = {
 
                             // We check the status
                             // and count till we r done
-                            if(f_length===f_delete_index) {
+                            if (f_length===f_delete_index) {
 
                                 fs.rmdir(path, function(err) {
-                                    if(err) {
+                                    if (err) {
                                         cb(err,null);
                                     }
                                     else {
@@ -282,9 +294,9 @@ var rpcFunctions = {
                             return false;
                         };
 
-                        if(!checkStatus()) {
+                        if (!checkStatus()) {
 
-                            for(var i=0;i<f_length;i++) {
+                            for (var i = 0; i < f_length; i++) {
 
                                 // Create a local scope for filePath
                                 // Not really needed, but just good practice
@@ -293,8 +305,8 @@ var rpcFunctions = {
                                     var filePath = path + vars.globals.fileSeparator + files[i];
                                     // Add a named function as callback
                                     // just to enlighten debugging
-                                    fs.removeRecursive(filePath, function removeRecursiveCB(err,status) {
-                                        if(!err) {
+                                    removeRecursive(filePath, function removeRecursiveCB(err, status) {
+                                        if (!err) {
 
                                             f_delete_index ++;
                                             checkStatus();
@@ -314,15 +326,22 @@ var rpcFunctions = {
             });
         };
 
-        fs.removeRecursive(projectPath, function (error, status){
+        removeRecursive(projectPath, function (error, status){
             if(!error) {
                 console.log("Succesfull deletion of directory " + projectPath);
-                sendResponse({hasError: false, data: "Succesfull deletion of project " + projectName});
+                if (!responseSent) {
+                    sendResponse({hasError: false, data: "Succesfull deletion of project " + projectName});
+                    responseSent = true;
+                }
+                
             }
             else {
                 console.log("Error in deletion of directory " + projectPath);
                 console.log("Error deleting project: " + error);
-                sendResponse({hasError: true, data: "Error deleting project: " + error});
+                if (!responseSent) {
+                    sendResponse({hasError: true, data: "Error deleting project: " + error});    
+                    responseSent = true;
+                }
             }
 
         });
@@ -506,7 +525,7 @@ var rpcFunctions = {
                 if(weinreDebug)
                     fs.writeFileSync(pathOfIndexHTML, originalIndexHTMLData, "utf8" );
             }
-
+            
             var bundleCommand = "bin\\win\\Bundle.exe";
 
             if (vars.globals.localPlatform.indexOf("darwin") >=0)
@@ -517,7 +536,7 @@ var rpcFunctions = {
             {
               bundleCommand = "bin/linux/Bundle";
             }
-
+            
             var command =  bundleCommand + " -in \"" + vars.globals.rootWorkspacePath +
                 vars.globals.fileSeparator + projectDir +
                 vars.globals.fileSeparator + "LocalFiles\" -out \"" +

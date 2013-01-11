@@ -14,8 +14,8 @@ define([
         },
 
         render: function () {
-
             var data = {};
+
             var compiledTemplate = _.template( contentTemplate, data );
             this.$el.html( compiledTemplate );
             return this.$el;

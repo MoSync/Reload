@@ -8,8 +8,6 @@ define([
 
     var LogView = Backbone.View.extend({
 
-        el: $('#container'),
-
         timer: null,
 
         initialize: function () {
@@ -18,6 +16,11 @@ define([
             this.model = new LogModel();
         },
         render: function () {
+
+            // Update log on render() so we don't have to wait for
+            // interval timer.
+            this.updateLog();
+
             var self = this;
             this.timer = setInterval(function(){
                 self.updateLog();
@@ -25,14 +28,15 @@ define([
         },
 
         close: function () {
-            ////COMPLETELY UNBIND THE VIEW
-            //this.undelegateEvents();
-            //this.$el.removeData().unbind();
+            //COMPLETELY UNBIND THE VIEW
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
 
-            ////Remove view from DOM
-            //this.remove();
-            //Backbone.View.prototype.remove.call(this);
+            //Remove view from DOM
+            this.remove();
+            Backbone.View.prototype.remove.call(this);
 
+            // Clear timer.
             clearInterval(this.timer);
             this.timer = null;
         },

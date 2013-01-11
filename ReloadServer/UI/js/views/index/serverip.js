@@ -8,8 +8,6 @@ define([
 
     var ServerIpView = Backbone.View.extend({
 
-        el: $('#header-center'),
-
         initialize: function () {
 
             _.bindAll(this, 'render');
@@ -22,7 +20,7 @@ define([
         render: function () {
             var data = { ip: this.model.get('ip') };
             var compiledTemplate = _.template( serverIpTemplate, data );
-            this.$el.html( compiledTemplate );
+            return this.$el.html( compiledTemplate );
         }
 
     });
