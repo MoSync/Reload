@@ -260,11 +260,6 @@ private:
 	LoadingScreen *mLoadingScreen;
 
 	/**
-	 * Custom handler for PhoneGap File API messages.
-	 */
-	ReloadFileHandler* mReloadFileHandler;
-
-	/**
 	 * true when an app is running, false if on the login screen.
 	 */
 	bool mRunningApp;
