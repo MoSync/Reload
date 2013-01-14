@@ -330,6 +330,22 @@ margin-top: auto;
     *zoom: 1;
 }
 
+.errorContainer {
+    background-color: #FFEBEB;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.RemoteErrorHeader {
+    color: red;
+}
+
+.RemoteErrorBody {
+    color: green;
+    padding-left: 35px;
+}
+
 /* ==========================================================================
    Print styles
    ========================================================================== */

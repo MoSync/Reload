@@ -47,12 +47,40 @@ define([
 
                 var msgs = $('<div>');
                 _(res).each(function(msg) {
-                    msgs.append(msg + '<br />');
-                });
 
-                //if(res.length !== 0) {
-                    //console.log(res);
-                //}
+                    if(msg.indexOf("Error") >= 0) {
+                        var errorHeader = msg.split(":",1);
+                        errorHeader[0] += ":";
+                        /*console.log("------------------------------");
+                        console.log(msg.indexOf(errorHeader[0]));
+                        console.log(errorHeader[0].length);
+                        console.log("------------------------------");*/
+                        console.log("------------------------------");
+                        console.log(errorHeader[0]);
+                        
+                        var errorBody = msg.substr( msg.indexOf(errorHeader[0]) + errorHeader[0].length );
+                        //var errorHeader = msg.substr( 0, msg.indexOf("Error:") + "Error:".length() );
+                        console.log(errorBody);
+                        console.log("------------------------------");
+
+                        /*var eh = document.createElement("span");
+                        eh.class = "RemoteErrorHeader";
+                        eh.innerHTML = errorHeader[0];
+
+                        var eb = document.createElement("span");
+                        eb.class = "RemoteErrorBody";
+                        eb.innerHTML = errorBody;*/
+
+                        msgs.append('<div class="errorContainer">' +
+                                    '<img src="http://www.iconhot.com/icon/png/ose-png/32/error-1.png" class="errorImg" />' + 
+                                    '<span class="RemoteErrorHeader">' + errorHeader[0] + '</span><br />' +
+                                    '<span class="RemoteErrorBody">' + errorBody + '</span><br />' +
+                                    '</div>' 
+                                    );
+                    } else {
+                        msgs.append(msg + '<br />');
+                    }
+                });
 
                 var compiledTemplate = _.template( logTemplate, { data: msgs.html() } );
                 self.$el.html( compiledTemplate );
