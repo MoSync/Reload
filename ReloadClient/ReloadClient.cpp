@@ -95,19 +95,12 @@ void ReloadClient::initializeWebView()
 	mInitialized = true;
 	createUI();
 	enableWebViewMessages();
-
-	// Initialize the message handler.
 	getMessageHandler()->initialize(this);
-	//getMessageHandler()->nativeUIEventsOff();
 
 	// Set the beep sound. This is defined in the
 	// Resources/Resources.lst file. You can change
 	// this by changing the sound file in that folder.
 	setBeepSound(BEEP_WAV);
-
-	// Show the WebView that contains the HTML/CSS UI
-	// and the JavaScript code.
-	getWebView()->setVisible(true);
 }
 
 void ReloadClient::initializeVariables()
@@ -605,6 +598,7 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
+	// Get path to app.
 	String fullAppPath = mFileUtil->getLocalPath() + mAppPath;
 
 	// Check that index.html exists.
@@ -616,19 +610,18 @@ void ReloadClient::loadSavedApp()
 	}
 	maFileClose(file);
 
-	// We want NativeUI events.
-	//getMessageHandler()->nativeUIEventsOn();
+	// Set path to the app's local files.
+	mFileUtil->setAppPath(fullAppPath);
 
 	// Open the page.
-	//showWebView();
-	//getWebView()->setBaseUrl(fullAppPath);
-	//getWebView()->openURL("index.html");
-	mFileUtil->setAppPath(fullAppPath);
-	getWebView()->setBaseUrl(fullAppPath);
-	showPage("index.html");
+	getWebView()->setVisible(true);
+	showWebView();
+	String baseURL = "file://" + fullAppPath;
+	getWebView()->setBaseUrl(baseURL);
+	getWebView()->openURL("index.html");
 
+	// Set status variables.
 	mHasPage = true;
-
 	mRunningApp = true;
 }
 

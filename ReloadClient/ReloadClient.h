@@ -42,7 +42,6 @@ MA 02110-1301, USA.
 
 #include "LoginScreen.h"
 #include "LoadingScreen.h"
-#include "ReloadFile.h"
 
 #include <yajl/YAJLDom.h>
 
