@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ReloadClient.cpp
  *
  *  Created on: Feb 27, 2012
- *      Author: Ali Sarrafi, Iraklis Rossis
+ *	  Author: Ali Sarrafi, Iraklis Rossis
  */
 
 #include "mastdlib.h"
@@ -95,19 +95,12 @@ void ReloadClient::initializeWebView()
 	mInitialized = true;
 	createUI();
 	enableWebViewMessages();
-
-	// Initialize the message handler.
 	getMessageHandler()->initialize(this);
-	//getMessageHandler()->nativeUIEventsOff();
 
 	// Set the beep sound. This is defined in the
 	// Resources/Resources.lst file. You can change
 	// this by changing the sound file in that folder.
 	setBeepSound(BEEP_WAV);
-
-	// Show the WebView that contains the HTML/CSS UI
-	// and the JavaScript code.
-	getWebView()->setVisible(true);
 }
 
 void ReloadClient::initializeVariables()
@@ -175,14 +168,6 @@ void ReloadClient::initializeFiles()
 
 void ReloadClient::createMessageHandlers()
 {
-	// Special handler for local file system messages.
-	// This is needed because applications are unpacked to temporary
-	// directories, and not in the application's root folder.
-	/*mReloadFileHandler = new ReloadFileHandler(
-		getMessageHandler()->getPhoneGapMessageHandler());
-	(getMessageHandler()->getPhoneGapMessageHandler())->
-		setFileHandler(mReloadFileHandler);*/
-
 	// Set the log message listener.
 	getMessageHandler()->setLogMessageListener(this);
 }
@@ -259,26 +244,26 @@ void ReloadClient::exit()
 static String SysLoadStringResource(MAHandle data)
 {
 	// Get size of data.
-    int size = maGetDataSize(data);
+	int size = maGetDataSize(data);
 
-    // Allocate space for text plus zero termination character.
-    char* text = (char*) malloc(size + 1);
-    if (NULL == text)
-    {
-    	return NULL;
-    }
+	// Allocate space for text plus zero termination character.
+	char* text = (char*) malloc(size + 1);
+	if (NULL == text)
+	{
+		return NULL;
+	}
 
-    // Read data.
-    maReadData(data, text, 0, size);
+	// Read data.
+	maReadData(data, text, 0, size);
 
-    // Zero terminate string.
-    text[size] = 0;
+	// Zero terminate string.
+	text[size] = 0;
 
-    String s = text;
+	String s = text;
 
-    free(text);
+	free(text);
 
-    return s;
+	return s;
 }
 
 /**
@@ -539,7 +524,7 @@ void ReloadClient::downloadBundle()
  */
 void ReloadClient::downloadCancelled(Downloader* downloader)
 {
-    LOG("@@@ RELOAD: downloadCancelled");
+	LOG("@@@ RELOAD: downloadCancelled");
 }
 
 /**
@@ -549,8 +534,8 @@ void ReloadClient::downloadCancelled(Downloader* downloader)
  */
 void ReloadClient::error(Downloader* downloader, int code)
 {
-    LOG("@@@ RELOAD: Downloader error: %d", code);
-    showConErrorMessage(code);
+	LOG("@@@ RELOAD: Downloader error: %d", code);
+	showConErrorMessage(code);
 }
 
 /**
@@ -560,53 +545,52 @@ void ReloadClient::error(Downloader* downloader, int code)
  */
 void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
 {
-    // Check that we have the expected bundle size.
-    int dataSize = maGetDataSize(data);
-    LOG("@@@ RELOAD: Received size: %d, expected size: %d", dataSize, mBundleSize);
-    if (dataSize < mBundleSize)
-    {
-    	maDestroyPlaceholder(mResourceFile);
+	// Check that we have the expected bundle size.
+	int dataSize = maGetDataSize(data);
+	LOG("@@@ RELOAD: Received size: %d, expected size: %d", dataSize, mBundleSize);
+	if (dataSize < mBundleSize)
+	{
+		maDestroyPlaceholder(mResourceFile);
 
-    	// TODO: Show LoginScreen or error message?
-    	// We should not try to download again, because
-    	// this could case an infinite download loop.
+		// TODO: Show LoginScreen or error message?
+		// We should not try to download again, because
+		// this could case an infinite download loop.
 
-    	return;
-    }
+		return;
+	}
 
-    // Clear old files.
-    clearAppsFolder();
+	// Clear old files.
+	clearAppsFolder();
 
-    // Set new app path.
-    char buf[1024];
-    sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
-    mAppPath = buf;
-    String fullPath = mFileUtil->getLocalPath() + mAppPath;
-    mReloadFileHandler->setLocalPath(fullPath);
+	// Set the new app path.
+	char buf[1024];
+	sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
+	mAppPath = buf;
 
-    // Extract files.
-    setCurrentFileSystem(data, 0);
-    int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
-    freeCurrentFileSystem();
-    maDestroyPlaceholder(mResourceFile);
+	// Extract files.
+	String fullPath = mFileUtil->getLocalPath() + mAppPath;
+	setCurrentFileSystem(data, 0);
+	int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
+	freeCurrentFileSystem();
+	maDestroyPlaceholder(mResourceFile);
 
-    // Load the app on success.
-    if (result > 0)
-    {
-    	// Save location of last loaded app.
-    	mFileUtil->writeTextToFile(
-    		mFileUtil->getLocalPath() + "LastAppDir.txt",
-    		mAppPath);
+	// Load the app on success.
+	if (result > 0)
+	{
+		// Save location of last loaded app.
+		mFileUtil->writeTextToFile(
+			mFileUtil->getLocalPath() + "LastAppDir.txt",
+			mAppPath);
 
-    	// Bundle was extracted, load the new app files.
-    	loadSavedApp();
-    }
-    else
-    {
-    	// TODO: Show LoginScreen or error message?
-    	// We should not try to download again, because
-    	// this could case an infinite download loop.
-    }
+		// Bundle was extracted, load the new app files.
+		loadSavedApp();
+	}
+	else
+	{
+		// TODO: Show LoginScreen or error message?
+		// We should not try to download again, because
+		// this could case an infinite download loop.
+	}
 }
 
 /**
@@ -614,6 +598,7 @@ void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
  */
 void ReloadClient::loadSavedApp()
 {
+	// Get path to app.
 	String fullAppPath = mFileUtil->getLocalPath() + mAppPath;
 
 	// Check that index.html exists.
@@ -625,19 +610,18 @@ void ReloadClient::loadSavedApp()
 	}
 	maFileClose(file);
 
-	// We want NativeUI events.
-	//getMessageHandler()->nativeUIEventsOn();
+	// Set path to the app's local files.
+	mFileUtil->setAppPath(fullAppPath);
 
 	// Open the page.
-	//showWebView();
-	//getWebView()->setBaseUrl(fullAppPath);
-	//getWebView()->openURL("index.html");
-	mFileUtil->setAppPath(fullAppPath);
-	getWebView()->setBaseUrl(fullAppPath);
-	showPage("index.html");
+	getWebView()->setVisible(true);
+	showWebView();
+	String baseURL = "file://" + fullAppPath;
+	getWebView()->setBaseUrl(baseURL);
+	getWebView()->openURL("index.html");
 
+	// Set status variables.
 	mHasPage = true;
-
 	mRunningApp = true;
 }
 
@@ -755,9 +739,27 @@ void ReloadClient::showConErrorMessage(int errorCode)
 		"An error occurred during SSL negotiation." //SSL = -18;
 	};
 
-	//The errorCode is always a negative number, so we reverse it to
-	//index our C array
-	maAlert("RELOAD Error", errorMessages[-errorCode].c_str(), "OK", NULL, NULL);
+	const char* errorMessage;
+	char errorMessageBuffer[64];
+
+	// Check if the error code is an internal Reload code.
+	// In this case we use the above error messages.
+	if (errorCode <= 0 && errorCode >= -18)
+	{
+		// The errorCode is a negative number,
+		// so we reverse it to index our C array.
+		errorMessage = errorMessages[-errorCode].c_str();
+	}
+	else
+	{
+		// Otherwise, display the error code.
+		sprintf(errorMessageBuffer, "Reload error: %i", errorCode);
+		errorMessage = errorMessageBuffer;
+	}
+
+	LOG("@@@ RELOAD: showConErrorMessage: %s", errorMessage);
+
+	maAlert("RELOAD Error", errorMessage, "OK", NULL, NULL);
 }
 
 void ReloadClient::cancelDownload()
