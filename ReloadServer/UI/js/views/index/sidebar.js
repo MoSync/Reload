@@ -5,10 +5,18 @@ define([
     'views/index/sidebar_reload_button',
     'views/index/sidebar_controls',
     'views/index/sidebar_debug_switch',
+    'views/index/sidebar_left_foot',
     'views/project/list',
     'collections/projects',
     'text!../../../templates/index/sidebar.html'
-], function($, _, Backbone, SidebarReloadButtonView, SidebarControls, SidebarDebugSwitchView, ProjectListView, ProjectCollection, sidebarTemplate){
+], function($, _, Backbone,
+            SidebarReloadButtonView,
+            SidebarControls,
+            SidebarDebugSwitchView,
+            SidebarLeftFootView,
+            ProjectListView,
+            ProjectCollection,
+            sidebarTemplate){
 
     var SidebarView = Backbone.View.extend({
 
@@ -49,6 +57,9 @@ define([
                 parent: this
             });
             this.$el.append( this.projectListView.render() );
+
+            var sidebarLeftFootView = new SidebarLeftFootView();
+            this.$el.append( sidebarLeftFootView.render() );
 
             return this.$el;
         },

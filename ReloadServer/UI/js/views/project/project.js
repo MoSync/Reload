@@ -9,6 +9,8 @@ define([
 
     var ProjectView = Backbone.View.extend({
 
+        tagName: 'li',
+
         initialize: function (options) {
 
             _.bindAll(this,
@@ -25,14 +27,14 @@ define([
 
             this.model.on('change', this.toggle);
 
+            this.id = (this.model.id !== undefined) ? this.model.id: this.model.cid;
+
             this.controls = _.template(controlsTemplate, {
-                id: this.id,
-                className: this.className
+                id: this.id
             });
 
             this.$controls = $(this.controls);
 
-            this.id = (this.model.id !== undefined) ? this.model.id: this.model.cid;
 
             this.compiledTemplate = _.template( projectTemplate, {
                 name: this.model.get('name'),
@@ -63,9 +65,11 @@ define([
 
         control: function (e) {
             e.preventDefault();
-            console.log('hej');
+            console.log('control click');
             var command = $(e.target).data('command');
             var id = $(e.target).data('id');
+
+            console.log($(e.target));
 
             switch (command) {
             case 'reload':
