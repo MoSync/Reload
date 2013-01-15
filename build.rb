@@ -80,18 +80,28 @@ files_to_copy = [
   "ReloadServer/build.dat",
   "ReloadServer/MoSyncVersion.dat",
   "ReloadServer/node_modules"
-  
   ]
 
 
 main_dir = FileUtils.pwd
 
-FileUtils.cd "ReloadLauncher/Mac"
-if File.exist?("Reload.app")
-  FileUtils.rm_rf "Reload.app"
-end
-sh "platypus -y -P ./Reload.platypus ./Reload.app"
+sh "cp -r ReloadServer/* ReloadLauncher/Mac/cefclient/res/ReloadServer/"
 
+FileUtils.cd "ReloadLauncher/Mac"
+
+#Remove the previous package and foce xcode to build a new one
+if(File.exist?("xcodebuild/Release/Reload.app"))
+  FileUtils.rm_rf "xcodebuild/Release/Reload.app"
+end
+
+#Set the correct path to xcodebuild
+xcodebuild = "/Developer/usr/bin/xcodebuild";
+if(!File.exist?(xcodebuild))
+  xcodebuild = "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild"
+end
+
+# build Reload Mac Luancher
+sh "#{xcodebuild} -configuration Release -project Reload.xcodeproj"
 FileUtils.cd main_dir
 
 
@@ -103,7 +113,7 @@ FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/Android Client"
 FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/iOS Client"
 FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/WP7 Client"
 FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/Reload.app"
-FileUtils.cp_r "ReloadLauncher/Mac/Reload.app", "/Volumes/MoSync Reload (BETA)/"
+FileUtils.cp_r "ReloadLauncher/Mac/xcodebuild/Release/Reload.app", "/Volumes/MoSync Reload (BETA)/"
 
 puts "Copying Clients"
 FileUtils.cp_r "ReloadClient/Clients/Android", "/Volumes/MoSync Reload (BETA)/Android Client"

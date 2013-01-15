@@ -1,0 +1,36 @@
+Message: sidebar init
+Source: http://localhost:8283/js/views/index/sidebar.js
+Line: 20
+-----------------------
+Message: rendering jumbo button
+Source: http://localhost:8283/js/views/index/sidebar_reload_button.js
+Line: 29
+-----------------------
+Message: rendering sidebar controls
+Source: http://localhost:8283/js/views/index/sidebar_controls.js
+Line: 28
+-----------------------
+Message: Got server ip 192.168.0.120
+Source: http://localhost:8283/js/models/index/serverip.js
+Line: 23
+-----------------------
+Message: Got server info {"version":"MoSync Reload Version 1.0","timestamp":"130115-1200"}
+Source: http://localhost:8283/js/models/index/serverinfo.js
+Line: 23
+-----------------------
+Message: Got device info []
+Source: http://localhost:8283/js/models/devices/devices.js
+Line: 30
+-----------------------
+Message: 
+Source: http://localhost:8283/js/models/devices/devices.js
+Line: 34
+-----------------------
+Message: 
+Source: http://localhost:8283/js/models/log/log.js
+Line: 33
+-----------------------
+Message: Got project list
+Source: http://localhost:8283/js/collections/projects.js
+Line: 29
+-----------------------

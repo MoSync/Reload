@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaScript API Documentation</title>
+<link rel="stylesheet" type="text/css" href="./docbody.css">
+<link rel="stylesheet" type="text/css" href="./doc.css">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+<meta name="format-detection" content="false">
+<link rel="stylesheet" type="text/css" href="prettify/prettify.css">
+<script type="text/javascript" src="prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+<div id="header_bar">
+		<h1>
+<a href="index.html"><img src="./MoSync_logo.png"></a>MoSync 3.1.1</h1>
+		<small>JavaScript API Documentation</small>
+	</div>
+<div id="main_container">
+	<div id="sidebar">
+		<p><a href="./index.html">Home</a></p>
+
+<h2>Wormhole</h2>
+
+<ul>
+<li><a href="mosync-sensormanager.md.html#Sensor%20Manager">Sensor Manager</a></li>
+<li><a href="nativeui.md.html#Native%20UI">Native UI</a></li>
+<li><a href="pushnotifications.md.html#Push%20Notifications">Push Notifications</a></li>
+<li><a href="notification.md.html#Notification">Notification</a></li>
+<li><a href="accelerometer.md.html#Accelerometer">Accelerometer</a></li>
+<li><a href="compass.md.html#Compass">Compass</a></li>
+<li><a href="device.md.html#Device">Device</a></li>
+<li><a href="connection.md.html#Connection">Connection</a></li>
+<li><a href="capture.md.html#Capture">Capture</a></li>
+<li><a href="file.md.html#File">File</a></li>
+<li><a href="geolocation.md.html#Geolocation">Geolocation</a></li>
+<li><a href="storage.md.html#Storage">Storage</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
+</ul>
+<p><a href="./_index.html">Keyword Index</a></p>
+
+<p><a href="./licenses.md.html">License</a></p>
+
+<p><a class="external" href="http://www.mobilesorcery.com/files/imports/doxygen/latest/html/index.html">C++ API Reference</a></p>
+
+	</div>
+	<div id="contents_div">
+		<h1><a name="Native%20UI">Native UI</a></h1>
+
+<blockquote>
+  <p>Provides the ability to create Native User Interface through HTML and JavaScript.</p>
+</blockquote>
+
+<h2>Widget Creation</h2>
+
+<p>There are two different ways of creating <a href="nativeui.md.html#Native%20UI">Native UI</a> widgets. The first approach is to write HTML markups with custom attributes. The second way is to create the UI elements using JavaScript. Here we describe the usage of HTML markups in creating <a href="nativeui.md.html#Native%20UI">Native UI</a>. Please see <a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a> for details on creating widgets in JavaScript
+here is an example of a code that creates a Native User Interface on the device:</p>
+
+<pre class="prettyprint"><code>    &lt;div id="NativeUI"&gt;
+        &lt;!-- the element with id="mainScreen" is loaded to the device screen  by default --&gt;
+        &lt;div data-widgetType="TabScreen" id="mainScreen"&gt;
+            &lt;div data-widgetType="Screen" id="firstScreen" data-title="Web Screen" data-icon_iOS="img/TabIconWebView.png" &gt;
+                &lt;div data-widgetType="WebView" data-width="100%" data-height="100%" data-url="http://www.google.com"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div data-widgetType="Screen" id="SecondScreen" data-title="Widget Screen"&gt;
+                &lt;div data-widgetType="VerticalLayout" id="mainLayout" data-width="100%" data-height="100%"&gt;
+                    &lt;div data-widgetType="Label" id="myLabel" data-width="100%" data-text="Here is a Label" data-fontSize="19"&gt;&lt;/div&gt;
+                    &lt;div data-widgetType="Button" id="myButton" data-width="100%" data-text="Click !" data-onevent="alert('Clicked!')"&gt;&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+</code></pre>
+
+<p>All of the <a href="nativeui.md.html#Native%20UI">Native UI</a> widgets should be wrapped inside a div tag with id "NativeUI". The system picks everything inside that tag and creates Native widgets for each corresponding tag. You can specify the type of the Native widget with the attribute "data-widgetType" and also use other attributes to set the properties of the widgets. For more information on the available widget types, properties,  and valid values please see <a href="widgetTypes.md.html#Widget%20Types">Widget Types</a>, <a href="WidgetEvents.md.html#Widget%20Events">Widget Events</a>, and <a href="WidgetProps.md.html#Widget%20Properties">Widget Properties</a>.</p>
+
+<p><strong>Note:</strong>: You can skip the prefix "data-" in the attributes, the system supports both versions. When using a property in the JavaScript code, you should only use the properthy <a href="name.md.html#name">name</a> without the "data-" prefix.</p>
+
+<p><strong>Note:</strong> Using HTML markup on Windows Phone 7 is not recommended due to performance issues. </p>
+
+<h2>Icons</h2>
+
+<p>To use icons for your tabviews you can use special attributes to assign icons to the tabs. Valid attribute types for the icons are <strong>"data-icon_android"</strong>, <strong>"data-icon_iOS"</strong>, and <strong>"data-icon"</strong>.</p>
+
+<h2>Events</h2>
+
+<p>Currently we only support binding click events through HTML markup. In order to bind a function to the click event of your widget use the "data-onevent" attribute.</p>
+
+<h2>Accessing Widgets From JavaScript</h2>
+
+<p>To access the widgets created in HTML markup you can use <a href="mosync-nativeui.js.html#document.getNativeElementById">document.getNativeElementById</a> to get a object of Type <a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement">mosync.nativeui.NativeWidgetElement</a>. Here is an example of accessing one of the widgets defined above.</p>
+
+<pre class="prettyprint"><code>    // Get an instacne of the button created in the markup.
+    var myButton = <a href="mosync-nativeui.js.html#document.getNativeElementById">document.getNativeElementById</a>("myButton");
+    // Add an event listener to it.
+    myButton.addEventListener("Clicked", changeLabel);
+</code></pre>
+
+<h2>Links</h2>
+
+<ul>
+<li><a href="widgetTypes.md.html#Widget%20Types">Widget Types</a></li>
+<li><a href="WidgetEvents.md.html#Widget%20Events">Widget Events</a></li>
+<li><a href="WidgetProps.md.html#Widget%20Properties">Widget Properties</a></li>
+<li><a href="resource.md.html#Resource">Resource</a></li>
+</ul>
+<h2>JavaScript Methods</h2>
+
+<ul>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui">mosync.nativeui</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement">mosync.nativeui.NativeWidgetElement</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.setProperty">mosync.nativeui.NativeWidgetElement.setProperty</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.getProperty">mosync.nativeui.NativeWidgetElement.getProperty</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.addEventListener">mosync.nativeui.NativeWidgetElement.addEventListener</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.addChild">mosync.nativeui.NativeWidgetElement.addChild</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.insertChild">mosync.nativeui.NativeWidgetElement.insertChild</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.removeChild">mosync.nativeui.NativeWidgetElement.removeChild</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.addTo">mosync.nativeui.NativeWidgetElement.addTo</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.clone">mosync.nativeui.NativeWidgetElement.clone</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.show">mosync.nativeui.NativeWidgetElement.show</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.pushTo">mosync.nativeui.NativeWidgetElement.pushTo</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.pop">mosync.nativeui.NativeWidgetElement.pop</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.showDialog">mosync.nativeui.NativeWidgetElement.showDialog</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.NativeWidgetElement.hideDialog">mosync.nativeui.NativeWidgetElement.hideDialog</a></li>
+<li><a href="mosync-nativeui.js.html#document.getNativeElementById">document.getNativeElementById</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.create">mosync.nativeui.create</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.UIReady">mosync.nativeui.UIReady</a></li>
+<li><a href="mosync-nativeui.js.html#mosync.nativeui.initUI">mosync.nativeui.initUI</a></li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>
