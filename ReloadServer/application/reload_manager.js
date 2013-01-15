@@ -449,7 +449,7 @@ var rpcFunctions = {
             weinreDebug = debug;
         }
 
-        console.log("| Weinre Enabled:" + weinreDebug);
+        console.log("Weinre Enabled:" + weinreDebug);
 
         sendResponse({hasError: false, data: ""});
 
@@ -920,17 +920,18 @@ var rpcFunctions = {
                             projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
-            data = String(fs.readFileSync( indexHtmlPath, "utf8"));
+
+            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
 
         jsdom.env(
             data,
-            ["http://code.jquery.com/jquery.js"],
-            function (errors, window) {
+            ["http://code.jquery.com/jquery-1.8.3.js"],
+            function (errors, win) {
 
                 /**
                  * Get all embeded script tags
                  */
-                var embededScriptTags = window.$("script:not([class='jsdom']):not([src])");
+                var embededScriptTags = win.$("script:not([class='jsdom']):not([src])");
                 console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
                 for (var i = 0; i < embededScriptTags.length; i++) {
 
@@ -943,7 +944,7 @@ var rpcFunctions = {
                 /**
                  * Get all external js script files
                  */
-                var externalScriptFiles = window.$("script[src]:not([class='jsdom'])");
+                var externalScriptFiles = win.$("script[src]:not([class='jsdom'])");
                 console.log("--Debug Feature-- There was: " + externalScriptFiles.length + " external JS scripts found.");
 
                 for (var i = 0; i < externalScriptFiles.length; i++) {
@@ -974,23 +975,34 @@ var rpcFunctions = {
 
                 /**
                  * Get all elements that have inline js code
+                 * To add more tag attributes:
+                 *   - add the attribute name (lowercase in attrs)
+                 *   - add the atribute in jquery selector
                  */
-                 var inlineJsCode = window.$("[onclick]");
+
+                 var attrs = ["onclick", "onevent"];	// Attribute list
+                 var inlineJsCode = win.$("[onclick],[onEvent]"); // jQuery Selector
+
+
                  console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-                 var inlineCode = "";
 
                  for( var i = 0; i < inlineJsCode.length; i++) {
 
-                    inlineCode = inlineJsCode[0].getAttribute("onclick");
-                    inlineJsCode[i].setAttribute("onclick",  "try { \n eval(unescape(\"" +
+                 	for( var j = 0; j < attrs.length; j++) {
+
+                 		var inlineCode = inlineJsCode[i].getAttribute(attrs[j]);
+                 		if( inlineCode !== "" ) {
+                 			inlineJsCode[i].setAttribute(attrs[j],  "try { \n eval(unescape(\"" +
                                                             escape(inlineCode) +
-                                                            "\"));  \n } catch (e) { \nmosync.rlog(escape(e.stack)); \n};");
+                                                            "\")); \n } catch (e) { \nmosync.rlog(escape(e.stack)); \n};");
+                 		}
+                 	}
                  }
 
                  /**
                   * Write index.html file
                   */
-                fs.writeFileSync(indexHtmlPath, window.document.outerHTML, "utf8");
+                fs.writeFileSync(indexHtmlPath, win.document.outerHTML, "utf8");
 
                 callback();
             }
