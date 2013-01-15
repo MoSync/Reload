@@ -22,7 +22,9 @@ define([
                 timestamp: this.model.get('timestamp')
             };
             var compiledTemplate = _.template( serverInfoTemplate, data );
-            return this.$el.html( compiledTemplate );
+            this.$el.html( compiledTemplate );
+
+            $('#server-info').html( this.$el );
         }
     });
 

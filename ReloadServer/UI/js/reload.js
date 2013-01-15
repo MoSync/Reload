@@ -10,7 +10,6 @@ define([
         // Setup Backbone to send RPC messages.
         var rpc = {
             rpc: function (options) {
-                //var xhr =(this.sync || Backbone.sync).call(this, 'rpc', this, options);
                 (this.sync || Backbone.sync).call(this, 'rpc', this, options);
             }
         };

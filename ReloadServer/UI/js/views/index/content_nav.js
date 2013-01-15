@@ -8,24 +8,40 @@ define([
 
     var ContentNavView = Backbone.View.extend({
 
+        el: '<ul class="nav nav-tabs">',
+
+        events: {
+            'click ul.nav li': 'redrawTabs'
+        },
+
         initialize: function () {
-            _.bindAll(this, 'render');
+            _.bindAll(this, 'render', 'redrawTabs');
+        },
+
+        redrawTabs: function (e) {
+            $(e.target).parent().parent().children().each(function() {
+                console.log($(this));
+                if($(this).hasClass('active')) {
+                    $(this).removeClass('active');
+                }
+            });
+            $(e.target).parent().addClass('active');
         },
 
         render: function () {
-            var items = $('<li><a href="/#/editor">EDITOR</a></li>');
+            console.log('render menu');
+            var items = $('<li class="active"><a href="/#">Home</a></li>');
 
             // Weinre works only in webkit for now :(
             if ($.browser.webkit) {
-                items.append($('<li><a href="/#/debug">DEBUG</a></li>'));
+                items.append($('<li><a href="/#/debug">Debug</a></li>'));
             }
 
-            items.append($('<li><a href="/#/devices">DEVICES</a></li>'));
-            items.append($('<li><a href="/#/log">LOG</a></li>'));
-            items.append($('<li><a href="/#/docs">DOCS</a></li>'));
+            items.append($('<li><a href="/#/log">Log</a></li>'));
+            items.append($('<li><a href="/#/docs">Docs</a></li>'));
+            items.append($('<li class="pull-right"><a href="#">Send us feedback!</a></li>'));
 
-            var nav = $('<div>');
-            nav.append($('<ul>').append(items));
+            var nav = this.$el.html(items);
 
             var compiledTemplate = _.template( contentNavTemplate, { data: nav.html() } );
             return this.$el.html( compiledTemplate );
