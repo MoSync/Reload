@@ -50,36 +50,8 @@ define([
 
         render: function () {
 
-
             //var self = this;
             this.$el.modal('show');
-            //$(this.compiledTemplate).dialog({
-                //autoOpen : false,
-                //title : "Change Workspace Path",
-                //width : 400,
-                //modal : true,
-                //buttons : {
-                    //"Change" : function () {
-                        //var workspacePath = document.getElementById("workspacePath");
-                        //if (workspacepath.value !== "") {
-                            //self.projectlist.path = workspacepath.value;
-                            //// trigger 'change:path' evenet to execute rpc call
-                            //// in sidebar.js and persist changed path on server.
-                            //self.projectlist.trigger('change:path');
-                            //$(this).dialog("close");
-                            //$(this).remove();
-                        //} else {
-                            //alert("please enter a path!");
-                        //}
-                    //},
-                    //"Cancel" : function () {
-                        //$(this).dialog("close");
-                        //$(this).remove();
-                    //}
-                //},
-                //close : function (event, ui) {}
-            //}).dialog('open');
-
         }
 
     });

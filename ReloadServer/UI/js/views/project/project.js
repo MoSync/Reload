@@ -164,6 +164,7 @@ define([
                 console.log(resp.result);
                 self.projectList.remove(self.model);
                 self.projectList.rePopulate();
+                self.parent.selectedProject = null;
             };
 
             options.error   = function (resp) {

@@ -39,7 +39,7 @@ define([
 
             items.append($('<li><a href="/#/log">Log</a></li>'));
             items.append($('<li><a href="/#/docs">Docs</a></li>'));
-            items.append($('<li class="pull-right"><a href="#">Send us feedback!</a></li>'));
+            items.append($('<li class="pull-right"><a href="/#/feedback">Send us feedback!</a></li>'));
 
             var nav = this.$el.html(items);
 
