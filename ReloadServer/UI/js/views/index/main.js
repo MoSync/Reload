@@ -13,13 +13,12 @@ define([
 
         initialize: function () {
             _.bindAll(this, 'render', 'close');
-            this.contentNavView = new ContentNavView();
             this.contentView = new ContentView();
         },
 
         render: function () {
 
-            // TODO: Keep nav option selected after click event.
+            this.contentNavView = new ContentNavView();
             $('#content-nav').html( this.contentNavView.render() );
 
             this.sidebarView = new SidebarView();

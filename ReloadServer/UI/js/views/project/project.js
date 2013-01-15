@@ -90,6 +90,23 @@ define([
         },
 
         reloadProject: function () {
+            // TODO refactor reload function from
+            // sidebar_reload_button.js
+
+            // Check if a project is selected.
+            if (this.parent.selectedProject === null) {
+                alert ('Please select a project.');
+                return;
+            }
+
+            // TODO Make an extra pull for device list before trying to
+            // reload.
+            // Check if any devices are connected.
+            if (this.parent.deviceCount === 0) {
+                alert ('Please connect a device.');
+                return;
+            }
+
             console.log(this.model.get('name'));
             var options     = {};
             options.url     = 'http://localhost:8283';

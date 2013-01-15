@@ -6,11 +6,9 @@ define([
     'views/index/main',
     'views/editor/main',
     'views/debug/main',
-    'models/devices/devices',
-    'views/devices/main',
     'views/log/main',
     'views/docs/main'
-], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, DevicesModel, DevicesView, LogView, DocsView) {
+], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, LogView, DocsView) {
 
     var ReloadRouter = Backbone.Router.extend({
         initialize: function () {
@@ -40,7 +38,6 @@ define([
         views.indexView = new IndexView();
         views.editorView = new EditorView();
         views.debugView = new DebugView();
-        views.devicesView = new DevicesView();
         views.logView = new LogView();
         views.docsView = new DocsView();
 
@@ -58,10 +55,6 @@ define([
 
         router.on('route:showDebug', function () {
             viewHandler.show(views.debugView);
-        });
-
-        router.on('route:showDevices', function () {
-            viewHandler.show(views.devicesView);
         });
 
         router.on('route:showLog', function () {

@@ -14,7 +14,7 @@ define([
                 this.currentView = view;
                 this.currentView.render();
 
-                $('#container').html( this.currentView.el );
+                $('#content').html( this.currentView.el );
             }
         };
     };

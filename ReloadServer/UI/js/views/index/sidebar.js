@@ -22,10 +22,10 @@ define([
 
         debug: false,
         selectedProject: null,
+        deviceCount: 0,
 
         initialize: function () {
 
-            console.log('sidebar init');
             _.bindAll(this, 'render', 'changePath');
 
             this.collection = new ProjectCollection();
@@ -42,10 +42,10 @@ define([
             });
             this.$el.append( sidebarReloadButtonView.render() );
 
-            var sidebarDebugSwitchView = new SidebarDebugSwitchView({
-                parent: this
-            });
-            this.$el.append( sidebarDebugSwitchView.render() );
+            //var sidebarDebugSwitchView = new SidebarDebugSwitchView({
+                //parent: this
+            //});
+            //this.$el.append( sidebarDebugSwitchView.render() );
 
             var sidebarControls = new SidebarControls({
                 projectList: this.collection
@@ -58,7 +58,7 @@ define([
             });
             this.$el.append( this.projectListView.render() );
 
-            var sidebarLeftFootView = new SidebarLeftFootView();
+            var sidebarLeftFootView = new SidebarLeftFootView( {parent: this} );
             this.$el.append( sidebarLeftFootView.render() );
 
             return this.$el;

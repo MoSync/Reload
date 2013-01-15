@@ -10,7 +10,10 @@ define([
 
         timer: null,
 
-        initialize: function () {
+        initialize: function (options) {
+
+            console.log(options);
+            this.parent = options.parent;
 
             _.bindAll(this, 'render', 'close', 'updateDeviceList');
 
@@ -50,6 +53,9 @@ define([
             // Clear previous content to prevent endless accumulation of
             // HTML. TODO Prevent flickering.
             self.$el.empty();
+
+            self.parent.deviceCount = 0;
+
             this.model.getDevices(function(res) {
 
                 var data = {};
@@ -68,6 +74,8 @@ define([
 
                         var compiledTemplate = _.template( devicesTemplate, { data: data } );
                         self.$el.append( compiledTemplate );
+
+                        self.parent.deviceCount++;
                     });
                 }
 

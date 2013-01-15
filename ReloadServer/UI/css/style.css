@@ -2,6 +2,11 @@ html, body {
     height: 100%;
 }
 
+iframe {
+    border: 0;
+    height: 100%;
+}
+
 ul {
     list-style: none;
     margin: 0;
@@ -22,6 +27,10 @@ ul li {
     width: 300px;
     /*border-right: 1px solid rgb(225, 229, 235);*/
 }
+#bar-left-head {
+    background: #efefef;
+}
+
 #bar-left .nav-top {
     padding: 10px 0;
     background: rgb(238, 238, 238);
@@ -65,10 +74,21 @@ ul li {
     border-left: 1px solid rgb(184, 184, 184);
 }
 
+#main-content #content-nav {
+    display: table;
+}
+
+#main-content #content-nav ul {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 0;
+}
+
 #main-content #content {
-    background: #ccc;
+    background: #fff;
     position: relative; /* So codemirrors absolute positioning obeys its context*/
-    height: 60%;
+    height: 100%;
 }
 
 #main-content #console {
@@ -80,6 +100,7 @@ ul li {
 #main-content #console div.span12 {
     border-top: 1px solid rgb(221, 221, 221);
 }
+
 
 .fill {
     height: 100%;
@@ -166,7 +187,7 @@ ul#projects li a.select-project {
 .select-project ul {
     position: absolute;
     bottom: 10px;
-    right: 10px;
+    right: 0;
     padding: 0 !important;
 }
 .select-project ul li {
