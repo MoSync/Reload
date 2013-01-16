@@ -14,15 +14,14 @@ define([
 
             this.model = new ServerIpModel();
             this.model.on( 'change', this.render );
-
         },
 
         render: function () {
-            var data = { ip: this.model.get('ip') };
-            var compiledTemplate = _.template( serverIpTemplate, data );
-            return this.$el.html( compiledTemplate );
+            var compiledTemplate = _.template( serverIpTemplate, {
+                ip: this.model.get('ip')
+            });
+            $('#server-ip').html( this.$el.html( compiledTemplate ) );
         }
-
     });
 
     return ServerIpView;

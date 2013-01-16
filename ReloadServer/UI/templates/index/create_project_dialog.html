@@ -1,18 +1,41 @@
-<div id="new-project-dialog" title="New widget">
-    <label>Project Type:</label>
-    <br/>
-    <br/>
-    <input type="radio" name="projectType" id="projectType" value="native" />
-    NativeUI Based
-    <br/>
-    <br/>
-    <input type="radio" name="projectType" id="projectType" checked="true" value="web" />
-    Web based
-    <br/>
-    <br/>
-    <br/>
-    <label>Project Name:</label>
-    <input type="text" name="newProjectName" id="newProjectName" class="text ui-widget-content ui-corner-all"/>
-    <br/>
-</div>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Create New Project</h3>
+    </div>
+    <div class="modal-body">
 
+<form class="form-horizontal">
+
+    <div class="control-group">
+        <div class="control-label" for="project-name">Project Type</div>
+        <div class="controls">
+            <label class="radio inline">
+                <input type="radio" name="projectType" id="optionsRadios"
+                value="web" checked>
+                Web based
+            </label>
+            <label class="radio inline">
+                <input type="radio" name="projectType" id="optionsRadios"
+                value="native">
+                Native UI based
+            </label>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="project-name">Project Name</label>
+        <div class="controls">
+            <input type="text" name="project-name" id="project-name"
+            placeholder="Project Name" value="">
+        </div>
+    </div>
+
+</form>
+
+
+    <div class="modal-footer">
+        <button id="close" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button id="submit" class="btn btn-primary">Create Project</button>
+    </div>
+</div>

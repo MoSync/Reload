@@ -6,11 +6,10 @@ define([
     'views/index/main',
     'views/editor/main',
     'views/debug/main',
-    'models/devices/devices',
-    'views/devices/main',
     'views/log/main',
-    'views/docs/main'
-], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, DevicesModel, DevicesView, LogView, DocsView) {
+    'views/docs/main',
+    'views/feedback/main'
+], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, LogView, DocsView, FeedbackView) {
 
     var ReloadRouter = Backbone.Router.extend({
         initialize: function () {
@@ -24,6 +23,7 @@ define([
             'devices':  'showDevices',
             'log':      'showLog',
             'docs':     'showDocs',
+            'feedback': 'showFeedback',
 
             // Default
             '*actions': 'defaultAction'
@@ -40,9 +40,9 @@ define([
         views.indexView = new IndexView();
         views.editorView = new EditorView();
         views.debugView = new DebugView();
-        views.devicesView = new DevicesView();
         views.logView = new LogView();
         views.docsView = new DocsView();
+        views.feedbackView = new FeedbackView();
 
         var viewHandler = new ViewHandler();
         var router = new ReloadRouter();
@@ -60,15 +60,14 @@ define([
             viewHandler.show(views.debugView);
         });
 
-        router.on('route:showDevices', function () {
-            viewHandler.show(views.devicesView);
-        });
-
         router.on('route:showLog', function () {
             viewHandler.show(views.logView);
         });
         router.on('route:showDocs', function () {
             viewHandler.show(views.docsView);
+        });
+        router.on('route:showFeedback', function () {
+            viewHandler.show(views.feedbackView);
         });
         router.on('route:defaultAction', function (actions) {
             // We have no matching route, lets just log what the URL was
