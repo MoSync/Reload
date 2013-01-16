@@ -51,34 +51,25 @@ define([
                     if(msg.indexOf("Error") >= 0) {
                         var errorHeader = msg.split(":",1);
                         errorHeader[0] += ":";
-                        /*console.log("------------------------------");
-                        console.log(msg.indexOf(errorHeader[0]));
-                        console.log(errorHeader[0].length);
-                        console.log("------------------------------");*/
-                        console.log("------------------------------");
-                        console.log(errorHeader[0]);
-                        
+
                         var errorBody = msg.substr( msg.indexOf(errorHeader[0]) + errorHeader[0].length );
-                        //var errorHeader = msg.substr( 0, msg.indexOf("Error:") + "Error:".length() );
-                        console.log(errorBody);
-                        console.log("------------------------------");
-
-                        /*var eh = document.createElement("span");
-                        eh.class = "RemoteErrorHeader";
-                        eh.innerHTML = errorHeader[0];
-
-                        var eb = document.createElement("span");
-                        eb.class = "RemoteErrorBody";
-                        eb.innerHTML = errorBody;*/
 
                         msgs.append('<div class="errorContainer">' +
-                                    '<img src="http://www.iconhot.com/icon/png/ose-png/32/error-1.png" class="errorImg" />' + 
+                                    '<img src="http://localhost:8283/img/error32.png" class="errorImg" />' +
                                     '<span class="RemoteErrorHeader">' + errorHeader[0] + '</span><br />' +
                                     '<span class="RemoteErrorBody">' + errorBody + '</span><br />' +
-                                    '</div>' 
+                                    '</div>'
                                     );
                     } else {
-                        msgs.append(msg + '<br />');
+                        //msgs.append(msg + '<br />');
+                        //<img src="http://www.iconhot.com/icon/png/ose-png/32/error-1.png" class="errorImg" />
+                        //<img src="http://code.google.com/p/mosync/logo?cct=1322576702" class="rlogImg" />
+                        msgs.append('<div class="rlogContainer">' +
+                                    '<img src="http://localhost:8283/img/mosyncLogo.png" class="rlogImg" />' +
+                                    '<span class="rlogHeader">Remote Log</span><br />' +
+                                    '<span class="rlogBody">' + msg + '</span><br />' +
+                                    '</div>'
+                                    );
                     }
                 });
 
