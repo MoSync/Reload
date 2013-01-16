@@ -9,7 +9,7 @@ define([
     var ProjectListView = Backbone.View.extend({
 
         events: {
-            'click a.select-project': 'selectProject'
+            'click #projects li a': 'selectProject'
         },
 
         initialize: function (options) {
@@ -54,7 +54,7 @@ define([
                 parent: this.parent
             });
 
-            $('#projectListContainer').append( pv.render() );
+            $('#projects').append( pv.render() );
         },
 
         selectProject: function (e) {
@@ -63,6 +63,15 @@ define([
             var self = this;
             var id = $(e.target).data('id');
             var found = this.projectList.getByCid(id);
+
+            var p = $(e.target).parent().parent();
+            if (p.is('#projects')) {
+                p.children().each(function() {
+                    $(this).children().removeClass('select-project');
+                });
+
+                $(e.target).addClass('select-project');
+            }
 
             // Hide all controls first.
             _(this.projectList.models).each(function (project) {

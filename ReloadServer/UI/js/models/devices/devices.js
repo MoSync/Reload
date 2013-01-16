@@ -27,11 +27,9 @@ define([
 
             var self = this;
             options.success = function (resp) {
-                console.log('Got device info ' + resp.result);
                 _(JSON.parse(resp.result)).each(function (d) {
                     self.devices.push(d);
                 });
-                console.log(self.devices);
 
                 if (typeof(callback) === 'function') {
                     callback(self.devices);

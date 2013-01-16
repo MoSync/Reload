@@ -15,6 +15,9 @@ define([
             var data = {};
             console.log(debugTemplate);
             var compiledTemplate = _.template( debugTemplate, data );
+
+            console.log($('iframe').contents().find('#toolbar'));
+
             return this.$el.html( compiledTemplate );
         },
 

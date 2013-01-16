@@ -2,7 +2,8 @@ require.config({
     paths: {
         'jquery':     'vendor/jquery-1.7.2.min',
         'underscore': 'vendor/underscore-1.4.3.min',
-        'backbone':   'vendor/backbone-0.9.2.min'
+        'backbone':   'vendor/backbone-0.9.2.min',
+        'bootstrap':  'vendor/bootstrap.min'
     },
     // Define non AMD modules
     shim: {
@@ -10,7 +11,7 @@ require.config({
             exports: '_'
         },
         backbone: {
-            deps: ["underscore", "jquery"],
+            deps: ["underscore", "jquery", "bootstrap"],
             exports: "Backbone"
         }
     }
