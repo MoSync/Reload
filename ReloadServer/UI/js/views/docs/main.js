@@ -7,6 +7,8 @@ define([
 
     var DocsView = Backbone.View.extend({
 
+        name: 'docs',
+
         render: function () {
 
             console.log('render Docs VIEW');

@@ -70,11 +70,9 @@ define([
             id = t.data('id');
 
             if (t.is('span')) {
-
                 p = t.parent().parent().parent();
                 a = t.parent();
                 id = t.parent().data('id');
-
             }
 
             found = this.projectList.getByCid(id);

@@ -10,11 +10,14 @@ define([
 
         timer: null,
 
+        name: 'log',
+
         initialize: function () {
             _.bindAll(this, 'render', 'close', 'updateLog');
 
             this.model = new LogModel();
         },
+
         render: function () {
 
             // Update log on render() so we don't have to wait for

@@ -7,6 +7,8 @@ define([
 
     var FeedbackView = Backbone.View.extend({
 
+        name: 'feedback',
+
         events: {
             'click button.btn': 'submit'
         },

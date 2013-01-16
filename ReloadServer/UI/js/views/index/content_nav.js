@@ -11,35 +11,45 @@ define([
         el: '<ul class="nav nav-tabs">',
 
         events: {
-            'click ul.nav li': 'redrawTabs'
+            'click ul.nav li': 'setActive'
         },
 
         initialize: function () {
-            _.bindAll(this, 'render', 'redrawTabs');
+            _.bindAll(this, 'render', 'setActive');
         },
 
-        redrawTabs: function (e) {
-            $(e.target).parent().parent().children().each(function() {
-                console.log($(this));
-                if($(this).hasClass('active')) {
+        setActive: function (tab) {
+
+            // Clear old active tab before setting new tab as active.
+            this.$el.children().each(function() {
+                if ($(this).hasClass('active')) {
                     $(this).removeClass('active');
                 }
+
+                if ($(this).data('name') === tab) {
+                    $(this).addClass('active');
+                }
+
             });
-            $(e.target).parent().addClass('active');
+            if (typeof(tab) === 'object') {
+                $(tab.target).parent().addClass('active');
+            }
+            // Set new tab as active.
+            //$(e.target).parent().addClass('active');
         },
 
         render: function () {
             console.log('render menu');
-            var items = $('<li class="active"><a href="/#">Home</a></li>');
+            var items = $('<li data-name="index" class="active"><a href="/#">Home</a></li>');
 
             // Weinre works only in webkit for now :(
             if ($.browser.webkit) {
-                items.append($('<li><a href="/#/debug">Debug</a></li>'));
+                items.append($('<li data-name="debug"><a href="/#/debug">Debug</a></li>'));
             }
 
-            items.append($('<li><a href="/#/log">Log</a></li>'));
-            items.append($('<li><a href="/#/docs">Docs</a></li>'));
-            items.append($('<li class="pull-right"><a href="/#/feedback">Send us feedback!</a></li>'));
+            items.append($('<li data-name="log"><a href="/#/log">Log</a></li>'));
+            items.append($('<li data-name="docs"><a href="/#/docs">Docs</a></li>'));
+            items.append($('<li data-name="feedback" class="pull-right"><a href="/#/feedback">Send us feedback!</a></li>'));
 
             var nav = this.$el.html(items);
 
