@@ -7,9 +7,10 @@ define([
     'views/editor/main',
     'views/debug/main',
     'views/log/main',
+    'views/workbench/main',
     'views/docs/main',
     'views/feedback/main'
-], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, LogView, DocsView, FeedbackView) {
+], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, LogView, WorkbenchView, DocsView, FeedbackView) {
 
     var ReloadRouter = Backbone.Router.extend({
         initialize: function () {
@@ -22,6 +23,7 @@ define([
             'debug':    'showDebug',
             'devices':  'showDevices',
             'log':      'showLog',
+            'workbench':'showWorkbench',
             'docs':     'showDocs',
             'feedback': 'showFeedback',
 
@@ -41,6 +43,7 @@ define([
         views.editorView = new EditorView();
         views.debugView = new DebugView();
         views.logView = new LogView();
+        views.workbenchView = new WorkbenchView();
         views.docsView = new DocsView();
         views.feedbackView = new FeedbackView();
 
@@ -51,17 +54,17 @@ define([
         router.on('route:index', function () {
             viewHandler.show(views.indexView);
         });
-
         router.on('route:showEditor', function () {
             viewHandler.show(views.editorView);
         });
-
         router.on('route:showDebug', function () {
             viewHandler.show(views.debugView);
         });
-
         router.on('route:showLog', function () {
             viewHandler.show(views.logView);
+        });
+        router.on('route:showWorkbench', function () {
+            viewHandler.show(views.workbenchView);
         });
         router.on('route:showDocs', function () {
             viewHandler.show(views.docsView);
