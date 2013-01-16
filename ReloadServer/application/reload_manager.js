@@ -914,19 +914,23 @@ var rpcFunctions = {
     debugInjection: function (projectName, callback) {
 
         var self = this,
-            //projectName   = "jsdomTest",
             indexHtmlPath = vars.globals.rootWorkspacePath +
                             vars.globals.fileSeparator +
                             projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
+            data 	= String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
+            jquery 	= String(fs.readFileSync( process.cwd() + vars.globals.fileSeparator +
+            						  "lib" + vars.globals.fileSeparator + "jquery-1.8.3.min.js"));
 
-            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
-
-        jsdom.env(
-            data,
-            ["http://code.jquery.com/jquery-1.8.3.js"],
-            function (errors, win) {
+        /**
+         * Load the index.html file and parse it to a new window object
+         * including jQuery for accessing and manipulating elements
+         */
+        jsdom.env({
+        	html: data,
+        	src: [jquery],
+        	done: function (errors, win) {
 
                 /**
                  * Get all embeded script tags
@@ -1006,9 +1010,8 @@ var rpcFunctions = {
 
                 callback();
             }
-        );
-    }
-
+        });
+	}
 };
 
 // These functions are called for initialization

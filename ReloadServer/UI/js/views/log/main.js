@@ -61,7 +61,6 @@ define([
                                     '</div>'
                                     );
                     } else {
-                        //msgs.append(msg + '<br />');
                         //<img src="http://www.iconhot.com/icon/png/ose-png/32/error-1.png" class="errorImg" />
                         //<img src="http://code.google.com/p/mosync/logo?cct=1322576702" class="rlogImg" />
                         msgs.append('<div class="rlogContainer">' +
