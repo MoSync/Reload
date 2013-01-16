@@ -941,7 +941,7 @@ var rpcFunctions = {
 
                     embededScriptTags[i].innerHTML = "try { \n eval(unescape(\"" +
                                                      escape(embededScriptTags[i].innerHTML) +
-                                                     "\")); \n } catch (e) { \nmosync.rlog(escape(e.stack)); \n};";
+                                                     "\")); \n } catch (e) { \nmosync.rlog(escape(e.toString())); \n};";
                 }
 
 
@@ -966,7 +966,7 @@ var rpcFunctions = {
                                 var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
                                 jsFileData = "try { \n eval(unescape(\"" + escape(jsFileData) +
-                                              "\")); \n } catch (e) { \nmosync.rlog(escape(e.stack)); \n};";
+                                              "\")); \n } catch (e) { \nmosync.rlog(escape(e.toString())); \n};";
                                 fs.writeFileSync(scriptPath, jsFileData, "utf8");
                             }
 
@@ -998,7 +998,7 @@ var rpcFunctions = {
                  		if( inlineCode !== "" ) {
                  			inlineJsCode[i].setAttribute(attrs[j],  "try { \n eval(unescape(\"" +
                                                             escape(inlineCode) +
-                                                            "\")); \n } catch (e) { \nmosync.rlog(escape(e.stack)); \n};");
+                                                            "\")); \n } catch (e) { \nmosync.rlog(escape(e.toString())); \n};");
                  		}
                  	}
                  }
