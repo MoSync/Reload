@@ -60,24 +60,38 @@ define([
         selectProject: function (e) {
             e.preventDefault();
 
-            var self = this;
-            var id = $(e.target).data('id');
-            var found = this.projectList.getByCid(id);
+            var t, p, a, self, id, found;
 
-            var p = $(e.target).parent().parent();
+            t = $(e.target);
+            self = this;
+
+            p = t.parent().parent();
+            a = t;
+            id = t.data('id');
+
+            if (t.is('span')) {
+
+                p = t.parent().parent().parent();
+                a = t.parent();
+                id = t.parent().data('id');
+
+            }
+
+            found = this.projectList.getByCid(id);
+
             if (p.is('#projects')) {
                 p.children().each(function() {
                     $(this).children().removeClass('select-project');
+                    $(this).children().find('span').removeClass('project-name-clip');
                 });
 
-                $(e.target).addClass('select-project');
+                a.addClass('select-project');
+                a.find('span').addClass('project-name-clip');
             }
 
             // Hide all controls first.
             _(this.projectList.models).each(function (project) {
                 if (project === found) {
-                    console.log(self.parent.debug);
-
                     project.set({ showControls: true });
                     //project.set({ debug: self.parent.debug });
 

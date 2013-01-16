@@ -58,6 +58,13 @@ ul li {
     font-weight: bold;
     font-size: 18px;
 }
+#bar-left .project-name-clip {
+    width: 120px;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+}
+
 
 #bar-left a.btn-nostyle,
 #bar-left a.btn-nostyle:hover {

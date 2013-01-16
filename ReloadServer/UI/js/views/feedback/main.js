@@ -23,6 +23,8 @@ define([
                 // Send rpc call
                 // Say "Thank you" on success.
                 // Show error on failure.
+            } else {
+                alert('Please enter a message!');
             }
         },
 
