@@ -707,6 +707,14 @@ void ReloadClient::sendClientDeviceInfo()
 		deviceOSVersion
 		);
 
+	// Add header with command parameter and message size.
+	// Command 2 means JSON message.
+	String messageHeader =
+		Convert::intToHex(2) +
+		Convert::intToHex(strlen(buffer));
+
+	// Send header and then buffer.
+	mSocket.write(messageHeader.c_str(), messageHeader.length());
 	mSocket.write(buffer, strlen(buffer));
 }
 
@@ -825,6 +833,26 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 	// just call the url supplied using a REST convention.
 	if (0 == strcmp("undefined", url))
 	{
+#if(1)
+		// New method (TCP).
+
+		// Send the result back to the server as a JSON string
+		MAUtil::String messageString = Encoder::escape(message);
+		MAUtil::String json(
+			"{"
+			"\"message\":  \"remoteLogRequest\","
+			"\"params\": [   "
+				"\"" + messageString + "\""
+				"],"
+			"\"id\": 0"
+			"}");
+
+		mSocket.write(json.c_str(), json.length());
+#endif
+
+#if(0)
+		// Unused method (HTTP).
+
 		// Set URL for remote log service.
 		MAUtil::String messageString = message;
 		MAUtil::String json(
@@ -843,13 +871,14 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 		// Send request to server.
 		RemoteLogConnection* connection = new RemoteLogConnection();
 		connection->get(commandUrl.c_str());
+#endif
 	}
 	else
 	{
 		MAUtil::String urlString = url;
 
 		// Escape ("percent encode") the message.
-		MAUtil::String request = urlString + WebViewMessage::escape(message);
+		MAUtil::String request = urlString + Encoder::escape(message);
 
 		// Send request to server.
 		RemoteLogConnection* connection = new RemoteLogConnection();

@@ -181,3 +181,10 @@ int Convert::hexToInt(const char* input)
 
 	return v;
 }
+
+String Convert::intToHex(int input)
+{
+	char buffer[128];
+	snprintf(buffer, 128, "%08x", input);
+	return buffer;
+}

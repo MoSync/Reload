@@ -37,6 +37,7 @@ class Convert
 		static String toString(bool input);
 
 		static int hexToInt(const char* input);
+		static String intToHex(int input);
 };
 
 #endif /* CONVERT_H_ */

@@ -887,7 +887,7 @@ var rpcFunctions = {
 
         while(pathTemp.indexOf("%20") > 0) {
 
-            console.log(pathTemp.indexOf("%20"));
+            //console.log(pathTemp.indexOf("%20"));
             pathTemp = pathTemp.replace("%20", "\\ ");
         }
 
