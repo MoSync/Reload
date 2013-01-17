@@ -83,7 +83,9 @@ ul li {
 }
 
 #main-content #content-nav {
-    display: table;
+    height: 48px;
+    position: absolute;
+    top: 0;
 }
 
 #main-content #content-nav ul {
@@ -94,9 +96,10 @@ ul li {
 }
 
 #main-content #content {
+    position: absolute;
     background: #fff;
-    position: relative; /* So codemirrors absolute positioning obeys its context*/
-    height: 100%;
+    top: 48px;
+    bottom: 0;
 }
 
 #main-content #console {
@@ -108,7 +111,6 @@ ul li {
 #main-content #console div.span12 {
     border-top: 1px solid rgb(221, 221, 221);
 }
-
 
 .fill {
     height: 100%;
