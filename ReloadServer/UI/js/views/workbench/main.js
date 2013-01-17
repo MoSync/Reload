@@ -8,6 +8,8 @@ define([
 
     var WorkbenchView = Backbone.View.extend({
 
+        name: 'workbench',
+
         initialize: function() {
 
             _.bindAll(this,

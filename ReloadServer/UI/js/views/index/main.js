@@ -9,6 +9,8 @@ define([
 
     var IndexView = Backbone.View.extend({
 
+        name: 'index',
+
         initialize: function () {
             _.bindAll(this, 'render', 'close');
             this.contentView = new ContentView();
