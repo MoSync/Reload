@@ -42,7 +42,6 @@ MA 02110-1301, USA.
 
 #include "LoginScreen.h"
 #include "LoadingScreen.h"
-#include "ReloadFile.h"
 
 #include <yajl/YAJLDom.h>
 
@@ -258,11 +257,6 @@ private:
 	 * Class that handles the Loading screen UI.
 	 */
 	LoadingScreen *mLoadingScreen;
-
-	/**
-	 * Custom handler for PhoneGap File API messages.
-	 */
-	ReloadFileHandler* mReloadFileHandler;
 
 	/**
 	 * true when an app is running, false if on the login screen.

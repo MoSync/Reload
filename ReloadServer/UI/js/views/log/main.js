@@ -50,12 +50,30 @@ define([
 
                 var msgs = $('<div>');
                 _(res).each(function(msg) {
-                    msgs.append(msg + '<br />');
-                });
 
-                //if(res.length !== 0) {
-                    //console.log(res);
-                //}
+                    if(msg.indexOf("Error") >= 0) {
+                        var errorHeader = msg.split(":",1);
+                        errorHeader[0] += ":";
+
+                        var errorBody = msg.substr( msg.indexOf(errorHeader[0]) + errorHeader[0].length );
+
+                        msgs.append('<div class="errorContainer">' +
+                                    '<img src="http://localhost:8283/img/error32.png" class="errorImg" />' +
+                                    '<span class="RemoteErrorHeader">' + errorHeader[0] + '</span><br />' +
+                                    '<span class="RemoteErrorBody">' + errorBody + '</span><br />' +
+                                    '</div>'
+                                    );
+                    } else {
+                        //<img src="http://www.iconhot.com/icon/png/ose-png/32/error-1.png" class="errorImg" />
+                        //<img src="http://code.google.com/p/mosync/logo?cct=1322576702" class="rlogImg" />
+                        msgs.append('<div class="rlogContainer">' +
+                                    '<img src="http://localhost:8283/img/mosyncLogo.png" class="rlogImg" />' +
+                                    '<span class="rlogHeader">Remote Log</span><br />' +
+                                    '<span class="rlogBody">' + msg + '</span><br />' +
+                                    '</div>'
+                                    );
+                    }
+                });
 
                 var compiledTemplate = _.template( logTemplate, { data: msgs.html() } );
                 self.$el.html( compiledTemplate );

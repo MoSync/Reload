@@ -113,6 +113,9 @@ ul li {
     border-top: 1px solid rgb(221, 221, 221);
 }
 
+#weinre {
+    margin-top: 10px;
+}
 .fill {
     height: 100%;
     min-height: 100%;
@@ -223,4 +226,43 @@ ul#projects li a.select-project {
 .radio.inline {
     white-space: nowrap;
     margin-right: 10px;
+}
+
+/**
+ * Remote Log Panel CSS Styles
+ */
+.errorContainer {
+    background-color: #FFEBEB;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px #DDDDDD solid;
+    margin-bottom: 3px;
+}
+
+.RemoteErrorHeader {
+    color: red;
+}
+
+.RemoteErrorBody {
+    color: green;
+    padding-left: 35px;
+}
+
+.rlogContainer {
+	background-color: #EEEEEE;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px #DDDDDD solid;
+    margin-bottom: 3px;
+}
+
+.rlogHeader {
+    color: #0088cc;
+}
+
+.rlogBody {
+    color: #333333;
+    padding-left: 35px;
 }
