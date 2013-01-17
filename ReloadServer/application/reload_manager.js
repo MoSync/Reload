@@ -537,7 +537,7 @@ var rpcFunctions = {
             }
             console.log('Copy Process      : Successfull');
 
-            self.debugInjection(projectDir, function (){
+            //self.debugInjection(projectDir, function (){
 
                 try {
                     // WEINRE injection
@@ -607,7 +607,7 @@ var rpcFunctions = {
                 {
                     console.log("Error in bundleApp: " + err);
                 }
-            });
+            //});
         });
     },
 
