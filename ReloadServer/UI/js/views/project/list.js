@@ -17,7 +17,7 @@ define([
             this.projectList = options.projectList;
             this.parent = options.parent;
 
-            _.bindAll(this, 'render', 'appendProjectView');
+            _.bindAll(this, 'render', 'appendProjectView', 'makeSelection');
 
             this.projectList.on('add', this.appendProjectView);
             this.projectList.on('remove', this.render);
@@ -54,53 +54,36 @@ define([
                 parent: this.parent
             });
 
+            if (this.parent.selectedProject === project.get('name')) {
+                this.makeSelection(project.cid);
+            }
+
             $('#projects').append( pv.render() );
         },
 
         selectProject: function (e) {
             e.preventDefault();
-
-            var t, p, a, self, id, found;
-
+            var t, id;
             t = $(e.target);
-            self = this;
-
-            p = t.parent().parent();
-            a = t;
             id = t.data('id');
-
             if (t.is('span')) {
-                p = t.parent().parent().parent();
-                a = t.parent();
                 id = t.parent().data('id');
             }
+            this.makeSelection(id);
+        },
 
-            found = this.projectList.getByCid(id);
-
-            if (p.is('#projects')) {
-                p.children().each(function() {
-                    $(this).children().removeClass('select-project');
-                    $(this).children().find('span').removeClass('project-name-clip');
-                });
-
-                a.addClass('select-project');
-                a.find('span').addClass('project-name-clip');
-            }
-
-            // Hide all controls first.
+        makeSelection: function (id) {
+            var self = this;
+            var found = this.projectList.getByCid(id);
             _(this.projectList.models).each(function (project) {
                 if (project === found) {
                     project.set({ showControls: true });
-                    //project.set({ debug: self.parent.debug });
-
-                    self.selectedProject = project;
-                    self.parent.selectedProject = project;
+                    self.parent.selectedProject = project.get('name');
                 } else {
                     project.set({ showControls: false });
                 }
             });
         }
-
     });
 
     return ProjectListView;

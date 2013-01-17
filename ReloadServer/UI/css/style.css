@@ -29,13 +29,14 @@ ul li {
 }
 #bar-left-head {
     background: #efefef;
+    border-bottom: 1px solid rgb(206, 206, 206);
 }
 
 #bar-left .nav-top {
     padding: 10px 0;
     background: rgb(238, 238, 238);
     text-align: center;
-    border-top: 1px solid rgb(206, 206, 206);
+    border-top: 1px solid #fff;
     border-bottom: 1px solid rgb(227, 228, 227);
 
     background: #ededed; /* Old browsers */

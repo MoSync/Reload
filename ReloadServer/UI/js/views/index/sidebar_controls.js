@@ -75,7 +75,6 @@ define([
         },
 
         updateProjectList: function (e) {
-            console.log(e);
             e.preventDefault();
 
             console.log('Update project list');
