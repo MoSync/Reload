@@ -8,6 +8,11 @@ define([
 
     var CreateProjectDialog = Backbone.View.extend({
 
+        events: {
+            'click button#submit': 'submit',
+            'click button#close': 'close'
+        },
+
         initialize: function (options) {
 
             _.bindAll(this, 'render');
@@ -15,49 +20,45 @@ define([
             this.project = options.project;
 
             this.compiledTemplate = _.template( dialogTemplate, {} );
+            this.$el = $(this.compiledTemplate);
+        },
+
+        submit: function () {
+
+            var type = 'web';
+            var rdolist = document.getElementsByName("projectType");
+            if (rdolist[1].checked) {
+                type = "native";
+            }
+
+            var newProjectName = $('#project-name');
+
+            if (newProjectName.val().length !== 0) {
+
+                this.project.set({
+                    name: newProjectName.val(),
+                    type: type
+                });
+
+                this.close();
+            } else {
+                alert("Please enter a project name.");
+            }
+
+        },
+
+        close: function () {
+
+            // Don't remove until transition is complete.
+            this.$el.on('hidden', function () {
+                this.remove();
+            });
+
+            this.$el.modal('hide');
         },
 
         render: function () {
-
-            var self = this;
-
-            $(this.compiledTemplate).dialog({
-                autoOpen : false,
-                title : "Create New Project",
-                width : 450,
-                modal : true,
-                buttons : {
-                    "Create" : function () {
-                        var type = "web";
-                        var rdolist = document.getElementsByName("projectType");
-                        var newProjectName = document.getElementById("newProjectName");
-
-                        if (rdolist[0].checked) {
-                            type = "native";
-                        }
-
-                        if (newProjectName.value !== "") {
-
-                            self.project.set({
-                                name: newProjectName.value,
-                                type: type
-                            });
-
-                            $(this).dialog("close");
-                            $(this).remove();
-
-                        } else {
-                            alert("Please enter A Project Name!");
-                        }
-                    },
-                    "Cancel" : function () {
-                        $(this).dialog("close");
-                        $(this).remove();
-                    }
-                },
-                close : function (event, ui) {
-                }
-            }).dialog('open');
+            this.$el.modal('show');
         }
 
     });

@@ -1,83 +1,30 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!DOCTYPE HTML>
+<html>
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<title>Reload</title>
-<link rel="icon" href="icon.png">
-<meta name="description" content="">
-<meta name="viewport" content="width=device-width">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
 
-<link rel="stylesheet" href="css/normalize.min.css">
-<link rel="stylesheet" href="css/main.css">
-<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
-<!-- Toggle Switch -->
-<link rel="stylesheet" href="css/toggle-switch.css">
+    <!-- Load the js/main.js as our entry point -->
+    <script data-main="js/main" src="js/vendor/require.js"></script>
 
-<!-- Prism Syntax Highlighter -->
-<link rel="stylesheet" href="lib/prism/prism.css">
-<script src="lib/prism/prism.js"></script>
-
-<script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-
-
-
-<!-- Load the js/main.js as our entry point -->
-<script data-main="js/main" src="js/vendor/require.js"></script>
-
+    <!-- CodeMirror - Later use require (js/main.js) -->
+    <script src="js/vendor/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="js/vendor/codemirror/lib/codemirror.css">
+    <script src="js/vendor/codemirror/mode/javascript/javascript.js"></script>
+    
+    <title>Reload</title>
 </head>
 <body>
-<!--[if lt IE 7]>
-            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-        <![endif]-->
 
+<div id="wrap" class="fill">
+    <div id="bar-left" class="fill"></div>
 
-<div id="main">
-    <div id="header">
-        <div id="header-left">
-            <a href="#"><img alt="" src="img/Reload-logo-top.png"></a>
-        </div>
-        <div id="header-right">
-            <a alt="" href="http://www.mosync.com" target="_blank" title="MoSync's website"><img src="img/MoSync-logo-top.png"></a>
-        </div>
-        <div id="header-center" class="server-info">
-            SERVER IP: </div>
+    <div id="main-content" class="fill">
+        <div id="content-nav" class="row-fluid"></div>
+        <div id="content" class="row-fluid"></div>
     </div>
-
-
-
-    <section id="content">
-        <header id="content-nav">
-        </header>
-
-        <div id="container">
-
-        </div>
-        <div id="server-info"></div>
-
-
-
-    </section>
-
-
-    <section id="right-bar">
-    </section>
-
 </div>
-
-<!--
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.1.js"><\/script>')</script>
-        -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.7.2.min.js"><\/script>')</script>
-
-<!-- jQuery Dialog -->
-<script src="js/vendor/jquery-ui-1.8.16.custom.min.js"></script>
-<link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
-
 
 </body>
 </html>

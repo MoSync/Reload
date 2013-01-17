@@ -10,7 +10,10 @@ define([
 
         timer: null,
 
-        initialize: function () {
+        initialize: function (options) {
+
+            console.log(options);
+            this.parent = options.parent;
 
             _.bindAll(this, 'render', 'close', 'updateDeviceList');
 
@@ -47,32 +50,36 @@ define([
         updateDeviceList: function() {
 
             var self = this;
+            // Clear previous content to prevent endless accumulation of
+            // HTML. TODO Prevent flickering.
+            self.$el.empty();
+
+            self.parent.deviceCount = 0;
+
             this.model.getDevices(function(res) {
 
                 var data = {};
 
                 if(res.length === 0) {
 
-                    data = 'No clients connected.';
+                    self.$el.html( '<center>No clients connected.</center>' );
 
                 } else {
 
-                    var devices = $('<div>');
-
                     _(res).each(function(d){
-                        var device = $('<dl>');
-                        device.append($('<dt>Platform</dt><dd>'    + d.version + '</dd>'));
-                        device.append($('<dt>Name</dt><dd>'        + d.name + '</dd>'));
-                        device.append($('<dt>UUID</dt><dd>'        + d.uuid + '</dd>'));
-                        device.append($('<dt>Version</dt><dd>'     + d.version + '</dd>'));
-                        devices.append(device);
-                    });
+                        data.platform   = d.platform;
+                        data.name       = d.name;
+                        data.uuid       = d.uuid;
+                        data.version    = d.version;
 
-                    data = devices.html();
+                        var compiledTemplate = _.template( devicesTemplate, { data: data } );
+                        self.$el.append( compiledTemplate );
+
+                        self.parent.deviceCount++;
+                    });
                 }
 
-                var compiledTemplate = _.template( devicesTemplate, { data: data } );
-                self.$el.html( compiledTemplate );
+                $('#device-list').html( self.$el );
             });
         }
     });
