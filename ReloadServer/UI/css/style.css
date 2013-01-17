@@ -16,6 +16,7 @@ ul li {
 }
 
 #wrap {
+    min-width: 800px;
     width:100%;
     overflow:hidden;
 }
