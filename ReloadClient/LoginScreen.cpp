@@ -307,17 +307,17 @@ void LoginScreen::buttonClicked(Widget *button)
 
 	if(button == mServerConnectButton)
 	{
-		mReloadClient->connectTo(address.c_str());
+		mReloadClient->connectToServer(address.c_str());
 		mServerIPBox->hideKeyboard(); //Needed for iOS
 	}
 	else if(button == mServerDisconnectButton)
 	{
-		mReloadClient->disconnect();
+		mReloadClient->disconnectFromServer();
 	}
 	else if(button == mLoadLastAppButton)
 	{
 		//Just load whatever app we have already extracted
-		mReloadClient->loadSavedApp();
+		mReloadClient->launchSavedApp();
 	}
 	else if(button == mInfoIcon)
 	{

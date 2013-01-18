@@ -19,12 +19,11 @@ MA 02110-1301, USA.
 /**
  * @file ReloadClient.h
  *
- *  Created on: Feb 27, 2012
- *      Author: Ali Sarrafi, Iraklis Rossis
+ *  Author: Ali Sarrafi, Iraklis Rossis, Mikael Kindborg
  */
 
-#ifndef RELOADCLIENT_H_
-#define RELOADCLIENT_H_
+#ifndef MOSYNC_RELOAD_RELOADCLIENT_H
+#define MOSYNC_RELOAD_RELOADCLIENT_H
 
 #include <Wormhole/HybridMoblet.h>
 #include <Wormhole/MessageProtocol.h>
@@ -34,120 +33,149 @@ MA 02110-1301, USA.
 #include <Wormhole/Libs/JSNativeUI/NativeUIMessageHandler.h>
 #include <Wormhole/Libs/JSNativeUI/ResourceMessageHandler.h>
 #include <NativeUI/Widgets.h>
-#include <MAUtil/Connection.h>
 #include <wchar.h>
-#include "MAHeaders.h"
-#include <MAUtil/Downloader.h>
-#include <MAFS/File.h>		// Library for file system bundles
+#include <MAFS/File.h> // Library for file system bundles
+#include <yajl/YAJLDom.h>
 
 #include "LoginScreen.h"
 #include "LoadingScreen.h"
+#include "SocketHandler.h"
+#include "DownloadHandler.h"
+#include "MAHeaders.h"
 
-#include <yajl/YAJLDom.h>
-
+// Forward declarations.
 class LoginScreen;
 class LoadingScreen;
 
-// Namespaces we want to access.
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Wormhole library.
-using namespace MAUtil::YAJLDom; //Json Parser
-
 /**
- * The application class.
+ * The ReloadClient application class.
  */
 class ReloadClient :
-	public HybridMoblet,
-	public ConnectionListener,
-	public DownloadListener,
-	public LogMessageListener
+	public Wormhole::HybridMoblet,
+	public SocketHandlerListener,
+	public DownloadHandlerListener,
+	public Wormhole::LogMessageListener
 {
 public:
+	// ========== Creation and destruction ==========
+
+	/**
+	 * Constructor.
+	 */
 	ReloadClient();
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~ReloadClient();
 
+	/**
+	 * Creation/initialization.
+	 */
 	void initializeWebView();
 	void initializeVariables();
 	void initializeFiles();
-	void createMessageHandlers();
-	void createDownloader();
 	void createScreens();
+	void createMessageHandlers();
+	void createNetworkHandlers();
+
+	// ========== Implemented (inherited) methods  ==========
+
+	/**
+	 * Called from JavaScript when a Wormhole app has been loaded.
+	 */
+	virtual void openWormhole(MAHandle webViewHandle);
 
 	/**
 	 * This method is called when a key is pressed.
 	 * Forwards the event to PhoneGapMessageHandler.
 	 */
-	void keyPressEvent(int keyCode, int nativeCode);
+	virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
 	 * We want to quit the ReloadClient only if an app is not running.
 	 * This method is called from the WOrmhole library when a JavaScript
 	 * application requests to exit.
 	 */
-	void ReloadClient::exit();
+	virtual void exit();
 
 	/**
-	 * Called from JavaScript when a Wormhole app has been loaded.
+	 * Method in interface LogMessageListener.
 	 */
-	void openWormhole(MAHandle webViewHandle);
+	void onLogMessage(const char* message, const char* url);
 
-	//The socket->connect() operation has finished
-	void connectFinished(Connection *conn, int result);
-
-	//We received a TCP message from the server
-	void connRecvFinished(Connection *conn, int result) {}
+	// ========== SocketHandlerListener methods  ==========
+	/**
+	 * A connection to the server has been established.
+	 */
+	void socketHandlerConnected(int result);
 
 	/**
-	 * Helper function to get command and size from
-	 * the message header (two 32 bit numbers as
-	 * a hex string).
-	 * Header example: 0000000200000044
-	 * Command: 00000002
-	 * Size: 00000044
-	 * @param buffer
-	 * @param command
-	 * @param size
+	 * We received a message from the server.
 	 */
-	void getMessageCommandAndSize(
-		char* buffer,
-		int& command,
-		int& size);
+	void socketHandlerDisconnected(int result);
 
 	/**
-	 * Process a JSON message
+	 * We received a message from the server.
 	 */
-	void processJSONMessage(const MAUtil::String& jsonString);
+	void socketHandlerMessageReceived(const char* message);
 
-	void downloadHTML();
+	// ========== DownloadHandlerListener methods  ==========
 
-	//Download the bundle
-	void downloadBundle();
+	/**
+	 * Called on downloaded error.
+	 */
+	void downloadHandlerError(int code);
 
-    /**
-     * Called when a download operation is canceled
-     * @param downloader The downloader that was canceled
-     */
-    void downloadCancelled(Downloader* downloader);
+	/**
+	 * Called on download success. Note that we must destroy
+	 * the data object.
+	 */
+	void downloadHandlerSuccess(MAHandle data);
 
-    /**
-     * Method displays error code in case of error in downloading.
-     * @param downloader The downloader that got the error
-     * @param code The error code that was returned
-     */
-    void error(Downloader* downloader, int code);
+	// ========== Methods called from the UI  ==========
 
     /**
-     * Called when the download is complete
-     * @param downloader The downloader who finished it's operation
-     * @param data A handle to the data that was downloaded
+     * Called from the UI to cancel the download.
      */
-    void finishedDownloading(Downloader* downloader, MAHandle data);
+    void cancelDownload();
+
+    /**
+     * Open connection to the Reload server.
+     * @param serverAddress IP-address as a string.
+     */
+    void connectToServer(const char* serverAddress);
+
+    /**
+     * Disconnect from the Reload server.
+     */
+    void disconnectFromServer();
+
+    // ========== Server message handling  ==========
+
+	/**
+	 * Handle JSON messages.
+	 */
+	void handleJSONMessage(const MAUtil::String& json);
+
+	// ========== Download methods ==========
+
+	/**
+	 * Download an app bundle from the server.
+	 */
+	void downloadBundle(const String& urlData, int fileSize);
+
+	/**
+	 * Experimental method not used.
+	 */
+	// void downloadHTML();
+
+	// ========== Launching apps ==========
 
     /**
      * Loads the HTML files that were extracted last time.
      */
-    void loadSavedApp();
+    void launchSavedApp();
 
     /**
      * Resets the client (destroys widgets and stops sensors)
@@ -156,107 +184,48 @@ public:
     void freeHardware();
 
     /**
+     * Empty the folder where apps are stored.
+     */
+	void clearAppsFolder();
+
+	// ========== Send info to server  ==========
+
+    /**
+     * Sends information about the device to the server.
+     */
+    void sendClientDeviceInfo();
+
+    // ========== Helper methods ==========
+
+	/**
+	 * Send a TCP message to the server. Prepends the message
+	 * with the message length as an 8 char hex string.
+	 * @param message Message to send.
+	 */
+	void sendTCPMessage(const MAUtil::String& message);
+
+    /**
      * Get client info.
      * @return String with client info.
      */
 	MAUtil::String getInfo();
 
     /**
-     * Sends information about the device to the server
-     */
-    void sendClientDeviceInfo();
-
-    /**
-     * This method handles any connection error messages
-     * @param errorCode The error code that was returned
+     * This method handles any connection error messages.
+     * @param errorCode The error code that was returned.
      */
     void showConErrorMessage(int errorCode);
 
-    void cancelDownload();
-
-    void connectTo(const char *serverAddress);
-
-    void disconnect();
-
-	void connWriteFinished(Connection *conn, int result) {}
-
-	void connReadFinished(Connection *conn, int result);
-
-	void clearAppsFolder();
-
-	void deleteFolderRecurse(const char *path);
-
-	/**
-	 * Set the url to be used for remote log messages.
-	 * @param url The url to use for the remote logging service,
-	 * for example: "http://localhost:8282/log/"
-	 */
-	void setRemoteLogURL(const MAUtil::String& url);
-
-	/**
-	 * Method in interface LogMessageListener.
-	 */
-	void onLogMessage(const char* message, const char* url);
-
-	/**
-	 * This method parses and stores the JSON data received from server
-	 * @param jsonMessage The JSON message received from the server
-	 */
-	void parseJsonClientMessage(MAUtil::String jsonMessage);
-
 private:
-	/**
-	 * The TCP socket used for registering with the server
-	 * and listening for commands from the server.
-	 */
-	Connection mSocket;
-
-	/**
-	 * TODO: Document what this variable is used for.
-	 */
-	bool mHasPage;
-
-	/**
-	 * Buffer for TCP messages.
-	 * TODO: Should be allocated dynamically,
-	 * based on message size.
-	 */
-	char mBuffer[4096];
-
-	/**
-	 * Buffer for the bundle address.
-	 */
-	char mBundleAddress[512];
-
-	/**
-	 * Buffer for the bundle address.
-	 */
-	int mBundleSize;
-
-	/**
-	 * Server Message Command Size.
-	 */
-	int mServerCommand;
-
-	/**
-	 * Server Message Size.
-	 */
-	int mServerMessageSize;
-
-	/**
-	 * A pointer to a JSON Message Received from the server.
-	 */
-	Value* serverMessageJSONRoot;
-
 	/**
 	 * Class that handles the Login Screen UI.
 	 */
-	LoginScreen *mLoginScreen;
+	LoginScreen* mLoginScreen;
 
 	/**
 	 * Class that handles the Loading screen UI.
 	 */
-	LoadingScreen *mLoadingScreen;
+	LoadingScreen* mLoadingScreen;
 
 	/**
 	 * true when an app is running, false if on the login screen.
@@ -264,46 +233,49 @@ private:
 	bool mRunningApp;
 
 	/**
-	 * Used to download the app bundles.
+	 * TODO: Document what this variable is used for.
 	 */
-	Downloader *mDownloader;
-
-	/**
-	 * A placeholder that holds the bundle as it's
-	 * being downloaded.
-	 */
-	MAHandle mResourceFile;
+	bool mHasPage;
 
 	/**
 	 * The platform the client is running on.
 	 */
-	String mOS;
+	MAUtil::String mOS;
 
 	/**
 	 * The client information (version, timestamp).
 	 */
-	String mInfo;
+	MAUtil::String mInfo;
 
 	/**
 	 * The address of the server we are connected to.
 	 */
-	String mServerAddress;
-
-	/**
-	 * The TCP port we are connecting to.
-	 */
-	String mPort;
+	MAUtil::String mServerAddress;
 
 	/**
 	 * The general folder where app files reside.
 	 */
-	String mAppsFolder;
+	MAUtil::String mAppsFolder;
 
 	/**
 	 * The relative path to the downloaded app folder.
 	 */
-	String mAppPath;
+	MAUtil::String mAppPath;
 
+	/**
+	 * Expected size of the downloaded bundle.
+	 */
+	int mBundleSize;
+
+	/**
+	 * Object that handles socket connections.
+	 */
+	SocketHandler mSocketHandler;
+
+	/**
+	 * Object that handles downloads.
+	 */
+	DownloadHandler mDownloadHandler;
 };
 
-#endif /* RELOADCLIENT_H_ */
+#endif

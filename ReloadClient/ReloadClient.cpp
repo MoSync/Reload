@@ -30,16 +30,17 @@ MA 02110-1301, USA.
 
 #include "ReloadClient.h"
 #include "ReloadNativeUIMessageHandler.h"
-#include "Convert.h"
 #include "Log.h"
 
 #define SERVER_TCP_PORT "7000"
 #define SERVER_HTTP_PORT "8283"
 
 // Namespaces we want to access.
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
-using namespace Wormhole; // Wormhole library.
+using namespace MAUtil;
+using namespace NativeUI;
+using namespace Wormhole;
+
+// ========== Helper class ==========
 
 /**
  * Helper class for making a HTTP request for a remote log message.
@@ -67,8 +68,66 @@ public:
 	}
 };
 
-ReloadClient::ReloadClient() :
-	mSocket(this)
+/**
+ * Helper function to read a string resource.
+ */
+static String SysLoadStringResource(MAHandle data)
+{
+	// Get size of data.
+	int size = maGetDataSize(data);
+
+	// Allocate space for text plus zero termination character.
+	char* text = (char*) malloc(size + 1);
+	if (NULL == text)
+	{
+		return NULL;
+	}
+
+	// Read data.
+	maReadData(data, text, 0, size);
+
+	// Zero terminate string.
+	text[size] = 0;
+
+	String s = text;
+
+	free(text);
+
+	return s;
+}
+
+/**
+ * Helper function to delete a directory and its sub directories.
+ */
+static void DeleteFolderRecursively(const char *path)
+{
+	char fileName[128];
+	char fullPath[256];
+	//LOG("@@@ RELOAD: Deleting files in folder: %s", path);
+	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
+	int length = maFileListNext(list, fileName, 128);
+	while (length > 0)
+	{
+		sprintf(fullPath, "%s%s", path, fileName);
+		if (fileName[length-1] == '/')
+		{
+			DeleteFolderRecursively(fullPath);
+		}
+		MAHandle appDirHandle = maFileOpen(fullPath, MA_ACCESS_READ_WRITE);
+		if (maFileExists(appDirHandle))
+		{
+			//LOG("@@@ RELOAD: Deleting: %s", fileName);
+			maFileDelete(appDirHandle);
+		}
+		maFileClose(appDirHandle);
+		length = maFileListNext(list, fileName, 128);
+	}
+	maFileListClose(list);
+}
+
+// ========== Creation and destruction ==========
+
+ReloadClient::ReloadClient()
 {
 	// Initialize application.
 	// Order of calls are important as data needed by
@@ -78,7 +137,7 @@ ReloadClient::ReloadClient() :
 	initializeFiles();
 	createScreens();
 	createMessageHandlers();
-	createDownloader();
+	createNetworkHandlers();
 
 	// Show first screen.
 	mLoginScreen->showNotConnectedScreen();
@@ -106,9 +165,7 @@ void ReloadClient::initializeWebView()
 void ReloadClient::initializeVariables()
 {
 	mHasPage = false;
-	mPort = SERVER_TCP_PORT;
 	mAppsFolder = "apps/";
-	mServerCommand = 0;
 	mRunningApp = false;
 
 	// Get the OS we are on.
@@ -141,7 +198,8 @@ void ReloadClient::initializeFiles()
 		mAppPath = "";
 	}
 
-	// TODO: What is this?
+	// TODO: What is this? Some resource string?
+	// TODO: Use SysLoadStringResource(MAHandle data)
 	int size = maGetDataSize(INFO_TEXT);
 	if (size > 0)
 	{
@@ -153,7 +211,7 @@ void ReloadClient::initializeFiles()
 	}
 	else
 	{
-		maPanic(0, "RELOAD: Could not read info file");
+		maPanic(0, "RELOAD: Could not read INFO_TEXT");
 	}
 
 	// Get the most recently used server ip address.
@@ -166,20 +224,6 @@ void ReloadClient::initializeFiles()
 	}
 }
 
-void ReloadClient::createMessageHandlers()
-{
-	// Set the log message listener.
-	getMessageHandler()->setLogMessageListener(this);
-}
-
-void ReloadClient::createDownloader()
-{
-	// Create downloader object.
-	mDownloader = new Downloader();
-	mDownloader->addDownloadListener(this);
-	mDownloader->addDownloadListener(mLoadingScreen);
-}
-
 void ReloadClient::createScreens()
 {
 	// Create login screen and loading screen.
@@ -188,17 +232,38 @@ void ReloadClient::createScreens()
 	mLoadingScreen = new LoadingScreen(this);
 	mLoadingScreen->initializeScreen(mOS);
 
-	// Set the most recently used server ip address.
+	// Set the most recently used server IP address.
 	mLoginScreen->defaultAddress(mServerAddress.c_str());
 }
 
-/**
- * Get client info.
- * @return String with client info.
- */
-MAUtil::String ReloadClient::getInfo()
+void ReloadClient::createMessageHandlers()
 {
-	return mInfo;
+	// Set the log message listener.
+	getMessageHandler()->setLogMessageListener(this);
+}
+
+void ReloadClient::createNetworkHandlers()
+{
+	mDownloadHandler.setListener(this);
+	mDownloadHandler.addDownloadListener(mLoadingScreen);
+
+	mSocketHandler.setListener(this);
+}
+
+// ========== Implemented (inherited) methods  ==========
+
+/**
+ * Called from JavaScript when a Wormhole app has been loaded.
+ */
+void ReloadClient::openWormhole(MAHandle webViewHandle)
+{
+	// Apply customizations to functions loaded in wormhole.js.
+	String script = SysLoadStringResource(CUSTOM_JS);
+	script += "('" + mAppPath + "')";
+	callJS(webViewHandle, script.c_str());
+
+	// Call super class method to handler initialization.
+	HybridMoblet::openWormhole(webViewHandle);
 }
 
 /**
@@ -223,7 +288,7 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 
 /**
  * We want to quit the ReloadClient only if an app is not running.
- * This method is called from the WOrmhole library when a JavaScript
+ * This method is called from the Wormhole library when a JavaScript
  * application requests to exit.
  */
 void ReloadClient::exit()
@@ -241,53 +306,79 @@ void ReloadClient::exit()
 	}
 }
 
-static String SysLoadStringResource(MAHandle data)
+/**
+ * Log message handler.
+ */
+void ReloadClient::onLogMessage(const char* message, const char* url)
 {
-	// Get size of data.
-	int size = maGetDataSize(data);
-
-	// Allocate space for text plus zero termination character.
-	char* text = (char*) malloc(size + 1);
-	if (NULL == text)
+	// If the url is set to "undefined", we will use JsonRPC to
+	// send the log message to the Reload server. Otherwise, we
+	// just call the url supplied using a REST convention.
+	if (0 == strcmp("undefined", url))
 	{
-		return NULL;
+#if(1)
+		// New method (TCP).
+
+		// Send the result back to the server as a JSON string
+		MAUtil::String messageString = Encoder::escape(message);
+		MAUtil::String json(
+			"{"
+			"\"message\":\"remoteLogRequest\","
+			"\"params\":["
+				"\"" + messageString + "\""
+				"],"
+			"\"id\":0"
+			"}");
+
+		sendTCPMessage(json);
+#endif
+
+#if(0)
+		// Unused method (HTTP).
+
+		// Set URL for remote log service.
+		MAUtil::String messageString = message;
+		MAUtil::String json(
+			"{"
+			"\"method\":  \"client.remoteLog\","
+			"\"params\": [   "
+				"\"" + messageString + "\""
+				"],"
+			"\"id\": 0"
+			"}");
+
+		MAUtil::String commandUrl =
+			"http://" + mServerAddress + ":" + SERVER_HTTP_PORT +
+			"/proccess?jsonRPC=" + Encoder::escape(json);
+
+		// Send request to server.
+		RemoteLogConnection* connection = new RemoteLogConnection();
+		connection->get(commandUrl.c_str());
+#endif
 	}
+	else
+	{
+		MAUtil::String urlString = url;
 
-	// Read data.
-	maReadData(data, text, 0, size);
+		// Escape ("percent encode") the message.
+		MAUtil::String request = urlString + Encoder::escape(message);
 
-	// Zero terminate string.
-	text[size] = 0;
-
-	String s = text;
-
-	free(text);
-
-	return s;
+		// Send request to server.
+		RemoteLogConnection* connection = new RemoteLogConnection();
+		connection->get(request.c_str());
+	}
 }
 
-/**
- * Called from JavaScript when a Wormhole app has been loaded.
- */
-void ReloadClient::openWormhole(MAHandle webViewHandle)
-{
-	// Apply customizations to functions loaded in wormhole.js.
-	String script = SysLoadStringResource(CUSTOM_JS);
-	script += "('" + mAppPath + "')";
-	callJS(webViewHandle, script.c_str());
-
-	// Call super class method to handler initialization.
-	HybridMoblet::openWormhole(webViewHandle);
-}
+// ========== SocketHandlerListener methods  ==========
 
 /**
- * The socket->connect() operation has completed.
- * Socket is open if result > 0.
+ * A connection to the server has been established.
  */
-void ReloadClient::connectFinished(Connection *conn, int result)
+void ReloadClient::socketHandlerConnected(int result)
 {
 	if (result > 0)
 	{
+		// Tell UI we are connected.
 		mLoginScreen->connectedTo(mServerAddress.c_str());
 
 		// Save the server address.
@@ -295,10 +386,8 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 			mFileUtil->getLocalPath() + "LastServerAddress.txt",
 			mServerAddress);
 
+		// Send info about this device to the server.
 		sendClientDeviceInfo();
-
-		// Read header of next message sent from server.
-		mSocket.read(mBuffer,16);
 	}
 	else
 	{
@@ -307,113 +396,149 @@ void ReloadClient::connectFinished(Connection *conn, int result)
 }
 
 /**
- * We received a TCP message from the server.
+ * We received a message from the server.
  */
-void ReloadClient::connReadFinished(Connection *conn, int result)
+void ReloadClient::socketHandlerDisconnected(int result)
 {
-	// If the command is zero, we have a new header with
-	// command and size data.
-	if (mServerCommand == 0)
+	LOG("@@@ RELOAD: ERROR socketHandlerDisconnected: %i", result);
+
+	showConErrorMessage(result);
+
+	// Go back to the login screen.
+	mLoginScreen->showNotConnectedScreen();
+}
+
+/**
+ * We received a message from the server.
+ */
+void ReloadClient::socketHandlerMessageReceived(const char* message)
+{
+	if (NULL != message)
 	{
-		// Last two parameters are passed by reference to return
-		// the values for command and size.
-		getMessageCommandAndSize(
-			mBuffer,
-			mServerCommand,
-			mServerMessageSize);
+		LOG("@@@ RELOAD: socketHandlerMessageReceived JSON data: %s", message);
 
-		LOG("@@@ RELOAD: connReadFinished "
-			"mServerCommand: %d, mServerMessageSize: %d",
-			mServerCommand, mServerMessageSize);
-
-		// Read the message (JSON format).
-		mSocket.read(mBuffer, mServerMessageSize);
-	}
-	else if (mServerCommand > 0)
-	{
-		// What will this be used for?
-		if (mServerCommand == 1)
-		{
-			// TODO: Implement or remove.
-		}
-		// We have a JSON Message
-		else if (mServerCommand == 2)
-		{
-			// Null terminate the JSON string.
-			mBuffer[mServerMessageSize] = '\0';
-
-			LOG("@@@ RELOAD: connReadFinished JSON data: %s", mBuffer);
-
-			processJSONMessage(mBuffer);
-		}
-		else
-		{
-			maPanic(0,"RELOAD: Unknown server command");
-		}
-
-		// Reset server command.
-		mServerCommand = 0;
-
-		// Read the next TCP message header.
-		mSocket.read(mBuffer, 16);
-
+		handleJSONMessage(message);
 	}
 	else
 	{
-		LOG("@@@ RELOAD: ERROR connReadFinished result %d", result);
+		LOG("@@@ RELOAD: ERROR socketHandlerMessageReceived");
 
-		showConErrorMessage(result);
+		// TODO: Add error message.
+		//showConErrorMessage(result);
 
-		// Go back to the login screen on an error.
+		// Go back to the login screen.
 		mLoginScreen->showNotConnectedScreen();
 	}
 }
 
-/**
- * Helper function to get command and size from
- * the message header (two 32 bit numbers as
- * a hex string).
- * Header example: 0000000200000044
- * Command: 00000002
- * Size: 00000044
- * @param buffer
- * @param command
- * @param size
- */
-void ReloadClient::getMessageCommandAndSize(
-	char* buffer,
-	int& command,
-	int& size)
-{
-	char c = buffer[8];
-	buffer[8] = '\0';
-	command = Convert::hexToInt(buffer);
-	buffer[8] = c;
+// ========== DownloadHandlerListener methods  ==========
 
-	c = buffer[16];
-	buffer[16] = '\0';
-	size = Convert::hexToInt(buffer+8);
-	buffer[16] = c;
+void ReloadClient::downloadHandlerError(int code)
+{
+	LOG("@@@ RELOAD: Downloader error: %d", code);
+	showConErrorMessage(code);
 }
 
-/**
- * Process a JSON message
- */
-void ReloadClient::processJSONMessage(const String& jsonString)
+void ReloadClient::downloadHandlerSuccess(MAHandle data)
 {
-	// Parse the JSON string.
-	parseJsonClientMessage(jsonString);
+	// Check that we have the expected bundle size.
+	int dataSize = maGetDataSize(data);
+	LOG("@@@ RELOAD: Received size: %d, expected size: %d", dataSize, mBundleSize);
+	if (dataSize != mBundleSize)
+	{
+		maDestroyPlaceholder(data);
 
-	// Get the message field.
-	Value* jsonValue = serverMessageJSONRoot->getValueForKey("message");
-	MAUtil::String message = jsonValue->toString().c_str();
+		// TODO: Show LoginScreen or error message?
+		// We should not try to download again, because
+		// this could case an infinite download loop.
+
+		return;
+	}
+
+	// Delete old files.
+	clearAppsFolder();
+
+	// Set the new app path.
+	char buf[1024];
+	sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
+	mAppPath = buf;
+
+	// Extract files.
+	String fullPath = mFileUtil->getLocalPath() + mAppPath;
+	setCurrentFileSystem(data, 0);
+	int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
+	freeCurrentFileSystem();
+	maDestroyPlaceholder(data);
+
+	// Load the app.
+	if (result > 0)
+	{
+		// Save location of last loaded app.
+		mFileUtil->writeTextToFile(
+			mFileUtil->getLocalPath() + "LastAppDir.txt",
+			mAppPath);
+
+		// Bundle was extracted, launch the new app files.
+		launchSavedApp();
+	}
+	else
+	{
+		// TODO: Show LoginScreen or error message?
+		// We should not try to download again, because
+		// this could case an infinite download loop.
+	}
+}
+
+// ========== Methods called from the UI  ==========
+
+void ReloadClient::cancelDownload()
+{
+	mDownloadHandler.cancelDownload();
+	mLoginScreen->showConnectedScreen();
+}
+
+void ReloadClient::connectToServer(const char* serverAddress)
+{
+	mSocketHandler.connectToServer(serverAddress, SERVER_TCP_PORT);
+}
+
+void ReloadClient::disconnectFromServer()
+{
+	// Close the socket, and show the connect controls again.
+	mSocketHandler.closeConnection();
+	mLoginScreen->disconnected();
+}
+
+// ========== Server message handling  ==========
+
+/**
+ * Handle JSON messages.
+ */
+void ReloadClient::handleJSONMessage(const String& json)
+{
+	// Parse JSON data.
+	YAJLDom::Value* jsonRoot = YAJLDom::parse(
+		(const unsigned char*)json.c_str(),
+		json.size());
+
+	// Check that the root is valid.
+	if (NULL == jsonRoot
+		|| YAJLDom::Value::NUL == jsonRoot->getType()
+		|| YAJLDom::Value::MAP != jsonRoot->getType())
+	{
+		maPanic(0, "RELOAD: The JSON message format is incorrect");
+	}
+
+	// Get the message name.
+	YAJLDom::Value* jsonValue = jsonRoot->getValueForKey("message");
+	String message = jsonValue->toString().c_str();
 
 	// Download a bundle.
 	if (message == "ReloadBundle")
 	{
-		// Get fields.
-		String urlData = (serverMessageJSONRoot->getValueForKey("url"))->toString();
-		int fileSize = (serverMessageJSONRoot->getValueForKey("fileSize"))->toInt();
+		// Get message parameters.
+		String urlData = (jsonRoot->getValueForKey("url"))->toString();
+		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
 
 		// Check that we have valid file size field.
 		if (fileSize < 0 )
@@ -421,46 +546,10 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 			maPanic(0, "RELOAD: File size identifier not found");
 		}
 
-		// Create the request.
-		MAUtil::String jsonRequest("{"
-			"\"method\":  \"client.getBundle\","
-			"\"params\" : [   "
-				 "\"" + urlData + "\""
-				"],"
-			"\"id\": 1"
-			"}");
+		downloadBundle(urlData, fileSize);
 
-		LOG("@@@ RELOAD urlData: %s", urlData.c_str() );
-		LOG("@@@ RELOAD jsonRequest: %s", jsonRequest.c_str() );
-
-		MAUtil::String commandUrl =
-			"http://" + mServerAddress + ":" + SERVER_HTTP_PORT +
-			"/proccess?jsonRPC=" + Encoder::escape(jsonRequest);
-
-		// Save the bundle address.
-		strcpy(mBundleAddress, commandUrl.c_str());
-
-		// Save the file size.
-		mBundleSize = fileSize;
-
-		// Reset the app environment (destroy widgets, stop sensors).
-		freeHardware();
-
-		LOG("@@@ RELOAD: processJSONMessage before downloading bundle: "
-			"mBundleAddress=%s mBundleSize=%d",
-			mBundleAddress, mBundleSize);
-
-		// Download the bundle.
-		downloadBundle();
-
-		// Use this to use experimental HTML download.
-		// Needs divineprog/LiveApps/FileServer to work
-		// and manual config of BasePath.
-		// Comment out downloadBundle when testing this.
-		//downloadHTML();
-
-		// Delete Json tree.
-		YAJLDom::deleteValue(serverMessageJSONRoot);
+		// Delete the JSON tree.
+		YAJLDom::deleteValue(jsonRoot);
 	}
 	else
 	{
@@ -468,10 +557,53 @@ void ReloadClient::processJSONMessage(const String& jsonString)
 	}
 }
 
+// ========== Download methods ==========
+
+void ReloadClient::downloadBundle(const String& urlData, int fileSize)
+{
+	// Create download request.
+	MAUtil::String jsonRequest("{"
+		"\"method\":\"client.getBundle\","
+		"\"params\":["
+			 "\"" + urlData + "\""
+			"],"
+		"\"id\":1"
+		"}");
+
+	LOG("@@@ RELOAD urlData: %s", urlData.c_str() );
+	LOG("@@@ RELOAD jsonRequest: %s", jsonRequest.c_str() );
+
+	MAUtil::String url =
+		"http://" + mServerAddress + ":" + SERVER_HTTP_PORT +
+		"/proccess?jsonRPC=" + Encoder::escape(jsonRequest);
+
+	LOG("@@@ RELOAD: downloadBundle before downloading bundle: "
+		"url: %s fileSize: %d",
+		url.c_str(), fileSize);
+
+	// Save the file size so that we can verify the download.
+	mBundleSize = fileSize;
+
+	int result = mDownloadHandler.startDownload(url.c_str());
+	if (result > 0)
+	{
+		LOG("@@@ RELOAD: downloadBundle started with result: %d\n", result);
+
+		// Show the loading screen during downloading.
+		mLoadingScreen->show();
+	}
+	else
+	{
+		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
+		showConErrorMessage(result);
+	}
+}
+
 /**
  * New function called to download index.html from the server.
- * TODO: This is experimental code.
+ * TODO: This is experimental code. NOT USED.
  */
+/*
 void ReloadClient::downloadHTML()
 {
 	// Clear web view cache.
@@ -488,115 +620,14 @@ void ReloadClient::downloadHTML()
 	mHasPage = true;
 	mRunningApp = true;
 }
+*/
 
-void ReloadClient::downloadBundle()
-{
-	// Create a data object for the downloaded bundle.
-	mResourceFile = maCreatePlaceholder();
-
-	// Start the bundle download.
-	if (mDownloader->isDownloading())
-	{
-		return;
-		//mDownloader->cancelDownloading();
-	}
-
-	//Prepare a reciever for the download
-	mResourceFile = maCreatePlaceholder();
-	int result = mDownloader->beginDownloading(mBundleAddress, mResourceFile);
-	if (result > 0)
-	{
-		LOG("@@@ RELOAD: downloadBundle started with result: %d\n", result);
-
-		// Show the loading screen during downloading.
-		mLoadingScreen->show();
-	}
-	else
-	{
-		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
-		showConErrorMessage(result);
-	}
-}
-
-/**
- * Called when a download operation is canceled
- * @param downloader The downloader that was canceled
- */
-void ReloadClient::downloadCancelled(Downloader* downloader)
-{
-	LOG("@@@ RELOAD: downloadCancelled");
-}
-
-/**
- * Method displays error code in case of error in downloading.
- * @param downloader The downloader that got the error
- * @param code The error code that was returned
- */
-void ReloadClient::error(Downloader* downloader, int code)
-{
-	LOG("@@@ RELOAD: Downloader error: %d", code);
-	showConErrorMessage(code);
-}
-
-/**
- * Called when the download is complete
- * @param downloader The downloader who finished it's operation
- * @param data A handle to the data that was downloaded
- */
-void ReloadClient::finishedDownloading(Downloader* downloader, MAHandle data)
-{
-	// Check that we have the expected bundle size.
-	int dataSize = maGetDataSize(data);
-	LOG("@@@ RELOAD: Received size: %d, expected size: %d", dataSize, mBundleSize);
-	if (dataSize < mBundleSize)
-	{
-		maDestroyPlaceholder(mResourceFile);
-
-		// TODO: Show LoginScreen or error message?
-		// We should not try to download again, because
-		// this could case an infinite download loop.
-
-		return;
-	}
-
-	// Clear old files.
-	clearAppsFolder();
-
-	// Set the new app path.
-	char buf[1024];
-	sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
-	mAppPath = buf;
-
-	// Extract files.
-	String fullPath = mFileUtil->getLocalPath() + mAppPath;
-	setCurrentFileSystem(data, 0);
-	int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
-	freeCurrentFileSystem();
-	maDestroyPlaceholder(mResourceFile);
-
-	// Load the app on success.
-	if (result > 0)
-	{
-		// Save location of last loaded app.
-		mFileUtil->writeTextToFile(
-			mFileUtil->getLocalPath() + "LastAppDir.txt",
-			mAppPath);
-
-		// Bundle was extracted, load the new app files.
-		loadSavedApp();
-	}
-	else
-	{
-		// TODO: Show LoginScreen or error message?
-		// We should not try to download again, because
-		// this could case an infinite download loop.
-	}
-}
+// ========== Launching apps ==========
 
 /**
  * Loads the HTML files that were extracted last time.
  */
-void ReloadClient::loadSavedApp()
+void ReloadClient::launchSavedApp()
 {
 	// Get path to app.
 	String fullAppPath = mFileUtil->getLocalPath() + mAppPath;
@@ -609,6 +640,9 @@ void ReloadClient::loadSavedApp()
 		return;
 	}
 	maFileClose(file);
+
+	// Reset the app environment (destroy widgets, stop sensors).
+	freeHardware();
 
 	// Set path to the app's local files.
 	mFileUtil->setAppPath(fullAppPath);
@@ -650,8 +684,15 @@ void ReloadClient::freeHardware()
 	}
 }
 
+void ReloadClient::clearAppsFolder()
+{
+	DeleteFolderRecursively((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+}
+
+// ========== Send info to server  ==========
+
 /**
- * Sends information about the device to the server
+ * Sends information about the device to the server.
  */
 void ReloadClient::sendClientDeviceInfo()
 {
@@ -683,7 +724,7 @@ void ReloadClient::sendClientDeviceInfo()
 
 	//Due to some limitations on some devices
 	//We have to check the UUID separately
-	if(uuidRes < 0)
+	if (uuidRes < 0)
 	{
 		sprintf(deviceUUID, "Not Accessible");
 	}
@@ -707,15 +748,23 @@ void ReloadClient::sendClientDeviceInfo()
 		deviceOSVersion
 		);
 
-	// Add header with command parameter and message size.
-	// Command 2 means JSON message.
-	String messageHeader =
-		Convert::intToHex(2) +
-		Convert::intToHex(strlen(buffer));
+	sendTCPMessage(buffer);
+}
 
-	// Send header and then buffer.
-	mSocket.write(messageHeader.c_str(), messageHeader.length());
-	mSocket.write(buffer, strlen(buffer));
+// ========== Helper methods ==========
+
+void ReloadClient::sendTCPMessage(const String& message)
+{
+	mSocketHandler.sendMessage(message.c_str());
+}
+
+/**
+ * Get client info.
+ * @return String with client info.
+ */
+MAUtil::String ReloadClient::getInfo()
+{
+	return mInfo;
 }
 
 /**
@@ -768,136 +817,4 @@ void ReloadClient::showConErrorMessage(int errorCode)
 	LOG("@@@ RELOAD: showConErrorMessage: %s", errorMessage);
 
 	maAlert("RELOAD Error", errorMessage, "OK", NULL, NULL);
-}
-
-void ReloadClient::cancelDownload()
-{
-	mDownloader->cancelDownloading();
-	mLoginScreen->showConnectedScreen();
-}
-
-void ReloadClient::connectTo(const char *serverAddress)
-{
-	// User tries to connect, reset the socket and
-	// start a new connection.
-	mSocket.close();
-	mServerAddress = serverAddress;
-	sprintf(mBuffer, "socket://%s:%s",
-		mServerAddress.c_str(),
-		mPort.c_str());
-	mSocket.connect(mBuffer);
-}
-
-void ReloadClient::disconnect()
-{
-	// Close the socket, and show the connect controls again.
-	mSocket.close();
-	mLoginScreen->disconnected();
-}
-
-void ReloadClient::clearAppsFolder()
-{
-	deleteFolderRecurse((mFileUtil->getLocalPath() + mAppsFolder).c_str());
-}
-
-void ReloadClient::deleteFolderRecurse(const char *path)
-{
-	char fileName[128];
-	char fullPath[256];
-	//LOG("@@@ RELOAD: Deleting files in folder: %s", path);
-	MAHandle list = maFileListStart(path, "*", MA_FL_SORT_NONE);
-	int length = maFileListNext(list, fileName, 128);
-	while (length > 0)
-	{
-		sprintf(fullPath, "%s%s", path, fileName);
-		if (fileName[length-1] == '/')
-		{
-			deleteFolderRecurse(fullPath);
-		}
-		MAHandle appDirHandle = maFileOpen(fullPath, MA_ACCESS_READ_WRITE);
-		if (maFileExists(appDirHandle))
-		{
-			//LOG("@@@ RELOAD: Deleting: %s", fileName);
-			maFileDelete(appDirHandle);
-		}
-		maFileClose(appDirHandle);
-		length = maFileListNext(list, fileName, 128);
-	}
-	maFileListClose(list);
-}
-
-void ReloadClient::onLogMessage(const char* message, const char* url)
-{
-	// If the url is set to "undefined", we will use JsonRPC to
-	// send the log message to the Reload server. Otherwise, we
-	// just call the url supplied using a REST convention.
-	if (0 == strcmp("undefined", url))
-	{
-#if(1)
-		// New method (TCP).
-
-		// Send the result back to the server as a JSON string
-		MAUtil::String messageString = Encoder::escape(message);
-		MAUtil::String json(
-			"{"
-			"\"message\":  \"remoteLogRequest\","
-			"\"params\": [   "
-				"\"" + messageString + "\""
-				"],"
-			"\"id\": 0"
-			"}");
-
-		mSocket.write(json.c_str(), json.length());
-#endif
-
-#if(0)
-		// Unused method (HTTP).
-
-		// Set URL for remote log service.
-		MAUtil::String messageString = message;
-		MAUtil::String json(
-			"{"
-			"\"method\":  \"client.remoteLog\","
-			"\"params\": [   "
-				"\"" + messageString + "\""
-				"],"
-			"\"id\": 0"
-			"}");
-
-		MAUtil::String commandUrl =
-			"http://" + mServerAddress + ":" + SERVER_HTTP_PORT +
-			"/proccess?jsonRPC=" + Encoder::escape(json);
-
-		// Send request to server.
-		RemoteLogConnection* connection = new RemoteLogConnection();
-		connection->get(commandUrl.c_str());
-#endif
-	}
-	else
-	{
-		MAUtil::String urlString = url;
-
-		// Escape ("percent encode") the message.
-		MAUtil::String request = urlString + Encoder::escape(message);
-
-		// Send request to server.
-		RemoteLogConnection* connection = new RemoteLogConnection();
-		connection->get(request.c_str());
-	}
-}
-
-void ReloadClient::parseJsonClientMessage(MAUtil::String jsonMessage)
-{
-	// Parse Json data.
-	serverMessageJSONRoot = YAJLDom::parse(
-		(const unsigned char*)jsonMessage.c_str(),
-		jsonMessage.size());
-
-	// Check that the root is valid.
-	if (NULL == serverMessageJSONRoot
-		|| Value::NUL == serverMessageJSONRoot->getType()
-		|| Value::MAP != serverMessageJSONRoot->getType())
-	{
-		maPanic(0, "RELOAD: The JSON message format is incorrect");
-	}
 }

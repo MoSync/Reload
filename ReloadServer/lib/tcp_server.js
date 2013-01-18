@@ -3,263 +3,236 @@ var vars = require('../application/globals');
 /**
  * Object that accumulates data sent over a streaming
  * protocol (TCP).
- * A separator string is used to delimit the start and
- * end of a message.
+ *
+ * A message starts with the magic header "RELOADMSG".
+ * Then follows a hex size header (8 characters) that
+ * encodes the length of the message.
  */
-var dataAccumulator = (function()
+var accumulator = (function()
 {
-	var self = {};
-	var separatorLength = 16;
-	var separator = null;
-	var accumulatedData = "";
-	
-	/**
-	 * Reset the accumulator. Will keep any data after the
-	 * ending separator.
-	 */
-	self.reset = function()
-	{
-		// If a separator is set, then scan for ending
-		// separator to preserve any accumunated data.
-		if (separator)
-		{
-			// Find ending separator.
-			var index = accumulatedData.indexOf(separator);
-			if (index >= 0)
-			{
-				// This could be an empty string if no data follows
-				// the ending separator.
-				accumulatedData = accumulatedData.substr(index + separatorLength);
-			}
-			else
-			{
-				// No separatyor found, resent to empty string.
-				accumulatedData = "";
-			}
-		}
-		
-		// Reset separator.
-		separator = null;
-	};
-	
-	/**
-	 * Read (accumulate) data.
-	 */
-	self.read = function(data)
-	{
-		if (!separator)
-		{
-			separator = data.substr(0, separatorLength);
-			accumulatedData = accumulatedData + data.substr(separatorLength);
-		}
-		else 
-		{
-			accumulatedData = accumulatedData + data;
-		}
-		separator = ;
-	};
-	
-	/**
-	 * Scan for message.
-	 */
-	self.getMessage = function()
-	{
-		
-		return accumulatedData;
-	};
-	
-	return self;
-}();
+    var self = {};
+    var mMessageLength = 0;
+    var mMessageData = null;
+    var mAccumulatedData = "";
+    var mMagicHeader = "RELOADMSG";
+    var mHeaderSize = 9 + 8; // Magic header +  message size.
 
-/**
- * Object that accumulates data sent over a streaming
- * protocol (TCP).
- * A hex size header (8 characters) is used to encode
- * the length of a message.
- */
-var dataAccumulator = (function()
-{
-	var self = {};
-	var messageLength = 0;
-	var remainingLength = 0;
-	var accumulatedData = "";
-	
-	/**
-	 * Reset the accumulator. Will keep any data after the
-	 * ending separator.
-	 */
-	self.reset = function()
-	{
-		if (remainingLength == 0)
-		{
-			// Find ending separator.
-			var index = accumulatedData.indexOf(separator);
-			if (index >= 0)
-			{
-				// This could be an empty string if no data follows
-				// the ending separator.
-				accumulatedData = accumulatedData.substr(index + separatorLength);
-			}
-			else
-			{
-				// No separatyor found, resent to empty string.
-				accumulatedData = "";
-			}
-		}
-		
-		// Reset separator.
-		separator = null;
-	};
-	
-	/**
-	 * Read (accumulate) data.
-	 */
-	self.read = function(data)
-	{
-		// If messageLength is not set, the assume
-		// we are getting it as the first 8 characters.
-		if (messageLength == 0)
-		{
-			var dataLength = data.substr(0, 8);
-			messageLength = parseInt(dataLength, 16);
-			accumulatedData = data.substr(8);
-		}
-		else
-		{
-			accumulatedData += data;
-		}
-		
-		// Have we got the whole message?
-		if (accumulatedData.length >= messageLength)
-		{
-			
-		}
-		
-		var chunkLength = accumulatedData.length;
-		remainingLength = messageLength - chunkLength;
-			
-		if (remainingLength > 0)
-		{
-			accumulatedData = accumulatedData + data.substr(separatorLength);
-		}
-		else 
-		{
-			accumulatedData = accumulatedData + data;
-		}
-		separator = ;
-	};
-	
-	/**
-	 * Scan for message.
-	 */
-	self.getMessage = function()
-	{
-		
-		return accumulatedData;
-	};
-	
-	return self;
-}();
+    /**
+     * Reset the accumulator to read next message.
+     */
+    self.next = function()
+    {
+        console.log("accumulator.next");
+        mMessageData = null;
+    };
 
-create = function (port) {
+    /**
+     * Add data to the accumulator.
+     */
+    self.add = function(data)
+    {
+        console.log("accumulator.add");
+        mAccumulatedData += data;
+    };
 
-	var net = require('net');
+    /**
+     * Get message.
+     * @return String with message data, null if there
+     * is no complete message.
+     */
+    self.getMessage = function()
+    {
+        // Do we have a message?
+        if (mMessageData)
+        {
+            // Yes we have, return it.
+            return mMessageData;
+        }
 
-	function generateDeviceInfoListJSON() {
+        // Are there any data?
+        if (mAccumulatedData.length < mHeaderSize)
+        {
+            // Not enough data yet.
+            return null;
+        }
 
-		var infoListJSON = [];
+        // Do we have a data length?
+        if (0 === mMessageLength)
+        {
+            // No data length, get the length from the
+            // accumulated data. First scan to the end of
+            // the magic header.
+            var index = mAccumulatedData.indexOf(mMagicHeader);
+            if (index < 0)
+            {
+                // TODO: Add some error/recovery handling
+                // in case the data is garbled and header
+                // not found.
+                console.log("tcp_server.js/accumulator: cannot find magic header");
+                return null;
+            }
 
-		vars.globals.clientList.forEach(function(c){
+            // Get message size.
+            // TODO: Check that message length is a number.
+            mAccumulatedData = mAccumulatedData.substr(mMagicHeader.length);
+            var dataLength = mAccumulatedData.substr(0, 8);
+            mMessageLength = parseInt(dataLength, 16);
 
-			infoListJSON.push(c.deviceInfo);
-		});
+            console.log("accumulator.getMessage: dataLength: " + dataLength);
+            console.log("accumulator.getMessage: mMessageLength: " + mMessageLength);
 
-		vars.globals.deviceInfoListJSON = JSON.stringify(infoListJSON);
-	}
-	
-	function processMessage(messageObject) {
-	
-		// The data is always in JSON format.
-		console.log("socket.on jsonString: " + jsonString);
-		var message = JSON.parse(jsonString);
-		console.log("socket.on message.message: " + message.message);
-		if (message != undefined);
-		{
-			// The device sent it's info upon connecting.
-			if (message.message == "clientConnectRequest")
-			{
-				// Platform, name, uuid, os version, phonegap version.
-				//message.type == null;
-				socket.deviceInfo 		  = message.params;
-				socket.deviceInfo.address = socket.remoteAddress;
-				generateDeviceInfoListJSON();
-				console.log("Client " + socket.remoteAddress +
-					" (" + socket.deviceInfo.name + ") has connected." )
-			}
-			// The device sent a log message.
-			else if (message.message == "remoteLog")
-			{
-				// TODO: Output log message.
-				//socket.deviceInfo.name // the name of the device.
-				console.log("NEW remote log: " + message);
-				console.log(jsonString);
-				console.log(message);
-				
-				//vars.globals.gRemoteLogData.push(message.params);
-			}
-		}
-	}
+            // Point to the start of actual message data.
+            mAccumulatedData = mAccumulatedData.substr(8);
+        }
 
-	function saveClient(socket) {
+        // Have we got the whole message?
+        if (mAccumulatedData.length >= mMessageLength)
+        {
+            // Yes we have, set message data.
+            mMessageData = mAccumulatedData.substr(0, mMessageLength);
 
-		try {
+            // Set accumulated data to whatever is left.
+            mAccumulatedData = mAccumulatedData.substr(mMessageLength);
 
-			vars.globals.clientList.push(socket);
+            console.log("accumulator.getMessage: got a new message");
+            console.log("accumulator.getMessage: mAccumulatedData left: " + mAccumulatedData);
 
-			// Use ascii encoding.
-			socket.setEncoding('ascii');
+            // Reset message length.
+            mMessageLength = 0;
 
-			// Executed then the client closes the connection.
-			socket.on('close',function (had_error) {
+            // Return the message.
+            return mMessageData;
+        }
 
-				var address = "-unknown address-";
-				if (socket.deviceInfo != undefined) {
+        // Wee need more data to get a whole message.
+        return null;
+    };
 
-					address = socket.deviceInfo.address;
-				}
+    return self;
+})();
 
-				console.log(
-					"Client " +
-					address + " (" +
-					socket.deviceInfo.name +
-					") has disconnected.");
-				for (var i = 0; i < vars.globals.clientList.length ; i++) {
+var create = function (port) {
 
-					if (vars.globals.clientList[i].remoteAddress == socket.remoteAddress) {
+    var net = require('net');
 
-						vars.globals.clientList.splice(i,1);
-						generateDeviceInfoListJSON();
-						break;
-					}
-				}
-			});
+    function generateDeviceInfoListJSON() {
 
-			// Executed when the client sends data to the server.
-			socket.on('data', function(jsonString) {
-				
-			});
-		}
-		catch(err)
-		{
-			console.log("Error in saveClient: " + err);
-		}
-	}
+        var infoListJSON = [];
 
-	console.log("Opening TPC socket on port: " + port);
-	var server = net.createServer(saveClient);
-	server.listen(7000);
+        vars.globals.clientList.forEach(function(c){
 
-	return server;
+            infoListJSON.push(c.deviceInfo);
+        });
+
+        vars.globals.deviceInfoListJSON = JSON.stringify(infoListJSON);
+    }
+
+    /**
+     * TODO: The socket object is used to store device info.
+     * We should update this to use a client object that in turn
+     * has the socket object. It can cause problems to add custom
+     * properties to the socket object.
+     */
+    function processMessage(jsonString, socket)
+    {
+        // The data is always in JSON format.
+        console.log("processMessage jsonString: " + jsonString);
+        var message = JSON.parse(jsonString);
+
+        console.log("processMessage message.message: " + message.message);
+
+        if (message != undefined);
+        {
+            // The device sent info upon connecting.
+            if (message.message == "clientConnectRequest")
+            {
+                // Platform, name, uuid, os version, phonegap version.
+                //message.type == null;
+                socket.deviceInfo = message.params;
+                socket.deviceInfo.address = socket.remoteAddress;
+                generateDeviceInfoListJSON();
+                console.log("Client " + socket.remoteAddress +
+                    " (" + socket.deviceInfo.name + ") has connected." )
+            }
+            // The device sent a log message.
+            else if (message.message == "remoteLog")
+            {
+                // TODO: Output log message.
+                //socket.deviceInfo.name // the name of the device.
+                console.log("NEW remote log: " + message);
+                console.log(jsonString);
+                console.log(message);
+
+                //vars.globals.gRemoteLogData.push(message.params);
+            }
+        }
+    }
+
+    function saveClient(socket)
+    {
+        try
+        {
+            // Save the socket on the list of connected clients.
+            vars.globals.clientList.push(socket);
+
+            // Use ascii encoding.
+            socket.setEncoding('ascii');
+
+            // Executed then the client closes the connection.
+            socket.on('close', function (had_error)
+            {
+                var address = "-unknown address-";
+                if (socket.deviceInfo != undefined)
+                {
+                    address = socket.deviceInfo.address;
+                }
+
+                console.log(
+                    "Client " +
+                    address + " (" +
+                    socket.deviceInfo.name +
+                    ") has disconnected.");
+
+                for (var i = 0; i < vars.globals.clientList.length; i++)
+                {
+                    if (vars.globals.clientList[i].remoteAddress ==
+                        socket.remoteAddress)
+                    {
+
+                        vars.globals.clientList.splice(i,1);
+                        generateDeviceInfoListJSON();
+                        break;
+                    }
+                }
+            });
+
+            // Executed when the client sends data to the server.
+            socket.on('data', function(data)
+            {
+                // Accumulate data recieved.
+                accumulator.add(data);
+
+                while (accumulator.getMessage())
+                {
+                    // Handle the message.
+                    processMessage(accumulator.getMessage(), socket);
+
+                    // Get the next message.
+                    accumulator.next();
+                }
+            });
+        }
+        catch(err)
+        {
+            console.log("Error in saveClient: " + err);
+        }
+    }
+
+    console.log("Opening TPC socket on port: " + port);
+    var server = net.createServer(saveClient);
+    server.listen(7000);
+
+    return server;
 }
 
 exports.create = create;

@@ -11,12 +11,6 @@
 #include <mawstring.h>
 #include <wchar.h>
 
-Convert::Convert()
-{}
-
-Convert::~Convert()
-{}
-
 int Convert::toInt(const char* digit)
 {
    int sign = 1;
@@ -162,17 +156,16 @@ String Convert::toString(const byte* src, size_t count)
 
 int Convert::hexToInt(const char* input)
 {
-
 	int v = 0;
 	while (char c = *input++)
 	{
 		if (c < '0') return 0; //invalid character
 		if (c > '9') //shift alphabetic characters down
 		{
-		if (c >= 'a') c -= 'a' - 'A'; //upper-case 'a' or higher
-		if (c > 'Z') return 0; //invalid character
-		if (c > '9') c -= 'A'-1-'9'; //make consecutive with digits
-		if (c < '9' + 1) return 0; //invalid character
+			if (c >= 'a') c -= 'a' - 'A'; //upper-case 'a' or higher
+			if (c > 'Z') return 0; //invalid character
+			if (c > '9') c -= 'A'-1-'9'; //make consecutive with digits
+			if (c < '9' + 1) return 0; //invalid character
 		}
 		c -= '0'; //convert char to hex digit value
 		v = v << 4; //shift left by a hex digit
@@ -185,6 +178,6 @@ int Convert::hexToInt(const char* input)
 String Convert::intToHex(int input)
 {
 	char buffer[128];
-	snprintf(buffer, 128, "%08x", input);
+	snprintf(buffer, 128, "%08X", input);
 	return buffer;
 }
