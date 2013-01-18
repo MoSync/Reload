@@ -8,6 +8,7 @@ define([
 
     var ProjectListView = Backbone.View.extend({
 
+        className: 'project-list',
         events: {
             'click #projects li a': 'selectProject'
         },

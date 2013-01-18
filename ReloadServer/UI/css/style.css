@@ -126,7 +126,20 @@ ul li {
 }
 .pad10 { padding: 10px; }
 
-ul#projects,
+.project-list {
+    position: absolute;
+    top: 162px;
+    bottom: 200px;
+    width: 100%;
+    overflow: auto;
+    border-top: 1px solid #bdbdbd;
+}
+
+
+ul#projects {
+}
+
+.project-list,
 ul#files {
     border-top: 1px solid #bdbdbd;
 }
