@@ -1,4 +1,5 @@
-var vars = require('../application/globals');
+var vars = require('../application/globals'),
+	fs = require('fs');
 
 create = function (port) {
 
@@ -39,6 +40,7 @@ create = function (port) {
 					address + " (" +
 					socket.deviceInfo.name +
 					") has disconnected.");
+
 				for (var i = 0; i < vars.globals.clientList.length ; i++) {
 
 					if (vars.globals.clientList[i].remoteAddress == socket.remoteAddress) {
@@ -62,6 +64,32 @@ create = function (port) {
 					{
 						// Platform, name, uuid, os version, phonegap version.
 						//message.type == null;
+
+						// Statistics Collection
+						vars.methods.loadStats(function (statistics) {
+
+							var deviceExists = false;
+
+							for( var i in statistics.clients) {
+								if( statistics.clients[i].uuid == message.params.uuid) {
+									deviceExists = true;
+								}
+							}
+							if( !deviceExists ) {
+
+									var client = {
+										platform: message.params.platform,
+										name: message.params.name,
+										uuid: message.params.uuid,
+										phonegap: message.params.phonegap
+									};
+
+									statistics.clients.push(client);
+
+									vars.methods.saveStats(statistics);
+							}
+						});
+
 						socket.deviceInfo 		  = message.params;
 						socket.deviceInfo.address = socket.remoteAddress;
 						generateDeviceInfoListJSON();
