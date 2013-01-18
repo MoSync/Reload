@@ -113,10 +113,38 @@ ul li {
     border-top: 1px solid rgb(221, 221, 221);
 }
 
-#weinre {
+.weinre {
     position: absolute;
+    width: 100%;
     top: 10px;
     bottom: 0;
+}
+
+#content .dl-horizontal {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    margin: 0;
+}
+#content .dl-horizontal dt {
+    width: 100px;
+
+}
+#content .dl-horizontal dd {
+    margin-left: 120px;
+
+}
+#content #log-controls {
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    left: 0;
+}
+#content #log-controls form {
+    margin: 0 20px 20px 0;
+    float: right;
 }
 
 .fill {

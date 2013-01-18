@@ -3,8 +3,9 @@ define([
     'underscore',
     'backbone',
     'models/log/log',
-    'text!../../../templates/log/main.html'
-], function($, _, Backbone, LogModel, logTemplate){
+    'views/log/ticker',
+    'text!../../../templates/log/message.html'
+], function($, _, Backbone, LogModel, LogTickerView, messageTemplate){
 
     var LogView = Backbone.View.extend({
 
@@ -12,13 +13,22 @@ define([
 
         name: 'log',
 
+        messages: $('<dl id="scroller" class="dl-horizontal">'),
+
+        events: {
+            'click #autoscroll': 'autoscrollCheck'
+        },
+
         initialize: function () {
             _.bindAll(this, 'render', 'close', 'updateLog');
 
             this.model = new LogModel();
+            this.logTicker = new LogTickerView();
         },
 
         render: function () {
+
+            this.$el.append( this.messages );
 
             // Update log on render() so we don't have to wait for
             // interval timer.
@@ -48,36 +58,45 @@ define([
             var self = this;
             this.model.getLogMsg(function(res) {
 
-                var msgs = $('<div>');
-                _(res).each(function(msg) {
+                var header, message, label;
 
-                    if(msg.indexOf("Error") >= 0) {
-                        var errorHeader = msg.split(":",1);
-                        errorHeader[0] += ":";
+                header = 'Log';
+                message = res;
+                label = 'info';
 
-                        var errorBody = msg.substr( msg.indexOf(errorHeader[0]) + errorHeader[0].length );
+                if(message.indexOf("Error") >= 0) {
+                    var errorHeader = message.split(":",1);
+                    header = errorHeader[0];
+                    errorHeader[0] = errorHeader[0] += ":";
+                    message = message.substr( message.indexOf(errorHeader[0]) + errorHeader[0].length );
+                    label = 'important';
+                }
 
-                        msgs.append('<div class="errorContainer">' +
-                                    '<img src="http://localhost:8283/img/error32.png" class="errorImg" />' +
-                                    '<span class="RemoteErrorHeader">' + errorHeader[0] + '</span><br />' +
-                                    '<span class="RemoteErrorBody">' + errorBody + '</span><br />' +
-                                    '</div>'
-                                    );
-                    } else {
-                        //<img src="http://www.iconhot.com/icon/png/ose-png/32/error-1.png" class="errorImg" />
-                        //<img src="http://code.google.com/p/mosync/logo?cct=1322576702" class="rlogImg" />
-                        msgs.append('<div class="rlogContainer">' +
-                                    '<img src="http://localhost:8283/img/mosyncLogo.png" class="rlogImg" />' +
-                                    '<span class="rlogHeader">Remote Log</span><br />' +
-                                    '<span class="rlogBody">' + msg + '</span><br />' +
-                                    '</div>'
-                                    );
-                    }
+                var compiledTemplate = _.template( messageTemplate, {
+                    header: header,
+                    message: message,
+                    label: label
                 });
+                self.messages.append( compiledTemplate );
 
-                var compiledTemplate = _.template( logTemplate, { data: msgs.html() } );
-                self.$el.html( compiledTemplate );
+                // Autoscroll if at the bottom.
+                var scroller = document.getElementById('scroller');
+
+                if ((scroller.scrollTop+scroller.clientHeight) === scroller.scrollHeight-20){
+                    console.log('at the bottom');
+                    scroller.scrollTop += 20;
+
+                }
+                //console.log( (scroller.scrollTop+scroller.clientHeight) + ' ' + scroller.scrollHeight);
             });
+        },
+
+        autoscrollCheck: function () {
+            var scroll = $('#autoscroll').is(':checked');
+            if (scroll) {
+                console.log('');
+            }
+
         }
     });
 
