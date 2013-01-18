@@ -16,7 +16,7 @@ ul li {
 }
 
 #wrap {
-    min-width: 800px;
+    min-width: 820px;
     width:100%;
     overflow:hidden;
 }
@@ -114,8 +114,11 @@ ul li {
 }
 
 #weinre {
-    margin-top: 10px;
+    position: absolute;
+    top: 10px;
+    bottom: 0;
 }
+
 .fill {
     height: 100%;
     min-height: 100%;

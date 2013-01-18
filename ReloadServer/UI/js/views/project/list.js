@@ -54,8 +54,10 @@ define([
                 parent: this.parent
             });
 
-            if (this.parent.selectedProject === project.get('name')) {
-                this.makeSelection(project.cid);
+            if (this.parent.selectedProject) {
+                if (this.parent.selectedProject.get('name') === project.get('name')) {
+                    this.makeSelection(project.cid);
+                }
             }
 
             $('#projects').append( pv.render() );
@@ -78,7 +80,7 @@ define([
             _(this.projectList.models).each(function (project) {
                 if (project === found) {
                     project.set({ showControls: true });
-                    self.parent.selectedProject = project.get('name');
+                    self.parent.selectedProject = project;
                 } else {
                     project.set({ showControls: false });
                 }
