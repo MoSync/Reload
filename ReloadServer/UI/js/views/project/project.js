@@ -52,9 +52,18 @@ define([
             if (this.model.get('showControls')) {
                 // Bind event to controls
                 this.$controls.on('click', this.control);
+
+                // Add style to selected project row.
+                this.$container.addClass('select-project');
+                this.$container.find('span').addClass('project-name-clip');
+
                 // Show controls
                 this.$container.append(this.$controls);
             } else {
+
+                this.$container.removeClass('select-project');
+                this.$container.find('span').removeClass('project-name-clip');
+
                 // Unbind events from controls
                 this.$controls.off('click', this.control);
                 //this.$controls.removeData().unbind();
@@ -164,6 +173,7 @@ define([
                 console.log(resp.result);
                 self.projectList.remove(self.model);
                 self.projectList.rePopulate();
+                self.parent.selectedProject = null;
             };
 
             options.error   = function (resp) {

@@ -4,12 +4,12 @@ define([
     'backbone',
     'views/index/serverip',
     'views/index/serverinfo',
-    'views/index/content_nav',
-    'views/index/sidebar',
     'views/index/content'
-], function($, _, Backbone, ServerIpView, ServerInfoView, ContentNavView, SidebarView, ContentView){
+], function($, _, Backbone, ServerIpView, ServerInfoView, ContentView){
 
     var IndexView = Backbone.View.extend({
+
+        name: 'index',
 
         initialize: function () {
             _.bindAll(this, 'render', 'close');
@@ -18,11 +18,6 @@ define([
 
         render: function () {
 
-            this.contentNavView = new ContentNavView();
-            $('#content-nav').html( this.contentNavView.render() );
-
-            this.sidebarView = new SidebarView();
-            $('#bar-left').html( this.sidebarView.render() );
 
             // Populate current container with a subview.
             return this.$el.html( this.contentView.render() );
