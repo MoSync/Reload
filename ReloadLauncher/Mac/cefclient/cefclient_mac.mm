@@ -64,7 +64,7 @@ static NSAutoreleasePool* g_autopool = nil;
 @interface ClientWindowDelegate : NSObject <NSWindowDelegate>
 //- (IBAction)goBack:(id)sender;
 //- (IBAction)goForward:(id)sender;
-//- (IBAction)reload:(id)sender;
+- (IBAction)reload:(id)sender;
 //- (IBAction)stopLoading:(id)sender;
 //- (IBAction)takeURLStringValueFrom:(NSTextField *)sender;
 - (void)alert:(NSString*)title withMessage:(NSString*)message;
@@ -84,12 +84,12 @@ static NSAutoreleasePool* g_autopool = nil;
   if (g_handler.get() && g_handler->GetBrowserId())
     g_handler->GetBrowser()->GoForward();
 }
-
+*/
 - (IBAction)reload:(id)sender {
   if (g_handler.get() && g_handler->GetBrowserId())
     g_handler->GetBrowser()->Reload();
 }
-
+/*
 - (IBAction)stopLoading:(id)sender {
   if (g_handler.get() && g_handler->GetBrowserId())
     g_handler->GetBrowser()->StopLoad();
@@ -185,7 +185,9 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
 }
 
 // Receives notifications from the application. Will delete itself when done.
-@interface ClientAppDelegate : NSObject
+@interface ClientAppDelegate : NSObject {
+    NSTask *task;
+}
 - (void)createApp:(id)object;
 - (IBAction)testGetSource:(id)sender;
 - (IBAction)testGetText:(id)sender;
@@ -206,48 +208,54 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
 - (IBAction)testZoomIn:(id)sender;
 - (IBAction)testZoomOut:(id)sender;
 - (IBAction)testZoomReset:(id)sender;
+
 @end
 
 @implementation ClientAppDelegate
 - (void)startTheBackgroundJob {
-    
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSTask *task;
-    task = [[NSTask alloc] init];
-    NSString* filePath = [[NSBundle mainBundle] pathForResource:@"reload" ofType:@"sh" inDirectory:@"ReloadServer"];
-   NSLog (@"script path:\n%@", filePath);
- //   NSString *command = [[NSString alloc] initWithFormat:@"/bin/sh %@",filePath];
-    NSString *newString = [filePath substringToIndex:[filePath length]-9];
-    //task = [NSTask  launchedTaskWithLaunchPath:filePath arguments:arguments];
-    
-    [task setLaunchPath: @"/bin/sh"];
-    
-    NSArray *arguments;
-    arguments = [NSArray arrayWithObjects: filePath, nil];
-    [task setArguments: arguments];
-    
-    NSPipe *pipe;
-    pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    
-    NSFileHandle *file;
-    file = [pipe fileHandleForReading];
-    [task setCurrentDirectoryPath:newString];
-    NSLog (@"directory path:\n%@", task.currentDirectoryPath);
-//    task.currentDirectoryPath = newString;
-    [task launch];
-    
-    NSData *data;
-    data = [file readDataToEndOfFile];
-    
-    NSString *string;
-    string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-    NSLog (@"server returned:\n%@", string);
-    
-    [string release];
-    [task release];
-    [pool release];    
-}
+    try {
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        
+        task = [[NSTask alloc] init];
+        NSString* filePath = [[NSBundle mainBundle] pathForResource:@"reload" ofType:@"sh" inDirectory:@"ReloadServer"];
+        NSLog (@"script path:\n%@", filePath);
+        NSString *newString = [filePath substringToIndex:[filePath length]-9];
+        
+        [task setLaunchPath: @"/bin/sh"];
+        
+        NSArray *arguments;
+        arguments = [NSArray arrayWithObjects: filePath, nil];
+        [task setArguments: arguments];
+        
+        NSPipe *pipe;
+        pipe = [NSPipe pipe];
+        [task setStandardOutput: pipe];
+        
+        NSFileHandle *file;
+        file = [pipe fileHandleForReading];
+        [task setCurrentDirectoryPath:newString];
+        NSLog (@"directory path:\n%@", task.currentDirectoryPath);
+        
+        [task launch];
+        
+        NSData *data;
+        data = [file readDataToEndOfFile];
+        
+        NSString *string;
+        string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+        NSLog (@"server returned:\n%@", string);
+        
+        [string release];
+        [task release];
+        [pool release];    
+
+    } catch (NSException *ex) {
+        
+        NSAlert *alert = [NSAlert alertWithMessageText:@"Failed to Run the server" defaultButton:@"Ok" alternateButton:nil otherButton:nil informativeTextWithFormat:nil];
+        [alert runModal];
+        
+    }
+   }
 // Create the application on the UI thread.
 - (void)createApp:(id)object {
   [NSApplication sharedApplication];
@@ -457,7 +465,7 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
   CefShutdown();
 
   [self release];
-
+    [task terminate];
   // Release the AutoRelease pool.
   [g_autopool release];
 }

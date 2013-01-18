@@ -7,45 +7,51 @@ define([
 
     var ChangeWorkspaceDialog = Backbone.View.extend({
 
-        el: $('body'),
+        events: {
+            'click button#submit': 'submit',
+            'click button#close': 'close'
+        },
+
         initialize: function (options) {
-            _.bindAll(this, 'render');
+            _.bindAll(this, 'render', 'submit', 'close');
 
             this.projectList = options.projectList;
 
             this.compiledTemplate = _.template( dialogTemplate, { path: this.projectList.path } );
+            this.$el = $(this.compiledTemplate);
+        },
+
+        submit: function () {
+            var workspacePath = $('#workspace-path');
+            console.log(workspacePath.val());
+
+            if (workspacePath.val().length !== 0) {
+                this.projectList.path = workspacePath.val();
+                // trigger 'change:path' evenet to execute rpc call
+                // in sidebar.js and persist changed path on server.
+                this.projectList.trigger('change:path');
+
+                this.close();
+
+            } else {
+                alert("Please enter a workspace path.");
+            }
+        },
+
+        close: function () {
+
+            // Don't remove until transition is complete.
+            this.$el.on('hidden', function () {
+                this.remove();
+            });
+
+            this.$el.modal('hide');
         },
 
         render: function () {
 
-            var self = this;
-            $(this.compiledTemplate).dialog({
-                autoOpen : false,
-                title : "Change Workspace Path",
-                width : 400,
-                modal : true,
-                buttons : {
-                    "Change" : function () {
-                        var workspacePath = document.getElementById("workspacePath");
-                        if (workspacePath.value !== "") {
-                            self.projectList.path = workspacePath.value;
-                            // Trigger 'change:path' evenet to execute RPC call
-                            // in sidebar.js and persist changed path on server.
-                            self.projectList.trigger('change:path');
-                            $(this).dialog("close");
-                            $(this).remove();
-                        } else {
-                            alert("Please enter a path!");
-                        }
-                    },
-                    "Cancel" : function () {
-                        $(this).dialog("close");
-                        $(this).remove();
-                    }
-                },
-                close : function (event, ui) {}
-            }).dialog('open');
-
+            //var self = this;
+            this.$el.modal('show');
         }
 
     });

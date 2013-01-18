@@ -34,3 +34,127 @@ Message: Got project list
 Source: http://localhost:8283/js/collections/projects.js
 Line: 29
 -----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/index/sidebar_left_foot.js
+Line: 15
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/devices/main.js
+Line: 15
+-----------------------
+Message: render menu
+Source: http://localhost:8283/js/views/index/content_nav.js
+Line: 32
+-----------------------
+Message: 
+Source: http://localhost:8283/js/models/log/log.js
+Line: 33
+-----------------------
+Message: Got project list
+Source: http://localhost:8283/js/collections/projects.js
+Line: 29
+-----------------------
+Message: Got server ip 192.168.0.120
+Source: http://localhost:8283/js/models/index/serverip.js
+Line: 23
+-----------------------
+Message: Got server info {"version":"MoSync Reload Version 1.0","timestamp":"130117-1206"}
+Source: http://localhost:8283/js/models/index/serverinfo.js
+Line: 23
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/index/sidebar_controls.js
+Line: 78
+-----------------------
+Message: Update project list
+Source: http://localhost:8283/js/views/index/sidebar_controls.js
+Line: 81
+-----------------------
+Message: Got project list
+Source: http://localhost:8283/js/collections/projects.js
+Line: 29
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/index/sidebar_left_foot.js
+Line: 15
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/devices/main.js
+Line: 15
+-----------------------
+Message: render menu
+Source: http://localhost:8283/js/views/index/content_nav.js
+Line: 32
+-----------------------
+Message: 
+Source: http://localhost:8283/js/models/log/log.js
+Line: 33
+-----------------------
+Message: Got project list
+Source: http://localhost:8283/js/collections/projects.js
+Line: 29
+-----------------------
+Message: Got server ip 192.168.0.120
+Source: http://localhost:8283/js/models/index/serverip.js
+Line: 23
+-----------------------
+Message: Got server info {"version":"MoSync Reload Version 1.0","timestamp":"130117-1206"}
+Source: http://localhost:8283/js/models/index/serverinfo.js
+Line: 23
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/index/sidebar_left_foot.js
+Line: 15
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/devices/main.js
+Line: 15
+-----------------------
+Message: render menu
+Source: http://localhost:8283/js/views/index/content_nav.js
+Line: 32
+-----------------------
+Message: 
+Source: http://localhost:8283/js/models/log/log.js
+Line: 33
+-----------------------
+Message: Got project list
+Source: http://localhost:8283/js/collections/projects.js
+Line: 29
+-----------------------
+Message: Got server ip 192.168.0.120
+Source: http://localhost:8283/js/models/index/serverip.js
+Line: 23
+-----------------------
+Message: Got server info {"version":"MoSync Reload Version 1.0","timestamp":"130117-1206"}
+Source: http://localhost:8283/js/models/index/serverinfo.js
+Line: 23
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/index/sidebar_left_foot.js
+Line: 15
+-----------------------
+Message: [object Object]
+Source: http://localhost:8283/js/views/devices/main.js
+Line: 15
+-----------------------
+Message: render menu
+Source: http://localhost:8283/js/views/index/content_nav.js
+Line: 32
+-----------------------
+Message: 
+Source: http://localhost:8283/js/models/log/log.js
+Line: 33
+-----------------------
+Message: Got project list
+Source: http://localhost:8283/js/collections/projects.js
+Line: 29
+-----------------------
+Message: Got server ip 192.168.0.120
+Source: http://localhost:8283/js/models/index/serverip.js
+Line: 23
+-----------------------
+Message: Got server info {"version":"MoSync Reload Version 1.0","timestamp":"130117-1206"}
+Source: http://localhost:8283/js/models/index/serverinfo.js
+Line: 23
+-----------------------

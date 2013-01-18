@@ -3,10 +3,10 @@ v5
 r1
 cCheck dependencies
 cProcessInfoPlistFile "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/Info.plist" cefclient/mac/helper-Info.plist
+cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_app_delegates.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app_delegates.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_app.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_handler.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler.cpp normal i386 c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_app_delegates.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app_delegates.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_handler_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_renderer.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/client_switches.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_switches.cpp normal i386 c++ com.apple.compilers.llvmgcc42
@@ -738,7 +738,7 @@ t1358247664
 s1310
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/MacOS/Reload Helper
-t1358248617
+t1358249229
 s112984
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/PkgInfo
@@ -866,7 +866,7 @@ r0
 
 CCheck dependencies
 r0
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies6075008d74a5b641^f8c1058d74a5b641^---0#1#0#--18"Check dependencies36"4CD6AF31-9FFE-4F7C-94B3-5B1494B21D62-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies2464a4ed12a8b641^94faaeed12a8b641^---0#1#0#--18"Check dependencies36"082F920C-0F60-4348-B12C-668CD8C1FE9D-
 
 CCompileC xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 s379940464.979754
@@ -1035,31 +1035,31 @@ xi386
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection116"Link /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/MacOS/Reload Helper1c9612f26fa5b641^88f51ef26fa5b641^---0#0#0#--1037"Ld "xcodebuild/Release/Reload Helper.app/Contents/MacOS/Reload Helper" normal i386    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-g++-4.2 -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -L/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks -LRelease -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -filelist "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Objects-normal/i386/Reload Helper.LinkFileList" -mmacosx-version-min=10.5 -dead_strip -Wl,-search_paths_first -Wl,-ObjC -Wl,-pie -lcef_dll_wrapper -framework AppKit -lcef -o "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/MacOS/Reload Helper"36"88EF355E-E884-45EE-8CB6-74B3710FB015-
 
 CPhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-E7010CE6EE6E4510B3D94E4A.sh
-s379942029.075302
-e379942029.161556
+s380113645.754789
+e380113646.117732
 r1
 xPhaseScriptExecution
 xPostbuild "Change Mach-O Flags"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-E7010CE6EE6E4510B3D94E4A.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection57"Run custom shell script 'Postbuild "Change Mach-O Flags"'04aa138d74a5b641^bc5b298d74a5b641^---0#0#0#--353"PhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-E7010CE6EE6E4510B3D94E4A.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-E7010CE6EE6E4510B3D94E4A.sh36"1450C29B-2C83-471E-BBD4-46B2B98FA5E9-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection57"Run custom shell script 'Postbuild "Change Mach-O Flags"'55a1c1ed12a8b641^c0231eee12a8b641^---0#0#0#--353"PhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-E7010CE6EE6E4510B3D94E4A.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-E7010CE6EE6E4510B3D94E4A.sh36"BD60FFAE-FA0B-4340-B1A7-3FFB5E3A3BA0-
 
 CPhaseScriptExecution "Postbuild \"Fix Framework Link\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-60F4FBFE68F6FC26CFBE112F.sh
-s379942029.052900
-e379942029.067334
+s380113645.717156
+e380113645.746317
 r1
 xPhaseScriptExecution
 xPostbuild "Fix Framework Link"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-60F4FBFE68F6FC26CFBE112F.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection56"Run custom shell script 'Postbuild "Fix Framework Link"'ecf60d8d74a5b641^473c118d74a5b641^---0#0#0#--352"PhaseScriptExecution "Postbuild \"Fix Framework Link\"" xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-60F4FBFE68F6FC26CFBE112F.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-60F4FBFE68F6FC26CFBE112F.sh36"0124FABC-7CD7-410D-8F02-00199A56052E-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection56"Run custom shell script 'Postbuild "Fix Framework Link"'4432b8ed12a8b641^b70dbfed12a8b641^---0#0#0#--352"PhaseScriptExecution "Postbuild \"Fix Framework Link\"" xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-60F4FBFE68F6FC26CFBE112F.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-60F4FBFE68F6FC26CFBE112F.sh36"9A46C03A-B455-44A7-A731-AA57E2A3B54F-
 
 CPhaseScriptExecution "Postbuild \"Strip If Needed\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-4EBB995E178D3EEBF95B91B5.sh
-s379942029.169493
-e379942029.240018
+s380113646.125753
+e380113646.293011
 r1
 xPhaseScriptExecution
 xPostbuild "Strip If Needed"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-4EBB995E178D3EEBF95B91B5.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Run custom shell script 'Postbuild "Strip If Needed"'d6c72b8d74a5b641^9f713d8d74a5b641^---0#0#0#--349"PhaseScriptExecution "Postbuild \"Strip If Needed\"" xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-4EBB995E178D3EEBF95B91B5.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-4EBB995E178D3EEBF95B91B5.sh36"8208C132-88CC-4076-B856-57AE5C3C825C-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Run custom shell script 'Postbuild "Strip If Needed"'5b9920ee12a8b641^93024bee12a8b641^---0#0#0#--349"PhaseScriptExecution "Postbuild \"Strip If Needed\"" xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-4EBB995E178D3EEBF95B91B5.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload_helper_app.build/Script-4EBB995E178D3EEBF95B91B5.sh36"133C5FFC-2CEE-471F-AC44-3192BB8E1DFE-
 
 CProcessInfoPlistFile "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/Info.plist" cefclient/mac/helper-Info.plist
 s379940464.968696
@@ -1071,10 +1071,10 @@ xcefclient/mac/helper-Info.plist
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection39"Process cefclient/mac/helper-Info.plista81bf8706ea5b641^38c0f8706ea5b641^---0#0#0#-19%DVTDocumentLocation2@93"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/helper-Info.plist0000000000000000^486"ProcessInfoPlistFile "xcodebuild/Release/Reload Helper.app/Contents/Info.plist" cefclient/mac/helper-Info.plist    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-infoPlistUtility cefclient/mac/helper-Info.plist -genpkginfo "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/PkgInfo" -expandbuildsettings -platform macosx -o "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app/Contents/Info.plist"36"9E4542B9-700B-48FA-9BCE-5641A50853BD-
 
 CTouch "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app"
-s379941417.254724
-e379941417.262681
+s380113646.301058
+e380113646.307473
 r1
 xTouch
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection88"Touch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app444c412972a5b641^d93f432972a5b641^---0#0#0#--205"Touch "xcodebuild/Release/Reload Helper.app"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /usr/bin/touch -c "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app"36"B464B2D8-4BF8-4596-A6EB-57811BF66BA4-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection88"Touch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app36214dee12a8b641^e1b64eee12a8b641^---0#0#0#--205"Touch "xcodebuild/Release/Reload Helper.app"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /usr/bin/touch -c "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload Helper.app"36"677EFEBB-E21B-42C0-88D7-1748A2ED25BF-
 

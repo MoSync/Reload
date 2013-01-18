@@ -3,33 +3,33 @@ v5
 r1
 cCheck dependencies
 cProcessInfoPlistFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Info.plist cefclient/mac/Info.plist
-cPBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app"
 cPBXCp Release/libplugin_carbon_interpose.dylib xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib
+cPBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app"
 cPBXCp Resources "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources"
 cPBXCp Release/libcef.dylib "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib"
 cPBXCp Release/ffmpegsumo.so "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"
-cCpResource cefclient/mac/cefclient.icns xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns
 cCopyStringsFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings cefclient/mac/English.lproj/InfoPlist.strings
+cCpResource cefclient/mac/cefclient.icns xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns
 cCompileXIB /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib
 cCpResource cefclient/res/binding.html xcodebuild/Release/Reload.app/Contents/Resources/binding.html
 cCpResource cefclient/res/dialogs.html xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html
 cCpResource cefclient/res/domaccess.html xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html
 cCpResource cefclient/res/localstorage.html xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html
 cCpResource cefclient/res/logo.png xcodebuild/Release/Reload.app/Contents/Resources/logo.png
-cCpResource cefclient/res/ReloadServer xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer
 cCpResource cefclient/res/xmlhttprequest.html xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html
 cCpResource Reload_Icon.icns xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns
-cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCpResource cefclient/res/ReloadServer xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/cefclient.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.cpp normal i386 c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_app_delegates.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app_delegates.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_app.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_app_delegates.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app_delegates.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_handler.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler.cpp normal i386 c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_renderer.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_switches.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_switches.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_renderer.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/dom_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/dom_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/cefclient_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/string_util.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/scheme_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/scheme_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/string_util.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/cefclient_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/client_handler_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/resource_util_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/resource_util_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
 cLd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reload normal i386
@@ -316,9 +316,9 @@ t1340893564
 s55080
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer
-c0000000050F535D600000000000001DC
-t1358247382
-s476
+c0000000050F7DB6A00000000000001FE
+t1358420842
+s510
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/binding.html
 c000000005065D21E00000000000002E5
@@ -857,8 +857,8 @@ i"include/cef_resource_handler.h"
 i"include/cef_response.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app
-c0000000050F538350000000000000066
-t1358247989
+c0000000050F7AB4C0000000000000066
+t1358408524
 s102
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app
@@ -1084,7 +1084,7 @@ r0
 
 CCheck dependencies
 r0
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies548c438d74a5b641^acc5438d74a5b641^---0#1#0#--18"Check dependencies36"7A5C494B-9A5B-41C5-B98A-A2970DE0E104-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependenciesc9e652ee12a8b641^dd0a55ee12a8b641^---0#1#0#--18"Check dependencies36"2E33492B-9869-4454-A54A-F09EC4E7CEEA-
 
 CCompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 s379940826.569121
@@ -1256,208 +1256,208 @@ xcom.apple.compilers.llvmgcc42
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection79"Compile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cppe17d19db6fa5b641^c87bc9db6fa5b641^---0#0#0#-19%DVTDocumentLocation2@87"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp0000000000000000^1937"CompileC xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/string_util.o cefclient/string_util.cpp normal i386 c++ com.apple.compilers.llvmgcc42    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv LANG en_US.US-ASCII    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-gcc-4.2 -x c++ -arch i386 -fmessage-length=0 -pipe -Wno-trigraphs -fno-exceptions -fno-rtti -O3 -Werror -Wnewline-eof -DCHROMIUM_BUILD -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_CONFIGURATION_POLICY -DENABLE_INPUT_SPEECH -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_GPU=1 -DENABLE_EGLIMAGE=1 -DUSE_SKIA=1 -DENABLE_TASK_MANAGER=1 -DENABLE_WEB_INTENTS=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PROTECTOR_SERVICE=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_BACKGROUND=1 -DENABLE_PROMO_RESOURCE_SERVICE=1 -DENABLE_AUTOMATION=1 -DENABLE_PRINTING=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DUSING_CEF_SHARED -D__STDC_FORMAT_MACROS -DNDEBUG -DNVALGRIND -DDYNAMIC_ANNOTATIONS_ENABLED=0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.5 -gdwarf-2 -fvisibility=hidden -fvisibility-inlines-hidden -fno-threadsafe-statics -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/include -I. -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/DerivedSources/i386 -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/DerivedSources -Wall -Wendif-labels -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -fno-strict-aliasing -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/string_util.o36"AFCBBB06-F227-41DD-B1BE-FAC2B7BA3F2F-
 
 CCompileXIB /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib
-s379942029.520305
-e379942029.910730
+s380113646.906401
+e380113647.495138
 r1
 xCompileXIB
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection96"Compiling /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib124c858d74a5b641^6b28e98d74a5b641^---0#0#0#-19%DVTDocumentLocation2@102"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib0000000000000000^647"CompileXIB cefclient/mac/English.lproj/MainMenu.xib    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv XCODE_DEVELOPER_USR_PATH /Applications/Xcode.app/Contents/Developer/usr/bin/..    /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/MainMenu.nib /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib --sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk36"6809BA7A-F212-4E83-B282-880FC4F73684-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection96"Compiling /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib1023e8ee12a8b641^d3c17eef12a8b641^---0#0#0#-19%DVTDocumentLocation2@102"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib0000000000000000^647"CompileXIB cefclient/mac/English.lproj/MainMenu.xib    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv XCODE_DEVELOPER_USR_PATH /Applications/Xcode.app/Contents/Developer/usr/bin/..    /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/MainMenu.nib /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib --sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk36"137CBC1F-7D8E-451E-BAC6-DF75D9BC519D-
 
 CCopyStringsFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings cefclient/mac/English.lproj/InfoPlist.strings
-s379942029.520280
-e379942029.529969
+s380113646.906383
+e380113646.914986
 r1
 xCopyStringsFile
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings
 xcefclient/mac/English.lproj/InfoPlist.strings
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection50"Copy cefclient/mac/English.lproj/InfoPlist.strings404d858d74a5b641^fcab878d74a5b641^---0#0#0#-19%DVTDocumentLocation2@107"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/InfoPlist.strings0000000000000000^444"CopyStringsFile xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings cefclient/mac/English.lproj/InfoPlist.strings    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copyStrings --validate --inputencoding utf-8 --outputencoding UTF-16 --outdir /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj -- cefclient/mac/English.lproj/InfoPlist.strings36"D6BDE7C1-26C8-41AA-AF3C-EEBF8C8FBDD3-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection50"Copy cefclient/mac/English.lproj/InfoPlist.stringsc827e8ee12a8b641^433ceaee12a8b641^---0#0#0#-19%DVTDocumentLocation2@107"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/InfoPlist.strings0000000000000000^444"CopyStringsFile xcodebuild/Release/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings cefclient/mac/English.lproj/InfoPlist.strings    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copyStrings --validate --inputencoding utf-8 --outputencoding UTF-16 --outdir /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/English.lproj -- cefclient/mac/English.lproj/InfoPlist.strings36"1DA5A51A-A7E4-4EB1-89D9-AFE21E15A14E-
 
 CCpResource Reload_Icon.icns xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns
-s379942029.525950
-e379942029.534384
+s380113646.914557
+e380113646.923180
 r1
 xCpResource
 xReload_Icon.icns
 xxcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection70"Copy xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icnsa7b0868d74a5b641^0cce888d74a5b641^---0#0#0#-19%DVTDocumentLocation2@127"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns000000000080d041^543"CpResource Reload_Icon.icns xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Reload_Icon.icns /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"31244E8A-125B-46D2-B5B5-EE4A001E09EA-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection70"Copy xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns1138eaee12a8b641^3f56ecee12a8b641^---0#0#0#-19%DVTDocumentLocation2@127"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns000000000080d041^543"CpResource Reload_Icon.icns xcodebuild/Release/Reload.app/Contents/Resources/Reload_Icon.icns    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Reload_Icon.icns /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"A42E0EBE-9024-4C5D-8A27-4E8023F69621-
 
 CCpResource cefclient/mac/cefclient.icns xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns
-s379942029.520273
-e379942029.522996
+s380113646.906395
+e380113646.917696
 r1
 xCpResource
 xcefclient/mac/cefclient.icns
 xxcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection68"Copy xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icnsed48858d74a5b641^a8e3858d74a5b641^---0#0#0#-19%DVTDocumentLocation2@125"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns000000000080d041^565"CpResource cefclient/mac/cefclient.icns xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/cefclient.icns /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"0ADDAF86-5D18-4BB1-B42F-A63A05F48DE5-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection68"Copy xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icnsc328e8ee12a8b641^a6eeeaee12a8b641^---0#0#0#-19%DVTDocumentLocation2@125"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns000000000080d041^565"CpResource cefclient/mac/cefclient.icns xcodebuild/Release/Reload.app/Contents/Resources/cefclient.icns    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/cefclient.icns /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"7BB7D6A8-5D37-4C12-AA3A-E4E323BC4D31-
 
 CCpResource cefclient/res/ReloadServer xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer
-s379942029.524192
-e379942031.888057
+s380113646.914573
+e380113647.365231
 r1
 xCpResource
 xcefclient/res/ReloadServer
 xxcodebuild/Release/Reload.app/Contents/Resources/ReloadServer
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection66"Copy xcodebuild/Release/Reload.app/Contents/Resources/ReloadServeree3f868d74a5b641^815be38f74a5b641^-949"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/android/aapt -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer/bin/mac/android/aapt/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/android/adb -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer/bin/mac/android/adb/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/Bundle -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer/bin/mac/Bundle1(21%IDEActivityLogMessage2@144"warning: skipping copy phase strip, binary is code signed: /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/node-379942031#18446744073709551615#0#-1#-23%DVTTextDocumentLocation3@-0000000000000000^18446744073709551615#18446744073709551615#18446744073709551615#18446744073709551615#18446744073709551615#0#13"PBXCp Warning--0#0#0#-19%DVTDocumentLocation4@123"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer000000000080d041^559"CpResource cefclient/res/ReloadServer xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"767608A2-DEA0-4923-92DB-BAD507EDC3D4-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection66"Copy xcodebuild/Release/Reload.app/Contents/Resources/ReloadServere336eaee12a8b641^84835def12a8b641^-949"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/android/aapt -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer/bin/mac/android/aapt/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/android/adb -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer/bin/mac/android/adb/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/Bundle -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer/bin/mac/Bundle1(21%IDEActivityLogMessage2@144"warning: skipping copy phase strip, binary is code signed: /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer/bin/mac/node-380113647#18446744073709551615#0#-1#-23%DVTTextDocumentLocation3@-0000000000000000^18446744073709551615#18446744073709551615#18446744073709551615#18446744073709551615#18446744073709551615#0#13"PBXCp Warning--0#0#0#-19%DVTDocumentLocation4@123"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer000000000080d041^559"CpResource cefclient/res/ReloadServer xcodebuild/Release/Reload.app/Contents/Resources/ReloadServer    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"FA7A6374-C0B6-4737-80F4-6BF48FBA22C8-
 
 CCpResource cefclient/res/binding.html xcodebuild/Release/Reload.app/Contents/Resources/binding.html
-s379942029.520314
-e379942029.526128
+s380113646.906408
+e380113646.913426
 r1
 xCpResource
 xcefclient/res/binding.html
 xxcodebuild/Release/Reload.app/Contents/Resources/binding.html
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection66"Copy xcodebuild/Release/Reload.app/Contents/Resources/binding.html0a4a858d74a5b641^64b0868d74a5b641^---0#0#0#-19%DVTDocumentLocation2@123"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/binding.html000000000080d041^559"CpResource cefclient/res/binding.html xcodebuild/Release/Reload.app/Contents/Resources/binding.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/binding.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"B3DBE6F2-474A-4C6C-8623-D8AD01CFC9F1-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection66"Copy xcodebuild/Release/Reload.app/Contents/Resources/binding.html3a21e8ee12a8b641^23d7e9ee12a8b641^---0#0#0#-19%DVTDocumentLocation2@123"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/binding.html000000000080d041^559"CpResource cefclient/res/binding.html xcodebuild/Release/Reload.app/Contents/Resources/binding.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/binding.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"5357093B-4D53-441D-8821-C19C4BF6E53D-
 
 CCpResource cefclient/res/dialogs.html xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html
-s379942029.520326
-e379942029.524849
+s380113646.906413
+e380113646.913336
 r1
 xCpResource
 xcefclient/res/dialogs.html
 xxcodebuild/Release/Reload.app/Contents/Resources/dialogs.html
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection66"Copy xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html6748858d74a5b641^4a5d868d74a5b641^---0#0#0#-19%DVTDocumentLocation2@123"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html000000000080d041^559"CpResource cefclient/res/dialogs.html xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/dialogs.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"8BE8D80F-9B2E-4E67-8126-4322D0732282-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection66"Copy xcodebuild/Release/Reload.app/Contents/Resources/dialogs.htmla320e8ee12a8b641^96d0e9ee12a8b641^---0#0#0#-19%DVTDocumentLocation2@123"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html000000000080d041^559"CpResource cefclient/res/dialogs.html xcodebuild/Release/Reload.app/Contents/Resources/dialogs.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/dialogs.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"7F99C542-6952-4B12-B937-32E8FDB65BDA-
 
 CCpResource cefclient/res/domaccess.html xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html
-s379942029.520344
-e379942029.527293
+s380113646.906422
+e380113646.909513
 r1
 xCpResource
 xcefclient/res/domaccess.html
 xxcodebuild/Release/Reload.app/Contents/Resources/domaccess.html
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection68"Copy xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html494b858d74a5b641^9cfc868d74a5b641^---0#0#0#-19%DVTDocumentLocation2@125"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html000000000080d041^565"CpResource cefclient/res/domaccess.html xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/domaccess.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"56A13321-7E04-47A8-8ABE-16115CF78A7E-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection68"Copy xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html0c20e8ee12a8b641^f5d6e8ee12a8b641^---0#0#0#-19%DVTDocumentLocation2@125"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html000000000080d041^565"CpResource cefclient/res/domaccess.html xcodebuild/Release/Reload.app/Contents/Resources/domaccess.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/domaccess.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"3D5E0246-50E6-4890-9B05-2161C44AB543-
 
 CCpResource cefclient/res/localstorage.html xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html
-s379942029.520347
-e379942029.523724
+s380113646.906662
+e380113646.919504
 r1
 xCpResource
 xcefclient/res/localstorage.html
 xxcodebuild/Release/Reload.app/Contents/Resources/localstorage.html
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection71"Copy xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html8449858d74a5b641^3c13868d74a5b641^---0#0#0#-19%DVTDocumentLocation2@128"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html000000000080d041^574"CpResource cefclient/res/localstorage.html xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/localstorage.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"ED8C9002-F965-453B-B5EF-66CED29AC4F9-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection71"Copy xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html832fe8ee12a8b641^3c67ebee12a8b641^---0#0#0#-19%DVTDocumentLocation2@128"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html000000000080d041^574"CpResource cefclient/res/localstorage.html xcodebuild/Release/Reload.app/Contents/Resources/localstorage.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/localstorage.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"E7149CFD-A081-4279-B753-9DCB36BEC211-
 
 CCpResource cefclient/res/logo.png xcodebuild/Release/Reload.app/Contents/Resources/logo.png
-s379942029.520579
-e379942029.530778
+s380113646.906792
+e380113646.917712
 r1
 xCpResource
 xcefclient/res/logo.png
 xxcodebuild/Release/Reload.app/Contents/Resources/logo.png
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection62"Copy xcodebuild/Release/Reload.app/Contents/Resources/logo.png2a56858d74a5b641^43e1878d74a5b641^---0#0#0#-19%DVTDocumentLocation2@119"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/logo.png000000000080d041^547"CpResource cefclient/res/logo.png xcodebuild/Release/Reload.app/Contents/Resources/logo.png    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/logo.png /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"8AA9F8D0-6FC9-4F23-9A41-35D1A7717C97-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection62"Copy xcodebuild/Release/Reload.app/Contents/Resources/logo.png7636e8ee12a8b641^1ff2eaee12a8b641^---0#0#0#-19%DVTDocumentLocation2@119"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/logo.png000000000080d041^547"CpResource cefclient/res/logo.png xcodebuild/Release/Reload.app/Contents/Resources/logo.png    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/logo.png /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"830EF718-97E2-4C23-A0A9-D735AAA0B34F-
 
 CCpResource cefclient/res/xmlhttprequest.html xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html
-s379942029.524196
-e379942029.533181
+s380113646.910672
+e380113646.921453
 r1
 xCpResource
 xcefclient/res/xmlhttprequest.html
 xxcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection73"Copy xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html3140868d74a5b641^247f888d74a5b641^---0#0#0#-19%DVTDocumentLocation2@130"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html000000000080d041^580"CpResource cefclient/res/xmlhttprequest.html xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/xmlhttprequest.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"631B7781-F5A8-4218-91E3-50BFBA2409FA-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection73"Copy xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.htmld237e9ee12a8b641^bde4ebee12a8b641^---0#0#0#-19%DVTDocumentLocation2@130"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html000000000080d041^580"CpResource cefclient/res/xmlhttprequest.html xcodebuild/Release/Reload.app/Contents/Resources/xmlhttprequest.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/xmlhttprequest.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Resources36"C1A3C806-5AE4-4A02-9B2E-246574AAF068-
 
 CLd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reload normal i386
-s379942031.904899
-e379942031.964385
+s380113647.511324
+e380113647.974335
 r1
 xLd
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reload
 xnormal
 xi386
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection102"Link /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reloada0c4e78f74a5b641^b9e2f68f74a5b641^---0#0#0#--985"Ld xcodebuild/Release/Reload.app/Contents/MacOS/Reload normal i386    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-g++-4.2 -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -L/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks -LRelease -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -filelist /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/Reload.LinkFileList -mmacosx-version-min=10.5 -dead_strip -Wl,-search_paths_first -Wl,-ObjC -Wl,-pie -lcef_dll_wrapper -framework AppKit -lcef -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reload36"9D1155A1-C239-4132-B6BD-9CEC09E13F19-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection102"Link /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reload98f982ef12a8b641^8b6ef9ef12a8b641^---0#0#0#--985"Ld xcodebuild/Release/Reload.app/Contents/MacOS/Reload normal i386    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-g++-4.2 -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -L/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks -LRelease -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release -filelist /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Objects-normal/i386/Reload.LinkFileList -mmacosx-version-min=10.5 -dead_strip -Wl,-search_paths_first -Wl,-ObjC -Wl,-pie -lcef_dll_wrapper -framework AppKit -lcef -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/MacOS/Reload36"EAD05AAE-7DF1-45A5-84F5-E540AA7DE990-
 
 CPBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app"
-s379942029.280683
-e379942029.294145
+s380113646.348461
+e380113646.373164
 r1
 xPBXCp
 xxcodebuild/Debug/Reload Helper.app
 xxcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection72"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app96ed478d74a5b641^e44c4b8d74a5b641^-351"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app/Contents/MacOS/Reload Helper -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app/Contents/MacOS/Reload Helper-0#0#0#-19%DVTDocumentLocation2@131"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Reload%20Helper.app000000000080d041^583"PBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks36"F4CCE070-8680-4C20-97CD-0B4E6681BF7C-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection72"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app6e5259ee12a8b641^7b875fee12a8b641^-351"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app/Contents/MacOS/Reload Helper -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app/Contents/MacOS/Reload Helper-0#0#0#-19%DVTDocumentLocation2@131"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Reload%20Helper.app000000000080d041^583"PBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Release/Reload.app/Contents/Frameworks/Reload Helper.app"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks36"ACB76E9B-DFE3-4952-9667-F98F8AD1BD0C-
 
 CPBXCp Release/ffmpegsumo.so "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"
-s379942029.333126
-e379942029.353384
+s380113646.548684
+e380113646.586100
 r1
 xPBXCp
 xRelease/ffmpegsumo.so
 xxcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection116"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so035b558d74a5b641^1d775a8d74a5b641^-324"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Release/ffmpegsumo.so -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so-0#0#0#-19%DVTDocumentLocation2@177"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Libraries/ffmpegsumo.so000000000080d041^601"PBXCp Release/ffmpegsumo.so "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks Release/ffmpegsumo.so "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries"36"7AA4018F-65D7-4534-A243-A6FD5B3174FD-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection116"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so66878cee12a8b641^b70a96ee12a8b641^-324"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Release/ffmpegsumo.so -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so-0#0#0#-19%DVTDocumentLocation2@177"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Libraries/ffmpegsumo.so000000000080d041^601"PBXCp Release/ffmpegsumo.so "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks Release/ffmpegsumo.so "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries"36"1C06C697-C25E-4FE0-AA41-D3CF2D2C3828-
 
 CPBXCp Release/libcef.dylib "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib"
-s379942029.333121
-e379942029.512300
+s380113646.548679
+e380113646.898295
 r1
 xPBXCp
 xRelease/libcef.dylib
 xxcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection115"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib295a558d74a5b641^4a26838d74a5b641^-322"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Release/libcef.dylib -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib-0#0#0#-19%DVTDocumentLocation2@176"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Libraries/libcef.dylib000000000080d041^598"PBXCp Release/libcef.dylib "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks Release/libcef.dylib "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries"36"83403F52-2147-42D9-BC15-CEA87F781395-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection115"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib55878cee12a8b641^2ff7e5ee12a8b641^-322"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Release/libcef.dylib -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib-0#0#0#-19%DVTDocumentLocation2@176"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Libraries/libcef.dylib000000000080d041^598"PBXCp Release/libcef.dylib "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks Release/libcef.dylib "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries"36"5390B666-CD0F-4F47-B9B9-804F3551F07C-
 
 CPBXCp Release/libplugin_carbon_interpose.dylib xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib
-s379942029.280687
-e379942029.288288
+s380113646.348455
+e380113646.368286
 r1
 xPBXCp
 xRelease/libplugin_carbon_interpose.dylib
 xxcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection87"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylibabec478d74a5b641^b3cd498d74a5b641^-314"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Release/libplugin_carbon_interpose.dylib -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib-0#0#0#-19%DVTDocumentLocation2@144"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib000000000080d041^558"PBXCp Release/libplugin_carbon_interpose.dylib xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks Release/libplugin_carbon_interpose.dylib /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks36"457CCE5C-642D-47C6-8791-5D2AF9BF6C50-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection87"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylibaa4859ee12a8b641^30485eee12a8b641^-314"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Release/libplugin_carbon_interpose.dylib -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib-0#0#0#-19%DVTDocumentLocation2@144"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib000000000080d041^558"PBXCp Release/libplugin_carbon_interpose.dylib xcodebuild/Release/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks Release/libplugin_carbon_interpose.dylib /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks36"BA8263A8-23C8-486E-ACFB-EE344894FE53-
 
 CPBXCp Resources "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources"
-s379942029.301690
-e379942029.324923
+s380113646.381212
+e380113646.540711
 r1
 xPBXCp
 xResources
 xxcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection102"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources76504d8d74a5b641^5a2e538d74a5b641^---0#0#0#-19%DVTDocumentLocation2@163"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Resources000000000080d041^599"PBXCp Resources "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Resources "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework"36"5376BC00-DB6B-466B-8F65-0D31C2477205-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection102"Copy xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources8fa761ee12a8b641^7f6c8aee12a8b641^---0#0#0#-19%DVTDocumentLocation2@163"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Resources000000000080d041^599"PBXCp Resources "xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-debug-symbols -strip-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Resources "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework"36"3E453C36-70AC-46EC-A3EC-AE8F4EE7CCB7-
 
 CPhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh
-s379942032.513059
-e379942032.605173
+s380113648.659734
+e380113648.750078
 r1
 xPhaseScriptExecution
 xPostbuild "Change Mach-O Flags"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection57"Run custom shell script 'Postbuild "Change Mach-O Flags"'cae1839074a5b641^8dec9a9074a5b641^---0#0#0#--331"PhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" xcodebuild/Reload.build/Release/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh36"1244469F-4E75-4E00-8D0F-801F3CB21A15-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection57"Run custom shell script 'Postbuild "Change Mach-O Flags"'cf4ba9f012a8b641^fb04c0f012a8b641^---0#0#0#--331"PhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" xcodebuild/Reload.build/Release/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh36"63E7B843-9585-470F-81B3-A94A5567B829-
 
 CPhaseScriptExecution "Postbuild \"Fix Framework Link\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-E2234B600593F2E17EC7B33D.sh
-s379942031.972811
-e379942031.992577
+s380113647.982771
+e380113648.002589
 r1
 xPhaseScriptExecution
 xPostbuild "Fix Framework Link"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-E2234B600593F2E17EC7B33D.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection56"Run custom shell script 'Postbuild "Fix Framework Link"'db6ff98f74a5b641^a819fe8f74a5b641^---0#0#0#--330"PhaseScriptExecution "Postbuild \"Fix Framework Link\"" xcodebuild/Reload.build/Release/Reload.build/Script-E2234B600593F2E17EC7B33D.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-E2234B600593F2E17EC7B33D.sh36"EB4DA366-D1DC-4195-80E8-1E71DCD235A5-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection56"Run custom shell script 'Postbuild "Fix Framework Link"'2ff9fbef12a8b641^f4a800f012a8b641^---0#0#0#--330"PhaseScriptExecution "Postbuild \"Fix Framework Link\"" xcodebuild/Reload.build/Release/Reload.build/Script-E2234B600593F2E17EC7B33D.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-E2234B600593F2E17EC7B33D.sh36"4548F74C-E827-46CE-AB0C-F1283D08C0F4-
 
 CPhaseScriptExecution "Postbuild \"Make More Helpers\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh
-s379942032.000753
-e379942032.504629
+s380113648.017083
+e380113648.651358
 r1
 xPhaseScriptExecution
 xPostbuild "Make More Helpers"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection55"Run custom shell script 'Postbuild "Make More Helpers"'d8b6009074a5b641^f92e819074a5b641^---0#0#0#--329"PhaseScriptExecution "Postbuild \"Make More Helpers\"" xcodebuild/Reload.build/Release/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh36"715499F2-1953-4158-98D5-2E186CFD7A72-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection55"Run custom shell script 'Postbuild "Make More Helpers"'77f704f012a8b641^8cbea6f012a8b641^---0#0#0#--329"PhaseScriptExecution "Postbuild \"Make More Helpers\"" xcodebuild/Reload.build/Release/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh36"9CD45036-7C97-4223-8800-5EE67219C695-
 
 CPhaseScriptExecution "Postbuild \"Strip If Needed\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-A019BF58402B64855147A97A.sh
-s379942032.613571
-e379942032.687801
+s380113648.758285
+e380113648.833769
 r1
 xPhaseScriptExecution
 xPostbuild "Strip If Needed"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-A019BF58402B64855147A97A.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Run custom shell script 'Postbuild "Strip If Needed"'6d759d9074a5b641^5114b09074a5b641^---0#0#0#--327"PhaseScriptExecution "Postbuild \"Strip If Needed\"" xcodebuild/Reload.build/Release/Reload.build/Script-A019BF58402B64855147A97A.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-A019BF58402B64855147A97A.sh36"DDDB199E-4738-4DFE-BDB1-47715C3825CB-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Run custom shell script 'Postbuild "Strip If Needed"'0281c2f012a8b641^e770d5f012a8b641^---0#0#0#--327"PhaseScriptExecution "Postbuild \"Strip If Needed\"" xcodebuild/Reload.build/Release/Reload.build/Script-A019BF58402B64855147A97A.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Release/Reload.build/Script-A019BF58402B64855147A97A.sh36"A6DD9B15-DA0E-4704-B8B7-BF547B0993E2-
 
 CProcessInfoPlistFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Info.plist cefclient/mac/Info.plist
-s379942029.270073
-e379942029.272857
+s380113646.337608
+e380113646.340397
 r1
 xProcessInfoPlistFile
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Info.plist
 xcefclient/mac/Info.plist
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection32"Process cefclient/mac/Info.plistbd34458d74a5b641^38da458d74a5b641^---0#0#0#-19%DVTDocumentLocation2@86"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/Info.plist0000000000000000^445"ProcessInfoPlistFile xcodebuild/Release/Reload.app/Contents/Info.plist cefclient/mac/Info.plist    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-infoPlistUtility cefclient/mac/Info.plist -genpkginfo /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/PkgInfo -expandbuildsettings -platform macosx -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Info.plist36"DBE96953-81A0-45E6-A7E2-951924A056BD-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection32"Process cefclient/mac/Info.plist7c8056ee12a8b641^a72457ee12a8b641^---0#0#0#-19%DVTDocumentLocation2@86"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/Info.plist0000000000000000^445"ProcessInfoPlistFile xcodebuild/Release/Reload.app/Contents/Info.plist cefclient/mac/Info.plist    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-infoPlistUtility cefclient/mac/Info.plist -genpkginfo /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/PkgInfo -expandbuildsettings -platform macosx -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app/Contents/Info.plist36"1F444D57-9858-4EED-9BE1-D936FE07EEAA-
 
 CTouch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app
-s379942032.695789
-e379942032.702472
+s380113648.842099
+e380113648.848715
 r1
 xTouch
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection81"Touch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app2b32b29074a5b641^fed5b39074a5b641^---0#0#0#--187"Touch xcodebuild/Release/Reload.app    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /usr/bin/touch -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app36"7F7CEA5C-D775-47D5-B87F-8A02F5BF57D9-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection81"Touch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app2fa8d7f012a8b641^d845d9f012a8b641^---0#0#0#--187"Touch xcodebuild/Release/Reload.app    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /usr/bin/touch -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Release/Reload.app36"3EF7675B-DB9A-4A00-A9C7-1B3CA670C3C1-
 

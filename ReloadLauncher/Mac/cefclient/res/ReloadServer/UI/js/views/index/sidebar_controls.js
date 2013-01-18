@@ -25,15 +25,12 @@ define([
         },
 
         render: function () {
-            console.log('rendering sidebar controls');
-
             var compiledTemplate = _.template( sidebarControlsTemplate, {} );
             return this.$el.html( compiledTemplate );
         },
 
         addProject: function (e) {
             e.preventDefault();
-            console.log('Add project');
 
             var self = this;
 

@@ -10,52 +10,70 @@ define([
 
         reloadButton: '#reload-button',
 
+        debugFlag: false,
+
         events: {
-            'click #reload-button':  'reload'
+            'click #reload-button': 'reload',
+            'click #debug-button':  'debug'
         },
 
         initialize: function (options) {
 
             this.parent = options.parent;
 
-            _.bindAll(this, 'render', 'reload');
+            _.bindAll(this, 'render', 'reload', 'debug');
 
             this.model = new SidebarReloadButtonModel();
 
             this.compiledTemplate = _.template( reloadButtonTemplate, {} );
+            this.$el.html( this.compiledTemplate );
         },
 
         render: function () {
-            console.log('rendering jumbo button');
-            return this.$el.html( this.compiledTemplate );
+            return this.$el;
+        },
+
+        debug: function() {
+            console.log('debug');
+            this.debugFlag = true;
+            this.reload();
         },
 
         reload: function () {
 
             // Check if a project is selected.
             if (this.parent.selectedProject === null) {
-                alert ('Please select a project first.');
-            } else {
-                var options     = {};
-                options.url     = 'http://localhost:8283';
-
-                options.rpcMsg  = {
-                    method: 'manager.reloadProject',
-                    params: [this.parent.selectedProject.get('name'), this.parent.debug],
-                    id: 0
-                };
-
-                options.success = function (resp) {
-                    console.log('reload');
-                    console.log(resp.result);
-                };
-
-                options.error   = function (resp) {
-                    console.log('could not reload');
-                    console.log(resp);
-                };
-                this.model.rpc(options);
+                alert ('Please select a project.');
+                return;
             }
+
+            // TODO Make an extra pull for device list before trying to
+            // reload.
+            // Check if any devices are connected.
+            if (this.parent.deviceCount === 0) {
+                alert ('Please connect a device.');
+                return;
+            }
+
+            var options     = {};
+            options.url     = 'http://localhost:8283';
+
+            options.rpcMsg  = {
+                method: 'manager.reloadProject',
+                params: [this.parent.selectedProject.get('name'), this.debugFlag],
+                id: 0
+            };
+
+            options.success = function (resp) {
+                console.log('reload');
+                console.log(resp.result);
+            };
+
+            options.error   = function (resp) {
+                console.log('could not reload');
+                console.log(resp);
+            };
+            this.model.rpc(options);
         }
 
     });
