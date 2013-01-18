@@ -3,9 +3,8 @@ define([
     'underscore',
     'backbone',
     'models/log/log',
-    'views/log/ticker',
     'text!../../../templates/log/message.html'
-], function($, _, Backbone, LogModel, LogTickerView, messageTemplate){
+], function($, _, Backbone, LogModel, messageTemplate){
 
     var LogView = Backbone.View.extend({
 
@@ -23,7 +22,6 @@ define([
             _.bindAll(this, 'render', 'close', 'updateLog');
 
             this.model = new LogModel();
-            this.logTicker = new LogTickerView();
         },
 
         render: function () {
