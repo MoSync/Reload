@@ -7,6 +7,8 @@ define([
 
     var DebugView = Backbone.View.extend({
 
+        name: 'debug',
+
         initialize: function () {
             _.bindAll(this, 'render', 'close');
         },

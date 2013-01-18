@@ -16,6 +16,7 @@ ul li {
 }
 
 #wrap {
+    min-width: 800px;
     width:100%;
     overflow:hidden;
 }
@@ -29,13 +30,14 @@ ul li {
 }
 #bar-left-head {
     background: #efefef;
+    border-bottom: 1px solid rgb(206, 206, 206);
 }
 
 #bar-left .nav-top {
     padding: 10px 0;
     background: rgb(238, 238, 238);
     text-align: center;
-    border-top: 1px solid rgb(206, 206, 206);
+    border-top: 1px solid #fff;
     border-bottom: 1px solid rgb(227, 228, 227);
 
     background: #ededed; /* Old browsers */
@@ -58,6 +60,13 @@ ul li {
     font-weight: bold;
     font-size: 18px;
 }
+#bar-left .project-name-clip {
+    width: 120px;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+}
+
 
 #bar-left a.btn-nostyle,
 #bar-left a.btn-nostyle:hover {
@@ -75,7 +84,9 @@ ul li {
 }
 
 #main-content #content-nav {
-    display: table;
+    height: 48px;
+    position: absolute;
+    top: 0;
 }
 
 #main-content #content-nav ul {
@@ -86,9 +97,10 @@ ul li {
 }
 
 #main-content #content {
+    position: absolute;
     background: #fff;
-    position: relative; /* So codemirrors absolute positioning obeys its context*/
-    height: 100%;
+    top: 48px;
+    bottom: 0;
 }
 
 #main-content #console {
@@ -101,7 +113,9 @@ ul li {
     border-top: 1px solid rgb(221, 221, 221);
 }
 
-
+#weinre {
+    margin-top: 10px;
+}
 .fill {
     height: 100%;
     min-height: 100%;
@@ -212,4 +226,43 @@ ul#projects li a.select-project {
 .radio.inline {
     white-space: nowrap;
     margin-right: 10px;
+}
+
+/**
+ * Remote Log Panel CSS Styles
+ */
+.errorContainer {
+    background-color: #FFEBEB;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px #DDDDDD solid;
+    margin-bottom: 3px;
+}
+
+.RemoteErrorHeader {
+    color: red;
+}
+
+.RemoteErrorBody {
+    color: green;
+    padding-left: 35px;
+}
+
+.rlogContainer {
+	background-color: #EEEEEE;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px #DDDDDD solid;
+    margin-bottom: 3px;
+}
+
+.rlogHeader {
+    color: #0088cc;
+}
+
+.rlogBody {
+    color: #333333;
+    padding-left: 35px;
 }
