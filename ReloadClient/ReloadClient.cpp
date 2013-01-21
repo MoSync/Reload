@@ -40,6 +40,33 @@ using namespace MAUtil;
 using namespace NativeUI;
 using namespace Wormhole;
 
+// ========== Error messages ==========
+
+#define RELOAD_ERROR_COULD_NOT_CONNECT_TO_SERVER 0
+
+static String sErrorMessages[] =
+{
+	"Could not connect to the server", // 0
+	"Could not connect to the server", // -1
+	"Could not connect to the server", //GENERIC = -2;
+	"The maximum number of open connections allowed has been reached", //MAX = -3;
+	"DNS resolution error", //DNS = -4;
+	"Internal error. Please report any occurrences", //INTERNAL = -5;
+	"The connection was closed by the remote peer", //CLOSED = -6;
+	"Attempted to write to a read-only connection", //READONLY = -7;
+	"The OS does not trust you enough to let you open this connection", //FORBIDDEN = -8;
+	"No operation has been started yet", //UNINITIALIZED = -9;
+	"The Content-Length header could not be found", //CONLEN = -10;
+	"You supplied a malformed URL", //URL = -11;
+	"The protocol is not available", //UNAVAILABLE = -12;
+	"You canceled the operation", //CANCELED = -13;
+	"The server gave an invalid response", //PROTOCOL = -14;
+	"The network connection could not be established", //NETWORK = -15;
+	"The requested header could not be found", //NOHEADER = -16;
+	"The requested object could not be found", //NOTFOUND = -17;
+	"An error occurred during SSL negotiation" //SSL = -18;
+};
+
 // ========== Helper class ==========
 
 /**
@@ -391,7 +418,18 @@ void ReloadClient::socketHandlerConnected(int result)
 	}
 	else
 	{
-		showConErrorMessage(result);
+		// Special handling of error code -13, which is sent
+		// when a maConnect fails, on Android at least. Is this
+		// a bug in the runtime? See issue RELOAD-133.
+		if (-13 == result)
+		{
+			showConnectionErrorMessage(
+				RELOAD_ERROR_COULD_NOT_CONNECT_TO_SERVER);
+		}
+		else
+		{
+			showConnectionErrorMessage(result);
+		}
 	}
 }
 
@@ -402,7 +440,7 @@ void ReloadClient::socketHandlerDisconnected(int result)
 {
 	LOG("@@@ RELOAD: ERROR socketHandlerDisconnected: %i", result);
 
-	showConErrorMessage(result);
+	showConnectionErrorMessage(result);
 
 	// Go back to the login screen.
 	mLoginScreen->showNotConnectedScreen();
@@ -435,8 +473,8 @@ void ReloadClient::socketHandlerMessageReceived(const char* message)
 
 void ReloadClient::downloadHandlerError(int code)
 {
-	LOG("@@@ RELOAD: Downloader error: %d", code);
-	showConErrorMessage(code);
+	LOG("@@@ RELOAD: Download handler error: %d", code);
+	showConnectionErrorMessage(code);
 }
 
 void ReloadClient::downloadHandlerSuccess(MAHandle data)
@@ -499,7 +537,13 @@ void ReloadClient::cancelDownload()
 
 void ReloadClient::connectToServer(const char* serverAddress)
 {
-	mSocketHandler.connectToServer(serverAddress, SERVER_TCP_PORT);
+	int result = mSocketHandler.connectToServer(
+		serverAddress,
+		SERVER_TCP_PORT);
+	if (result < 0)
+	{
+		showConnectionErrorMessage(RELOAD_ERROR_COULD_NOT_CONNECT_TO_SERVER);
+	}
 }
 
 void ReloadClient::disconnectFromServer()
@@ -595,7 +639,7 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 	else
 	{
 		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
-		showConErrorMessage(result);
+		showConnectionErrorMessage(result);
 	}
 }
 
@@ -768,53 +812,34 @@ MAUtil::String ReloadClient::getInfo()
 }
 
 /**
- * This method handles any connection error messages
- * @param errorCode The error code that was returned
+ * This method handles any connection error messages.
+ * @param errorCode The error code that was returned.
  */
-void ReloadClient::showConErrorMessage(int errorCode)
+void ReloadClient::showConnectionErrorMessage(int errorCode)
 {
-	String errorMessages[] =
-	{
-		"Could not connect to the server.", // 0
-		"Could not connect to the server.", // -1
-		"Could not connect to the server.", //GENERIC = -2;
-		"The maximum number of open connections allowed has been reached.", //MAX = -3;
-		"DNS resolution error.", //DNS = -4;
-		"Internal error. Please report any occurrences", //INTERNAL = -5;
-		"The connection was closed by the remote peer.", //CLOSED = -6;
-		"Attempted to write to a read-only connection.", //READONLY = -7;
-		"The OS does not trust you enough to let you open this connection.", //FORBIDDEN = -8;
-		"No operation has been started yet.", //UNINITIALIZED = -9;
-		"The Content-Length header could not be found.", //CONLEN = -10;
-		"You supplied a malformed URL.", //URL = -11;
-		"The protocol is not available.", //UNAVAILABLE = -12;
-		"You canceled the operation.", //CANCELED = -13;
-		"The server gave an invalid response.", //PROTOCOL = -14;
-		"The network connection could not be established.", //NETWORK = -15;
-		"The requested header could not be found.", //NOHEADER = -16;
-		"The requested object could not be found.", //NOTFOUND = -17;
-		"An error occurred during SSL negotiation." //SSL = -18;
-	};
+	String errorMessage;
+	char code[64];
 
-	const char* errorMessage;
-	char errorMessageBuffer[64];
+	sprintf(code, "%i", errorCode);
 
 	// Check if the error code is an internal Reload code.
 	// In this case we use the above error messages.
 	if (errorCode <= 0 && errorCode >= -18)
 	{
-		// The errorCode is a negative number,
-		// so we reverse it to index our C array.
-		errorMessage = errorMessages[-errorCode].c_str();
+		// The errorCode is a negative number, so we
+		// negate it to get a positive array index.
+		errorMessage = sErrorMessages[-errorCode] + " (";
+		errorMessage += code;
+		errorMessage += ")";
 	}
 	else
 	{
 		// Otherwise, display the error code.
-		sprintf(errorMessageBuffer, "Reload error: %i", errorCode);
-		errorMessage = errorMessageBuffer;
+		errorMessage = "Error: ";
+		errorMessage += code;
 	}
 
-	LOG("@@@ RELOAD: showConErrorMessage: %s", errorMessage);
+	LOG("@@@ RELOAD: showConnectionErrorMessage: %s", errorMessage.c_str());
 
-	maAlert("RELOAD Error", errorMessage, "OK", NULL, NULL);
+	maAlert("Network Status:", errorMessage.c_str(), "OK", NULL, NULL);
 }

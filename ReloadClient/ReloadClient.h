@@ -214,7 +214,7 @@ public:
      * This method handles any connection error messages.
      * @param errorCode The error code that was returned.
      */
-    void showConErrorMessage(int errorCode);
+    void showConnectionErrorMessage(int errorCode);
 
 private:
 	/**

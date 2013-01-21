@@ -55,7 +55,7 @@ void SocketHandler::setListener(SocketHandlerListener* listener)
 	mListener = listener;
 }
 
-void SocketHandler::connectToServer(
+int SocketHandler::connectToServer(
 	const MAUtil::String& serverAddress,
 	const MAUtil::String& port)
 {
@@ -66,7 +66,7 @@ void SocketHandler::connectToServer(
 		serverAddress.c_str(),
 		port.c_str());
 	LOG("@@@ RELOAD: Connect string: %s", buffer);
-	mSocket.connect(buffer);
+	return mSocket.connect(buffer);
 }
 
 void SocketHandler::closeConnection()
@@ -133,7 +133,7 @@ void SocketHandler::readMessage(int size)
  */
 void SocketHandler::connectFinished(Connection* conn, int result)
 {
-	if (result >= 0)
+	if (result > 0)
 	{
 		// Call connected callback.
 		mListener->socketHandlerConnected(result);
@@ -143,14 +143,14 @@ void SocketHandler::connectFinished(Connection* conn, int result)
 	}
 	else
 	{
-		// TODO: Should we call this?
-		mListener->socketHandlerDisconnected(result);
+		// Call with error code.
+		mListener->socketHandlerConnected(result);
 	}
 }
 
 void SocketHandler::connReadFinished(Connection* conn, int result)
 {
-	if (result >= 0)
+	if (result > 0)
 	{
 		// Did we get the message header?
 		if (1 == mReadState)
@@ -194,7 +194,7 @@ void SocketHandler::connRecvFinished(Connection* conn, int result)
 
 void SocketHandler::connWriteFinished(Connection* conn, int result)
 {
-	if (result >= 0)
+	if (result > 0)
 	{
 		// Write has finished, remove written element (first in queue).
 		mSendQueue.remove(0);

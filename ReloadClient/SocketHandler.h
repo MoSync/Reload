@@ -88,7 +88,7 @@ public:
 	/**
 	 * Open connection to the server.
 	 */
-	void connectToServer(
+	int connectToServer(
 		const MAUtil::String& serverAddress,
 		const MAUtil::String& port);
 
@@ -212,7 +212,6 @@ protected:
 	char mHeaderBufferIn[18];
 	int mHeaderBufferSize;
 	MAUtil::String mMagicHeader;
-
 };
 
 #endif
