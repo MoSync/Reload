@@ -1088,8 +1088,8 @@ var rpcFunctions = {
          *   - add the attribute name (lowercase in attrs)
          * TODO: search more elements than only div
          */
-        var attrs = ["onclick", "onevent"];    // Attribute list
-        var inlineJsCode = $("div").each(function (index, element){
+        var attrs = ["onclick", "onevent", "onload"];    // Attribute list
+        var inlineJsCode = $("div,body").each(function (index, element){
             
             for( var i in element.attribs ) {
 
