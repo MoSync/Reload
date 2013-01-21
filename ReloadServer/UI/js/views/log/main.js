@@ -52,6 +52,7 @@ define([
             this.timer = null;
         },
 
+        firstScroll: true,
         updateLog: function() {
             var self = this;
             this.model.getLogMsg(function(res) {
@@ -79,13 +80,24 @@ define([
 
                 // Autoscroll if at the bottom.
                 var scroller = document.getElementById('scroller');
+                var doScroll;
 
-                if ((scroller.scrollTop+scroller.clientHeight) === scroller.scrollHeight-20){
-                    console.log('at the bottom');
-                    scroller.scrollTop += 20;
-
+                // We are at the bottom.
+                if ((scroller.scrollTop+scroller.clientHeight) === (scroller.scrollHeight-20)){
+                    doScroll = true;
+                } else {
+                    doScroll = false;
                 }
-                //console.log( (scroller.scrollTop+scroller.clientHeight) + ' ' + scroller.scrollHeight);
+
+                // Do initial scroll as soon as overflow kick in.
+                if ((scroller.clientHeight < scroller.scrollHeight) && self.firstScroll) {
+                    doScroll = true;
+                    self.firstScroll = false;
+                }
+
+                if (doScroll) {
+                    scroller.scrollTop += 20;
+                }
             });
         },
 
