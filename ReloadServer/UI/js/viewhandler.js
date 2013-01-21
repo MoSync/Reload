@@ -31,6 +31,7 @@ define([
                 } else {
                     this.contentNavView = new ContentNavView();
                     $('#content-nav').html( this.contentNavView.render() );
+                    this.contentNavView.setActive(view.name);
                 }
             }
         };

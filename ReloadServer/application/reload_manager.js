@@ -2,8 +2,8 @@ var rpc   = require('../lib/jsonrpc');
 var net   = require('net');
 var fs    = require('fs');
 var path  = require('path');
-var jsdom = require('../node_modules/jsdom');
 var ncp   = require('../node_modules/ncp');
+var cheerio = require('cheerio');
 
 /**
  * The functions that are available for remote calling
@@ -532,7 +532,7 @@ var rpcFunctions = {
             }
             console.log('Copy Process      : Successfull');
 
-            //self.debugInjection(projectDir, function (){
+            self.debugInjection(projectDir, function (){
 
                 try {
                     // WEINRE injection
@@ -602,7 +602,7 @@ var rpcFunctions = {
                 {
                     console.log("Error in bundleApp: " + err);
                 }
-            //});
+            });
         });
     },
 
@@ -914,99 +914,88 @@ var rpcFunctions = {
                             projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
-            data     = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
-            jquery     = String(fs.readFileSync( process.cwd() + vars.globals.fileSeparator +
-                                      "lib" + vars.globals.fileSeparator + "jquery-1.8.3.min.js"));
+            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
 
         /**
          * Load the index.html file and parse it to a new window object
          * including jQuery for accessing and manipulating elements
          */
-        jsdom.env({
-            html: data,
-            src: [jquery],
-            done: function (errors, win) {
+        $ = cheerio.load(data,{
+            lowerCaseTags: false
+        });
 
-                /**
-                 * Get all embeded script tags
-                 */
-                var embededScriptTags = win.$("script:not([class='jsdom']):not([src])");
-                console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
-                for (var i = 0; i < embededScriptTags.length; i++) {
+        /**
+         * Get all embeded script tags
+         */
+        var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
+            $(this).html("try {  eval(unescape(\"" +
+                                escape($(this).html()) +
+                            "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+        });
+        console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
 
-                    embededScriptTags[i].innerHTML = "try { \n eval(unescape(\"" +
-                                                     escape(embededScriptTags[i].innerHTML) +
-                                                     "\")); \n } catch (e) { \nmosync.rlog(escape(e.toString())); \n};";
-                }
+        /**
+         * Get all external js script files
+         */
+        var externalScriptFiles = $("script[src]:not([class='jsdom'])").each(function (index, element){
 
+            if( element.attribs.src !== "js/wormhole.js") {
+                var scriptPath = vars.globals.rootWorkspacePath +
+                                 vars.globals.fileSeparator +
+                                 projectName +
+                                 vars.globals.fileSeparator + 'TempBundle' +
+                                 vars.globals.fileSeparator + self.fixPathsUnix(element.attribs.src);
+                try {
 
-                /**
-                 * Get all external js script files
-                 */
-                var externalScriptFiles = win.$("script[src]:not([class='jsdom'])");
-                console.log("--Debug Feature-- There was: " + externalScriptFiles.length + " external JS scripts found.");
+                    var s = fs.statSync(scriptPath);
 
-                for (var i = 0; i < externalScriptFiles.length; i++) {
-                    if( externalScriptFiles[i].src !== "wormhole.js") {
-                        var scriptPath = vars.globals.rootWorkspacePath +
-                                         vars.globals.fileSeparator +
-                                         projectName +
-                                         vars.globals.fileSeparator + 'TempBundle' +
-                                         vars.globals.fileSeparator + self.fixPathsUnix(externalScriptFiles[i].src);
-                        try {
+                    if( s.isFile() ) {
+                        var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
-                            var s = fs.statSync(scriptPath);
-
-                            if( s.isFile() ) {
-                                var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
-
-                                jsFileData = "try { \n eval(unescape(\"" + escape(jsFileData) +
-                                              "\")); \n } catch (e) { \nmosync.rlog(escape(e.toString())); \n};";
-                                fs.writeFileSync(scriptPath, jsFileData, "utf8");
-                            }
-
-                        } catch (e) {
-
-                            console.log(e);
-                        }
+                        jsFileData = "try { eval(unescape(\"" + escape(jsFileData) +
+                                      "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };";
+                        fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
+                } catch (e) {
+                    console.log(e);
                 }
-
-                /**
-                 * Get all elements that have inline js code
-                 * To add more tag attributes:
-                 *   - add the attribute name (lowercase in attrs)
-                 *   - add the atribute in jquery selector
-                 */
-
-                 var attrs = ["onclick", "onevent"];    // Attribute list
-                 var inlineJsCode = win.$("[onclick],[onEvent]"); // jQuery Selector
-
-
-                 console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-
-                 for( var i = 0; i < inlineJsCode.length; i++) {
-
-                     for( var j = 0; j < attrs.length; j++) {
-
-                         var inlineCode = inlineJsCode[i].getAttribute(attrs[j]);
-                         if( inlineCode !== "" ) {
-                             inlineJsCode[i].setAttribute(attrs[j],  "try { \n eval(unescape(\"" +
-                                                            escape(inlineCode) +
-                                                            "\")); \n } catch (e) { \nmosync.rlog(escape(e.toString())); \n};");
-                         }
-                     }
-                 }
-
-                 /**
-                  * Write index.html file
-                  */
-                fs.writeFileSync(indexHtmlPath, win.document.outerHTML, "utf8");
-
-                callback();
             }
         });
-    }
+        console.log("--Debug Feature-- There was: " + externalScriptFiles.length + " external JS scripts found.");
+
+        /**
+         * Get all elements that have inline js code
+         * To add more tag attributes:
+         *   - add the attribute name (lowercase in attrs)
+         * TODO: search more elements than only div
+         */
+        var attrs = ["onclick", "onevent"];    // Attribute list
+        var inlineJsCode = $("div").each(function (index, element){
+            
+            for( var i in element.attribs ) {
+
+                for( var j = 0; j < attrs.length; j++) {
+
+                    if( i.toLowerCase() == attrs[j] ) {
+
+                        var inlineCode = $(this).attr(i);
+
+                        $(element).attr(i, "try { eval(unescape(\"" +
+                                                    escape(inlineCode) +
+                                                    "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                    }
+                }
+            }
+        }); 
+        console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
+        
+         /**
+          * Write index.html file
+          */
+        fs.writeFileSync(indexHtmlPath, $.html(), "utf8");
+
+        callback();
+	}
 };
 
 // These functions are called for initialization
