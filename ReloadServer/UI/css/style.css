@@ -16,7 +16,7 @@ ul li {
 }
 
 #wrap {
-    min-width: 800px;
+    min-width: 820px;
     width:100%;
     overflow:hidden;
 }
@@ -113,9 +113,40 @@ ul li {
     border-top: 1px solid rgb(221, 221, 221);
 }
 
-#weinre {
-    margin-top: 10px;
+.weinre {
+    position: absolute;
+    width: 100%;
+    top: 10px;
+    bottom: 0;
 }
+
+#content .dl-horizontal {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    margin: 0;
+}
+#content .dl-horizontal dt {
+    width: 100px;
+
+}
+#content .dl-horizontal dd {
+    margin-left: 120px;
+
+}
+#content #log-controls {
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    left: 0;
+}
+#content #log-controls form {
+    margin: 0 20px 20px 0;
+    float: right;
+}
+
 .fill {
     height: 100%;
     min-height: 100%;
@@ -123,7 +154,20 @@ ul li {
 }
 .pad10 { padding: 10px; }
 
-ul#projects,
+.project-list {
+    position: absolute;
+    top: 162px;
+    bottom: 200px;
+    width: 100%;
+    overflow: auto;
+    border-top: 1px solid #bdbdbd;
+}
+
+
+ul#projects {
+}
+
+.project-list,
 ul#files {
     border-top: 1px solid #bdbdbd;
 }

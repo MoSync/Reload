@@ -25,15 +25,17 @@ define([
                 //this.devices = [];
             //}
 
-            var self = this;
             options.success = function (resp) {
+                var messages = [];
+
                 _(JSON.parse(resp.result)).each(function (d) {
-                    self.messages.push(d);
+                    messages.push(d);
                 });
-                console.log(self.messages);
 
                 if (typeof(callback) === 'function') {
-                    callback(self.messages);
+                    _(messages).each(function(m){
+                        callback(m);
+                    });
                 }
             };
 
