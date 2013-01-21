@@ -22,7 +22,6 @@ var accumulator = (function()
      */
     self.next = function()
     {
-        console.log("accumulator.next");
         mMessageData = null;
     };
 
@@ -31,8 +30,9 @@ var accumulator = (function()
      */
     self.add = function(data)
     {
-        console.log("accumulator.add");
         mAccumulatedData += data;
+        //console.log("accumulator.add data.length: " + data.length);
+        //console.log("accumulator.add mAccumulatedData.length: " + mAccumulatedData.length);
     };
 
     /**
@@ -78,8 +78,8 @@ var accumulator = (function()
             var dataLength = mAccumulatedData.substr(0, 8);
             mMessageLength = parseInt(dataLength, 16);
 
-            console.log("accumulator.getMessage: dataLength: " + dataLength);
-            console.log("accumulator.getMessage: mMessageLength: " + mMessageLength);
+            //console.log("accumulator.getMessage: dataLength: " + dataLength);
+            //console.log("accumulator.getMessage: mMessageLength: " + mMessageLength);
 
             // Point to the start of actual message data.
             mAccumulatedData = mAccumulatedData.substr(8);
@@ -94,8 +94,8 @@ var accumulator = (function()
             // Set accumulated data to whatever is left.
             mAccumulatedData = mAccumulatedData.substr(mMessageLength);
 
-            console.log("accumulator.getMessage: got a new message");
-            console.log("accumulator.getMessage: mAccumulatedData left: " + mAccumulatedData);
+            //console.log("accumulator.getMessage: got a new message");
+            //console.log("accumulator.getMessage: mAccumulatedData left.length: " + mAccumulatedData.length);
 
             // Reset message length.
             mMessageLength = 0;

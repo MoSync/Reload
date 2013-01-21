@@ -73,7 +73,7 @@ void SocketHandler::closeConnection()
 {
 	mSocket.close();
 
-	// TODO: Should we call this?
+	// TODO: Should we call this? No, I think.
 	mListener->socketHandlerDisconnected(0);
 }
 
@@ -91,14 +91,13 @@ void SocketHandler::sendMessage(const char* message)
 	// Create message data, starting with a magic header.
 	String data = mMagicHeader + messageLength + message;
 
-	// If there is already a message being sent we need to  queue the
-	// message and send it when current send operation has finished.
-	if (mSendQueue.size() > 0)
-	{
-		// Queue the data.
-		mSendQueue.add(data);
-	}
-	else
+	// Queue the data.
+	mSendQueue.add(data);
+
+	// Send it directly if this is the only item to be sent.
+	// If there are elements waiting in the queue, they will
+	// be sent in connWriteFinished.
+	if (mSendQueue.size() == 1)
 	{
 		// Send the data.
 		mSocket.write(data.c_str(), data.length());
@@ -197,17 +196,21 @@ void SocketHandler::connWriteFinished(Connection* conn, int result)
 {
 	if (result >= 0)
 	{
+		// Write has finished, remove written element (first in queue).
+		mSendQueue.remove(0);
+
 		// Is there more data waiting to be sent?
 		if (mSendQueue.size() > 0)
 		{
-			// Remove data from queue and send the data.
-			String data = mSendQueue[0];
-			mSendQueue.remove(0);
-			mSocket.write(data.c_str(), data.length());
+			// Send first in queue.
+			mSocket.write((mSendQueue[0]).c_str(), (mSendQueue[0]).length());
 		}
 	}
 	else
 	{
+		// Empty the queue.
+		mSendQueue.clear();
+
 		// TODO: Should we call this?
 		mListener->socketHandlerDisconnected(result);
 	}
