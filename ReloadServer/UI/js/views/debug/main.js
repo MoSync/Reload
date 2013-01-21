@@ -9,6 +9,8 @@ define([
 
         name: 'debug',
 
+        className: 'weinre',
+
         initialize: function () {
             _.bindAll(this, 'render', 'close');
         },

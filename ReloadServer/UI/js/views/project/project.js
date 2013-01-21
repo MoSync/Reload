@@ -10,6 +10,9 @@ define([
     var ProjectView = Backbone.View.extend({
 
         tagName: 'li',
+        events: {
+            'dblclick': 'toggleRename'
+        },
 
         initialize: function (options) {
 
@@ -49,6 +52,7 @@ define([
         },
 
         toggle: function () {
+            console.log('toggle');
             if (this.model.get('showControls')) {
                 // Bind event to controls
                 this.$controls.on('click', this.control);
@@ -59,10 +63,16 @@ define([
 
                 // Show controls
                 this.$container.append(this.$controls);
+
             } else {
 
                 this.$container.removeClass('select-project');
                 this.$container.find('span').removeClass('project-name-clip');
+
+                // Unbind doubleclick.
+                this.$container.find('span').off('dblclick');
+
+                // Remove form.
 
                 // Unbind events from controls
                 this.$controls.off('click', this.control);
@@ -70,6 +80,23 @@ define([
                 // Remove controls
                 this.$controls.remove();
             }
+        },
+        toggleRename: function () {
+            var span = this.$container.find('span');
+            var form = $('<form class="rename"><input value="'+span.html()+'"type="text"/></form>');
+            span.html(form);
+
+
+            var self = this;
+
+            form.find('input').on('click', function () {
+                self.model.set({ showControls: true });
+                console.log(self.model.get('showControls'));
+            });
+            form.find('input').focus();
+            form.find('input').on('blur', function() {
+                $(this).parent().parent().html($(this).val());
+            });
         },
 
         control: function (e) {
@@ -188,4 +215,3 @@ define([
 
     return ProjectView;
 });
-
