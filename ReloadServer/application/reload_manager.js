@@ -791,7 +791,9 @@ var rpcFunctions = {
 
     sendFeedback : function (text, sendResponse) {
         //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
+        if(typeof sendResponse !== 'function' || typeof text !== "string") {
+            return false;
+        }
 
         var postData = JSON.stringify( { feedback : text });
         

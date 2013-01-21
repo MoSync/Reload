@@ -75,10 +75,12 @@ create = function (port) {
 									deviceExists = true;
 								}
 							}
+							console.log(message.params);
 							if( !deviceExists ) {
 
 									var client = {
 										platform: message.params.platform,
+										version: message.params.version,
 										name: message.params.name,
 										uuid: message.params.uuid,
 										phonegap: message.params.phonegap

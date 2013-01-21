@@ -45,7 +45,7 @@ var globals = {
 	statsRequestOptions: {
         host: 'requestb.in',
         port: '80',
-        path: '/1gcqf431',
+        path: '/1eojc8e1',
         method: 'POST'
     },
 
@@ -53,7 +53,7 @@ var globals = {
     feedbackRequestOptions: {
         host: 'requestb.in',
         port: '80',
-        path: '/1gcqf431',
+        path: '/1eojc8e1',
         method: 'POST'
     }
 };
