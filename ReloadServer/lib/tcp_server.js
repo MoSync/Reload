@@ -136,10 +136,7 @@ var create = function (port) {
     function processMessage(jsonString, socket)
     {
         // The data is always in JSON format.
-        console.log("processMessage jsonString: " + jsonString);
         var message = JSON.parse(jsonString);
-
-        console.log("processMessage message.message: " + message.message);
 
         if (message != undefined);
         {
@@ -155,15 +152,12 @@ var create = function (port) {
                     " (" + socket.deviceInfo.name + ") has connected." )
             }
             // The device sent a log message.
-            else if (message.message == "remoteLog")
+            else if (message.message == "remoteLogRequest")
             {
-                // TODO: Output log message.
-                //socket.deviceInfo.name // the name of the device.
-                console.log("NEW remote log: " + message);
-                console.log(jsonString);
-                console.log(message);
-
-                //vars.globals.gRemoteLogData.push(message.params);
+                // Add log message to queue.
+                // TODO: Use a function for this rather than
+                // accessing global data directly.
+                vars.globals.gRemoteLogData.push(message.params);
             }
         }
     }
