@@ -29,7 +29,7 @@ create = function(port) {
 
     //console.log(express.json());
     app.use(express.favicon());
-    app.use(express.logger('dev'));
+    //app.use(express.logger('dev'{stream}));
     app.use(express.cookieParser('foobar'));
     app.use(express.session());
     app.use(express.bodyParser());
@@ -37,7 +37,7 @@ create = function(port) {
 
     app.get('/proccess', function(request, response){
 
-		console.log(request.query.jsonRPC);
+		//console.log(request.query.jsonRPC);
 		rpc.listen(JSON.parse(request.query.jsonRPC), response);
 	});
 
@@ -45,9 +45,9 @@ create = function(port) {
 
     app.post('/', function( request, response ){
 
-        console.dlog("REQUEST TYPE: " + request.method);
+        //console.dlog("REQUEST TYPE: " + request.method);
 
-        console.log("request.body: " + request.body);
+        //console.log("request.body: " + request.body);
         rpc.listen(request.body, response);
     });
 

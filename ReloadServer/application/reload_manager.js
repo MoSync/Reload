@@ -51,7 +51,7 @@ var rpcFunctions = {
             if(sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             }
-    	}
+        }
     },
 
     /**
@@ -467,13 +467,11 @@ var rpcFunctions = {
             //send the new bundle URL to the device clients
             vars.globals.clientList.forEach(function (client){
 
-                console.log("url       : " + url + "?filesize=" + data.length);
+                console.log("url: " + url + "?filesize=" + data.length);
                 try {
-                    // TODO: We need to send length of url.
-                    // First length as hex 8 didgits, e.g.: "000000F0"
-                    // Then string data follows.
-                    // Update client to read this format.
-                    // Or should we use "number:stringdata", e.g.: "5:Hello" ??
+                    // Protocol consists of header "RELOADMSG" followed
+                    // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+                    // Then string data follows with actual JSON message.
                     // Advantage with hex is that we can read fixed numer of bytes
                     // in the read operation.
                     // Convert to hex:
@@ -482,17 +480,14 @@ var rpcFunctions = {
                     // creating message for the client
                     var jsonMessage      = {};
                     jsonMessage.message  = 'ReloadBundle';
-                    jsonMessage.url      = url;// + "?filesize=" + data.length;
+                    jsonMessage.url      = url;
                     jsonMessage.fileSize = data.length;
 
-                    console.log("message   : " + self.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
-                                                 self.toHex8Byte(JSON.stringify(jsonMessage).length) +
-                                                 JSON.stringify(jsonMessage));
+                    var message = JSON.stringify(jsonMessage);
+                    var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+                    var result = client.write(fullMessage, "ascii");
 
-                    var result = client.write(  self.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
-                                                self.toHex8Byte(JSON.stringify(jsonMessage).length) +
-                                                JSON.stringify(jsonMessage), "ascii");
-
+                    console.log('message: ' + fullMessage);
                     console.log("-----------------------------------------------");
                 }
                 catch(err) {
@@ -887,7 +882,7 @@ var rpcFunctions = {
 
         while(pathTemp.indexOf("%20") > 0) {
 
-            console.log(pathTemp.indexOf("%20"));
+            //console.log(pathTemp.indexOf("%20"));
             pathTemp = pathTemp.replace("%20", "\\ ");
         }
 
@@ -919,7 +914,7 @@ var rpcFunctions = {
                             projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
-            data 	= String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
+            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
 
         /**
          * Load the index.html file and parse it to a new window object
@@ -961,9 +956,7 @@ var rpcFunctions = {
                                       "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
-
                 } catch (e) {
-
                     console.log(e);
                 }
             }
