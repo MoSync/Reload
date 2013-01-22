@@ -159,6 +159,7 @@ ReloadClient::ReloadClient()
 	// Initialize application.
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
+	setScreenOrientation();
 	initializeWebView();
 	initializeVariables();
 	initializeFiles();
@@ -172,6 +173,19 @@ ReloadClient::ReloadClient()
 
 ReloadClient::~ReloadClient()
 {
+}
+
+void ReloadClient::setScreenOrientation()
+{
+	// Android and Windows Phone.
+	maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
+
+	// iOS and Windows Phone.
+	maScreenSetSupportedOrientations(
+		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+		MA_SCREEN_ORIENTATION_PORTRAIT |
+		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
 }
 
 void ReloadClient::initializeWebView()

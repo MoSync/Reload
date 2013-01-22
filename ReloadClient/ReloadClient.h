@@ -72,6 +72,7 @@ public:
 	/**
 	 * Creation/initialization.
 	 */
+	void setScreenOrientation();
 	void initializeWebView();
 	void initializeVariables();
 	void initializeFiles();
