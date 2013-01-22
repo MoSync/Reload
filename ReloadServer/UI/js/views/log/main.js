@@ -23,6 +23,7 @@ define([
             _.bindAll(this, 'render', 'close', 'clear', 'updateLog');
 
             this.model = new LogModel();
+            this.model.on('change', this.clear);
             this.$el.append( $(_.template( controlsTemplate, {} )) );
         },
 
@@ -57,7 +58,10 @@ define([
         },
 
         clear: function (e) {
-            e.preventDefault();
+            if (typeof(e) === 'obejct') {
+                e.preventDefault();
+            }
+
             this.messages.empty();
         },
 

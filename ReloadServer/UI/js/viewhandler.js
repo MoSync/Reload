@@ -4,7 +4,10 @@ define([
     'views/index/content_nav'
 ], function ($, SidebarView, ContentNavView) {
 
-    var ViewHandler = function () {
+    var views;
+
+    var ViewHandler = function (options) {
+        views = options.views;
 
         return {
             show: function(view) {
@@ -21,8 +24,7 @@ define([
                 if (this.sidebarView) {
                     console.log('sidebar is set!');
                 } else {
-
-                    this.sidebarView = new SidebarView();
+                    this.sidebarView = new SidebarView( {views: views} );
                     $('#bar-left').html( this.sidebarView.render() );
                 }
 

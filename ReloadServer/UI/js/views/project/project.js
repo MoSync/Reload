@@ -81,6 +81,7 @@ define([
                 this.$controls.remove();
             }
         },
+
         toggleRename: function () {
             var span = this.$container.find('span');
             var form = $('<form class="rename"><input value="'+span.html()+'"type="text"/></form>');
@@ -126,6 +127,7 @@ define([
         },
 
         reloadProject: function () {
+            var self = this;
             // TODO refactor reload function from
             // sidebar_reload_button.js
 
@@ -155,6 +157,8 @@ define([
             options.success = function (resp) {
                 console.log('reload');
                 console.log(resp.result);
+                // Clear log.
+                self.parent.views.logView.clear();
             };
 
             options.error   = function (resp) {

@@ -47,7 +47,7 @@ define([
         views.docsView = new DocsView();
         views.feedbackView = new FeedbackView();
 
-        var viewHandler = new ViewHandler();
+        var viewHandler = new ViewHandler( {views: views} );
         var router = new ReloadRouter();
 
         // Listen to router events.
