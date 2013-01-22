@@ -3,8 +3,9 @@ define([
     'underscore',
     'backbone',
     'models/log/log',
-    'text!../../../templates/log/message.html'
-], function($, _, Backbone, LogModel, messageTemplate){
+    'text!../../../templates/log/message.html',
+    'text!../../../templates/log/controls.html'
+], function($, _, Backbone, LogModel, messageTemplate, controlsTemplate){
 
     var LogView = Backbone.View.extend({
 
@@ -15,18 +16,20 @@ define([
         messages: $('<dl id="scroller" class="dl-horizontal">'),
 
         events: {
-            'click #autoscroll': 'autoscrollCheck'
+            'click a#clear':         'clear'
         },
 
         initialize: function () {
-            _.bindAll(this, 'render', 'close', 'updateLog');
+            _.bindAll(this, 'render', 'close', 'clear', 'updateLog');
 
             this.model = new LogModel();
+            this.$el.append( $(_.template( controlsTemplate, {} )) );
         },
 
         render: function () {
-
             this.$el.append( this.messages );
+            // Rebind all events in case close() was called.
+            this.delegateEvents();
 
             // Update log on render() so we don't have to wait for
             // interval timer.
@@ -39,6 +42,7 @@ define([
         },
 
         close: function () {
+            console.log('close log');
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();
@@ -50,6 +54,11 @@ define([
             // Clear timer.
             clearInterval(this.timer);
             this.timer = null;
+        },
+
+        clear: function (e) {
+            e.preventDefault();
+            this.messages.empty();
         },
 
         firstScroll: true,
@@ -99,14 +108,6 @@ define([
                     scroller.scrollTop += 20;
                 }
             });
-        },
-
-        autoscrollCheck: function () {
-            var scroll = $('#autoscroll').is(':checked');
-            if (scroll) {
-                console.log('');
-            }
-
         }
     });
 

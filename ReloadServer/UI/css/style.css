@@ -124,9 +124,10 @@ ul li {
     position: absolute;
     width: 100%;
     top: 0;
-    bottom: 0;
+    bottom: 22px;
     overflow: auto;
     margin: 0;
+    border-bottom: 1px solid #bdbdbd;
 }
 #content .dl-horizontal dt {
     width: 100px;
@@ -136,11 +137,35 @@ ul li {
     margin-left: 120px;
 
 }
-#content #log-controls {
-    position: fixed;
-    z-index: 100;
+#content #controls {
+    position: absolute;
     bottom: 0;
-    left: 0;
+    height: 21px;
+    width: 100%;
+    /*
+    border-top: 1px solid #bdbdbd;
+    background: #eee;
+    */
+
+    background: rgb(238, 238, 238);
+    border-top: 1px solid #fff;
+
+    background: #ededed; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ededed 0%, #dddddd 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ededed), color-stop(100%,#dddddd)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ededed 0%,#dddddd 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ededed 0%,#dddddd 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ededed 0%,#dddddd 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ededed 0%,#dddddd 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
+}
+#content #controls #clear {
+    display: inline-block;
+    width: 32px;
+    height: 21px;
+    -webkit-mask-image:url('/img/clearConsoleButtonGlyph.png');
+    background-color: rgba(0, 0, 0, 0.75);
+    margin: -2px 0 0 0;
 }
 #content #log-controls form {
     margin: 0 20px 20px 0;
