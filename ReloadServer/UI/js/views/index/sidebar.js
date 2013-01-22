@@ -42,11 +42,6 @@ define([
             });
             this.$el.append( sidebarReloadButtonView.render() );
 
-            //var sidebarDebugSwitchView = new SidebarDebugSwitchView({
-                //parent: this
-            //});
-            //this.$el.append( sidebarDebugSwitchView.render() );
-
             var sidebarControls = new SidebarControls({
                 projectList: this.collection
             });

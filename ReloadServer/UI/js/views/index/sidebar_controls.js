@@ -63,7 +63,7 @@ define([
                 project.rpc(options);
             });
 
-            var dialog = new CreateProjectDialog( { project: project } );
+            var dialog = new CreateProjectDialog( { project: project, projectList: this.projectList } );
             dialog.render();
         },
 
