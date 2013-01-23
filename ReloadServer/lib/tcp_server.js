@@ -1,5 +1,5 @@
-var vars = require('../application/globals');
-
+var vars = require('../application/globals'),
+	fs = require('fs');
 /**
  * Object that accumulates data sent over a streaming
  * protocol (TCP).
@@ -145,6 +145,32 @@ var create = function (port) {
             {
                 // Platform, name, uuid, os version, phonegap version.
                 //message.type == null;
+                // Statistics Collection
+				vars.methods.loadStats(function (statistics) {
+
+					var deviceExists = false;
+
+					for( var i in statistics.clients) {
+						if( statistics.clients[i].uuid == message.params.uuid) {
+							deviceExists = true;
+						}
+					}
+					console.log(message.params);
+					if( !deviceExists ) {
+
+							var client = {
+								platform: message.params.platform,
+								version: message.params.version,
+								name: message.params.name,
+								uuid: message.params.uuid,
+								phonegap: message.params.phonegap
+							};
+
+							statistics.clients.push(client);
+
+							vars.methods.saveStats(statistics);
+					}
+				});
                 socket.deviceInfo = message.params;
                 socket.deviceInfo.address = socket.remoteAddress;
                 generateDeviceInfoListJSON();
