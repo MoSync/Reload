@@ -60,7 +60,7 @@ var JSONRPC = {
 				response.end("");
 	      	}
 	      	else {
-				//console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
+				console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
 				response.writeHead(200, {
 							  'Content-Length': JSON.stringify(responseObject).length,
 							  'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ var JSONRPC = {
 	      	};
 	    };
 
-	    //JSONRPC.trace('<--', 'request (id ' + message.id + '): ' + message.method + '(' + message.params.join(', ') + ')');
+	    JSONRPC.trace('<--', 'request (id ' + message.id + '): ' + message.method + '(' + message.params.join(', ') + ')');
 
 	    // Try to call the method, but intercept errors and call our onFailure handler.
 	    var method = this.functions[message.method];

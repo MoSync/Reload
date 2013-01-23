@@ -155,7 +155,7 @@ var create = function (port) {
 							deviceExists = true;
 						}
 					}
-					console.log(message.params);
+					
 					if( !deviceExists ) {
 
 							var client = {

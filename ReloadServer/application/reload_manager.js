@@ -160,77 +160,87 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-        try {
-            console.log(
-                "Creating new project: " + projectName +
-                ", of type " + projectType);
+        // check if directory exists
+        fs.exists( vars.globals.rootWorkspacePath +
+                   vars.globals.fileSeparator +
+                   projectName, function (exists) {
+            if(exists) {
+                sendResponse({hasError: true, data: "Error in createNewProject: Project already exists."});
+            }
+            else {
+                try {
+                    console.log(
+                        "Creating new project: " + projectName +
+                        ", of type " + projectType);
 
-            var templateName = "ReloadTemplate";
-            if (projectType)
-            {
-                if (projectType == "native")
-                {
-                    templateName = "NativeUITemplate";
+                    var templateName = "ReloadTemplate";
+                    if (projectType)
+                    {
+                        if (projectType == "native")
+                        {
+                            templateName = "NativeUITemplate";
+                        }
+                        else
+                        {
+                            templateName = "ReloadTemplate";
+                        }
+                    }
+
+                    var exec = require('child_process').exec;
+
+                    function resultCommand(error, stdout, stderr) {
+                        console.log("stdout: " + stdout);
+                        console.log("stderr: " + stderr);
+                        if (error)
+                        {
+                            console.log("error: " + error);
+                        }
+
+                        var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
+                                                          vars.globals.fileSeparator +
+                                                          projectName +
+                                                          vars.globals.fileSeparator +
+                                                          ".project", 'utf8');
+
+                        //TODO: Very bad way to change the project name in file
+                        var newData = projectData.replace(templateName, projectName);
+
+                        fs.writeFileSync(vars.globals.rootWorkspacePath +
+                                         vars.globals.fileSeparator +
+                                         projectName +
+                                         vars.globals.fileSeparator +
+                                         ".project", newData    , 'utf8');
+
+                        sendResponse({hasError: false, data: projectName});
+                    }
+
+                    if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
+                    {
+                        var command = "cp -r " + this.fixPathsUnix(vars.globals.currentWorkingPath) +
+                                                 "/templates/" +
+                                                 this.fixPathsUnix(templateName) +
+                                           " " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
+                                                 this.fixPathsUnix(vars.globals.fileSeparator) +
+                                                 this.fixPathsUnix(projectName);
+                    }
+                    else
+                    {
+                        var command = "xcopy /e /I \"" + vars.globals.currentWorkingPath +
+                                                         "\\templates\\" + templateName +
+                                               "\" \"" + vars.globals.rootWorkspacePath +
+                                                         vars.globals.fileSeparator +
+                                                         projectName + "\"";
+                    }
+                    console.log("Command: " + command);
+                    exec(command, resultCommand);
                 }
-                else
+                catch(err)
                 {
-                    templateName = "ReloadTemplate";
+                    console.log("Error in createNewProject: " + err);
+                    sendResponse({hasError: true, data: "Error in createNewProject: " + err});
                 }
             }
-
-            var exec = require('child_process').exec;
-
-            function resultCommand(error, stdout, stderr) {
-                console.log("stdout: " + stdout);
-                console.log("stderr: " + stderr);
-                if (error)
-                {
-                    console.log("error: " + error);
-                }
-
-                var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
-                                                  vars.globals.fileSeparator +
-                                                  projectName +
-                                                  vars.globals.fileSeparator +
-                                                  ".project", 'utf8');
-
-                //TODO: Very bad way to change the project name in file
-                var newData = projectData.replace(templateName, projectName);
-
-                fs.writeFileSync(vars.globals.rootWorkspacePath +
-                                 vars.globals.fileSeparator +
-                                 projectName +
-                                 vars.globals.fileSeparator +
-                                 ".project", newData    , 'utf8');
-
-                sendResponse({hasError: false, data: projectName});
-            }
-
-            if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
-            {
-                var command = "cp -r " + this.fixPathsUnix(vars.globals.currentWorkingPath) +
-                                         "/templates/" +
-                                         this.fixPathsUnix(templateName) +
-                                   " " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
-                                         this.fixPathsUnix(vars.globals.fileSeparator) +
-                                         this.fixPathsUnix(projectName);
-            }
-            else
-            {
-                var command = "xcopy /e /I \"" + vars.globals.currentWorkingPath +
-                                                 "\\templates\\" + templateName +
-                                       "\" \"" + vars.globals.rootWorkspacePath +
-                                                 vars.globals.fileSeparator +
-                                                 projectName + "\"";
-            }
-            console.log("Command: " + command);
-            exec(command, resultCommand);
-        }
-        catch(err)
-        {
-            console.log("Error in createNewProject: " + err);
-            sendResponse({hasError: true, data: "Error in createNewProject: " + err});
-        }
+        });
     },
 
     /**
@@ -765,11 +775,10 @@ var rpcFunctions = {
         var unescapedLogArray = [];
         vars.globals.gRemoteLogData.forEach(function (element, index, self){
             unescapedLogArray[index] = unescape(element);
-            console.log(element);
         });
 
         var dataString  = JSON.stringify(unescapedLogArray);
-        console.log(dataString);
+        
         vars.globals.gRemoteLogData = [];
 
         sendResponse({hasError: false, data: dataString});
@@ -838,7 +847,14 @@ var rpcFunctions = {
         
         vars.methods.loadStats( function(statistics){
             
+            function respond( error, message) {
+                if(typeof sendResponse === 'function') {
+                    sendResponse({hasError: error, data: message});
+                }
+            }
+
             if( statistics.clients.length === 0 ) {
+                respond(false, "Nothing to Send");
                 return;
             }
 
@@ -862,16 +878,15 @@ var rpcFunctions = {
                     });
 
                     //if it is an RPC call
-                    if(typeof sendResponse === 'function') {
-                        sendResponse({hasError: false, data: true});
-                    }
+                    respond(false, "Statistics Sent");
+                    
+                } else {
+                    respond(true, "Status Code: " + res.statusCode);
                 }
                 
                 res.setEncoding('utf8');
                 res.on('error', function (){
-                    if(typeof sendResponse === 'function') {
-                        sendResponse({hasError: true, data: "Error in processing feedback"});
-                    }
+                    respond(true, "Error in processing feedback");
                 });
                 res.on('data', function (chunk) {
 
@@ -881,9 +896,7 @@ var rpcFunctions = {
 
             postRequest.on('error', function(e) {
                 console.log('Could not establish connection with MoSync: ' + e.message);
-                if(typeof sendResponse === 'function') {
-                        sendResponse({hasError: true, data: 'Could not establish connection with MoSync: ' + e.message});
-                }
+                respond(true, 'Could not establish connection with MoSync: ' + e.message);                
             });
             // post the data
             postRequest.write(postData);
@@ -1041,10 +1054,11 @@ var rpcFunctions = {
         /**
          * Get all embeded script tags
          */
+
         var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
             $(this).html("try {  eval(unescape(\"" +
-                                escape($(this).html()) +
-                            "\"));  } catch (e) { mosync.rlog(e.toString()); };");
+                                escape("try {" + $(this).html() + "} catch(w) { mosync.rlog(w.toString()); }") +
+                            "\"));  } catch (e) { mosync.rlog(e.stack); };");
         });
         console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
 
@@ -1066,8 +1080,9 @@ var rpcFunctions = {
                     if( s.isFile() ) {
                         var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
-                        jsFileData = "try { eval(unescape(\"" + escape(jsFileData) +
-                                      "\"));  } catch (e) { mosync.rlog(e.toString()); };";
+                        jsFileData = "try { eval(unescape(\"" + 
+                                        escape("try {" + jsFileData + "} catch(w) { mosync.rlog(w.toString()); }") +
+                                      "\"));  } catch (e) { 'EX' + mosync.rlog(e.toString()); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
                 } catch (e) {
@@ -1095,8 +1110,8 @@ var rpcFunctions = {
                         var inlineCode = $(this).attr(i);
 
                         $(element).attr(i, "try { eval(unescape(\"" +
-                                                    escape(inlineCode) +
-                                                    "\"));  } catch (e) { mosync.rlog(e.toString()); };");
+                                                    escape("try {" + inlineCode + "} catch(w) { mosync.rlog(w.toString()); }") +
+                                                    "\"));  } catch (e) { mosync.rlog('I' + e.toString()); };");
                     }
                 }
             }

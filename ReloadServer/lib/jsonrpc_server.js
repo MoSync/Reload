@@ -29,7 +29,7 @@ create = function(port) {
 
     //console.log(express.json());
     app.use(express.favicon());
-    //app.use(express.logger('dev'{stream}));
+    app.use(express.logger('dev'));
     app.use(express.cookieParser('foobar'));
     app.use(express.session());
     app.use(express.bodyParser());
