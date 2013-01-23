@@ -66,6 +66,7 @@ define([
 
         selectProject: function (e) {
             e.preventDefault();
+
             var t, id;
             t = $(e.target);
             id = t.data('id');

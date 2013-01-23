@@ -15,6 +15,7 @@ var globals = {
 
 	fileSeparator: "",
 
+	// List of node.js sockets for connected clients.
 	clientList: [],
 
 	deviceInfoListJSON: "[]",

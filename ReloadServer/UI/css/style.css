@@ -198,6 +198,18 @@ ul#projects li a:hover {
     text-decoration: none;
 }
 
+form.rename {
+    margin: 0;
+    padding: 0;
+}
+form.rename input {
+    width: 100px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height: 18px;
+}
+
 .selected,
 ul#projects li a:active,
 ul#projects li a.select-project {
