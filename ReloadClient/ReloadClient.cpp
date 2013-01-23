@@ -419,13 +419,10 @@ void ReloadClient::socketHandlerConnected(int result)
 {
 	if (result > 0)
 	{
+		LOG("@@@ RELOAD connected to: %s", mServerAddress.c_str());
+
 		// Tell UI we are connected.
 		mLoginScreen->connectedTo(mServerAddress.c_str());
-
-		// Save the server address.
-		mFileUtil->writeTextToFile(
-			mFileUtil->getLocalPath() + "LastServerAddress.txt",
-			mServerAddress);
 
 		// Send info about this device to the server.
 		sendClientDeviceInfo();
@@ -454,7 +451,14 @@ void ReloadClient::socketHandlerDisconnected(int result)
 {
 	LOG("@@@ RELOAD: ERROR socketHandlerDisconnected: %i", result);
 
-	showConnectionErrorMessage(result);
+	// Do not show the alert if we have result code zero.
+	// This means we have closed the connection manually,
+	// it is not an error. Does this work the same on all
+	// platforms? (Tested on Android.)
+	if (0 != result)
+	{
+		showConnectionErrorMessage(result);
+	}
 
 	// Go back to the login screen.
 	mLoginScreen->showNotConnectedScreen();
@@ -551,6 +555,15 @@ void ReloadClient::cancelDownload()
 
 void ReloadClient::connectToServer(const char* serverAddress)
 {
+	// Store the server address.
+	mServerAddress = serverAddress;
+
+	// Save the server address on file.
+	mFileUtil->writeTextToFile(
+		mFileUtil->getLocalPath() + "LastServerAddress.txt",
+		mServerAddress);
+
+	// Initiate connection sequence.
 	int result = mSocketHandler.connectToServer(
 		serverAddress,
 		SERVER_TCP_PORT);
