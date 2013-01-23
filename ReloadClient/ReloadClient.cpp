@@ -159,7 +159,8 @@ ReloadClient::ReloadClient()
 	// Initialize application.
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
-	setScreenOrientation();
+
+	//setScreenOrientation(); // Turned off. Use JS to set screen orientation.
 	initializeWebView();
 	initializeVariables();
 	initializeFiles();
@@ -601,8 +602,7 @@ void ReloadClient::handleJSONMessage(const String& json)
 	}
 
 	// Get the message name.
-	YAJLDom::Value* jsonValue = jsonRoot->getValueForKey("message");
-	String message = jsonValue->toString().c_str();
+	String message = (jsonRoot->getValueForKey("message"))->toString();
 
 	// Download a bundle.
 	if (message == "ReloadBundle")
@@ -611,27 +611,35 @@ void ReloadClient::handleJSONMessage(const String& json)
 		String urlData = (jsonRoot->getValueForKey("url"))->toString();
 		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
 
-		// Check that we have valid file size field.
-		if (fileSize < 0 )
-		{
-			maPanic(0, "RELOAD: File size identifier not found");
-		}
-
+		// Initiate the download.
 		downloadBundle(urlData, fileSize);
-
-		// Delete the JSON tree.
-		YAJLDom::deleteValue(jsonRoot);
+	}
+	// Evaluate a JavaScript string.
+	else if (message == "EvalJS")
+	{
+		// Get message parameters.
+		String script = (jsonRoot->getValueForKey("script"))->toString();
+		evaluateScript(script);
 	}
 	else
 	{
 		maPanic(0,"RELOAD: Unknown server message");
 	}
+
+	// Delete the JSON tree.
+	YAJLDom::deleteValue(jsonRoot);
 }
 
 // ========== Download methods ==========
 
 void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 {
+	// Check that we have valid file size field.
+	if (fileSize <= 0 )
+	{
+		maPanic(0, "RELOAD: downloadBundle file size is invalid");
+	}
+
 	// Create download request.
 	MAUtil::String jsonRequest("{"
 		"\"method\":\"client.getBundle\","
@@ -693,6 +701,20 @@ void ReloadClient::downloadHTML()
 }
 */
 
+// ========== Evaluate JavaScript ==========
+
+void ReloadClient::evaluateScript(const String& script)
+{
+	String url = "javascript:";
+	url += "try{var res=eval(unescape('";
+	url += script;
+	url += "'));";
+	url += "mosync.rlog('javascript:'+JSON.stringify(res))}";
+	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
+
+	getWebView()->openURL(url);
+}
+
 // ========== Launching apps ==========
 
 /**
@@ -722,8 +744,8 @@ void ReloadClient::launchSavedApp()
 	getWebView()->setVisible(true);
 	showWebView();
 	String baseURL = "file://" + fullAppPath;
-	getWebView()->setBaseUrl(baseURL);
-	getWebView()->openURL("index.html");
+	//getWebView()->setBaseUrl(baseURL);
+	getWebView()->openURL(baseURL + "index.html");
 
 	// Set status variables.
 	mHasPage = true;

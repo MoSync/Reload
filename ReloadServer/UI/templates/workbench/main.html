@@ -2,12 +2,18 @@
     <textarea>
 // Welcome to the JavaScript Workbench!
 // 
-// When you are connected to a device, you
-// can run JavScript on it by selecting code
-// in this editor and click the "Eval" button.
+// When you are connected to a device, you can evaluate JavScript
+// code on it by selecting text in this editor and click the "Do It"
+// or "Print It" button.
 //
-// For example try out this line:
+// For example try out the following lines (one at a time):
+mosync.rlog('Hello World')
+1+2
+mosync.app.openExternalURL('http://maps.google.com/')
+mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC)
+mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_PORTRAIT)
+mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_LANDSCAPE)
 document.body.innerHTML = '<h1>Hello World</h1>'
     </textarea>
-    <input value="Eval" class="workbench.eval" type="button" />
+	<a href="javascript:window.reload_workbench.doit('')">Do selection</a>
 </div>
