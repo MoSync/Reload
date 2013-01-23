@@ -765,9 +765,11 @@ var rpcFunctions = {
         var unescapedLogArray = [];
         vars.globals.gRemoteLogData.forEach(function (element, index, self){
             unescapedLogArray[index] = unescape(element);
+            console.log(element);
         });
 
         var dataString  = JSON.stringify(unescapedLogArray);
+        console.log(dataString);
         vars.globals.gRemoteLogData = [];
 
         sendResponse({hasError: false, data: dataString});
@@ -1042,7 +1044,7 @@ var rpcFunctions = {
         var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
             $(this).html("try {  eval(unescape(\"" +
                                 escape($(this).html()) +
-                            "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                            "\"));  } catch (e) { mosync.rlog(e.toString()); };");
         });
         console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
 
@@ -1065,7 +1067,7 @@ var rpcFunctions = {
                         var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
                         jsFileData = "try { eval(unescape(\"" + escape(jsFileData) +
-                                      "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };";
+                                      "\"));  } catch (e) { mosync.rlog(e.toString()); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
                 } catch (e) {
@@ -1094,7 +1096,7 @@ var rpcFunctions = {
 
                         $(element).attr(i, "try { eval(unescape(\"" +
                                                     escape(inlineCode) +
-                                                    "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                                                    "\"));  } catch (e) { mosync.rlog(e.toString()); };");
                     }
                 }
             }
