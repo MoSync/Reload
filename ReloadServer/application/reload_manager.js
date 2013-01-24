@@ -4,6 +4,7 @@ var fs    = require('fs');
 var path  = require('path');
 var ncp   = require('../node_modules/ncp');
 var cheerio = require('cheerio');
+var http = require('http');
 
 /**
  * The functions that are available for remote calling
@@ -108,10 +109,10 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-        var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
+        vars.globals.versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
-        var versionInfoJSON = JSON.stringify({"version":versionInfo[0],
-                                              "timestamp": versionInfo[1]});
+        var versionInfoJSON = JSON.stringify({"version":vars.globals.versionInfo[0],
+                                              "timestamp": vars.globals.versionInfo[1]});
         console.log(versionInfoJSON);
 
         sendResponse({hasError: false, data: versionInfoJSON});
@@ -500,9 +501,6 @@ var rpcFunctions = {
         // Bundle the app.
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
 
-            console.log("---------- S e n d i n g   B u n d l e --------");
-            console.log("actualPath: " + actualPath);
-
             // We will send the file size information together with
             // the command as an extra level of integrity checking.
             var data = fs.readFileSync(actualPath);
@@ -512,12 +510,22 @@ var rpcFunctions = {
                     ' ',
                     '%20');
 
+            console.log("---------- S e n d i n g   B u n d l e --------");
+            console.log("actualPath: " + actualPath);
+            console.log("url: " + url + "?filesize=" + data.length);
+
             // Send the new bundle URL to the device clients.
             sendToAllClients({
                 message: 'ReloadBundle',
                 url: url,
                 fileSize: data.length
             });
+
+			// Statistics
+			vars.methods.loadStats(function (statistics) {
+				statistics.reloads += 1;
+				vars.methods.saveStats(statistics);
+			});
         });
     },
 
@@ -793,9 +801,11 @@ var rpcFunctions = {
         var unescapedLogArray = [];
         vars.globals.gRemoteLogData.forEach(function (element, index, self){
             unescapedLogArray[index] = unescape(element);
+            console.log(element);
         });
 
         var dataString  = JSON.stringify(unescapedLogArray);
+        console.log(dataString);
         vars.globals.gRemoteLogData = [];
 
         sendResponse({hasError: false, data: dataString});
@@ -810,6 +820,111 @@ var rpcFunctions = {
         if(typeof sendResponse !== 'function') return false;
 
         sendResponse({hasError: false, data: {"path":vars.globals.rootWorkspacePath}});
+    },
+
+    sendFeedback : function (text, sendResponse) {
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function' || typeof text !== "string") {
+            return false;
+        }
+
+        var postData = JSON.stringify( { feedback : text });
+        
+        var requestOptions = vars.globals.feedbackRequestOptions;
+
+        requestOptions.headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+        };
+
+        // Set up the request
+        var postRequest = http.request(requestOptions, function(res) {
+
+            var responseText = "";
+
+            if(res.statusCode == 200) {
+                sendResponse({hasError: false, data: true});
+            } else {
+                sendResponse({hasError: true, data: "Error in processing feedback"});
+            }
+            
+            res.setEncoding('utf8');
+            res.on('error', function (){
+                sendResponse({hasError: true, data: "Error in processing feedback"});
+            });
+            res.on('data', function (chunk) {
+
+                responseText += chunk;
+            });
+        });
+
+        postRequest.on('error', function(e) {
+            sendResponse({hasError: true, data: "Could not establish connection with Mosync."});
+            console.log('Could not establish connection with MoSync: ' + e.message);
+        });
+        // post the data
+        postRequest.write(postData);
+        postRequest.end();
+    },
+
+    /** 
+     * (RPC and Internal) Used to send the feedback data if there are any
+     */
+    sendStats: function (sendResponse) {
+        
+        vars.methods.loadStats( function(statistics){
+            
+            if( statistics.clients.length === 0 ) {
+                return;
+            }
+
+            var postData = JSON.stringify(statistics);
+        
+            var requestOptions = vars.globals.statsRequestOptions;
+            requestOptions.headers = {
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length
+            };
+
+            // Set up the request
+            var postRequest = http.request(requestOptions, function(res) {
+
+                var responseText = "";
+                if(res.statusCode == 200) {
+                    vars.methods.loadStats(function (statistics) {
+                        statistics.reloads = 0;
+                        statistics.clients = [];
+                        vars.methods.saveStats(statistics);
+                    });
+
+                    //if it is an RPC call
+                    if(typeof sendResponse === 'function') {
+                        sendResponse({hasError: false, data: true});
+                    }
+                }
+                
+                res.setEncoding('utf8');
+                res.on('error', function (){
+                    if(typeof sendResponse === 'function') {
+                        sendResponse({hasError: true, data: "Error in processing feedback"});
+                    }
+                });
+                res.on('data', function (chunk) {
+
+                    responseText += chunk;
+                });
+            });
+
+            postRequest.on('error', function(e) {
+                console.log('Could not establish connection with MoSync: ' + e.message);
+                if(typeof sendResponse === 'function') {
+                        sendResponse({hasError: true, data: 'Could not establish connection with MoSync: ' + e.message});
+                }
+            });
+            // post the data
+            postRequest.write(postData);
+            postRequest.end();
+        });
     },
 
     /**
@@ -965,7 +1080,7 @@ var rpcFunctions = {
         var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
             $(this).html("try {  eval(unescape(\"" +
                                 escape($(this).html()) +
-                            "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                            "\"));  } catch (e) { mosync.rlog(e.toString()); };");
         });
         console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
 
@@ -988,7 +1103,7 @@ var rpcFunctions = {
                         var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
                         jsFileData = "try { eval(unescape(\"" + escape(jsFileData) +
-                                      "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };";
+                                      "\"));  } catch (e) { mosync.rlog(e.toString()); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
                 } catch (e) {
@@ -1004,9 +1119,9 @@ var rpcFunctions = {
          *   - add the attribute name (lowercase in attrs)
          * TODO: search more elements than only div
          */
-        var attrs = ["onclick", "onevent"];    // Attribute list
-        var inlineJsCode = $("div").each(function (index, element){
-
+        var attrs = ["onclick", "onevent", "onload"];    // Attribute list
+        var inlineJsCode = $("div,body").each(function (index, element){
+            
             for( var i in element.attribs ) {
 
                 for( var j = 0; j < attrs.length; j++) {
@@ -1017,7 +1132,7 @@ var rpcFunctions = {
 
                         $(element).attr(i, "try { eval(unescape(\"" +
                                                     escape(inlineCode) +
-                                                    "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                                                    "\"));  } catch (e) { mosync.rlog(e.toString()); };");
                     }
                 }
             }
@@ -1034,7 +1149,9 @@ var rpcFunctions = {
 };
 
 // These functions are called for initialization
+rpcFunctions.getVersionInfo(function (a){});
 rpcFunctions.getLatestPath();
 rpcFunctions.getNetworkIP();
+rpcFunctions.sendStats();
 
 rpc.exposeModule('manager', rpcFunctions);

@@ -38,6 +38,8 @@ end
 
 FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
 FileUtils.cp ENV['MOSYNCDIR'] + "/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
+FileUtils.rm_rf "ReloadServer/UI/docs"
+FileUtils.cp_r ENV['MOSYNCDIR'] + "/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/html5", "ReloadServer/UI/docs"
 
 #build Output Directory
 FileUtils.mkdir_p "Build/#{time_stamp}"
