@@ -15,8 +15,12 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #!/bin/bash
+function error_exit
+{
+	echo "$1" 1>&2
+	exit 1
+}
 
-
-./bin/mac/node main.js &
-./bin/mac/node node_modules/weinre/weinre --boundHost -all- &
+./bin/mac/node main.js & 
+./bin/mac/node node_modules/weinre/weinre --boundHost -all- || error_exit "Could not  start weinre."
 wait %1

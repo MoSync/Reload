@@ -64,7 +64,7 @@ static NSAutoreleasePool* g_autopool = nil;
 @interface ClientWindowDelegate : NSObject <NSWindowDelegate>
 //- (IBAction)goBack:(id)sender;
 //- (IBAction)goForward:(id)sender;
-- (IBAction)reload:(id)sender;
+    - (IBAction)reload:(id)sender;
 //- (IBAction)stopLoading:(id)sender;
 //- (IBAction)takeURLStringValueFrom:(NSTextField *)sender;
 - (void)alert:(NSString*)title withMessage:(NSString*)message;
@@ -187,6 +187,7 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
 // Receives notifications from the application. Will delete itself when done.
 @interface ClientAppDelegate : NSObject {
     NSTask *task;
+    NSTextView *theTextView;
 }
 - (void)createApp:(id)object;
 - (IBAction)testGetSource:(id)sender;
@@ -208,15 +209,81 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
 - (IBAction)testZoomIn:(id)sender;
 - (IBAction)testZoomOut:(id)sender;
 - (IBAction)testZoomReset:(id)sender;
-
+- (void)receivedData:(NSNotification *)notif;
+- (void)startTheBackgroundJob;
 @end
 
 @implementation ClientAppDelegate
+- (void)receivedData:(NSNotification *)notif {
+    try {
+        //get the data from notification
+        NSData *data = [[notif userInfo] objectForKey: NSFileHandleNotificationDataItem];
+        
+        //make sure there's actual data
+        if ([data length])
+        {
+            //    outputEmpty = NO;
+            NSMutableString *str = [[NSMutableString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+            NSLog(@"logging........................%@", str);
+            NSTextStorage *text = [theTextView textStorage];
+            [text replaceCharactersInRange: NSMakeRange([text length], 0) withString: str];
+            [theTextView scrollRangeToVisible: NSMakeRange([text length], 0)];
+            //append the output to the text field
+            //[theTextView insertText:str];
+
+            // we schedule the file handle to go and read more data in the background again.
+            [[notif object] readInBackgroundAndNotify];
+        }
+        else
+        {
+            NSLog(@"no data read---------------");
+        }
+
+    } catch (NSException *ex) {
+        NSLog(@"failed log");
+    }
+  
+  }
+
+
 - (void)startTheBackgroundJob {
     try {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        NSRect windowRect = NSMakeRect(0.0f, 0.0f, 600.0f, 400.0f);
         
+        NSWindow *window = [[NSWindow alloc] initWithContentRect:windowRect
+                                                       styleMask:(NSTitledWindowMask | NSResizableWindowMask | NSClosableWindowMask)
+                                                         backing:NSBackingStoreBuffered defer:NO];
+        
+        [window setBackgroundColor:[NSColor blackColor]];
+        
+        [window makeKeyAndOrderFront:nil];
         task = [[NSTask alloc] init];
+        NSScrollView *scrollview = [[NSScrollView alloc]
+                                    initWithFrame:[[window contentView] frame]];
+        NSSize contentSize = [scrollview contentSize];
+        
+        [scrollview setBorderType:NSNoBorder];
+        [scrollview setHasVerticalScroller:YES];
+        [scrollview setHasHorizontalScroller:NO];
+        [scrollview setAutoresizingMask:NSViewWidthSizable |
+         NSViewHeightSizable];
+        
+        theTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0,
+                                                                   contentSize.width, contentSize.height)];
+        [theTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
+        [theTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+        [theTextView setVerticallyResizable:YES];
+        [theTextView setHorizontallyResizable:NO];
+        [theTextView setAutoresizingMask:NSViewWidthSizable];
+        
+        [[theTextView textContainer]
+         setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
+        [[theTextView textContainer] setWidthTracksTextView:YES];
+        [scrollview setDocumentView:theTextView];
+        [window setContentView:scrollview];
+        [window makeFirstResponder:theTextView];
+        
         NSString* filePath = [[NSBundle mainBundle] pathForResource:@"reload" ofType:@"sh" inDirectory:@"ReloadServer"];
         NSLog (@"script path:\n%@", filePath);
         NSString *newString = [filePath substringToIndex:[filePath length]-9];
@@ -230,22 +297,20 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
         NSPipe *pipe;
         pipe = [NSPipe pipe];
         [task setStandardOutput: pipe];
-        
-        NSFileHandle *file;
-        file = [pipe fileHandleForReading];
         [task setCurrentDirectoryPath:newString];
         NSLog (@"directory path:\n%@", task.currentDirectoryPath);
         
+        
+        NSFileHandle *file;
+        file = [pipe fileHandleForReading];
+        //[file readToEndOfFileInBackgroundAndNotify];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivedData:) name:NSFileHandleReadCompletionNotification object:file];
+        [file readInBackgroundAndNotify];
+
         [task launch];
+        [task waitUntilExit];
+            
         
-        NSData *data;
-        data = [file readDataToEndOfFile];
-        
-        NSString *string;
-        string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-        NSLog (@"server returned:\n%@", string);
-        
-        [string release];
         [task release];
         [pool release];    
 
@@ -260,8 +325,6 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
 - (void)createApp:(id)object {
   [NSApplication sharedApplication];
   [NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
-   [NSThread detachNewThreadSelector:@selector(startTheBackgroundJob) toTarget:self withObject:nil];
-    [NSThread sleepForTimeInterval:3]; 
   // Set the delegate for application events.
   [NSApp setDelegate:self];
   
@@ -270,6 +333,8 @@ NSButton* MakeButton(NSRect* rect, NSString* title, NSView* parent) {
   
   // Create the delegate for control and browser window events.
   ClientWindowDelegate* delegate = [[ClientWindowDelegate alloc] init];
+    [NSThread detachNewThreadSelector:@selector(startTheBackgroundJob) toTarget:self withObject:nil];
+    [NSThread sleepForTimeInterval:1];
   
   // Create the main application window.
   NSRect screen_rect = [[NSScreen mainScreen] visibleFrame];

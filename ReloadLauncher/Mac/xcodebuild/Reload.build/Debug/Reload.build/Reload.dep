@@ -1,7 +1,7 @@
 ffffffffffffffffffffffffffffffff 12776a4f1e2371b2dd11b7715ad653b6 ffffffffffffffffffffffffffffffff 102 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app
-ffffffffffffffffffffffffffffffff 0d7bd5e55b6173cfcb4dfc1d22db2471 ffffffffffffffffffffffffffffffff 1851440 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload
-000000000098010e000000000000a169 d485efb7be42d661223170882b75109c ffffffffffffffffffffffffffffffff 394384 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o
-0000000050f7f77a0000000000000066 ac555b67d62c6fab2eeea594b70490ba ffffffffffffffffffffffffffffffff 102 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app
+ffffffffffffffffffffffffffffffff 0d7bd5e55b6173cfcb4dfc1d22db2471 ffffffffffffffffffffffffffffffff 1856644 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload
+00000000016eff03000000000000ad56 d485efb7be42d661223170882b75109c ffffffffffffffffffffffffffffffff 406604 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o
+00000000510109d70000000000000066 ac555b67d62c6fab2eeea594b70490ba ffffffffffffffffffffffffffffffff 102 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app
 000000005065d21000000000000033a1 a1c82bf980646ac03c8036a9d271f835 ffffffffffffffffffffffffffffffff 48048 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/resource_util_mac.o
 000000005065d14f000000000000282e d40bed5f9d636ba5d34320f9a6d06b37 ffffffffffffffffffffffffffffffff 186616 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_handler_mac.o
 000000005065d21e000000000000175f 232f5238d8ff0aed281c4dd1a36de3e3 ffffffffffffffffffffffffffffffff 164980 /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/string_util.o
