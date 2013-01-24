@@ -12,6 +12,52 @@ var http = require('http');
 
 var vars = require('./globals');
 
+/**
+ * Send a given message to all connected clients.
+ * @param jsonMessage Message in JSON format.
+ * The message must contain a field named 'message'
+ * with the message name.
+ */
+var sendToAllClients = function(jsonMessage) {
+
+    // TODO: What about a client list object that has a send
+    // method in it and other methods for managing the client list.
+    // And a client object instaed of using bare socket objects.
+    vars.globals.clientList.forEach(function (client) {
+
+        try {
+            // Protocol consists of header "RELOADMSG" followed
+            // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+            // Then string data follows with actual JSON message.
+            // Advantage with hex is that we can read fixed numer of bytes
+            // in the read operation.
+            // Convert to hex:
+            // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+
+            // Construct message with proper header.
+            var message = JSON.stringify(jsonMessage);
+            var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+
+            // Send the message.
+            // TODO: Perhaps make client object that wraps the base socket and
+            // put a send/write method in there.
+            var result = client.write(fullMessage, "ascii");
+        }
+        catch (err) {
+            console.log("@@@ reload_manager.js: sendToAllClients error: " + err)
+
+            // Remove this client from the list since we have problems with it.
+            var index = vars.globals.clientList.indexOf(client);
+            if (index != -1)
+            {
+                vars.globals.clientList.splice(index, 1);
+            }
+        }
+    });
+};
+
+// TODO: Move non-RPC functions out of this object to make the code
+// mode clean and make rpcFunctions contain only the RPC functions.
 var rpcFunctions = {
 
     /**
@@ -435,15 +481,13 @@ var rpcFunctions = {
     reloadProject: function (projectPath, debug, sendResponse) {
 
         //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
-
-        var self = this;
+        if (typeof sendResponse !== 'function') return false;
 
         var weinreDebug;
         console.log("-----------------------------------------------");
         console.log("-                 R e l o a d                 -");
         console.log("-----------------------------------------------");
-        if( typeof debug !== "boolean" || typeof debug === "undefined") {
+        if (typeof debug !== "boolean" || typeof debug === "undefined") {
             weinreDebug = false;
         }
         else {
@@ -455,57 +499,49 @@ var rpcFunctions = {
         sendResponse({hasError: false, data: ""});
 
         // Bundle the app.
-        this.bundleApp(projectPath, weinreDebug, function (actualPath) {
+        this.bundleApp(projectPath, weinreDebug, function(actualPath) {
 
+            // We will send the file size information together with
+            // the command as an extra level of integrity checking.
+            var data = fs.readFileSync(actualPath);
+            var url = projectPath.replace(
+                "LocalFiles.html",
+                "LocalFiles.bin").replace(
+                    ' ',
+                    '%20');
 
-            // We will send the file size information together with the command as
-            // an extra level of integrity checking.
             console.log("---------- S e n d i n g   B u n d l e --------");
             console.log("actualPath: " + actualPath);
-            var data = fs.readFileSync(actualPath);
-            var url = projectPath.replace("LocalFiles.html", "LocalFiles.bin").replace(' ', '%20');
+            console.log("url: " + url + "?filesize=" + data.length);
 
-            //send the new bundle URL to the device clients
-            vars.globals.clientList.forEach(function (client){
-
-                console.log("url: " + url + "?filesize=" + data.length);
-                try {
-                    // Protocol consists of header "RELOADMSG" followed
-                    // by data length encoded as 8 hex didgits, e.g.: "000000F0"
-                    // Then string data follows with actual JSON message.
-                    // Advantage with hex is that we can read fixed numer of bytes
-                    // in the read operation.
-                    // Convert to hex:
-                    // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
-
-                    // creating message for the client
-                    var jsonMessage      = {};
-                    jsonMessage.message  = 'ReloadBundle';
-                    jsonMessage.url      = url;
-                    jsonMessage.fileSize = data.length;
-
-                    var message = JSON.stringify(jsonMessage);
-                    var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
-                    var result = client.write(fullMessage, "ascii");
-
-                    console.log('message: ' + fullMessage);
-                    console.log("-----------------------------------------------");
-
-                    // Statistics
-                    vars.methods.loadStats(function (statistics) {
-                        statistics.reloads += 1;
-                        vars.methods.saveStats(statistics);
-                    });
-                }
-                catch(err) {
-                    console.log("error     : " + err)
-                    var index = vars.globals.clientList.indexOf(client);
-                    if(index != -1)
-                    {
-                        vars.globals.clientList.splice(index, 1);
-                    }
-                }
+            // Send the new bundle URL to the device clients.
+            sendToAllClients({
+                message: 'ReloadBundle',
+                url: url,
+                fileSize: data.length
             });
+
+            // Statistics
+            vars.methods.loadStats(function (statistics) {
+                statistics.reloads += 1;
+                vars.methods.saveStats(statistics);
+            });
+        });
+    },
+
+    /**
+     * (RPC): Evaluate JS on the clients.
+     */
+    evalJS: function (script, sendResponse) {
+        if(typeof sendResponse !== 'function') return false;
+        console.log("@@@ ====================================");
+        console.log("@@@ evalJS " + script);
+        //console.log("@@@ Callstack:");
+        //console.log(new Error("CallStack").stack);
+        sendResponse({hasError: false, data: "ok"});
+        sendToAllClients({
+            message: 'EvalJS',
+            script: script
         });
     },
 
@@ -793,7 +829,7 @@ var rpcFunctions = {
         }
 
         var postData = JSON.stringify( { feedback : text });
-        
+
         var requestOptions = vars.globals.feedbackRequestOptions;
 
         requestOptions.headers = {
@@ -811,7 +847,7 @@ var rpcFunctions = {
             } else {
                 sendResponse({hasError: true, data: "Error in processing feedback"});
             }
-            
+
             res.setEncoding('utf8');
             res.on('error', function (){
                 sendResponse({hasError: true, data: "Error in processing feedback"});
@@ -831,19 +867,19 @@ var rpcFunctions = {
         postRequest.end();
     },
 
-    /** 
+    /**
      * (RPC and Internal) Used to send the feedback data if there are any
      */
     sendStats: function (sendResponse) {
-        
+
         vars.methods.loadStats( function(statistics){
-            
+
             if( statistics.clients.length === 0 ) {
                 return;
             }
 
             var postData = JSON.stringify(statistics);
-        
+
             var requestOptions = vars.globals.statsRequestOptions;
             requestOptions.headers = {
                 'Content-Type': 'application/json',
@@ -866,7 +902,7 @@ var rpcFunctions = {
                         sendResponse({hasError: false, data: true});
                     }
                 }
-                
+
                 res.setEncoding('utf8');
                 res.on('error', function (){
                     if(typeof sendResponse === 'function') {
@@ -1085,7 +1121,7 @@ var rpcFunctions = {
          */
         var attrs = ["onclick", "onevent", "onload"];    // Attribute list
         var inlineJsCode = $("div,body").each(function (index, element){
-            
+
             for( var i in element.attribs ) {
 
                 for( var j = 0; j < attrs.length; j++) {
@@ -1100,16 +1136,16 @@ var rpcFunctions = {
                     }
                 }
             }
-        }); 
+        });
         console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-        
+
          /**
           * Write index.html file
           */
         fs.writeFileSync(indexHtmlPath, $.html(), "utf8");
 
         callback();
-	}
+    }
 };
 
 // These functions are called for initialization
