@@ -4,6 +4,7 @@ var fs    = require('fs');
 var path  = require('path');
 var ncp   = require('../node_modules/ncp');
 var cheerio = require('cheerio');
+var http = require('http');
 
 /**
  * The functions that are available for remote calling
@@ -51,7 +52,7 @@ var rpcFunctions = {
             if(sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             }
-    	}
+        }
     },
 
     /**
@@ -62,10 +63,10 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-        var versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
+        vars.globals.versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
-        var versionInfoJSON = JSON.stringify({"version":versionInfo[0],
-                                              "timestamp": versionInfo[1]});
+        var versionInfoJSON = JSON.stringify({"version":vars.globals.versionInfo[0],
+                                              "timestamp": vars.globals.versionInfo[1]});
         console.log(versionInfoJSON);
 
         sendResponse({hasError: false, data: versionInfoJSON});
@@ -467,13 +468,11 @@ var rpcFunctions = {
             //send the new bundle URL to the device clients
             vars.globals.clientList.forEach(function (client){
 
-                console.log("url       : " + url + "?filesize=" + data.length);
+                console.log("url: " + url + "?filesize=" + data.length);
                 try {
-                    // TODO: We need to send length of url.
-                    // First length as hex 8 didgits, e.g.: "000000F0"
-                    // Then string data follows.
-                    // Update client to read this format.
-                    // Or should we use "number:stringdata", e.g.: "5:Hello" ??
+                    // Protocol consists of header "RELOADMSG" followed
+                    // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+                    // Then string data follows with actual JSON message.
                     // Advantage with hex is that we can read fixed numer of bytes
                     // in the read operation.
                     // Convert to hex:
@@ -482,18 +481,21 @@ var rpcFunctions = {
                     // creating message for the client
                     var jsonMessage      = {};
                     jsonMessage.message  = 'ReloadBundle';
-                    jsonMessage.url      = url;// + "?filesize=" + data.length;
+                    jsonMessage.url      = url;
                     jsonMessage.fileSize = data.length;
 
-                    console.log("message   : " + self.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
-                                                 self.toHex8Byte(JSON.stringify(jsonMessage).length) +
-                                                 JSON.stringify(jsonMessage));
+                    var message = JSON.stringify(jsonMessage);
+                    var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+                    var result = client.write(fullMessage, "ascii");
 
-                    var result = client.write(  self.toHex8Byte( vars.globals.commandMap['JSONMessage'] )        +
-                                                self.toHex8Byte(JSON.stringify(jsonMessage).length) +
-                                                JSON.stringify(jsonMessage), "ascii");
-
+                    console.log('message: ' + fullMessage);
                     console.log("-----------------------------------------------");
+
+                    // Statistics
+                    vars.methods.loadStats(function (statistics) {
+                        statistics.reloads += 1;
+                        vars.methods.saveStats(statistics);
+                    });
                 }
                 catch(err) {
                     console.log("error     : " + err)
@@ -763,9 +765,11 @@ var rpcFunctions = {
         var unescapedLogArray = [];
         vars.globals.gRemoteLogData.forEach(function (element, index, self){
             unescapedLogArray[index] = unescape(element);
+            console.log(element);
         });
 
         var dataString  = JSON.stringify(unescapedLogArray);
+        console.log(dataString);
         vars.globals.gRemoteLogData = [];
 
         sendResponse({hasError: false, data: dataString});
@@ -780,6 +784,111 @@ var rpcFunctions = {
         if(typeof sendResponse !== 'function') return false;
 
         sendResponse({hasError: false, data: {"path":vars.globals.rootWorkspacePath}});
+    },
+
+    sendFeedback : function (text, sendResponse) {
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function' || typeof text !== "string") {
+            return false;
+        }
+
+        var postData = JSON.stringify( { feedback : text });
+        
+        var requestOptions = vars.globals.feedbackRequestOptions;
+
+        requestOptions.headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+        };
+
+        // Set up the request
+        var postRequest = http.request(requestOptions, function(res) {
+
+            var responseText = "";
+
+            if(res.statusCode == 200) {
+                sendResponse({hasError: false, data: true});
+            } else {
+                sendResponse({hasError: true, data: "Error in processing feedback"});
+            }
+            
+            res.setEncoding('utf8');
+            res.on('error', function (){
+                sendResponse({hasError: true, data: "Error in processing feedback"});
+            });
+            res.on('data', function (chunk) {
+
+                responseText += chunk;
+            });
+        });
+
+        postRequest.on('error', function(e) {
+            sendResponse({hasError: true, data: "Could not establish connection with Mosync."});
+            console.log('Could not establish connection with MoSync: ' + e.message);
+        });
+        // post the data
+        postRequest.write(postData);
+        postRequest.end();
+    },
+
+    /** 
+     * (RPC and Internal) Used to send the feedback data if there are any
+     */
+    sendStats: function (sendResponse) {
+        
+        vars.methods.loadStats( function(statistics){
+            
+            if( statistics.clients.length === 0 ) {
+                return;
+            }
+
+            var postData = JSON.stringify(statistics);
+        
+            var requestOptions = vars.globals.statsRequestOptions;
+            requestOptions.headers = {
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length
+            };
+
+            // Set up the request
+            var postRequest = http.request(requestOptions, function(res) {
+
+                var responseText = "";
+                if(res.statusCode == 200) {
+                    vars.methods.loadStats(function (statistics) {
+                        statistics.reloads = 0;
+                        statistics.clients = [];
+                        vars.methods.saveStats(statistics);
+                    });
+
+                    //if it is an RPC call
+                    if(typeof sendResponse === 'function') {
+                        sendResponse({hasError: false, data: true});
+                    }
+                }
+                
+                res.setEncoding('utf8');
+                res.on('error', function (){
+                    if(typeof sendResponse === 'function') {
+                        sendResponse({hasError: true, data: "Error in processing feedback"});
+                    }
+                });
+                res.on('data', function (chunk) {
+
+                    responseText += chunk;
+                });
+            });
+
+            postRequest.on('error', function(e) {
+                console.log('Could not establish connection with MoSync: ' + e.message);
+                if(typeof sendResponse === 'function') {
+                        sendResponse({hasError: true, data: 'Could not establish connection with MoSync: ' + e.message});
+                }
+            });
+            // post the data
+            postRequest.write(postData);
+            postRequest.end();
+        });
     },
 
     /**
@@ -887,7 +996,7 @@ var rpcFunctions = {
 
         while(pathTemp.indexOf("%20") > 0) {
 
-            console.log(pathTemp.indexOf("%20"));
+            //console.log(pathTemp.indexOf("%20"));
             pathTemp = pathTemp.replace("%20", "\\ ");
         }
 
@@ -919,7 +1028,7 @@ var rpcFunctions = {
                             projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
-            data 	= String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
+            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
 
         /**
          * Load the index.html file and parse it to a new window object
@@ -935,7 +1044,7 @@ var rpcFunctions = {
         var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
             $(this).html("try {  eval(unescape(\"" +
                                 escape($(this).html()) +
-                            "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                            "\"));  } catch (e) { mosync.rlog(e.toString()); };");
         });
         console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
 
@@ -958,12 +1067,10 @@ var rpcFunctions = {
                         var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
                         jsFileData = "try { eval(unescape(\"" + escape(jsFileData) +
-                                      "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };";
+                                      "\"));  } catch (e) { mosync.rlog(e.toString()); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
-
                 } catch (e) {
-
                     console.log(e);
                 }
             }
@@ -976,8 +1083,8 @@ var rpcFunctions = {
          *   - add the attribute name (lowercase in attrs)
          * TODO: search more elements than only div
          */
-        var attrs = ["onclick", "onevent"];    // Attribute list
-        var inlineJsCode = $("div").each(function (index, element){
+        var attrs = ["onclick", "onevent", "onload"];    // Attribute list
+        var inlineJsCode = $("div,body").each(function (index, element){
             
             for( var i in element.attribs ) {
 
@@ -989,7 +1096,7 @@ var rpcFunctions = {
 
                         $(element).attr(i, "try { eval(unescape(\"" +
                                                     escape(inlineCode) +
-                                                    "\"));  } catch (e) { mosync.rlog(escape(e.toString())); };");
+                                                    "\"));  } catch (e) { mosync.rlog(e.toString()); };");
                     }
                 }
             }
@@ -1006,7 +1113,9 @@ var rpcFunctions = {
 };
 
 // These functions are called for initialization
+rpcFunctions.getVersionInfo(function (a){});
 rpcFunctions.getLatestPath();
 rpcFunctions.getNetworkIP();
+rpcFunctions.sendStats();
 
 rpc.exposeModule('manager', rpcFunctions);

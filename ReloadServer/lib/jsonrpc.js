@@ -131,7 +131,7 @@ var JSONRPC = {
     },
 
     handleMessage: function( message, callback ) {
-		JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
+		//JSONRPC.trace('-->', 'response (id ' + message.id + '): ');
 
 	    // Check for the required fields, and if they aren't there, then
 	    // dispatch to the handleInvalidRequest function.
@@ -178,7 +178,7 @@ var JSONRPC = {
 
 	    // Build our success handler
 	    var onSuccess = function(funcResp) {
-	    	JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
+	    	//JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
 
 	      	return {
 				'id': message.id,
@@ -198,7 +198,7 @@ var JSONRPC = {
 	      	};
 	    };
 
-	    JSONRPC.trace('<--', 'request (id ' + message.id + '): ' + message.method + '(' + message.params.join(', ') + ')');
+	    //JSONRPC.trace('<--', 'request (id ' + message.id + '): ' + message.method + '(' + message.params.join(', ') + ')');
 
 	    // Try to call the method, but intercept errors and call our onFailure handler.
 	    var method = this.functions[message.method];

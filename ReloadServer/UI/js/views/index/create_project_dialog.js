@@ -18,6 +18,7 @@ define([
             _.bindAll(this, 'render');
 
             this.project = options.project;
+            this.projectList = options.projectList;
 
             this.compiledTemplate = _.template( dialogTemplate, {} );
             this.$el = $(this.compiledTemplate);
@@ -25,26 +26,38 @@ define([
 
         submit: function () {
 
+            var errors = [];
             var type = 'web';
             var rdolist = document.getElementsByName("projectType");
             if (rdolist[1].checked) {
                 type = "native";
             }
 
-            var newProjectName = $('#project-name');
+            var newProjectName = $('#project-name').val();
 
-            if (newProjectName.val().length !== 0) {
+            // Check for empty name.
+            if (newProjectName.length === 0) {
+                errors.push('Please enter a project name.');
+            }
 
+            // Check if project name is taken.
+            _(this.projectList.models).each(function (p) {
+                if (p.get('name') === newProjectName) {
+                    errors.push('Please enter a project name that is not taken.');
+                }
+            });
+
+
+            if (errors.length > 0) {
+                alert(errors.join(','));
+            } else {
                 this.project.set({
-                    name: newProjectName.val(),
+                    name: newProjectName,
                     type: type
                 });
 
                 this.close();
-            } else {
-                alert("Please enter a project name.");
             }
-
         },
 
         close: function () {
