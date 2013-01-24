@@ -521,11 +521,11 @@ var rpcFunctions = {
                 fileSize: data.length
             });
 
-			// Statistics
-			vars.methods.loadStats(function (statistics) {
-				statistics.reloads += 1;
-				vars.methods.saveStats(statistics);
-			});
+            // Statistics
+            vars.methods.loadStats(function (statistics) {
+                statistics.reloads += 1;
+                vars.methods.saveStats(statistics);
+            });
         });
     },
 
@@ -829,7 +829,7 @@ var rpcFunctions = {
         }
 
         var postData = JSON.stringify( { feedback : text });
-        
+
         var requestOptions = vars.globals.feedbackRequestOptions;
 
         requestOptions.headers = {
@@ -847,7 +847,7 @@ var rpcFunctions = {
             } else {
                 sendResponse({hasError: true, data: "Error in processing feedback"});
             }
-            
+
             res.setEncoding('utf8');
             res.on('error', function (){
                 sendResponse({hasError: true, data: "Error in processing feedback"});
@@ -867,19 +867,19 @@ var rpcFunctions = {
         postRequest.end();
     },
 
-    /** 
+    /**
      * (RPC and Internal) Used to send the feedback data if there are any
      */
     sendStats: function (sendResponse) {
-        
+
         vars.methods.loadStats( function(statistics){
-            
+
             if( statistics.clients.length === 0 ) {
                 return;
             }
 
             var postData = JSON.stringify(statistics);
-        
+
             var requestOptions = vars.globals.statsRequestOptions;
             requestOptions.headers = {
                 'Content-Type': 'application/json',
@@ -902,7 +902,7 @@ var rpcFunctions = {
                         sendResponse({hasError: false, data: true});
                     }
                 }
-                
+
                 res.setEncoding('utf8');
                 res.on('error', function (){
                     if(typeof sendResponse === 'function') {
@@ -1121,7 +1121,7 @@ var rpcFunctions = {
          */
         var attrs = ["onclick", "onevent", "onload"];    // Attribute list
         var inlineJsCode = $("div,body").each(function (index, element){
-            
+
             for( var i in element.attribs ) {
 
                 for( var j = 0; j < attrs.length; j++) {
