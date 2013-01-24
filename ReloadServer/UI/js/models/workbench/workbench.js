@@ -21,13 +21,12 @@ define([
         setData: function (data) {
             this.data = data;
         },
-		
-		doit: function(script) {
-			console.log("@@@ workbench model doit");
+
+        doit: function(script) {
             this.rpcCall('manager.evalJS', [escape(script)]);
         },
-		
-		rpcCall: function(methodName, paramArray) {
+
+        rpcCall: function(methodName, paramArray) {
 
             var options = {};
             options.url = 'http://localhost:8283';
@@ -39,11 +38,12 @@ define([
 
             options.success = function (resp) {
                 console.log('@@@ Workbench RPC success: ' + methodName);
+                console.log(resp);
                 console.log(resp.result);
             };
 
             options.error = function (resp) {
-                console.log('@@@ Workbencg RPC error: ' + methodName);
+                console.log('@@@ Workbench RPC error: ' + methodName);
                 console.log(resp);
             };
 

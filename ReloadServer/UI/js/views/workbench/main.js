@@ -45,20 +45,19 @@ define([
             // an extra model update on refresh.
             self.editor.on("change", self.saveData);
 
-			// Create a global object that can be referenced from the UI buttons.
-			// TODO: What is the best way of doing this?
-			window.reload_workbench = {};
-			
-			// Add function to be called from the UI.
-			window.reload_workbench.doit = function(code) 
-			{
-				if (self.editor.somethingSelected())
-				{
-			console.log("@@@ window.reload_workbench.doit");
-					var script = self.editor.getSelection();
-					self.model.doit(script);
-				}
-			};
+            // Create a global object that can be referenced from the UI buttons.
+            // TODO: What is the best way of doing this?
+            window.reload_workbench = {};
+
+            // Add function to be called from the UI.
+            window.reload_workbench.doit = function(code)
+            {
+                if (self.editor.somethingSelected())
+                {
+                    var script = self.editor.getSelection();
+                    self.model.doit(script);
+                }
+            };
         },
 
         saveData: function(instance, changeObj) {
@@ -85,7 +84,7 @@ define([
                 self.editor.on("change", self.saveData);
                 }, 1);
         },
-		
+
         close: function () {
 
             //COMPLETELY UNBIND THE VIEW

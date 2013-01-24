@@ -705,13 +705,21 @@ void ReloadClient::downloadHTML()
 
 void ReloadClient::evaluateScript(const String& script)
 {
+
 	String url = "javascript:";
 	url += "try{var res=eval(unescape('";
 	url += script;
 	url += "'));";
 	url += "mosync.rlog('javascript:'+JSON.stringify(res))}";
 	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
-
+/*
+	String url = "javascript:";
+	url += "try{var res=eval(unescape('";
+	url += script;
+	url += "'));";
+	url += "}";
+	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
+*/
 	getWebView()->openURL(url);
 }
 

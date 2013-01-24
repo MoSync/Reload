@@ -19,49 +19,44 @@ var vars = require('./globals');
  */
 var sendToAllClients = function(jsonMessage) {
 
-console.log("@@@ sendToAllClients");
+    // TODO: What about a client list object that has a send
+    // method in it and other methods for managing the client list.
+    // And a client object instaed of using bare socket objects.
+    vars.globals.clientList.forEach(function (client) {
 
-	// TODO: What about a client list object that has a send
-	// method in it and other methods for managing the client list.
-	// And a client object instaed of using bare socket objects.
-	vars.globals.clientList.forEach(function (client) {
+        try {
+            // Protocol consists of header "RELOADMSG" followed
+            // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+            // Then string data follows with actual JSON message.
+            // Advantage with hex is that we can read fixed numer of bytes
+            // in the read operation.
+            // Convert to hex:
+            // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
-console.log("@@@ vars.globals.clientList.forEach");
-		try {
-			// Protocol consists of header "RELOADMSG" followed
-			// by data length encoded as 8 hex didgits, e.g.: "000000F0"
-			// Then string data follows with actual JSON message.
-			// Advantage with hex is that we can read fixed numer of bytes
-			// in the read operation.
-			// Convert to hex:
-			// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+            // Construct message with proper header.
+            var message = JSON.stringify(jsonMessage);
+            var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
 
-			// Construct message with proper header.
-			var message = JSON.stringify(jsonMessage);
-			var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
-			
-			// Send the message.
-			// TODO: Perhaps make client object that wraps the base socket and
-			// put a send/write method in there.
-			var result = client.write(fullMessage, "ascii");
+            // Send the message.
+            // TODO: Perhaps make client object that wraps the base socket and
+            // put a send/write method in there.
+            var result = client.write(fullMessage, "ascii");
+        }
+        catch (err) {
+            console.log("@@@ reload_manager.js: sendToAllClients error: " + err)
 
-			console.log("@@@ reload_manager.js: sendToAllClients fullMessage: " + fullMessage);
-		}
-		catch (err) {
-			console.log("@@@ reload_manager.js: sendToAllClients error: " + err)
-			
-			// Remove this client from the list since we have problems with it.
-			var index = vars.globals.clientList.indexOf(client);
-			if (index != -1)
-			{
-				vars.globals.clientList.splice(index, 1);
-			}
-		}
-	});
+            // Remove this client from the list since we have problems with it.
+            var index = vars.globals.clientList.indexOf(client);
+            if (index != -1)
+            {
+                vars.globals.clientList.splice(index, 1);
+            }
+        }
+    });
 };
 
 // TODO: Move non-RPC functions out of this object to make the code
-// mode clean and make rpcFunctions contain only the RPC functions. 
+// mode clean and make rpcFunctions contain only the RPC functions.
 var rpcFunctions = {
 
     /**
@@ -507,36 +502,39 @@ var rpcFunctions = {
 
             console.log("---------- S e n d i n g   B u n d l e --------");
             console.log("actualPath: " + actualPath);
-			
-            // We will send the file size information together with 
+
+            // We will send the file size information together with
             // the command as an extra level of integrity checking.
             var data = fs.readFileSync(actualPath);
             var url = projectPath.replace(
-				"LocalFiles.html", 
-				"LocalFiles.bin").replace(
-					' ',
-					'%20');
+                "LocalFiles.html",
+                "LocalFiles.bin").replace(
+                    ' ',
+                    '%20');
 
             // Send the new bundle URL to the device clients.
-			sendToAllClients({
-				message: 'ReloadBundle',
-				url: url,
-				fileSize: data.length
-			});
+            sendToAllClients({
+                message: 'ReloadBundle',
+                url: url,
+                fileSize: data.length
+            });
         });
     },
 
     /**
      * (RPC): Evaluate JS on the clients.
      */
-    evalJS: function (script) {
-	console.log("@@@ evalJS " + script);
-	console.log(new Error().stack);
-	new Error()
-		sendToAllClients({
-			message: 'EvalJS',
-			script: script
-		});
+    evalJS: function (script, sendResponse) {
+        if(typeof sendResponse !== 'function') return false;
+        console.log("@@@ ====================================");
+        console.log("@@@ evalJS " + script);
+        //console.log("@@@ Callstack:");
+        //console.log(new Error("CallStack").stack);
+        sendResponse({hasError: false, data: "ok"});
+        sendToAllClients({
+            message: 'EvalJS',
+            script: script
+        });
     },
 
     /**
@@ -1008,7 +1006,7 @@ var rpcFunctions = {
          */
         var attrs = ["onclick", "onevent"];    // Attribute list
         var inlineJsCode = $("div").each(function (index, element){
-            
+
             for( var i in element.attribs ) {
 
                 for( var j = 0; j < attrs.length; j++) {
@@ -1023,16 +1021,16 @@ var rpcFunctions = {
                     }
                 }
             }
-        }); 
+        });
         console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-        
+
          /**
           * Write index.html file
           */
         fs.writeFileSync(indexHtmlPath, $.html(), "utf8");
 
         callback();
-	}
+    }
 };
 
 // These functions are called for initialization
