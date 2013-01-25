@@ -6,30 +6,30 @@ cProcessInfoPlistFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/D
 cPBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app"
 cPBXCp Debug/libplugin_carbon_interpose.dylib xcodebuild/Debug/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib
 cPBXCp Resources "xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources"
-cPBXCp Debug/ffmpegsumo.so "xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"
 cPBXCp Debug/libcef.dylib "xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib"
+cPBXCp Debug/ffmpegsumo.so "xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"
 cCompileXIB /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib
-cCpResource cefclient/res/binding.html xcodebuild/Debug/Reload.app/Contents/Resources/binding.html
 cCpResource cefclient/mac/cefclient.icns xcodebuild/Debug/Reload.app/Contents/Resources/cefclient.icns
-cCopyStringsFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings cefclient/mac/English.lproj/InfoPlist.strings
 cCpResource cefclient/res/dialogs.html xcodebuild/Debug/Reload.app/Contents/Resources/dialogs.html
-cCpResource cefclient/res/domaccess.html xcodebuild/Debug/Reload.app/Contents/Resources/domaccess.html
+cCpResource cefclient/res/binding.html xcodebuild/Debug/Reload.app/Contents/Resources/binding.html
 cCpResource cefclient/res/localstorage.html xcodebuild/Debug/Reload.app/Contents/Resources/localstorage.html
+cCopyStringsFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings cefclient/mac/English.lproj/InfoPlist.strings
+cCpResource cefclient/res/domaccess.html xcodebuild/Debug/Reload.app/Contents/Resources/domaccess.html
 cCpResource cefclient/res/logo.png xcodebuild/Debug/Reload.app/Contents/Resources/logo.png
-cCpResource cefclient/res/xmlhttprequest.html xcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html
 cCpResource cefclient/res/ReloadServer xcodebuild/Debug/Reload.app/Contents/Resources/ReloadServer
 cCpResource Reload_Icon.icns xcodebuild/Debug/Reload.app/Contents/Resources/Reload_Icon.icns
-cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCpResource cefclient/res/xmlhttprequest.html xcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_app_delegates.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app_delegates.cpp normal i386 c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_renderer.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.cpp normal i386 c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_switches.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_switches.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_app.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_renderer.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_handler.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_switches.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_switches.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/dom_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/dom_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
-cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/string_util.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/scheme_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/scheme_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
+cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/string_util.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_handler_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
 cCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/resource_util_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/resource_util_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
 cLd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload normal i386
@@ -112,13 +112,13 @@ t1340108339
 s153386
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Resources
-c000000005065D94A0000000000000DF2
-t1348852042
+c00000000510251360000000000000DF2
+t1359106358
 s3570
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp
-c000000005065D21E0000000000000B9F
-t1348850206
+c00000000510251360000000000000B9F
+t1359106358
 s2975
 i"cefclient/binding_test.h"
 i<algorithm>
@@ -127,15 +127,15 @@ i"include/wrapper/cef_stream_resource_handler.h"
 i"cefclient/resource_util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.h
-c000000005065D21E00000000000002FB
-t1348850206
+c000000005102513600000000000002FB
+t1359106358
 s763
 i"cefclient/client_app.h"
 i"cefclient/client_handler.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.cpp
-c0000000050EE83A00000000000002F64
-t1357808544
+c00000000510251360000000000002F64
+t1359106358
 s12132
 i"cefclient/cefclient.h"
 i<stdio.h>
@@ -154,17 +154,17 @@ i"cefclient/string_util.h"
 i"cefclient/util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.h
-c000000005065D21E000000000000082E
-t1348850206
+c0000000051025136000000000000082E
+t1359106358
 s2094
 i<string>
 i"include/cef_base.h"
 i"cefclient/client_app.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm
-c00000000510109CA0000000000004D05
-t1359022538
-s19717
+c00000000510254FA000000000000479F
+t1359107322
+s18335
 i<Cocoa/Cocoa.h>
 i<sstream>
 i"cefclient/cefclient.h"
@@ -181,8 +181,8 @@ i"cefclient/scheme_test.h"
 i"cefclient/string_util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app.cpp
-c000000005065D21E0000000000002E49
-t1348850206
+c00000000510251360000000000002E49
+t1359106358
 s11849
 i"client_app.h"
 i<string>
@@ -193,8 +193,8 @@ i"include/cef_v8.h"
 i"util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app.h
-c000000005065D21E0000000000001D6B
-t1348850206
+c00000000510251360000000000001D6B
+t1359106358
 s7531
 i<map>
 i<set>
@@ -204,8 +204,8 @@ i<vector>
 i"include/cef_app.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app_delegates.cpp
-c000000005065D21E000000000000032A
-t1348850206
+c0000000051025136000000000000032A
+t1359106358
 s810
 i"cefclient/client_app.h"
 i"cefclient/client_renderer.h"
@@ -213,8 +213,8 @@ i"cefclient/dom_test.h"
 i"cefclient/scheme_test.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler.cpp
-c0000000050EE894F00000000000045DC
-t1357809999
+c000000005102513600000000000045DC
+t1359106358
 s17884
 i"cefclient/client_handler.h"
 i<algorithm>
@@ -236,8 +236,8 @@ i"cefclient/resource_util.h"
 i"cefclient/string_util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler.h
-c0000000050EE8A32000000000000294F
-t1357810226
+c0000000051025136000000000000294F
+t1359106358
 s10575
 i<map>
 i<set>
@@ -246,8 +246,8 @@ i"include/cef_client.h"
 i"cefclient/util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_handler_mac.mm
-c0000000050EE896C00000000000008BB
-t1357810028
+c000000005102513600000000000008BB
+t1359106358
 s2235
 i<Cocoa/Cocoa.h>
 i"cefclient/client_handler.h"
@@ -256,8 +256,8 @@ i"include/cef_frame.h"
 i"cefclient/cefclient.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.cpp
-c000000005065D21E0000000000000624
-t1348850206
+c00000000510251360000000000000624
+t1359106358
 s1572
 i"cefclient/client_renderer.h"
 i<sstream>
@@ -266,26 +266,26 @@ i"include/cef_dom.h"
 i"cefclient/util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_renderer.h
-c000000005065D21E000000000000029F
-t1348850206
+c0000000051025136000000000000029F
+t1359106358
 s671
 i"include/cef_base.h"
 i"cefclient/client_app.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_switches.cpp
-c000000005065D21E0000000000000DA8
-t1348850206
+c00000000510251360000000000000DA8
+t1359106358
 s3496
 i"client_switches.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_switches.h
-c000000005065D21E0000000000000A32
-t1348850206
+c00000000510251360000000000000A32
+t1359106358
 s2610
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/dom_test.cpp
-c000000005065D21E0000000000000FAA
-t1348850206
+c00000000510251360000000000000FAA
+t1359106358
 s4010
 i"cefclient/dom_test.h"
 i<sstream>
@@ -294,73 +294,73 @@ i"include/cef_dom.h"
 i"cefclient/util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/dom_test.h
-c000000005065D21E00000000000002EF
-t1348850206
+c000000005102513600000000000002EF
+t1359106358
 s751
 i"include/cef_base.h"
 i"cefclient/client_app.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/InfoPlist.strings
-c0000000050EE8EF00000000000000055
-t1357811440
+c00000000510251360000000000000055
+t1359106358
 s85
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/English.lproj/MainMenu.xib
-c0000000050EEDC710000000000004D89
-t1357831281
+c00000000510251360000000000004D89
+t1359106358
 s19849
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/cefclient.icns
-c000000004FEC697C000000000000D728
-t1340893564
+c0000000051025136000000000000D728
+t1359106358
 s55080
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/ReloadServer
-c0000000050F7DB6A00000000000001FE
-t1358420842
+c000000005102513700000000000001FE
+t1359106359
 s510
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/binding.html
-c000000005065D21E00000000000002E5
-t1348850206
+c000000005102513700000000000002E5
+t1359106359
 s741
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/dialogs.html
-c000000005065D21E0000000000000482
-t1348850206
+c00000000510251370000000000000482
+t1359106359
 s1154
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/domaccess.html
-c000000005065D21E00000000000001B0
-t1348850206
+c000000005102513700000000000001B0
+t1359106359
 s432
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/localstorage.html
-c000000005065D21E0000000000000306
-t1348850206
+c00000000510251370000000000000306
+t1359106359
 s774
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/logo.png
-c000000005065D21E0000000000004DA7
-t1348850206
+c00000000510251370000000000004DA7
+t1359106359
 s19879
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/xmlhttprequest.html
-c000000005065D21E0000000000000248
-t1348850206
+c00000000510251370000000000000248
+t1359106359
 s584
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/resource_util.h
-c000000005065D21E00000000000003A6
-t1348850206
+c000000005102513700000000000003A6
+t1359106359
 s934
 i"include/cef_base.h"
 i"cefclient/resource.h"
 i<string>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/resource_util_mac.mm
-c000000005065D21E00000000000009D6
-t1348850206
+c000000005102513700000000000009D6
+t1359106359
 s2518
 i<Foundation/Foundation.h>
 i<mach-o/dyld.h>
@@ -370,8 +370,8 @@ i"include/cef_stream.h"
 i"cefclient/util.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/scheme_test.cpp
-c000000005065D21E0000000000001564
-t1348850206
+c00000000510251370000000000001564
+t1359106359
 s5476
 i"cefclient/scheme_test.h"
 i<algorithm>
@@ -389,15 +389,15 @@ i"cefclient/util.h"
 i"cefclient/resource.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/scheme_test.h
-c000000005065D21E00000000000002F6
-t1348850206
+c000000005102513700000000000002F6
+t1359106359
 s758
 i<vector>
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.cpp
-c000000005065D21E000000000000095A
-t1348850206
+c0000000051025137000000000000095A
+t1359106359
 s2394
 i"cefclient/string_util.h"
 i<sstream>
@@ -405,23 +405,23 @@ i<string>
 i"include/cef_request.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/string_util.h
-c000000005065D21E00000000000002C7
-t1348850206
+c000000005102513700000000000002C7
+t1359106359
 s711
 i<string>
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/util.h
-c000000005065D21E00000000000003BC
-t1348850206
+c000000005102513700000000000003BC
+t1359106359
 s956
 i"include/cef_task.h"
 i<windows.h>
 i<assert.h>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_app.h
-c000000005065D21E0000000000001C3A
-t1348850206
+c00000000510251370000000000001C3A
+t1359106359
 s7226
 i"include/cef_base.h"
 i"include/cef_browser_process_handler.h"
@@ -431,8 +431,8 @@ i"include/cef_resource_bundle_handler.h"
 i"include/cef_scheme.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_application_mac.h
-c000000005065D21E0000000000001390
-t1348850206
+c00000000510251370000000000001390
+t1359106359
 s5008
 i"include/cef_base.h"
 i"base/message_pump_mac.h"
@@ -443,8 +443,8 @@ i<AppKit/AppKit.h>
 i<Cocoa/Cocoa.h>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_base.h
-c000000005065D21E0000000000001668
-t1348850206
+c00000000510251370000000000001668
+t1359106359
 s5736
 i"include/internal/cef_build.h"
 i"include/internal/cef_ptr.h"
@@ -454,8 +454,8 @@ i"include/internal/cef_mac.h"
 i"include/internal/cef_linux.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_browser.h
-c000000005065D21E0000000000002234
-t1348850206
+c00000000510251370000000000002234
+t1359106359
 s8756
 i"include/cef_base.h"
 i"include/cef_frame.h"
@@ -463,22 +463,22 @@ i"include/cef_process_message.h"
 i<vector>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_browser_process_handler.h
-c000000005065D21E0000000000000C5E
-t1348850206
+c00000000510251370000000000000C5E
+t1359106359
 s3166
 i"include/cef_base.h"
 i"include/cef_command_line.h"
 i"include/cef_proxy_handler.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_callback.h
-c000000005065D21E000000000000094F
-t1348850206
+c0000000051025137000000000000094F
+t1359106359
 s2383
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_client.h
-c000000005065D21E00000000000013D4
-t1348850206
+c000000005102513700000000000013D4
+t1359106359
 s5076
 i"include/cef_base.h"
 i"include/cef_context_menu_handler.h"
@@ -494,16 +494,16 @@ i"include/cef_process_message.h"
 i"include/cef_request_handler.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_command_line.h
-c000000005065D21E000000000000199C
-t1348850206
+c0000000051025137000000000000199C
+t1359106359
 s6556
 i"include/cef_base.h"
 i<map>
 i<vector>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_context_menu_handler.h
-c000000005065D21E0000000000001DD3
-t1348850206
+c00000000510251370000000000001DD3
+t1359106359
 s7635
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -511,44 +511,44 @@ i"include/cef_frame.h"
 i"include/cef_menu_model.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_cookie.h
-c000000005065D21E000000000000177E
-t1348850206
+c0000000051025137000000000000177E
+t1359106359
 s6014
 i"include/cef_base.h"
 i<vector>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_display_handler.h
-c000000005065D21E000000000000111D
-t1348850206
+c0000000051025137000000000000111D
+t1359106359
 s4381
 i"include/cef_base.h"
 i"include/cef_browser.h"
 i"include/cef_frame.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_dom.h
-c000000005065D21E0000000000002CC3
-t1348850206
+c00000000510251370000000000002CC3
+t1359106359
 s11459
 i"include/cef_base.h"
 i<map>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_download_handler.h
-c000000005065D21E000000000000109B
-t1348850206
+c0000000051025137000000000000109B
+t1359106359
 s4251
 i"include/cef_base.h"
 i"include/cef_browser.h"
 i"include/cef_download_item.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_download_item.h
-c000000005065D21E0000000000001068
-t1348850206
+c00000000510251370000000000001068
+t1359106359
 s4200
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_focus_handler.h
-c000000005065D21E0000000000000D21
-t1348850206
+c00000000510251370000000000000D21
+t1359106359
 s3361
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -556,8 +556,8 @@ i"include/cef_dom.h"
 i"include/cef_frame.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_frame.h
-c000000005065D21E0000000000001967
-t1348850206
+c00000000510251370000000000001967
+t1359106359
 s6503
 i"include/cef_base.h"
 i"include/cef_dom.h"
@@ -566,76 +566,76 @@ i"include/cef_stream.h"
 i"include/cef_string_visitor.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_geolocation_handler.h
-c000000005065D21E0000000000000E13
-t1348850206
+c00000000510251370000000000000E13
+t1359106359
 s3603
 i"include/cef_base.h"
 i"include/cef_browser.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_jsdialog_handler.h
-c000000005065D21E000000000000155C
-t1348850206
+c0000000051025137000000000000155C
+t1359106359
 s5468
 i"include/cef_base.h"
 i"include/cef_browser.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_keyboard_handler.h
-c000000005065D21E0000000000000D88
-t1348850206
+c00000000510251370000000000000D88
+t1359106359
 s3464
 i"include/cef_base.h"
 i"include/cef_browser.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_life_span_handler.h
-c000000005065D21E0000000000001211
-t1348850206
+c00000000510251370000000000001211
+t1359106359
 s4625
 i"include/cef_base.h"
 i"include/cef_browser.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_load_handler.h
-c000000005065D21E000000000000127F
-t1348850206
+c0000000051025137000000000000127F
+t1359106359
 s4735
 i"include/cef_base.h"
 i"include/cef_browser.h"
 i"include/cef_frame.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_menu_model.h
-c000000005065D21E0000000000002FA6
-t1348850206
+c00000000510251370000000000002FA6
+t1359106359
 s12198
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_path_util.h
-c000000005065D21E00000000000008F0
-t1348850206
+c000000005102513700000000000008F0
+t1359106359
 s2288
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_process_message.h
-c000000005065D21E0000000000000C35
-t1348850206
+c00000000510251370000000000000C35
+t1359106359
 s3125
 i"include/cef_base.h"
 i"include/cef_values.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_process_util.h
-c000000005065D21E0000000000000A31
-t1348850206
+c00000000510251370000000000000A31
+t1359106359
 s2609
 i"include/cef_base.h"
 i"include/cef_command_line.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_proxy_handler.h
-c000000005065D21E0000000000000979
-t1348850206
+c00000000510251370000000000000979
+t1359106359
 s2425
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_render_process_handler.h
-c000000005065D21E0000000000001361
-t1348850206
+c00000000510251370000000000001361
+t1359106359
 s4961
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -645,16 +645,16 @@ i"include/cef_process_message.h"
 i"include/cef_v8.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_request.h
-c000000005065D21E0000000000001CC2
-t1348850206
+c00000000510251370000000000001CC2
+t1359106359
 s7362
 i"include/cef_base.h"
 i<map>
 i<vector>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_request_handler.h
-c000000005065D21E0000000000001F44
-t1348850206
+c00000000510251370000000000001F44
+t1359106359
 s8004
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -666,14 +666,14 @@ i"include/cef_request.h"
 i"include/cef_web_plugin.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_resource_bundle_handler.h
-c000000005065D21E0000000000000CED
-t1348850206
+c00000000510251370000000000000CED
+t1359106359
 s3309
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_resource_handler.h
-c000000005065D21E0000000000001320
-t1348850206
+c00000000510251370000000000001320
+t1359106359
 s4896
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -683,15 +683,15 @@ i"include/cef_request.h"
 i"include/cef_response.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_response.h
-c000000005065D21E0000000000000E06
-t1348850206
+c00000000510251370000000000000E06
+t1359106359
 s3590
 i"include/cef_base.h"
 i<map>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_runnable.h
-c000000005065D21E0000000000003A02
-t1348850206
+c00000000510251370000000000003A02
+t1359106359
 s14850
 i"include/cef_base.h"
 i"include/cef_task.h"
@@ -699,8 +699,8 @@ i"base/tuple.h"
 i"internal/cef_tuple.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_scheme.h
-c000000005065D21E0000000000001CBB
-t1348850206
+c00000000510251370000000000001CBB
+t1359106359
 s7355
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -710,26 +710,26 @@ i"include/cef_response.h"
 i"include/cef_resource_handler.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_stream.h
-c000000005065D21E0000000000001707
-t1348850206
+c00000000510251370000000000001707
+t1359106359
 s5895
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_string_visitor.h
-c000000005065D21E0000000000000919
-t1348850206
+c00000000510251370000000000000919
+t1359106359
 s2329
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_task.h
-c000000005065D21E0000000000000D30
-t1348850206
+c00000000510251370000000000000D30
+t1359106359
 s3376
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_v8.h
-c000000005065D21E00000000000065D3
-t1348850206
+c000000005102513800000000000065D3
+t1359106360
 s26067
 i"include/cef_base.h"
 i"include/cef_browser.h"
@@ -737,70 +737,70 @@ i"include/cef_frame.h"
 i<vector>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_values.h
-c000000005065D21E000000000000385A
-t1348850206
+c0000000051025138000000000000385A
+t1359106360
 s14426
 i<vector>
 i"include/cef_base.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/cef_web_plugin.h
-c000000005065D21E0000000000001711
-t1348850206
+c00000000510251380000000000001711
+t1359106360
 s5905
 i"include/cef_base.h"
 i"include/cef_browser.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_build.h
-c000000005065D21E00000000000010F6
-t1348850206
+c000000005102513800000000000010F6
+t1359106360
 s4342
 i"base/compiler_specific.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_export.h
-c000000005065D21E0000000000000880
-t1348850206
+c00000000510251380000000000000880
+t1359106360
 s2176
 i"include/internal/cef_build.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_mac.h
-c000000005065D21E00000000000012C8
-t1348850206
+c000000005102513800000000000012C8
+t1359106360
 s4808
 i<pthread.h>
 i"include/internal/cef_types_mac.h"
 i"include/internal/cef_types_wrappers.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_ptr.h
-c000000005065D21E00000000000018EA
-t1348850206
+c000000005102513800000000000018EA
+t1359106360
 s6378
 i<stddef.h>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_string.h
-c000000005065D21E0000000000001386
-t1348850206
+c00000000510251380000000000001386
+t1359106360
 s4998
 i"include/internal/cef_string_types.h"
 i"include/internal/cef_string_wrappers.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_string_list.h
-c000000005065D21E0000000000000BCF
-t1348850206
+c00000000510251380000000000000BCF
+t1359106360
 s3023
 i"include/internal/cef_export.h"
 i"include/internal/cef_string.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_string_types.h
-c000000005065D21E0000000000001EB4
-t1348850206
+c00000000510251380000000000001EB4
+t1359106360
 s7860
 i"include/internal/cef_build.h"
 i"include/internal/cef_export.h"
 i<stddef.h>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_string_wrappers.h
-c000000005065D21E000000000000574B
-t1348850206
+c0000000051025138000000000000574B
+t1359106360
 s22347
 i<memory.h>
 i<string>
@@ -808,21 +808,21 @@ i"include/internal/cef_string_types.h"
 i"base/string16.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_time.h
-c000000005065D21E0000000000000C79
-t1348850206
+c00000000510251380000000000000C79
+t1359106360
 s3193
 i"include/internal/cef_export.h"
 i<time.h>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_tuple.h
-c000000005065D21E0000000000009CAB
-t1348850206
+c00000000510251380000000000009CAB
+t1359106360
 s40107
 i"base/logging.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_types.h
-c000000005065D21E0000000000007C69
-t1348850206
+c00000000510251380000000000007C69
+t1359106360
 s31849
 i"include/internal/cef_build.h"
 i"include/internal/cef_string.h"
@@ -834,213 +834,213 @@ i"include/internal/cef_types_linux.h"
 i<stddef.h>
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_types_mac.h
-c000000005065D21E0000000000000B16
-t1348850206
+c00000000510251380000000000000B16
+t1359106360
 s2838
 i"include/internal/cef_build.h"
 i"include/internal/cef_string.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/internal/cef_types_wrappers.h
-c000000005065D21E0000000000004E49
-t1348850206
+c00000000510251380000000000004E49
+t1359106360
 s20041
 i"include/internal/cef_string.h"
 i"include/internal/cef_string_list.h"
 i"include/internal/cef_types.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/include/wrapper/cef_stream_resource_handler.h
-c000000005065D21E0000000000000DF1
-t1348850206
+c00000000510251380000000000000DF1
+t1359106360
 s3569
 i"include/cef_base.h"
 i"include/cef_resource_handler.h"
 i"include/cef_response.h"
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app
-c00000000510109D70000000000000066
-t1359022551
+c00000000510254FB0000000000000066
+t1359107323
 s102
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app
-t1359022173
+t1359107325
 s102
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so
-t1358248111
+t1359106360
 s2107568
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/libcef.dylib
-t1358248112
+t1359106361
 s234311260
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources
-t1358248111
+t1359106361
 s3570
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app
-t1359022171
+t1359107323
 s102
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/libplugin_carbon_interpose.dylib
-t1358248111
+t1359106361
 s18400
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Info.plist
-t1358248111
+t1359106361
 s1338
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload
-t1359022173
-s1856644
+t1359107324
+s1856844
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/PkgInfo
-t1358248111
+t1359106361
 s8
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/English.lproj/InfoPlist.strings
-t1358248112
+t1359106361
 s172
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/English.lproj/MainMenu.nib
-t1358248112
+t1359106361
 s3910
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/ReloadServer
-t1358956713
+t1359106362
 s476
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/Reload_Icon.icns
-t1358248112
+t1359106362
 s153386
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/binding.html
-t1358248112
+t1359106362
 s741
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/cefclient.icns
-t1358248112
+t1359106362
 s55080
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/dialogs.html
-t1358248112
+t1359106362
 s1154
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/domaccess.html
-t1358248112
+t1359106362
 s432
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/localstorage.html
-t1358248112
+t1359106362
 s774
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/logo.png
-t1358248112
+t1359106362
 s19879
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html
-t1358248112
+t1359106362
 s584
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/libcef_dll_wrapper.a
-c0000000050F537250000000000716580
-t1358247717
+c00000000510254FB0000000000716580
+t1359107323
 s7431552
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/Reload.LinkFileList
-c0000000050F53727000000000000065D
-t1358247719
+c000000005102513B000000000000065D
+t1359106363
 s1629
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/binding_test.o
-t1358247721
+t1359106363
 s303668
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient.o
-t1358247721
+t1359106363
 s456448
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o
-t1359022172
-s406604
+t1359107324
+s408248
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_app.o
-t1358247721
+t1359106363
 s424172
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_app_delegates.o
-t1358247720
+t1359106363
 s151940
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_handler.o
-t1358247721
+t1359106363
 s501604
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_handler_mac.o
-t1358247722
+t1359106363
 s186616
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_renderer.o
-t1358247721
+t1359106363
 s204700
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_switches.o
-t1358247720
+t1359106363
 s11328
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/dom_test.o
-t1358247721
+t1359106363
 s271616
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/resource_util_mac.o
-t1358247722
+t1359106363
 s48048
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/scheme_test.o
-t1358247720
+t1359106363
 s98896
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/string_util.o
-t1358247721
+t1359106363
 s164980
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh
-c0000000050F53727000000000000002E
-t1358247719
+c000000005102513B000000000000002E
+t1359106363
 s46
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh
-c0000000050F537270000000000000044
-t1358247719
+c000000005102513B0000000000000044
+t1359106363
 s68
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh
-c0000000050F53727000000000000003F
-t1358247719
+c000000005102513B000000000000003F
+t1359106363
 s63
 
 N/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh
-c0000000050F5372700000000000000D8
-t1358247719
+c000000005102513B00000000000000D8
+t1359106363
 s216
 
 NDebug/ffmpegsumo.so
-c000000005065D21E00000000002028B0
-t1348850206
+c000000005102513300000000002028B0
+t1359106355
 s2107568
 
 NDebug/libcef.dylib
-c000000005065D23A000000000DF74E5C
-t1348850234
+c0000000051025135000000000DF74E5C
+t1359106357
 s234311260
 
 NDebug/libplugin_carbon_interpose.dylib
-c000000005065D23A00000000000047E0
-t1348850234
+c000000005102513500000000000047E0
+t1359106357
 s18400
 
 Ncefclient/mac/Info.plist
-c0000000050EEDC1800000000000003A5
-t1357831192
+c000000005102513600000000000003A5
+t1359106358
 s933
 
 CBuild AST from /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp
@@ -1084,7 +1084,7 @@ r0
 
 CCheck dependencies
 r0
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies1c984c5741b1b641^07cf4c5741b1b641^---0#1#0#--18"Check dependencies36"1E07C662-0772-447A-A7A8-0E83CBD143A7-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependenciesd9b1817b8cb2b641^84bb837b8cb2b641^---0#1#0#--18"Check dependencies36"4553FC28-F973-4B80-B493-4B53FE2C4825-
 
 CCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/binding_test.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/binding_test.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 s379940520.436311
@@ -1113,8 +1113,8 @@ xcom.apple.compilers.llvmgcc42
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection77"Compile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.cpp24d16fa86ea5b641^46d070a96ea5b641^---0#0#0#-19%DVTDocumentLocation2@85"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.cpp0000000000000000^1950"CompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient.o cefclient/cefclient.cpp normal i386 c++ com.apple.compilers.llvmgcc42    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv LANG en_US.US-ASCII    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-gcc-4.2 -x c++ -arch i386 -fmessage-length=0 -pipe -Wno-trigraphs -fno-exceptions -fno-rtti -O0 -Werror -Wnewline-eof -DCHROMIUM_BUILD -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_CONFIGURATION_POLICY -DENABLE_INPUT_SPEECH -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_GPU=1 -DENABLE_EGLIMAGE=1 -DUSE_SKIA=1 -DENABLE_TASK_MANAGER=1 -DENABLE_WEB_INTENTS=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PROTECTOR_SERVICE=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_BACKGROUND=1 -DENABLE_PROMO_RESOURCE_SERVICE=1 -DENABLE_AUTOMATION=1 -DENABLE_PRINTING=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DUSING_CEF_SHARED -D__STDC_FORMAT_MACROS -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.5 -gdwarf-2 -fvisibility=hidden -fvisibility-inlines-hidden -fno-threadsafe-statics -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/include -I. -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/DerivedSources/i386 -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/DerivedSources -Wall -Wendif-labels -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -fno-strict-aliasing -fstack-protector-all -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient.cpp -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient.o36"BD0779E6-3AEA-43B6-8063-30ABB37BC42D-
 
 CCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42
-s380715351.357148
-e380715352.572484
+s380800123.566612
+e380800124.777061
 r1
 xCompileC
 xxcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o
@@ -1123,7 +1123,7 @@ xnormal
 xi386
 xobjective-c++
 xcom.apple.compilers.llvmgcc42
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection80"Compile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm378b5b5741b1b641^d68e925841b1b641^---0#0#0#-19%DVTDocumentLocation2@88"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm0000000000000000^1984"CompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o cefclient/cefclient_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv LANG en_US.US-ASCII    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-gcc-4.2 -x objective-c++ -arch i386 -fmessage-length=0 -pipe -Wno-trigraphs -fno-exceptions -fno-rtti -O0 -Werror -Wnewline-eof -DCHROMIUM_BUILD -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_CONFIGURATION_POLICY -DENABLE_INPUT_SPEECH -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_GPU=1 -DENABLE_EGLIMAGE=1 -DUSE_SKIA=1 -DENABLE_TASK_MANAGER=1 -DENABLE_WEB_INTENTS=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PROTECTOR_SERVICE=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_BACKGROUND=1 -DENABLE_PROMO_RESOURCE_SERVICE=1 -DENABLE_AUTOMATION=1 -DENABLE_PRINTING=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DUSING_CEF_SHARED -D__STDC_FORMAT_MACROS -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.5 -gdwarf-2 -fvisibility=hidden -fvisibility-inlines-hidden -fno-threadsafe-statics -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/include -I. -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/DerivedSources/i386 -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/DerivedSources -Wall -Wendif-labels -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -fno-strict-aliasing -fstack-protector-all -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o36"1607EE9C-838D-4ACC-9D74-67FBE58AA436-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection80"Compile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm0724917b8cb2b641^abedc67c8cb2b641^---0#0#0#-19%DVTDocumentLocation2@88"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm0000000000000000^1984"CompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o cefclient/cefclient_mac.mm normal i386 objective-c++ com.apple.compilers.llvmgcc42    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv LANG en_US.US-ASCII    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-gcc-4.2 -x objective-c++ -arch i386 -fmessage-length=0 -pipe -Wno-trigraphs -fno-exceptions -fno-rtti -O0 -Werror -Wnewline-eof -DCHROMIUM_BUILD -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_CONFIGURATION_POLICY -DENABLE_INPUT_SPEECH -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_GPU=1 -DENABLE_EGLIMAGE=1 -DUSE_SKIA=1 -DENABLE_TASK_MANAGER=1 -DENABLE_WEB_INTENTS=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PROTECTOR_SERVICE=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_BACKGROUND=1 -DENABLE_PROMO_RESOURCE_SERVICE=1 -DENABLE_AUTOMATION=1 -DENABLE_PRINTING=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DUSING_CEF_SHARED -D__STDC_FORMAT_MACROS -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.5 -gdwarf-2 -fvisibility=hidden -fvisibility-inlines-hidden -fno-threadsafe-statics -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/include -I. -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/DerivedSources/i386 -I/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/DerivedSources -Wall -Wendif-labels -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -fno-strict-aliasing -fstack-protector-all -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/cefclient_mac.mm -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/cefclient_mac.o36"0DB46CBC-3226-4915-A829-2FFCF3280D9E-
 
 CCompileC xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/client_app.o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/client_app.cpp normal i386 c++ com.apple.compilers.llvmgcc42
 s379940520.436294
@@ -1354,23 +1354,23 @@ xxcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection71"Copy xcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html7bf9893070a5b641^04a98c3070a5b641^---0#0#0#-19%DVTDocumentLocation2@128"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html000000000080d041^450"CpResource cefclient/res/xmlhttprequest.html xcodebuild/Debug/Reload.app/Contents/Resources/xmlhttprequest.html    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/res/xmlhttprequest.html /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Resources36"8E685A9F-A171-4CFF-9A0E-2991B74AF9CB-
 
 CLd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload normal i386
-s380715352.579536
-e380715352.660992
+s380800124.783833
+e380800124.872247
 r1
 xLd
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload
 xnormal
 xi386
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection100"Link /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload4370945841b1b641^b037a95841b1b641^---0#0#0#--981"Ld xcodebuild/Debug/Reload.app/Contents/MacOS/Reload normal i386    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-g++-4.2 -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -L/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks -LDebug -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -filelist /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/Reload.LinkFileList -mmacosx-version-min=10.5 -Wl,-search_paths_first -Wl,-ObjC -Wl,-pie -fobjc-link-runtime -lcef_dll_wrapper -framework AppKit -lcef -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload36"5A1DD109-5363-4949-99EE-9E8CC659099C-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection100"Link /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reloadf987c97c8cb2b641^13efe07c8cb2b641^---0#0#0#--981"Ld xcodebuild/Debug/Reload.app/Contents/MacOS/Reload normal i386    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    setenv MACOSX_DEPLOYMENT_TARGET 10.5    /Applications/Xcode.app/Contents/Developer/usr/bin/llvm-g++-4.2 -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -L/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks -LDebug -F/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug -filelist /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Objects-normal/i386/Reload.LinkFileList -mmacosx-version-min=10.5 -Wl,-search_paths_first -Wl,-ObjC -Wl,-pie -fobjc-link-runtime -lcef_dll_wrapper -framework AppKit -lcef -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/MacOS/Reload36"07471860-4320-4A3F-9184-C58E396FAC01-
 
 CPBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app"
-s380715351.313866
-e380715351.318551
+s380800123.528175
+e380800123.532355
 r1
 xPBXCp
 xxcodebuild/Debug/Reload Helper.app
 xxcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection70"Copy xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.appb16a505741b1b641^198c515741b1b641^---0#0#0#-19%DVTDocumentLocation2@130"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload%20Helper.app/0000000000000000^453"PBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks36"17692CBD-DBF1-4DD0-ACF4-3536DED0DA81-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection70"Copy xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app4546877b8cb2b641^4948887b8cb2b641^---0#0#0#-19%DVTDocumentLocation2@130"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload%20Helper.app/0000000000000000^453"PBXCp "xcodebuild/Debug/Reload Helper.app" "xcodebuild/Debug/Reload.app/Contents/Frameworks/Reload Helper.app"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload Helper.app" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks36"D3490B57-B04E-46AC-B61B-8351C3603DAD-
 
 CPBXCp Debug/ffmpegsumo.so "xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Libraries/ffmpegsumo.so"
 s379940911.951714
@@ -1409,40 +1409,40 @@ xxcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.fra
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection100"Copy xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources4be7eb2f70a5b641^66a1f12f70a5b641^---0#0#0#-19%DVTDocumentLocation2@161"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium%20Embedded%20Framework.framework/Resources000000000080d041^469"PBXCp Resources "xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework/Resources"    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/Resources "/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Frameworks/Chromium Embedded Framework.framework"36"E1B13D99-23EE-407B-87E5-0C848EE73F1F-
 
 CPhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh
-s380715353.230629
-e380715353.319518
+s380800125.465042
+e380800125.557198
 r1
 xPhaseScriptExecution
 xPostbuild "Change Mach-O Flags"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection57"Run custom shell script 'Postbuild "Change Mach-O Flags"'1a6f3b5941b1b641^bccb515941b1b641^---0#0#0#--327"PhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh36"9F9F8EEE-B450-4D22-A7F1-5E0259F48684-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection57"Run custom shell script 'Postbuild "Change Mach-O Flags"'5c77777d8cb2b641^76a48e7d8cb2b641^---0#0#0#--327"PhaseScriptExecution "Postbuild \"Change Mach-O Flags\"" xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-C7D8B76891B2EB408E226FA2.sh36"D8456C14-C0F1-4EC4-812B-F1C4A534B15F-
 
 CPhaseScriptExecution "Postbuild \"Fix Framework Link\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh
-s380715352.669073
-e380715352.704899
+s380800124.879716
+e380800124.908191
 r1
 xPhaseScriptExecution
 xPostbuild "Fix Framework Link"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection56"Run custom shell script 'Postbuild "Fix Framework Link"'daabab5841b1b641^3274b45841b1b641^---0#0#0#--326"PhaseScriptExecution "Postbuild \"Fix Framework Link\"" xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh36"1F83AC98-E85E-4918-B93C-AEFDCACD89ED-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection56"Run custom shell script 'Postbuild "Fix Framework Link"'1dc9e17c8cb2b641^aa7fe87c8cb2b641^---0#0#0#--326"PhaseScriptExecution "Postbuild \"Fix Framework Link\"" xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-E2234B600593F2E17EC7B33D.sh36"EC71B68F-5BA2-4F75-8908-D16051C78640-
 
 CPhaseScriptExecution "Postbuild \"Make More Helpers\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh
-s380715352.712982
-e380715353.222306
+s380800124.916142
+e380800125.456996
 r1
 xPhaseScriptExecution
 xPostbuild "Make More Helpers"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection55"Run custom shell script 'Postbuild "Make More Helpers"'64eab65841b1b641^a7e8385941b1b641^---0#0#0#--325"PhaseScriptExecution "Postbuild \"Make More Helpers\"" xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh36"A536E794-117F-4F42-8C86-ADFC984BC180-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection55"Run custom shell script 'Postbuild "Make More Helpers"'c5feea7c8cb2b641^4cfd747d8cb2b641^---0#0#0#--325"PhaseScriptExecution "Postbuild \"Make More Helpers\"" xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-ADC9187E4C6728CF4AF86CC7.sh36"BB05B38F-13CC-4280-B759-4DE42CFBC2A1-
 
 CPhaseScriptExecution "Postbuild \"Strip If Needed\"" /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh
-s380715353.327169
-e380715353.343063
+s380800125.564930
+e380800125.580113
 r1
 xPhaseScriptExecution
 xPostbuild "Strip If Needed"
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Run custom shell script 'Postbuild "Strip If Needed"'e624545941b1b641^2cd3575941b1b641^---0#0#0#--323"PhaseScriptExecution "Postbuild \"Strip If Needed\"" xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh36"61767C11-448A-4098-BC4C-58B4E29A33E6-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Run custom shell script 'Postbuild "Strip If Needed"'2107917d8cb2b641^2882947d8cb2b641^---0#0#0#--323"PhaseScriptExecution "Postbuild \"Strip If Needed\"" xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /bin/sh -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Reload.build/Debug/Reload.build/Script-A019BF58402B64855147A97A.sh36"288A22B9-B974-41DF-BAD7-CFE503CD1C62-
 
 CProcessInfoPlistFile /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Info.plist cefclient/mac/Info.plist
 s379940911.895196
@@ -1454,10 +1454,10 @@ xcefclient/mac/Info.plist
 lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection32"Process cefclient/mac/Info.plist8d47e52f70a5b641^a41ae62f70a5b641^---0#0#0#-19%DVTDocumentLocation2@86"file://localhost/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/cefclient/mac/Info.plist0000000000000000^439"ProcessInfoPlistFile xcodebuild/Debug/Reload.app/Contents/Info.plist cefclient/mac/Info.plist    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    builtin-infoPlistUtility cefclient/mac/Info.plist -genpkginfo /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/PkgInfo -expandbuildsettings -platform macosx -o /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app/Contents/Info.plist36"11002D3F-03DC-4A80-894E-81FD6E38840D-
 
 CTouch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app
-s380715353.351406
-e380715353.358479
+s380800125.587990
+e380800125.593312
 r1
 xTouch
 x/Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app
-lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection79"Touch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.appee055a5941b1b641^cec55b5941b1b641^---0#0#0#--183"Touch xcodebuild/Debug/Reload.app    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /usr/bin/touch -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app36"BDD1B494-0ADA-437A-B632-FE86B250958B-
+lSLF05#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection79"Touch /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.appe692967d8cb2b641^43e5977d8cb2b641^---0#0#0#--183"Touch xcodebuild/Debug/Reload.app    cd /Users/ali/Work/dev/Reload/ReloadLauncher/Mac    /usr/bin/touch -c /Users/ali/Work/dev/Reload/ReloadLauncher/Mac/xcodebuild/Debug/Reload.app36"15AFE40E-D634-455B-AD4D-C7FF71BB9B10-
 
