@@ -105,7 +105,9 @@ var methods = {
 	},
 
 	loadConfig: function (callback) {
-        fs.readFile(process.cwd() + globals.fileSeparator + "config.dat", 
+		fs.exists(process.cwd() + globals.fileSeparator + "config.dat", function (exists){
+			if(exists){
+				fs.readFile(process.cwd() + globals.fileSeparator + "config.dat", 
                     "utf8", 
                     function(err, data){
                         console.log(data);
@@ -121,6 +123,12 @@ var methods = {
                         	callback();
                         }
                     });
+			} else {
+				fs.writeFile(process.cwd() + globals.fileSeparator + "config.dat", 
+						     JSON.stringify({statistics: "undefined"}), function (err) {} );
+			}
+		});
+        
     },
 };
 
