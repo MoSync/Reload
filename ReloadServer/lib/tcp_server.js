@@ -145,32 +145,35 @@ var create = function (port) {
             {
                 // Platform, name, uuid, os version, phonegap version.
                 //message.type == null;
-                // Statistics Collection
-				vars.methods.loadStats(function (statistics) {
+                if(vars.globals.statistics) {
+                    // Statistics Collection
+                    vars.methods.loadStats(function (statistics) {
 
-					var deviceExists = false;
+                        var deviceExists = false;
+                        //console.log(statistics);
+                        for( var i in statistics.clients) {
+                            if( statistics.clients[i].uuid == message.params.uuid) {
+                                deviceExists = true;
+                            }
+                        }
 
-					for( var i in statistics.clients) {
-						if( statistics.clients[i].uuid == message.params.uuid) {
-							deviceExists = true;
-						}
-					}
-					console.log(message.params);
-					if( !deviceExists ) {
+                        if( !deviceExists ) {
 
-							var client = {
-								platform: message.params.platform,
-								version: message.params.version,
-								name: message.params.name,
-								uuid: message.params.uuid,
-								phonegap: message.params.phonegap
-							};
+                                var client = {
+                                    platform: message.params.platform,
+                                    version: message.params.version,
+                                    name: message.params.name,
+                                    uuid: message.params.uuid,
+                                    phonegap: message.params.phonegap
+                                };
 
-							statistics.clients.push(client);
-
-							vars.methods.saveStats(statistics);
-					}
-				});
+                                statistics.clients.push(client);
+                                //console.log(statistics);
+                                vars.methods.saveStats(statistics);
+                        }
+                    });
+                }
+                
                 socket.deviceInfo = message.params;
                 socket.deviceInfo.address = socket.remoteAddress;
                 generateDeviceInfoListJSON();
