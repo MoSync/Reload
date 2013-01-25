@@ -502,10 +502,13 @@ var rpcFunctions = {
                     console.log("-----------------------------------------------");
 
                     // Statistics
-                    vars.methods.loadStats(function (statistics) {
-                        statistics.reloads += 1;
-                        vars.methods.saveStats(statistics);
-                    });
+                    if(vars.globals.statistics) {
+
+                        vars.methods.loadStats(function (statistics) {
+                            statistics.reloads += 1;
+                            vars.methods.saveStats(statistics);
+                        });
+                    }
                 }
                 catch(err) {
                     console.log("error     : " + err)
@@ -844,14 +847,20 @@ var rpcFunctions = {
      * (RPC and Internal) Used to send the feedback data if there are any
      */
     sendStats: function (sendResponse) {
+
+        function respond( error, message) {
+            if(typeof sendResponse === 'function') {
+                sendResponse({hasError: error, data: message});
+            }
+            console.log(message);
+        };
+
+        if (!vars.globals.statistics) {
+            respond(true, "Sending Statistics is not enabled.");
+            return;
+        }
         
         vars.methods.loadStats( function(statistics){
-            
-            function respond( error, message) {
-                if(typeof sendResponse === 'function') {
-                    sendResponse({hasError: error, data: message});
-                }
-            }
 
             if( statistics.clients.length === 0 ) {
                 respond(false, "Nothing to Send");
@@ -895,7 +904,6 @@ var rpcFunctions = {
             });
 
             postRequest.on('error', function(e) {
-                console.log('Could not establish connection with MoSync: ' + e.message);
                 respond(true, 'Could not establish connection with MoSync: ' + e.message);                
             });
             // post the data
@@ -937,6 +945,57 @@ var rpcFunctions = {
             sendResponse({hasError: false, data: newWorkspacePath});
         }
     },
+
+    /**
+     * (RPC): Sets a configuration option to specified value
+     */
+    setConfig: function (option, value, sendResponse ) {
+        //check if parameter passing was correct
+        var config = {};
+        if(typeof sendResponse !== 'function') return false;
+
+        fs.readFile(process.cwd() + vars.globals.fileSeparator + "config.dat", 
+                    "utf8", 
+                    function(err, data){
+                        //console.log(data);
+                        if (err) throw err;
+
+                        config = JSON.parse(data);
+                        config[option] = value;
+
+                        fs.writeFile( process.cwd() + vars.globals.fileSeparator + "config.dat",
+                                      JSON.stringify(config),
+                                      "utf8", 
+                                      function(err, data){
+                                        if (err) throw err;
+
+                                        //set the configuration var
+                                        vars.globals[option] = value;
+
+                                        sendResponse({hasError: false, data: true});
+                                    });
+                    });
+    },
+    getConfig: function (option, sendResponse ) {
+        //check if parameter passing was correct
+        var config = {};
+        if(typeof sendResponse !== 'function') return false;
+
+        fs.readFile(process.cwd() + vars.globals.fileSeparator + "config.dat", 
+                    "utf8", 
+                    function(err, data){
+                        console.log(data);
+                        if (err) throw err;
+
+                        config = JSON.parse(data);
+
+                        sendResponse({hasError: false, data: config[option]});
+                    });
+    },
+
+    /**
+     * (RPC): Gets a configuration option's value
+     */
 
     /**
      * (internal function) At server startup initializes the global var for path
@@ -1131,6 +1190,11 @@ var rpcFunctions = {
 rpcFunctions.getVersionInfo(function (a){});
 rpcFunctions.getLatestPath();
 rpcFunctions.getNetworkIP();
-rpcFunctions.sendStats();
+vars.methods.loadConfig(function () {
+    if(vars.globals.statistics) {
+        rpcFunctions.sendStats();
+    }
+});
+
 
 rpc.exposeModule('manager', rpcFunctions);
