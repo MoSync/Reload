@@ -42,6 +42,9 @@ var rpcFunctions = {
 	},
 
 	/**
+	 * UNUSED: This method is replaced with function in
+	 * tcp_server.js.
+	 *
 	 * Function that pushes a log message to gRemoteData[]
 	 * so it can be read from the web browser.
 	 */
@@ -50,10 +53,11 @@ var rpcFunctions = {
 		//check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-		console.log("CLIENT LOG: " + logMessage);
+		console.log("SHOULD NOT BE USED! CLIENT LOG: " + logMessage);
+		console.log(logMessage);
+		
 		vars.globals.gRemoteLogData.push(logMessage);
 		sendResponse({hasError: false, data: ""});
-
 	}
 	
 };

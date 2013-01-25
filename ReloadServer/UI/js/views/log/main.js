@@ -2,16 +2,17 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'socket.io',
     'models/log/log',
     'text!../../../templates/log/message.html',
     'text!../../../templates/log/controls.html'
-], function($, _, Backbone, LogModel, messageTemplate, controlsTemplate){
+], function($, _, Backbone, io, LogModel, messageTemplate, controlsTemplate){
 
     var LogView = Backbone.View.extend({
 
-        timer: null,
-
         name: 'log',
+
+        timer: null,
 
         messages: $('<dl id="scroller" class="dl-horizontal">'),
 
@@ -20,10 +21,17 @@ define([
         },
 
         initialize: function () {
+
             _.bindAll(this, 'render', 'close', 'clear', 'updateLog');
 
+            var self = this;
+            var socket = io.connect('http://localhost:8283');
+
+            socket.on('log', function (data) {
+                self.updateLog(data);
+            });
+
             this.model = new LogModel();
-            this.model.on('change', this.clear);
             this.$el.append( $(_.template( controlsTemplate, {} )) );
         },
 
@@ -32,14 +40,9 @@ define([
             // Rebind all events in case close() was called.
             this.delegateEvents();
 
-            // Update log on render() so we don't have to wait for
-            // interval timer.
-            this.updateLog();
-
-            var self = this;
-            this.timer = setInterval(function(){
-                self.updateLog();
-            }, 1000);
+            //// Update log on render() so we don't have to wait for
+            //// interval timer.
+            //this.updateLog();
         },
 
         close: function () {
@@ -66,52 +69,37 @@ define([
         },
 
         firstScroll: true,
-        updateLog: function() {
-            var self = this;
-            this.model.getLogMsg(function(res) {
+        updateLog: function(data) {
 
-                var header, message, label;
+            console.log(data);
 
-                header = 'Log';
-                message = res;
-                label = 'info';
-
-                if(message.indexOf("Error") >= 0) {
-                    var errorHeader = message.split(":",1);
-                    header = errorHeader[0];
-                    errorHeader[0] = errorHeader[0] += ":";
-                    message = message.substr( message.indexOf(errorHeader[0]) + errorHeader[0].length );
-                    label = 'important';
-                }
-
-                var compiledTemplate = _.template( messageTemplate, {
-                    header: header,
-                    message: message,
-                    label: label
-                });
-                self.messages.append( compiledTemplate );
-
-                // Autoscroll if at the bottom.
-                var scroller = document.getElementById('scroller');
-                var doScroll;
-
-                // We are at the bottom.
-                if ((scroller.scrollTop+scroller.clientHeight) === (scroller.scrollHeight-20)){
-                    doScroll = true;
-                } else {
-                    doScroll = false;
-                }
-
-                // Do initial scroll as soon as overflow kick in.
-                if ((scroller.clientHeight < scroller.scrollHeight) && self.firstScroll) {
-                    doScroll = true;
-                    self.firstScroll = false;
-                }
-
-                if (doScroll) {
-                    scroller.scrollTop += 20;
-                }
+            var compiledTemplate = _.template( messageTemplate, {
+                header: data.type,
+                message: data.msg,
+                label: data.type
             });
+            this.messages.append( compiledTemplate );
+
+            // Autoscroll if at the bottom.
+            var scroller = document.getElementById('scroller');
+            var doScroll;
+
+            // We are at the bottom.
+            if ((scroller.scrollTop+scroller.clientHeight) === (scroller.scrollHeight-20)){
+                doScroll = true;
+            } else {
+                doScroll = false;
+            }
+
+            // Do initial scroll as soon as overflow kick in.
+            if ((scroller.clientHeight < scroller.scrollHeight) && this.firstScroll) {
+                doScroll = true;
+                this.firstScroll = false;
+            }
+
+            if (doScroll) {
+                scroller.scrollTop += 20;
+            }
         }
     });
 

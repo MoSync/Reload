@@ -8,11 +8,12 @@ define([
         initialize: function () {
             _.bindAll(this, 'getDevices');
             this.devices = [];
-            this.getDevices();
+            //this.getDevices();
         },
 
         getDevices: function (callback) {
 
+            console.log('get devices');
             var options     = {};
             options.url     = 'http://localhost:8283';
             options.rpcMsg  = {

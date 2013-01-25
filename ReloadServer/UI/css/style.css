@@ -32,6 +32,22 @@ ul li {
     background: #efefef;
     border-bottom: 1px solid rgb(206, 206, 206);
 }
+#bar-left-head #powered-by {
+    background: #ccc;
+    height: 29px;
+}
+
+#bar-left-head #reload-button,
+#bar-left-head #debug-button {
+    width: 138px;
+    display: inline;
+    margin: 0;
+}
+
+#bar-left-head #reload-button { }
+#bar-left-head #debug-button { float: right;}
+
+
 
 #bar-left .nav-top {
     padding: 10px 0;

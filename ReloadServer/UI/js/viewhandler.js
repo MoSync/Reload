@@ -22,7 +22,7 @@ define([
                 $('#content').html( this.currentView.el );
 
                 if (this.sidebarView) {
-                    console.log('sidebar is set!');
+                    console.log('sidebar is already set');
                 } else {
                     this.sidebarView = new SidebarView( {views: views} );
                     $('#bar-left').html( this.sidebarView.render() );
