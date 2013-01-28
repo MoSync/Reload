@@ -145,6 +145,7 @@ define([
                 return;
             }
 
+            console.log('--- R e l o a d i n g ---');
             console.log(this.model.get('name'));
             var options     = {};
             options.url     = 'http://localhost:8283';
