@@ -867,11 +867,11 @@ var rpcFunctions = {
                 return;
             }
 
-            var postData = JSON.stringify(statistics);
+            var postData = "data=" + escape(JSON.stringify(statistics));
         
             var requestOptions = vars.globals.statsRequestOptions;
             requestOptions.headers = {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'Content-Length': postData.length
             };
 
@@ -976,6 +976,10 @@ var rpcFunctions = {
                                     });
                     });
     },
+    
+    /**
+     * (RPC): Gets a configuration option's value
+     */
     getConfig: function (option, sendResponse ) {
         //check if parameter passing was correct
         var config = {};
@@ -992,10 +996,6 @@ var rpcFunctions = {
                         sendResponse({hasError: false, data: config[option]});
                     });
     },
-
-    /**
-     * (RPC): Gets a configuration option's value
-     */
 
     /**
      * (internal function) At server startup initializes the global var for path

@@ -44,17 +44,17 @@ var globals = {
 
 	statsFile : "stats.dat",
 
-	// Server configs for Cellection of statistics
+	// Server configs for Collection of statistics
 	statsRequestOptions: {
-        host: 'requestb.in',
+        host: 'mosyncdev.devcloud.acquia-sites.com',
         port: '80',
-        path: '/1eojc8e1',
+        path: '/reload_stats',
         method: 'POST'
     },
 
     // Server configs for Feedback
     feedbackRequestOptions: {
-        host: 'requestb.in',
+        host: ' mosyncdev.devcloud.acquia-sites.com',
         port: '80',
         path: '/1eojc8e1',
         method: 'POST'
