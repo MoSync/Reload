@@ -160,6 +160,8 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
+        var self = this;
+
         // check if directory exists
         fs.exists( vars.globals.rootWorkspacePath +
                    vars.globals.fileSeparator +
@@ -216,12 +218,12 @@ var rpcFunctions = {
 
                     if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
                     {
-                        var command = "cp -r " + this.fixPathsUnix(vars.globals.currentWorkingPath) +
+                        var command = "cp -r " + self.fixPathsUnix(vars.globals.currentWorkingPath) +
                                                  "/templates/" +
-                                                 this.fixPathsUnix(templateName) +
-                                           " " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
-                                                 this.fixPathsUnix(vars.globals.fileSeparator) +
-                                                 this.fixPathsUnix(projectName);
+                                                 self.fixPathsUnix(templateName) +
+                                           " " + self.fixPathsUnix(vars.globals.rootWorkspacePath) +
+                                                 self.fixPathsUnix(vars.globals.fileSeparator) +
+                                                 self.fixPathsUnix(projectName);
                     }
                     else
                     {
