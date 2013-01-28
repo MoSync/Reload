@@ -21,12 +21,31 @@ ul li {
     overflow:hidden;
 }
 
+#banner {
+    height: 40px;
+    border-bottom: 1px solid rgb(184, 184, 184);
+    background: rgb(216, 221, 228);
+}
+#banner #mosync-logo {
+    width: 108px;
+    height: 40px;
+    float: right;
+    margin-right: 25px;
+    background: url('../img/MoSync-logo-top.png') no-repeat;
+}
+#banner #reload-logo {
+    width: 200px;
+    height: 40px;
+    float: left;
+    background: url('../img/Reload-logo-top.png') no-repeat;
+}
+
 #bar-left {
     position: relative;
     float: left;
     background: rgb(216, 221, 228);
     width: 300px;
-    /*border-right: 1px solid rgb(225, 229, 235);*/
+    border-top: 1px solid #fff;
 }
 #bar-left-head {
     background: #efefef;
@@ -100,7 +119,8 @@ ul li {
 }
 
 #main-content #content-nav {
-    height: 48px;
+    border-top: 1px solid #fff;
+    height: 49px;
     position: absolute;
     top: 0;
 }
@@ -111,12 +131,15 @@ ul li {
     padding-right: 10px;
     margin-bottom: 0;
 }
+.nav-tabs > li > a {
+    padding-top: 10px;
+}
 
 #main-content #content {
     position: absolute;
     background: #fff;
-    top: 48px;
-    bottom: 0;
+    top: 51px;
+    bottom: 41px;
 }
 
 #main-content #console {
@@ -158,10 +181,6 @@ ul li {
     bottom: 0;
     height: 21px;
     width: 100%;
-    /*
-    border-top: 1px solid #bdbdbd;
-    background: #eee;
-    */
 
     background: rgb(238, 238, 238);
     border-top: 1px solid #fff;
@@ -197,8 +216,8 @@ ul li {
 
 .project-list {
     position: absolute;
-    top: 162px;
-    bottom: 200px;
+    top: 99px;
+    bottom: 241px;
     width: 100%;
     overflow: auto;
     border-top: 1px solid #bdbdbd;
@@ -276,7 +295,7 @@ ul#projects li a.select-project {
     height: 200px;
     width: 100%;
     position: absolute;
-    bottom: 0;
+    bottom: 41px;
     border-top: 1px solid rgb(178, 194, 190);
     background: rgb(216, 221, 228);
 }
