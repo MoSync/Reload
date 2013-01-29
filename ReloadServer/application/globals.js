@@ -137,5 +137,39 @@ var methods = {
     },
 };
 
+var MsgDispatcher = function() {
+    return {
+        fns: [],
+        message: null,
+
+        subscribe: function (fn) {
+            this.fns.push(fn);
+        },
+
+        unsubscribe : function(fn) {
+            this.fns = this.fns.filter(
+                function(el) {
+                if ( el !== fn ) {
+                    return el;
+                }}
+            );
+        },
+
+        // Notifies observers.
+        notifyAll: function () {
+            var self = this;
+            this.fns.forEach( function(fn) {
+                fn(self.message);
+            });
+        },
+
+        dispatch: function (message) {
+            this.message = message;
+            this.notifyAll();
+        }
+    };
+};
+
 exports.globals = globals;
 exports.methods = methods;
+exports.MsgDispatcher = new MsgDispatcher();

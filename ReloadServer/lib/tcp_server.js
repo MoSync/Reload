@@ -1,5 +1,6 @@
 var vars = require('../application/globals'),
 	fs = require('fs');
+
 /**
  * Object that accumulates data sent over a streaming
  * protocol (TCP).
@@ -125,6 +126,13 @@ var create = function (port) {
         });
 
         vars.globals.deviceInfoListJSON = JSON.stringify(infoListJSON);
+
+        // Dispatch list of clients to WebUI through WebSockets.
+        var md = vars.MsgDispatcher;
+        md.dispatch({
+            target: 'devices',
+            msg: infoListJSON
+        });
     }
 
     /**
@@ -179,6 +187,13 @@ var create = function (port) {
                 // TODO: Use a function for this rather than
                 // accessing global data directly.
                 vars.globals.gRemoteLogData.push(message.params);
+
+                // Dispatch log message to WebUI through WebSockets.
+                var md = vars.MsgDispatcher;
+                md.dispatch({
+                    target: 'log',
+                    msg: unescape(unescape(message.params))
+                });
             }
         }
     }
