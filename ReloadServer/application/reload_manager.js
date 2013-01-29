@@ -160,6 +160,8 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
+        var self = this;
+
         // check if directory exists
         fs.exists( vars.globals.rootWorkspacePath +
                    vars.globals.fileSeparator +
@@ -216,12 +218,12 @@ var rpcFunctions = {
 
                     if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
                     {
-                        var command = "cp -r " + this.fixPathsUnix(vars.globals.currentWorkingPath) +
+                        var command = "cp -r " + self.fixPathsUnix(vars.globals.currentWorkingPath) +
                                                  "/templates/" +
-                                                 this.fixPathsUnix(templateName) +
-                                           " " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
-                                                 this.fixPathsUnix(vars.globals.fileSeparator) +
-                                                 this.fixPathsUnix(projectName);
+                                                 self.fixPathsUnix(templateName) +
+                                           " " + self.fixPathsUnix(vars.globals.rootWorkspacePath) +
+                                                 self.fixPathsUnix(vars.globals.fileSeparator) +
+                                                 self.fixPathsUnix(projectName);
                     }
                     else
                     {
@@ -501,11 +503,28 @@ var rpcFunctions = {
                     console.log('message: ' + fullMessage);
                     console.log("-----------------------------------------------");
 
-                    // Statistics
-                    if(vars.globals.statistics) {
+                    // Collect Stats Statistics
+                    if(vars.globals.statistics === true) {
+                        var indexPath = vars.globals.rootWorkspacePath +
+                                        vars.globals.fileSeparator + projectPath +
+                                        vars.globals.fileSeparator + "LocalFiles" +
+                                        vars.globals.fileSeparator + "index.html";
 
+                        var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                        
+                        $ = cheerio.load(indexFileData,{
+                            lowerCaseTags: false
+                        });
+                        var nativeUIProject = $("#NativeUI");
                         vars.methods.loadStats(function (statistics) {
-                            statistics.reloads += 1;
+
+                            if(nativeUIProject.length) {
+                                statistics.totalReloadsNative += 1;
+                            } else {
+                                statistics.totalReloadsHTML += 1;
+                            }
+                            
+                            statistics.lastActivityTS = new Date().getTime();
                             vars.methods.saveStats(statistics);
                         });
                     }
@@ -867,21 +886,26 @@ var rpcFunctions = {
                 return;
             }
 
-            var postData = JSON.stringify(statistics);
+            var postData = "data=" + escape(JSON.stringify(statistics));
         
             var requestOptions = vars.globals.statsRequestOptions;
             requestOptions.headers = {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'Content-Length': postData.length
             };
 
             // Set up the request
             var postRequest = http.request(requestOptions, function(res) {
 
-                var responseText = "";
+                var responseText = "",
+                    startTS = new Date().getTime();
+
                 if(res.statusCode == 200) {
                     vars.methods.loadStats(function (statistics) {
-                        statistics.reloads = 0;
+                        statistics.totalReloadsNative = 0;
+                        statistics.totalReloadsHTML = 0;
+                        statistics.serverStartTS = startTS;
+                        statistics.lastActivityTS = startTS;
                         statistics.clients = [];
                         vars.methods.saveStats(statistics);
                     });
@@ -976,6 +1000,10 @@ var rpcFunctions = {
                                     });
                     });
     },
+    
+    /**
+     * (RPC): Gets a configuration option's value
+     */
     getConfig: function (option, sendResponse ) {
         //check if parameter passing was correct
         var config = {};
@@ -992,10 +1020,6 @@ var rpcFunctions = {
                         sendResponse({hasError: false, data: config[option]});
                     });
     },
-
-    /**
-     * (RPC): Gets a configuration option's value
-     */
 
     /**
      * (internal function) At server startup initializes the global var for path
@@ -1195,6 +1219,5 @@ vars.methods.loadConfig(function () {
         rpcFunctions.sendStats();
     }
 });
-
 
 rpc.exposeModule('manager', rpcFunctions);

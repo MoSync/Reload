@@ -6,7 +6,8 @@ var http    = require('http'),
 
 var debug           = true,
     app             = express(),
-    emptyRPCRequest = "?jsonRPC={}";
+    emptyRPCRequest = "?jsonRPC={}",
+    vars = require('../application/globals');
 
 /**
  * We do not override console.log because it can 

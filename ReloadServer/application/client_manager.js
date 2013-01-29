@@ -30,11 +30,11 @@ var rpcFunctions = {
         if(typeof sendResponse !== 'function') return false;
 
 		// Set path to the project folder.
-		console.log("MOSYNC: Bundle Path: " + bundlePath);
+		console.log("MOSYNC: Bundle Path: " + unescape(bundlePath));
 
 		var data = fs.readFileSync(vars.globals.rootWorkspacePath + 
 								   vars.globals.fileSeparator +
-								   bundlePath +
+								   unescape(bundlePath) +
 								   vars.globals.fileSeparator +
 								   "LocalFiles.bin");
 		

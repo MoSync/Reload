@@ -145,32 +145,24 @@ var create = function (port) {
             {
                 // Platform, name, uuid, os version, phonegap version.
                 //message.type == null;
-                if(vars.globals.statistics) {
+                if(vars.globals.statistics === true) {
+
                     // Statistics Collection
                     vars.methods.loadStats(function (statistics) {
 
-                        var deviceExists = false;
-                        //console.log(statistics);
-                        for( var i in statistics.clients) {
-                            if( statistics.clients[i].uuid == message.params.uuid) {
-                                deviceExists = true;
-                            }
-                        }
+                        var actionTS = new Date().getTime();
+                        
+                        var client = {
+                            localIP: socket.remoteAddress,
+                            platform: message.params.platform,
+                            version: message.params.version,
+                            action: "connect",
+                            actionTS : actionTS
+                        };
 
-                        if( !deviceExists ) {
-
-                                var client = {
-                                    platform: message.params.platform,
-                                    version: message.params.version,
-                                    name: message.params.name,
-                                    uuid: message.params.uuid,
-                                    phonegap: message.params.phonegap
-                                };
-
-                                statistics.clients.push(client);
-                                //console.log(statistics);
-                                vars.methods.saveStats(statistics);
-                        }
+                        statistics.clients.push(client);
+                        
+                        vars.methods.saveStats(statistics);
                     });
                 }
                 
@@ -208,6 +200,26 @@ var create = function (port) {
                 if (socket.deviceInfo != undefined)
                 {
                     address = socket.deviceInfo.address;
+
+                    // Statistics Collection
+                    if(vars.globals.statistics === true) {
+                        vars.methods.loadStats(function (statistics) {
+
+                            var actionTS = new Date().getTime();
+
+                            var disconnectedClient = {
+                                localIP: address,
+                                platform: socket.deviceInfo.platform,
+                                version: socket.deviceInfo.version,
+                                action: "disconnect",
+                                actionTS : actionTS
+                            };
+
+                            statistics.clients.push(disconnectedClient);
+                            //console.log(statistics);
+                            vars.methods.saveStats(statistics);
+                        });
+                    }
                 }
 
                 console.log(
@@ -251,7 +263,7 @@ var create = function (port) {
         }
     }
 
-    console.log("Opening TPC socket on port: " + port);
+    console.log("Opening TCP socket on port: " + port);
     var server = net.createServer(saveClient);
     server.listen(7000);
 
