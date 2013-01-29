@@ -27,17 +27,19 @@ ul li {
     background: rgb(216, 221, 228);
 }
 #banner #mosync-logo {
-    width: 108px;
-    height: 40px;
+    width: 91px;
+    height: 30px;
     float: right;
     margin-right: 25px;
     background: url('../img/MoSync-logo-top.png') no-repeat;
+    background-position: 0 5px;
 }
 #banner #reload-logo {
-    width: 200px;
+    width: 148px;
     height: 40px;
     float: left;
     background: url('../img/Reload-logo-top.png') no-repeat;
+    background-position: 10px 5px;
 }
 
 #bar-left {

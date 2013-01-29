@@ -22,7 +22,8 @@ define([
                       'control',
                       'reloadProject',
                       'openFolder',
-                      'removeProject');
+                      'removeProject',
+                      'rename');
 
             this.projectList = options.projectList;
 
@@ -83,21 +84,83 @@ define([
         },
 
         toggleRename: function () {
-            var span = this.$container.find('span');
-            var form = $('<form class="rename"><input value="'+span.html()+'"type="text"/></form>');
-            span.html(form);
-
-
             var self = this;
 
-            form.find('input').on('click', function () {
+            var span = this.$container.find('span');
+            var oldval = span.html();
+
+            var form = $('<form class="rename"><input value="'+oldval+'"type="text"/></form>');
+            span.html(form);
+
+            var input = form.find('input');
+            input.on('click', function () {
                 self.model.set({ showControls: true });
                 console.log(self.model.get('showControls'));
             });
-            form.find('input').focus();
-            form.find('input').on('blur', function() {
-                $(this).parent().parent().html($(this).val());
+
+            // Save on "Return" key press.
+            input.keypress(function (e) {
+                var val = $(this).val();
+                if (e.which === 13) {
+                    e.preventDefault();
+                    if (val === oldval) {
+                        $(this).parent().parent().html(oldval);
+                    } else {
+                        $(this).parent().parent().html(val);
+                        self.rename(oldval, val);
+                    }
+
+                    $(this).parent().parent().html(val);
+                }
             });
+
+            input.on('blur', function() {
+                var val = $(this).val();
+                if (val === oldval) {
+                    $(this).parent().parent().html(oldval);
+                } else {
+                    $(this).parent().parent().html(val);
+                    self.rename(oldval, val);
+                }
+            });
+
+            input.focus();
+        },
+
+        rename: function (from, to) {
+            var errors = [];
+            // Check if project name is taken.
+            _(this.projectList.models).each(function (p) {
+                if (p.get('name') === to) {
+                    errors.push('Please enter a project name that is not taken.');
+                }
+            });
+
+            if (errors.length !== 0) {
+                _(errors).each(function(err){
+                    alert(err);
+                });
+            } else {
+                var options     = {};
+                options.url     = 'http://localhost:8283';
+                options.rpcMsg  = {
+                    method: 'manager.renameProject',
+                    params: [from, to],
+                    id: 0
+                };
+
+                options.success = function (resp) {
+                    console.log('--- R e n a m e   s u c c e s s f u l ---');
+                    console.log(resp.result);
+                };
+
+                options.error   = function (resp) {
+                    console.log('could not rename project');
+                    console.log(resp);
+                };
+
+                this.model.rpc(options);
+            }
         },
 
         control: function (e) {
