@@ -171,6 +171,15 @@ public:
 	 */
 	// void downloadHTML();
 
+	// ========== Evaluate JavaScript ==========
+
+	/**
+	 * Evaluate the given script in the main web view and
+	 * send the result back using mosync.rlog().
+	 * @param script
+	 */
+	void evaluateScript(const String& script);
+
 	// ========== Launching apps ==========
 
     /**

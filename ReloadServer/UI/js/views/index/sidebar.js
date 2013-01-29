@@ -27,8 +27,10 @@ define([
         debug: false,
         selectedProject: null,
         deviceCount: 0,
+        views: null,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.views = options.views;
 
             _.bindAll(this, 'render', 'changePath');
 

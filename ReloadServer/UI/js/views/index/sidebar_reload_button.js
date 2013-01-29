@@ -40,6 +40,7 @@ define([
         },
 
         reload: function () {
+            var self = this;
 
             // Check if a project is selected.
             if (this.parent.selectedProject === null) {
@@ -67,6 +68,7 @@ define([
             options.success = function (resp) {
                 console.log('reload');
                 console.log(resp.result);
+                self.parent.views.logView.clear();
             };
 
             options.error   = function (resp) {

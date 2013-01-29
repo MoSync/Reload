@@ -27,3 +27,9 @@ ReloadLauncher/Mac/Reload.app
 /NewReloadServer/lastWorkspace.dat
 
 Build
+node_modules/.bin/buster
+node_modules/.bin/buster-autotest
+node_modules/.bin/buster-server
+node_modules/.bin/buster-static
+node_modules/.bin/buster-test
+node_modules/buster

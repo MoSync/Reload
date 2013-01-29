@@ -2,8 +2,10 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'text!../../../templates/feedback/main.html'
-], function($, _, Backbone, template){
+    'models/feedback/feedback',
+    'text!../../../templates/feedback/main.html',
+    'text!../../../templates/feedback/thanks.html'
+], function($, _, Backbone, FeedbackModel, mainTemplate, thanksTemplate){
 
     var FeedbackView = Backbone.View.extend({
 
@@ -15,24 +17,52 @@ define([
 
         initialize: function () {
             _.bindAll(this, 'render', 'close', 'submit');
+            this.model = new FeedbackModel();
         },
 
         submit: function (e) {
             e.preventDefault();
+            var self = this;
+
             var content = $('textarea').val();
-            if (content.length > 0) {
-                console.log('');
-                // Send rpc call
-                // Say "Thank you" on success.
-                // Show error on failure.
-            } else {
+
+            if (content.length <= 0) {
                 alert('Please enter a message!');
+            } else {
+                var options     = {};
+                options.url     = 'http://localhost:8283';
+                options.rpcMsg  = {
+                    method: 'manager.sendFeedback',
+                    params: [content],
+                    id: 0
+                };
+
+                options.success = function (resp) {
+                    console.log('--- F e e d b a c k   s e n t ---');
+                    console.log(resp.result);
+                    // Say "Thank you" on success.
+                    self.sayThankYou();
+                    // Show error on failure.
+                };
+
+                options.error   = function (resp) {
+                    console.log('--- E R R O R ---');
+                    console.log(resp);
+                };
+
+                this.model.rpc(options);
             }
+        },
+
+        sayThankYou: function () {
+            var data = {};
+            var compiledTemplate = _.template( thanksTemplate, data );
+            return this.$el.html( compiledTemplate );
         },
 
         render: function () {
             var data = {};
-            var compiledTemplate = _.template( template, data );
+            var compiledTemplate = _.template( mainTemplate, data );
             return this.$el.html( compiledTemplate );
         },
 
