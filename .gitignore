@@ -1,7 +1,5 @@
 .DS_Store
 
-node_modules
-
 ReloadLauncher/Windows/ReloadLauncher.vcxproj.user
 ReloadLauncher/Windows/Debug
 ReloadLauncher/Windows/ipch
@@ -20,6 +18,8 @@ ReloadClient/Resources/LocalFiles.bin
 
 ReloadServer/ReloadLauncher.bat
 ReloadServer/lastWorkspace.dat
+ReloadServer/stats.dat
+ReloadServer/config.dat
 
 ReloadLauncher/Mac/Reload.app
 
@@ -27,3 +27,9 @@ ReloadLauncher/Mac/Reload.app
 /NewReloadServer/lastWorkspace.dat
 
 Build
+node_modules/.bin/buster
+node_modules/.bin/buster-autotest
+node_modules/.bin/buster-server
+node_modules/.bin/buster-static
+node_modules/.bin/buster-test
+node_modules/buster

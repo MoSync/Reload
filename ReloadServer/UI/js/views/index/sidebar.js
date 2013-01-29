@@ -8,6 +8,8 @@ define([
     'views/index/sidebar_left_foot',
     'views/project/list',
     'collections/projects',
+    'views/index/statistics_dialog',
+    'models/index/statistics',
     'text!../../../templates/index/sidebar.html'
 ], function($, _, Backbone,
             SidebarReloadButtonView,
@@ -16,6 +18,8 @@ define([
             SidebarLeftFootView,
             ProjectListView,
             ProjectCollection,
+            StatisticsDialog,
+            StatisticsModel,
             sidebarTemplate){
 
     var SidebarView = Backbone.View.extend({
@@ -32,6 +36,8 @@ define([
 
             this.collection = new ProjectCollection();
             this.collection.on('change:path', this.changePath);
+
+            this.model = new StatisticsModel();
         },
 
         render: function () {
@@ -57,6 +63,30 @@ define([
 
             var sidebarLeftFootView = new SidebarLeftFootView( {parent: this} );
             this.$el.append( sidebarLeftFootView.render() );
+
+            var options = {};
+
+            options.url     = "http://localhost:8283";
+            options.rpcMsg  = {
+                method: "manager.getConfig",
+                params: ["statistics"],
+                id: 0
+            };
+
+            options.success = function (resp) {
+                if(resp.result == "undefined") {
+
+                    var dialog = new StatisticsDialog();
+                    dialog.render();
+                }
+                console.log(resp);
+            };
+
+            options.error = function (resp) {
+                console.log("resp");
+            };
+
+            this.model.rpc(options);
 
             return this.$el;
         },

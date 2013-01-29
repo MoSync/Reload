@@ -40,19 +40,21 @@ var globals = {
 
 	homeDir: "",
 
+	statistics: undefined,
+
 	statsFile : "stats.dat",
 
-	// Server configs for Cellection of statistics
+	// Server configs for Collection of statistics
 	statsRequestOptions: {
-        host: 'requestb.in',
+        host: 'mosyncdev.devcloud.acquia-sites.com',
         port: '80',
-        path: '/1eojc8e1',
+        path: '/reload_stats',
         method: 'POST'
     },
 
     // Server configs for Feedback
     feedbackRequestOptions: {
-        host: 'requestb.in',
+        host: ' mosyncdev.devcloud.acquia-sites.com',
         port: '80',
         path: '/1eojc8e1',
         method: 'POST'
@@ -63,21 +65,38 @@ var methods = {
 
 	loadStats: function (callback) {
 		var self = this;
-		
-		fs.stat(process.cwd() + globals.fileSeparator + globals.statsFile, function (error, s) {
-			
-			var statistics = {};
-			if(error) {
-				statistics = JSON.parse('{"reloadVersion" : "'+ globals.versionInfo[0].trim() + '","reloadTimestamp": "' + globals.versionInfo[1].trim()+'","reloads" : 0,"ip" : "","clients" : []}');
+
+		function createNewStatsFile() {
+			var startTS = new Date().getTime();
+				statistics = JSON.parse('{ "serverPlatform" : "' + globals.localPlatform + '",' +
+										'"reloadVersion" : "'+ globals.versionInfo[0].trim() + '",'+
+										'"buildID": "' + globals.versionInfo[1].trim()+'",' +
+										'"serverStartTS": ' + startTS + ',' +
+										'"lastActivityTS": ' + startTS + ',' +
+										'"totalReloadsNative" : 0,' +
+										'"totalReloadsHTML" : 0,' +
+										'"clients" : []}');
 				self.saveStats(statistics);
-			} else {
-				statistics = JSON.parse(fs.readFileSync( process.cwd() + 
+
+				return statistics;
+		}
+
+		fs.exists( process.cwd() + globals.fileSeparator + globals.statsFile, function (exists){
+			if(exists) {
+				try {
+					statistics = JSON.parse(fs.readFileSync( process.cwd() + 
 											 globals.fileSeparator + globals.statsFile,
 											 "utf8"));
+				} catch (e) {
+					statistics = createNewStatsFile();
+				}
+				
+			} else {
+				statistics = createNewStatsFile();
 			}
 			callback(statistics);
-		});
-		
+
+		});	
 	},
 
 	saveStats: function (statistics) {
@@ -88,7 +107,34 @@ var methods = {
 			fs.writeFile(process.cwd() + globals.fileSeparator + globals.statsFile,
 						 data, function (err) {} );
 		});
-	}
+	},
+
+	loadConfig: function (callback) {
+		fs.exists(process.cwd() + globals.fileSeparator + "config.dat", function (exists){
+			if(exists){
+				fs.readFile(process.cwd() + globals.fileSeparator + "config.dat", 
+                    "utf8", 
+                    function(err, data){
+                        console.log(data);
+                        if (err) throw err;
+
+                        config = JSON.parse(data);
+                        
+                        for(var i in config) {
+                            globals[i] = config[i];
+                        }
+
+                        if(typeof callback === "function") {
+                        	callback();
+                        }
+                    });
+			} else {
+				fs.writeFile(process.cwd() + globals.fileSeparator + "config.dat", 
+						     JSON.stringify({statistics: "undefined"}), function (err) {} );
+			}
+		});
+        
+    },
 };
 
 var MsgDispatcher = function() {
