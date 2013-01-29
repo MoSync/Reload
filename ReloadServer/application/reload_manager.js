@@ -503,11 +503,28 @@ var rpcFunctions = {
                     console.log('message: ' + fullMessage);
                     console.log("-----------------------------------------------");
 
-                    // Statistics
-                    if(vars.globals.statistics) {
+                    // Collect Stats Statistics
+                    if(vars.globals.statistics === true) {
+                        var indexPath = vars.globals.rootWorkspacePath +
+                                        vars.globals.fileSeparator + projectPath +
+                                        vars.globals.fileSeparator + "LocalFiles" +
+                                        vars.globals.fileSeparator + "index.html";
 
+                        var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                        
+                        $ = cheerio.load(indexFileData,{
+                            lowerCaseTags: false
+                        });
+                        var nativeUIProject = $("#NativeUI");
                         vars.methods.loadStats(function (statistics) {
-                            statistics.reloads += 1;
+
+                            if(nativeUIProject.length) {
+                                statistics.totalReloadsNative += 1;
+                            } else {
+                                statistics.totalReloadsHTML += 1;
+                            }
+                            
+                            statistics.lastActivityTS = new Date().getTime();
                             vars.methods.saveStats(statistics);
                         });
                     }
@@ -880,10 +897,15 @@ var rpcFunctions = {
             // Set up the request
             var postRequest = http.request(requestOptions, function(res) {
 
-                var responseText = "";
+                var responseText = "",
+                    startTS = new Date().getTime();
+
                 if(res.statusCode == 200) {
                     vars.methods.loadStats(function (statistics) {
-                        statistics.reloads = 0;
+                        statistics.totalReloadsNative = 0;
+                        statistics.totalReloadsHTML = 0;
+                        statistics.serverStartTS = startTS;
+                        statistics.lastActivityTS = startTS;
                         statistics.clients = [];
                         vars.methods.saveStats(statistics);
                     });
@@ -1197,6 +1219,5 @@ vars.methods.loadConfig(function () {
         rpcFunctions.sendStats();
     }
 });
-
 
 rpc.exposeModule('manager', rpcFunctions);

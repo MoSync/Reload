@@ -65,29 +65,34 @@ var methods = {
 
 	loadStats: function (callback) {
 		var self = this;
-		
-		/*fs.stat(process.cwd() + globals.fileSeparator + globals.statsFile, function (error, s) {
-			
-			var statistics = {};
-			if(error) {
-				statistics = JSON.parse('{"reloadVersion" : "'+ globals.versionInfo[0].trim() + '","reloadTimestamp": "' + globals.versionInfo[1].trim()+'","reloads" : 0,"ip" : "","clients" : []}');
+
+		function createNewStatsFile() {
+			var startTS = new Date().getTime();
+				statistics = JSON.parse('{ "serverPlatform" : "' + globals.localPlatform + '",' +
+										'"reloadVersion" : "'+ globals.versionInfo[0].trim() + '",'+
+										'"buildID": "' + globals.versionInfo[1].trim()+'",' +
+										'"serverStartTS": ' + startTS + ',' +
+										'"lastActivityTS": ' + startTS + ',' +
+										'"totalReloadsNative" : 0,' +
+										'"totalReloadsHTML" : 0,' +
+										'"clients" : []}');
 				self.saveStats(statistics);
-			} else {
-				statistics = JSON.parse(fs.readFileSync( process.cwd() + 
-											 globals.fileSeparator + globals.statsFile,
-											 "utf8"));
-			}
-			callback(statistics);
-		});*/
+
+				return statistics;
+		}
 
 		fs.exists( process.cwd() + globals.fileSeparator + globals.statsFile, function (exists){
 			if(exists) {
-				statistics = JSON.parse(fs.readFileSync( process.cwd() + 
+				try {
+					statistics = JSON.parse(fs.readFileSync( process.cwd() + 
 											 globals.fileSeparator + globals.statsFile,
 											 "utf8"));
+				} catch (e) {
+					statistics = createNewStatsFile();
+				}
+				
 			} else {
-				statistics = JSON.parse('{"reloadVersion" : "'+ globals.versionInfo[0].trim() + '","reloadTimestamp": "' + globals.versionInfo[1].trim()+'","reloads" : 0,"ip" : "","clients" : []}');
-				self.saveStats(statistics);
+				statistics = createNewStatsFile();
 			}
 			callback(statistics);
 
