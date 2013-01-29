@@ -3,16 +3,18 @@ define([
     'underscore',
     'backbone',
     'models/project/project',
+    'views/project/rename_project_dialog',
     'text!../../../templates/project/project.html',
     'text!../../../templates/project/controls.html'
-], function($, _, Backbone, ProjectModel, projectTemplate, controlsTemplate){
+], function($, _, Backbone,
+            ProjectModel,
+            RenameProjectDialog,
+            projectTemplate,
+            controlsTemplate){
 
     var ProjectView = Backbone.View.extend({
 
         tagName: 'li',
-        events: {
-            'dblclick': 'toggleRename'
-        },
 
         initialize: function (options) {
 
@@ -23,7 +25,7 @@ define([
                       'reloadProject',
                       'openFolder',
                       'removeProject',
-                      'rename');
+                      'renameProject');
 
             this.projectList = options.projectList;
 
@@ -83,97 +85,15 @@ define([
             }
         },
 
-        toggleRename: function () {
-            var self = this;
-
-            var span = this.$container.find('span');
-            var oldval = span.html();
-
-            var form = $('<form class="rename"><input value="'+oldval+'"type="text"/></form>');
-            span.html(form);
-
-            var input = form.find('input');
-            input.on('click', function () {
-                self.model.set({ showControls: true });
-                console.log(self.model.get('showControls'));
-            });
-
-            // Save on "Return" key press.
-            input.keypress(function (e) {
-                var val = $(this).val();
-                if (e.which === 13) {
-                    e.preventDefault();
-                    if (val === oldval) {
-                        $(this).parent().parent().html(oldval);
-                    } else {
-                        $(this).parent().parent().html(val);
-                        self.rename(oldval, val);
-                    }
-
-                    $(this).parent().parent().html(val);
-                }
-            });
-
-            input.on('blur', function() {
-                var val = $(this).val();
-                if (val === oldval) {
-                    $(this).parent().parent().html(oldval);
-                } else {
-                    $(this).parent().parent().html(val);
-                    self.rename(oldval, val);
-                }
-            });
-
-            input.focus();
-        },
-
-        rename: function (from, to) {
-            var errors = [];
-            // Check if project name is taken.
-            _(this.projectList.models).each(function (p) {
-                if (p.get('name') === to) {
-                    errors.push('Please enter a project name that is not taken.');
-                }
-            });
-
-            if (errors.length !== 0) {
-                _(errors).each(function(err){
-                    alert(err);
-                });
-            } else {
-                var options     = {};
-                options.url     = 'http://localhost:8283';
-                options.rpcMsg  = {
-                    method: 'manager.renameProject',
-                    params: [from, to],
-                    id: 0
-                };
-
-                options.success = function (resp) {
-                    console.log('--- R e n a m e   s u c c e s s f u l ---');
-                    console.log(resp.result);
-                };
-
-                options.error   = function (resp) {
-                    console.log('could not rename project');
-                    console.log(resp);
-                };
-
-                this.model.rpc(options);
-            }
-        },
 
         control: function (e) {
             e.preventDefault();
-            console.log('control click');
             var command = $(e.target).data('command');
             var id = $(e.target).data('id');
 
-            console.log($(e.target));
-
             switch (command) {
-            case 'reload':
-                this.reloadProject(id);
+            case 'rename':
+                this.renameProject();
                 break;
 
             case 'open':
@@ -187,6 +107,42 @@ define([
             default:
                 console.log('Unknown action');
             }
+        },
+
+        renameProject: function () {
+            var self = this;
+            // Remember old name until change is made in dialog.
+            var oldName = this.model.get('name');
+
+            // RPC when project obj is modified by the dialog.
+            this.model.on('change:name', function(){
+                var options     = {};
+                options.url     = 'http://localhost:8283';
+                options.rpcMsg  = {
+                    method: 'manager.renameProject',
+                    params: [oldName, self.model.get('name')],
+                    id: 0
+                };
+
+                options.success = function (resp) {
+                    console.log('--- R e n a m e   S u c c e s s f u l ---');
+                    console.log(resp.result);
+                    self.projectList.rePopulate();
+                };
+
+                options.error   = function (resp) {
+                    console.log('Could not rename project');
+                    console.log(resp);
+                };
+
+                self.model.rpc(options);
+            });
+
+            var dialog = new RenameProjectDialog({
+                project: this.model,
+                projectList: this.projectList
+            });
+            dialog.render();
         },
 
         reloadProject: function () {
