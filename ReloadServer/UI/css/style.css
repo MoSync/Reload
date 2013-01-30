@@ -144,6 +144,10 @@ ul li {
     bottom: 41px;
 }
 
+#main-content #content .docs {
+    height: 100%;
+}
+
 #main-content #console {
     background: #fff;
     height: 40%;
