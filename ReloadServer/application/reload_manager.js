@@ -535,68 +535,31 @@ var rpcFunctions = {
                 fileSize: data.length
             });
 
-                console.log("url: " + url + "?filesize=" + data.length);
-                try {
-                    // Protocol consists of header "RELOADMSG" followed
-                    // by data length encoded as 8 hex didgits, e.g.: "000000F0"
-                    // Then string data follows with actual JSON message.
-                    // Advantage with hex is that we can read fixed numer of bytes
-                    // in the read operation.
-                    // Convert to hex:
-                    // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+            // Collect Stats Statistics
+            if(vars.globals.statistics === true) {
+                var indexPath = vars.globals.rootWorkspacePath +
+                                vars.globals.fileSeparator + projectPath +
+                                vars.globals.fileSeparator + "LocalFiles" +
+                                vars.globals.fileSeparator + "index.html";
 
-                    // creating message for the client
-                    var jsonMessage      = {};
-                    jsonMessage.message  = 'ReloadBundle';
-                    jsonMessage.url      = url;
-                    jsonMessage.fileSize = data.length;
+                var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                
+                $ = cheerio.load(indexFileData,{
+                    lowerCaseTags: false
+                });
+                var nativeUIProject = $("#NativeUI");
+                vars.methods.loadStats(function (statistics) {
 
-                    var message = JSON.stringify(jsonMessage);
-                    var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
-                    var result = client.write(fullMessage, "ascii");
-
-                    console.log('message: ' + fullMessage);
-                    console.log("-----------------------------------------------");
-
-                    // Collect Stats Statistics
-                    if(vars.globals.statistics === true) {
-                        var indexPath = vars.globals.rootWorkspacePath +
-                                        vars.globals.fileSeparator + projectPath +
-                                        vars.globals.fileSeparator + "LocalFiles" +
-                                        vars.globals.fileSeparator + "index.html";
-
-                        var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
-                        
-                        $ = cheerio.load(indexFileData,{
-                            lowerCaseTags: false
-                        });
-                        var nativeUIProject = $("#NativeUI");
-                        vars.methods.loadStats(function (statistics) {
-
-                            if(nativeUIProject.length) {
-                                statistics.totalReloadsNative += 1;
-                            } else {
-                                statistics.totalReloadsHTML += 1;
-                            }
-                            
-                            statistics.lastActivityTS = new Date().getTime();
-                            vars.methods.saveStats(statistics);
-                        });
+                    if(nativeUIProject.length) {
+                        statistics.totalReloadsNative += 1;
+                    } else {
+                        statistics.totalReloadsHTML += 1;
                     }
-                }
-                catch(err) {
-                    console.log("error     : " + err)
-                    var index = vars.globals.clientList.indexOf(client);
-                    if(index != -1)
-                    {
-                        vars.globals.clientList.splice(index, 1);
-                    }
-                }
-            // Statistics
-            vars.methods.loadStats(function (statistics) {
-                statistics.reloads += 1;
-                vars.methods.saveStats(statistics);
-            });
+                    
+                    statistics.lastActivityTS = new Date().getTime();
+                    vars.methods.saveStats(statistics);
+                });
+            }
         });
     },
 
@@ -898,12 +861,12 @@ var rpcFunctions = {
             return false;
         }
 
-        var postData = JSON.stringify( { feedback : text });
+        var postData = "data=" + escape(JSON.stringify({ feedback : text }));
 
         var requestOptions = vars.globals.feedbackRequestOptions;
 
         requestOptions.headers = {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
             'Content-Length': postData.length
         };
 
