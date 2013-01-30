@@ -32,7 +32,10 @@ define([
         initialize: function (options) {
             this.views = options.views;
 
-            _.bindAll(this, 'render', 'changePath');
+            _.bindAll(this,
+                      'render',
+                      'changePath'
+                     );
 
             this.collection = new ProjectCollection();
             this.collection.on('change:path', this.changePath);
@@ -64,29 +67,8 @@ define([
             var sidebarLeftFootView = new SidebarLeftFootView( {parent: this} );
             this.$el.append( sidebarLeftFootView.render() );
 
-            var options = {};
-
-            options.url     = "http://localhost:8283";
-            options.rpcMsg  = {
-                method: "manager.getConfig",
-                params: ["statistics"],
-                id: 0
-            };
-
-            options.success = function (resp) {
-                if(resp.result == "undefined") {
-
-                    var dialog = new StatisticsDialog();
-                    dialog.render();
-                }
-                console.log(resp);
-            };
-
-            options.error = function (resp) {
-                console.log("resp");
-            };
-
-            this.model.rpc(options);
+            var statisticsDialog = new StatisticsDialog();
+            statisticsDialog.render();
 
             return this.$el;
         },

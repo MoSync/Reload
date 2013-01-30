@@ -17,8 +17,8 @@ define([
 
             this.projectList = options.projectList;
 
-            this.compiledTemplate = _.template( dialogTemplate, { path: this.projectList.path } );
-            this.$el = $(this.compiledTemplate);
+            var compiledTemplate = _.template( dialogTemplate, { path: this.projectList.path } );
+            this.$el = $(compiledTemplate);
         },
 
         submit: function () {
@@ -49,8 +49,6 @@ define([
         },
 
         render: function () {
-
-            //var self = this;
             this.$el.modal('show');
         }
 

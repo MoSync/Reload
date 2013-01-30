@@ -14,15 +14,16 @@ define([
 
         initialize: function () {
 
-            _.bindAll(this, 'render');
-            this.model = new StatisticsModel;
+            _.bindAll(this, 'render', 'close', 'submit');
+            this.model = new StatisticsModel();
             this.compiledTemplate = _.template( dialogTemplate, {} );
             this.$el = $(this.compiledTemplate);
         },
 
         submit: function () {
-            
-            var statsValue = undefined,
+
+            console.log('submit');
+            var statsValue,
                 options    = {};
 
             if ($('#statsCheckbox').is(":checked")) {
@@ -65,7 +66,34 @@ define([
         },
 
         render: function () {
-            this.$el.modal('show');
+            // Check if statistics gathering is already confirmed by
+            // the user.
+            var options = {};
+            options.url     = "http://localhost:8283";
+            options.rpcMsg  = {
+                method: "manager.getConfig",
+                params: ["statistics"],
+                id: 0
+            };
+
+            var self = this;
+            options.success = function (resp) {
+                // Display stats confirmation dialog if config is not
+                // yet created.
+                if(resp.result === "undefined") {
+                    console.log('--- render popup ---');
+                    self.$el.modal('show');
+                }
+                //console.log(resp);
+            };
+
+            options.error = function (resp) {
+                console.log("resp");
+                console.log(resp);
+            };
+
+            this.model.rpc(options);
+
         }
 
     });
