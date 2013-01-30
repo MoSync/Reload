@@ -1053,7 +1053,9 @@ var rpcFunctions = {
         var config = {};
         if(typeof sendResponse !== 'function') return false;
 
-        fs.readFile(process.cwd() + vars.globals.fileSeparator + "config.dat", 
+        fs.exists(process.cwd() + vars.globals.fileSeparator + "config.dat", function (exists) {
+            if(exists) {
+                fs.readFile(process.cwd() + vars.globals.fileSeparator + "config.dat", 
                     "utf8", 
                     function(err, data){
                         //console.log(data);
@@ -1074,6 +1076,22 @@ var rpcFunctions = {
                                         sendResponse({hasError: false, data: true});
                                     });
                     });
+            } else {
+                config[option] = value;
+
+                fs.writeFile( process.cwd() + vars.globals.fileSeparator + "config.dat",
+                                      JSON.stringify(config),
+                                      "utf8", 
+                                      function(err, data){
+                                        if (err) throw err;
+
+                                        //set the configuration var
+                                        vars.globals[option] = value;
+
+                                        sendResponse({hasError: false, data: true});
+                                    });   
+            }
+        });
     },
     
     /**
@@ -1084,16 +1102,7 @@ var rpcFunctions = {
         var config = {};
         if(typeof sendResponse !== 'function') return false;
 
-        fs.readFile(process.cwd() + vars.globals.fileSeparator + "config.dat", 
-                    "utf8", 
-                    function(err, data){
-                        console.log(data);
-                        if (err) throw err;
-
-                        config = JSON.parse(data);
-
-                        sendResponse({hasError: false, data: config[option]});
-                    });
+        sendResponse({hasError: false, data: vars.globals[option]});
     },
 
     /**
@@ -1290,7 +1299,7 @@ rpcFunctions.getVersionInfo(function (a){});
 rpcFunctions.getLatestPath();
 rpcFunctions.getNetworkIP();
 vars.methods.loadConfig(function () {
-    if(vars.globals.statistics) {
+    if(vars.globals.statistics === true) {
         rpcFunctions.sendStats();
     }
 });

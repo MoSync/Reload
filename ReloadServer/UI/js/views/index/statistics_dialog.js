@@ -55,10 +55,11 @@ define([
         },
 
         close: function () {
-
+            var self = this;
+            
             // Don't remove until transition is complete.
             this.$el.on('hidden', function () {
-                this.remove();
+                self.remove();
             });
 
             this.$el.modal('hide');
