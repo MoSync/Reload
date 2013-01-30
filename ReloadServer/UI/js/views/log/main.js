@@ -39,10 +39,6 @@ define([
             this.$el.append( this.messages );
             // Rebind all events in case close() was called.
             this.delegateEvents();
-
-            //// Update log on render() so we don't have to wait for
-            //// interval timer.
-            //this.updateLog();
         },
 
         close: function () {

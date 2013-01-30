@@ -165,7 +165,8 @@ ul li {
     bottom: 0;
 }
 
-#content .dl-horizontal {
+#content .dl-horizontal,
+.CodeMirror {
     position: absolute;
     width: 100%;
     top: 0;
@@ -174,6 +175,10 @@ ul li {
     margin: 0;
     border-bottom: 1px solid #bdbdbd;
 }
+.CodeMirror {
+    height:auto;
+}
+
 #content .dl-horizontal dt {
     width: 100px;
 
