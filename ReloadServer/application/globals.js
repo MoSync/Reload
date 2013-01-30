@@ -54,9 +54,9 @@ var globals = {
 
     // Server configs for Feedback
     feedbackRequestOptions: {
-        host: ' mosyncdev.devcloud.acquia-sites.com',
+        host: 'mosyncdev.devcloud.acquia-sites.com',
         port: '80',
-        path: '/1eojc8e1',
+        path: '/reload_feedback',
         method: 'POST'
     }
 };
