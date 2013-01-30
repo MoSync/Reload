@@ -12,7 +12,7 @@ define([
         name: 'feedback',
 
         events: {
-            'click button.btn': 'submit'
+            'click button#submit': 'submit',
         },
 
         initialize: function () {
@@ -41,13 +41,17 @@ define([
                     console.log('--- F e e d b a c k   s e n t ---');
                     console.log(resp.result);
                     // Say "Thank you" on success.
-                    self.sayThankYou();
-                    // Show error on failure.
+                    if(resp.error) {
+                        self.throwError(resp.error, content);
+                    } else {
+                        self.sayThankYou();
+                    }
                 };
 
                 options.error   = function (resp) {
                     console.log('--- E R R O R ---');
                     console.log(resp);
+                    self.throwError(resp, content);
                 };
 
                 this.model.rpc(options);
@@ -60,14 +64,23 @@ define([
             return this.$el.html( compiledTemplate );
         },
 
+        throwError: function (error, content) {
+            var data = { legend: error, feedback: content };
+
+            var compiledTemplate = _.template( mainTemplate, data );
+            return this.$el.html( compiledTemplate );
+        },
+
         render: function () {
-            var data = {};
+            this.delegateEvents();
+
+            var data = {legend: "Tell us what you think about Reload!", feedback: ""};
             var compiledTemplate = _.template( mainTemplate, data );
             return this.$el.html( compiledTemplate );
         },
 
         close: function () {
-            console.log('close debug');
+            
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();
