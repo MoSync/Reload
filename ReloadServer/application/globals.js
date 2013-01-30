@@ -40,7 +40,7 @@ var globals = {
 
 	homeDir: "",
 
-	statistics: undefined,
+	statistics: "undefined",
 
 	statsFile : "stats.dat",
 
@@ -108,7 +108,11 @@ var methods = {
 						 data, function (err) {} );
 		});
 	},
-
+	/**
+	 * Loads Configuration settings from the config file if it exists
+	 * into globals variable. If the file does not exists it uses the 
+	 * defaultConfig to set the globals var and create new config file
+	 */
 	loadConfig: function (callback) {
 		fs.exists(process.cwd() + globals.fileSeparator + "config.dat", function (exists){
 			if(exists){
@@ -118,19 +122,36 @@ var methods = {
                         console.log(data);
                         if (err) throw err;
 
-                        config = JSON.parse(data);
+                        var config = JSON.parse(data);
                         
                         for(var i in config) {
                             globals[i] = config[i];
                         }
+
+                        //console.log("STATISTICS: " + globals.statistics);
 
                         if(typeof callback === "function") {
                         	callback();
                         }
                     });
 			} else {
+				var defaultConfig = {
+					statistics: "undefined"
+				}
+
 				fs.writeFile(process.cwd() + globals.fileSeparator + "config.dat", 
-						     JSON.stringify({statistics: "undefined"}), function (err) {} );
+						     JSON.stringify(defaultConfig), function (err) {
+
+					if(err) throw err;
+    
+					for(var i in defaultConfig) {
+						globals[i] = defaultConfig[i];
+					}
+					//console.log("STATISTICS: " + globals.statistics);
+					if(typeof callback === "function") {
+						callback();
+					}
+			    });
 			}
 		});
         

@@ -74,16 +74,15 @@ define([
             };
 
             options.success = function (resp) {
-                if(resp.result == "undefined") {
+                if(resp.result === "undefined") {
 
                     var dialog = new StatisticsDialog();
                     dialog.render();
                 }
-                console.log(resp);
             };
 
             options.error = function (resp) {
-                console.log("resp");
+                console.log("Error:"+resp);
             };
 
             this.model.rpc(options);
