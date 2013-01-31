@@ -7,11 +7,11 @@ iframe {
     height: 100%;
 }
 
-ul {
+#bar-left ul {
     list-style: none;
     margin: 0;
 }
-ul li {
+#bar-left ul li {
     display: inline-block;
 }
 
@@ -137,11 +137,30 @@ ul li {
     padding-top: 10px;
 }
 
+
 #main-content #content {
     position: absolute;
     background: #fff;
     top: 51px;
     bottom: 41px;
+    overflow: auto;
+}
+
+#main-content #content h1 {
+    font-size: 25px;
+    color: #888;
+}
+#main-content #content h3 {
+    font-size: 18px;
+    color: #888;
+    padding-left: 10px;
+    background: #eee;
+}
+#main-content #content .capital {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ccc;
+    margin: 10px;
 }
 
 #main-content #content .docs {

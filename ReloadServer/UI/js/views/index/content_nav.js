@@ -40,7 +40,7 @@ define([
 
         render: function () {
             console.log('render menu');
-            var items = $('<li data-name="index" class="active"><a href="/#">Quickstart</a></li>');
+            var items = $('<li data-name="index" class="active"><a href="/#">Quick Start</a></li>');
 
             // Weinre works only in webkit for now :(
             if ($.browser.webkit) {
