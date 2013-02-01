@@ -7,6 +7,11 @@ define([
 
     var initialize = function () {
 
+        // Display compatibility issues warning.
+        if (!$.browser.webkit) {
+                $('#banner-message').show();
+        }
+
         // Setup Backbone to send RPC messages.
         var rpc = {
             rpc: function (options) {

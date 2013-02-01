@@ -15,17 +15,18 @@ define([
 
         initialize: function (options) {
 
-            _.bindAll(this, 'render');
-
-            this.project = options.project;
-            this.projectList = options.projectList;
+            _.bindAll(this, 'render', 'submit', 'close');
 
             this.compiledTemplate = _.template( dialogTemplate, {} );
             this.$el = $(this.compiledTemplate);
+
+            this.project = options.project;
+            this.projectList = options.projectList;
         },
 
         submit: function () {
 
+            console.log('hej');
             var errors = [];
             var type = 'web';
             var rdolist = document.getElementsByName("projectType");
@@ -47,7 +48,6 @@ define([
                 }
             });
 
-
             if (errors.length > 0) {
                 alert(errors.join(','));
             } else {
@@ -62,10 +62,8 @@ define([
 
         close: function () {
             var self = this;
-            
             // Don't remove until transition is complete.
             this.$el.on('hidden', function () {
-            
                 self.remove();
             });
 
@@ -73,6 +71,7 @@ define([
         },
 
         render: function () {
+            this.delegateEvents();
             this.$el.modal('show');
         }
 

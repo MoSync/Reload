@@ -3,7 +3,6 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/style.css" />
 
     <!-- Load the js/main.js as our entry point -->
     <script data-main="js/main" src="js/vendor/require.js"></script>
@@ -14,14 +13,26 @@
     <script src="js/vendor/codemirror/mode/javascript/javascript.js"></script>
 
     
+
+    <link rel="stylesheet" href="css/style.css" />
     <title>Reload</title>
 </head>
 <body>
 
 <div id="wrap" class="fill">
     <div id="banner">
-        <div id="mosync-logo"></div>
         <div id="reload-logo"></div>
+
+        <div id="banner-content">
+            <div class="row-fluid">
+                <div id="banner-message" class="span10">
+                    <span class="label label-important">Important</span>
+                    It seems that you are not using a WebKit compatible
+                    browser. Some functionality may not be available.
+                </div>
+                <div id="mosync-logo" class="span2"></div>
+            </div>
+        </div>
     </div>
     <div id="bar-left" class="fill"></div>
 
