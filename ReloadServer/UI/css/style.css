@@ -26,6 +26,12 @@ iframe {
     border-bottom: 1px solid rgb(184, 184, 184);
     background: rgb(216, 221, 228);
 }
+#banner #banner-message {
+    height: 40px;
+    padding: 10px;
+    display: none;
+}
+
 #banner #mosync-logo {
     width: 91px;
     height: 30px;
@@ -35,11 +41,18 @@ iframe {
     background-position: 0 5px;
 }
 #banner #reload-logo {
+    min-width: 301px;
     width: 148px;
     height: 40px;
     float: left;
     background: url('../img/Reload-logo-top.png') no-repeat;
     background-position: 10px 5px;
+}
+#banner #banner-content {
+    position: relative;
+    margin: 0 0 0 301px;
+    height: 40px;
+    white-space: nowrap;
 }
 
 #bar-left {
