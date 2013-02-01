@@ -470,10 +470,10 @@ var rpcFunctions = {
             }
             else
             {
-                var command = "rename " + vars.globals.rootWorkspacePath +
+                var command = "rename \"" + vars.globals.rootWorkspacePath +
                                           vars.globals.fileSeparator +
                                           oldName +
-                              " " + newName;
+                              "\" \"" + newName + "\"";
             }
             console.log("Command: " + command);
             exec(command, resultCommand);
