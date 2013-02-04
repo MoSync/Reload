@@ -160,7 +160,7 @@ ReloadClient::ReloadClient()
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
 
-	//setScreenOrientation(); // Turned off. Use JS to set screen orientation.
+	setScreenOrientation(); // Turned off. Use JS to set screen orientation.
 	initializeWebView();
 	initializeVariables();
 	initializeFiles();
