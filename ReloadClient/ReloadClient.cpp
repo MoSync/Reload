@@ -713,21 +713,12 @@ void ReloadClient::downloadHTML()
 
 void ReloadClient::evaluateScript(const String& script)
 {
-
 	String url = "javascript:";
 	url += "try{var res=eval(unescape('";
 	url += script;
 	url += "'));";
-	url += "mosync.rlog('javascript:'+JSON.stringify(res))}";
-	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
-/*
-	String url = "javascript:";
-	url += "try{var res=eval(unescape('";
-	url += script;
-	url += "'));";
-	url += "}";
-	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
-*/
+	url += "if (typeof res!=='undefined'){mosync.rlog('javascript:'+JSON.stringify(res))}}";
+	url += "catch(err){mosync.rlog('javascript:'+err)}";
 	getWebView()->openURL(url);
 }
 
@@ -760,8 +751,8 @@ void ReloadClient::launchSavedApp()
 	getWebView()->setVisible(true);
 	showWebView();
 	String baseURL = "file://" + fullAppPath;
-	//getWebView()->setBaseUrl(baseURL);
-	getWebView()->openURL(baseURL + "index.html");
+	getWebView()->setBaseUrl(baseURL);
+	getWebView()->openURL("index.html");
 
 	// Set status variables.
 	mHasPage = true;
