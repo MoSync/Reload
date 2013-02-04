@@ -237,14 +237,6 @@ iframe {
     background: linear-gradient(to bottom,  #ededed 0%,#dddddd 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
 }
-#content #controls #clear {
-    display: inline-block;
-    width: 32px;
-    height: 21px;
-    -webkit-mask-image:url('/img/clearConsoleButtonGlyph.png');
-    background-color: rgba(0, 0, 0, 0.75);
-    margin: -2px 0 0 0;
-}
 #content #log-controls form {
     margin: 0 20px 20px 0;
     float: right;
@@ -424,4 +416,14 @@ ul#projects li a.select-project {
 .rlogBody {
     color: #333333;
     padding-left: 35px;
+}
+
+#clear,
+#do-selection {
+    margin-left: 5px;
+    white-space: nowrap;
+}
+#clear i,
+#do-selection i {
+    margin-right: 8px;
 }
