@@ -25,8 +25,6 @@ define([
             serverInfoView.render();
 
             var devicesView = new DevicesView( {parent: this.parent} );
-            //devicesView.render();
-
             var compiledTemplate = _.template( template, {} );
             var o = $(compiledTemplate).append( devicesView.render() );
             return this.$el.html( o );

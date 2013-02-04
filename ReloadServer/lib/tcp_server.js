@@ -118,6 +118,8 @@ var create = function (port) {
 
     function generateDeviceInfoListJSON() {
 
+        console.log('--- tcp_server.js: generateDeviceInfoListJSON() ---');
+        console.log(vars.globals.clientList);
         var infoListJSON = [];
 
         vars.globals.clientList.forEach(function(c){
