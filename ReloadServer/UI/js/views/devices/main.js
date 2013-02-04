@@ -13,7 +13,6 @@ define([
 
     var DevicesView = Backbone.View.extend({
 
-        timer: null,
         devices: [],
 
         events: {
@@ -36,6 +35,7 @@ define([
 
             var self = this;
             socket.on('devices', function (data) {
+                console.log('socket response');
                 console.log('data ' + JSON.stringify(data.msg));
                 self.devices = data.msg;
                 self.render();
@@ -55,11 +55,14 @@ define([
             var self = this;
             if (this.devices.length === 0) {
                 this.model.getDevices(function(res) {
+                    console.log('rpc call');
                     self.devices = res;
                     // Redraw device list.
                     self.updateDeviceList();
                 });
             }
+
+            console.log(this.devices.length);
 
             // Update device list instantly on render
             this.updateDeviceList();
@@ -76,18 +79,11 @@ define([
             this.remove();
             Backbone.View.prototype.remove.call(this);
 
-            // Clear timer.
-            clearInterval(this.timer);
-            this.timer = null;
-
             // Empty device list.
             this.devices = [];
         },
 
         updateDeviceList: function() {
-            // Clear previous content to prevent endless accumulation of
-            // HTML.
-            //this.$el.empty();
 
             this.parent.deviceCount = 0;
 
@@ -104,7 +100,6 @@ define([
 
                 this.parent.deviceCount = this.devices.length;
             }
-            $('#device-list').html( this.$el );
         }
     });
 

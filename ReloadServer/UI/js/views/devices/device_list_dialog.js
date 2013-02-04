@@ -25,6 +25,7 @@ define([
         },
 
         close: function () {
+            console.log('close');
             var self = this;
 
             // Don't remove until transition is complete.
@@ -36,7 +37,6 @@ define([
         },
 
         render: function () {
-            this.delegateEvents();
             var data = {};
             var devices = $('<div>');
             _(this.devices).each(function(d){
@@ -53,6 +53,7 @@ define([
             var compiledTemplate = _.template( dialogTemplate, {devices: devices.html()} );
             this.$el = $(compiledTemplate);
             this.$el.modal('show');
+            this.delegateEvents();
         }
 
     });
