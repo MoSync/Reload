@@ -33,68 +33,94 @@ LoginScreen::LoginScreen(ReloadClient *client)
 	mReloadClient = client;
 }
 
-void LoginScreen::initializeScreen(MAUtil::String &os)
+LoginScreen::~LoginScreen()
 {
+	mLoginScreen->removeLoginScreenListener(this);
+}
+
+void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
+{
+	// set the os string
+	mOS = os;
+
 	maScreenSetFullscreen(1);
 	MAExtent ex = maGetScrSize();
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);
 
-	int centerH = screenWidth / 2;
-	int buttonWidth = (int)((float)screenWidth * 0.75);
+	int centerH, buttonWidth, buttonHeight, buttonSpacing, editBoxHeight, logoWidth,
+		layoutTop, labelHeight, labelWidth, labelSpacing, layoutHeight, ipBoxButtonSpacing;
+	centerH = screenWidth / 2;
+
+	bool isLandscape = false;
+	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		isLandscape = true;
+	}
+
+	buttonWidth = (int)((float)screenWidth * 0.75);
+	if (isLandscape)
+	{
+		buttonHeight = (int)((float)screenHeight * 0.15);
+	}
+	else
+	{
+		buttonHeight = (int)((float)screenWidth * 0.15);
+	}
 	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonWidth = (int)((float)screenWidth * 0.4);
 	}
-	int buttonHeight = (int)((float)screenWidth * 0.15);
 	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonHeight = (int)((float)screenWidth * 0.07);
 	}
-	int buttonSpacing = (int)((float)buttonHeight * 0.3);
+	buttonSpacing = (int)((float)buttonHeight * 0.3);
 	if(os.find("Windows", 0) >= 0)
 	{
 		buttonSpacing = (int)((float)buttonHeight * 0.1);
 	}
-	int editBoxHeight = (int)((float)screenHeight * 0.07);
+	editBoxHeight = (int)((float)screenHeight * 0.07);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		editBoxHeight = (int)((float)screenHeight * 0.02);
 	}
-	int logoWidth = (int)((float)screenWidth * 0.75);
-	int layoutTop = (int)((float)screenHeight * 0.3);
+	logoWidth = (int)((float)screenWidth * 0.75);
+	layoutTop = (int)((float)screenHeight * 0.3);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		layoutTop = (int)((float)screenHeight * 0.25);
 	}
-	int labelHeight = (int)((float)screenHeight * 0.05);
+	labelHeight = (int)((float)screenHeight * 0.05);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelHeight = (int)((float)screenHeight * 0.025);
 	}
-	int labelWidth = screenWidth;
+	labelWidth = screenWidth;
 	if(os.find("Android", 0) >= 0)
 	{
 		labelWidth = buttonWidth;
 	}
-	int labelSpacing = (int)((float)screenHeight * 0.02);
+	labelSpacing = (int)((float)screenHeight * 0.02);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelSpacing = (int)((float)labelSpacing * 0.01);
 	}
-	int layoutHeight = (buttonHeight + buttonSpacing) * 2;
-	int ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
+	layoutHeight = (buttonHeight + buttonSpacing) * 2;
+	ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
 
-	mLoginScreen = new Screen();
+	mLoginScreen = new LoginScreenWidget();
+	mLoginScreen->addLoginScreenListener(this);
 
 	//The reload Logo
-	Image* logo = new Image();
-	logo->setImage(LOGO_IMAGE);
-	logo->wrapContentHorizontally();
-	logo->wrapContentVertically();
-	logo->setWidth(logoWidth);
-	logo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	logo->setPosition(centerH - logoWidth/2, screenHeight / 12);
+	mLogo = new Image();
+	mLogo->setImage(LOGO_IMAGE);
+	mLogo->wrapContentHorizontally();
+	mLogo->wrapContentVertically();
+	mLogo->setWidth(logoWidth);
+	mLogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+	mLogo->setPosition(centerH - logoWidth/2, screenHeight / 12);
 
 	//The connect to server button
 	if(os == "iPhone OS") //Android image buttons do not support text
@@ -125,14 +151,13 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mServerIPBox->setPosition(centerH - buttonWidth/2,layoutHeight - buttonHeight - editBoxHeight - ipBoxButtonSpacing);
 
 	//Label for the server IP edit box
-	Label *serverIPLabel = new Label();
-	serverIPLabel->setText("Server IP:");
-	serverIPLabel->setFontColor(0xFFFFFF);
-	serverIPLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	serverIPLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
-	serverIPLabel->setWidth(labelWidth);
-	serverIPLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight - editBoxHeight - ipBoxButtonSpacing);
-
+	mServerIPLabel = new Label();
+	mServerIPLabel->setText("Server IP:");
+	mServerIPLabel->setFontColor(0xFFFFFF);
+	mServerIPLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mServerIPLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mServerIPLabel->setWidth(labelWidth);
+	mServerIPLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight - editBoxHeight - ipBoxButtonSpacing);
 
 	/*
 	 * The mConnectLayout and mDisconnectLayout are placed
@@ -142,7 +167,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mConnectLayout = new RelativeLayout();
 	mConnectLayout->setWidth(screenWidth);
 	mConnectLayout->setHeight(layoutHeight);
-	mConnectLayout->addChild(serverIPLabel);
+	mConnectLayout->addChild(mServerIPLabel);
 	mConnectLayout->addChild(mServerIPBox);
 	mConnectLayout->addChild(mServerConnectButton);
 	mConnectLayout->setPosition(0, layoutTop);
@@ -161,7 +186,6 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		((Button*)mServerDisconnectButton)->addButtonListener(this);
 	}
 
-
 	mServerDisconnectButton->setText("Disconnect");
 	mServerDisconnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mServerDisconnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
@@ -170,14 +194,14 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mServerDisconnectButton->setPosition(centerH - buttonWidth/2, layoutHeight - buttonHeight);
 
 	//Some instructions for the user
-	Label *instructionsLabel = new Label();
-	instructionsLabel->setText("Use the Reload Web UI to load an app");
-	instructionsLabel->setFontColor(0xFFFFFF);
-	instructionsLabel->setWidth(labelWidth);
-	instructionsLabel->setMaxNumberOfLines(2);
-	instructionsLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	instructionsLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
-	instructionsLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight - ipBoxButtonSpacing);
+	mInstructionsLabel = new Label();
+	mInstructionsLabel->setText("Use the Reload Web UI to load an app");
+	mInstructionsLabel->setFontColor(0xFFFFFF);
+	mInstructionsLabel->setWidth(labelWidth);
+	mInstructionsLabel->setMaxNumberOfLines(2);
+	mInstructionsLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mInstructionsLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mInstructionsLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight - ipBoxButtonSpacing);
 
 	//Label with the Server IP
 	mConnectedToLabel = new Label();
@@ -196,7 +220,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mDisconnectLayout->setWidth(screenWidth);
 	mDisconnectLayout->setHeight(layoutHeight);
 	mDisconnectLayout->addChild(mConnectedToLabel);
-	mDisconnectLayout->addChild(instructionsLabel);
+	mDisconnectLayout->addChild(mInstructionsLabel);
 	mDisconnectLayout->addChild(mServerDisconnectButton);
 	mDisconnectLayout->setPosition(0, layoutTop);
 
@@ -218,7 +242,6 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		((Button*)mLoadLastAppButton)->addButtonListener(this);
 	}
 
-
 	mLoadLastAppButton->setText("Reload last app");
 	mLoadLastAppButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mLoadLastAppButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
@@ -235,31 +258,159 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 	mInfoIcon->setPosition((int)(screenWidth * 0.85), (int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
 
 	//A little MoSync logo at the lower right of the screen
-	Image* mosynclogo = new Image();
-	mosynclogo->setImage(MOSYNC_IMAGE);
-	mosynclogo->setHeight((int)(screenWidth * 0.1));
-	mosynclogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	mosynclogo->setPosition((int)(screenWidth * 0.05),(int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
+	mMosynclogo = new Image();
+	mMosynclogo->setImage(MOSYNC_IMAGE);
+	mMosynclogo->setHeight((int)(screenWidth * 0.1));
+	mMosynclogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+	mMosynclogo->setPosition((int)(screenWidth * 0.05),(int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
 
-	Image *background = new Image();
-	background->setSize(screenWidth, screenHeight);
-	background->setImage(BACKGROUND);
-	background->setScaleMode(IMAGE_SCALE_XY);
+	mBackground = new Image();
+	mBackground->setSize(screenWidth, screenHeight);
+	mBackground->setImage(BACKGROUND);
+	mBackground->setScaleMode(IMAGE_SCALE_XY);
 
-	RelativeLayout *mainLayout = new RelativeLayout();
-	mainLayout->setSize(screenWidth, screenHeight);
+	mMainLayout = new RelativeLayout();
+	mMainLayout->setSize(screenWidth, screenHeight);
 	if(os.find("Windows", 0) < 0)
 	{
-		mainLayout->addChild(background);
+		mMainLayout->addChild(mBackground);
 	}
-	mainLayout->addChild(logo);
-	mainLayout->addChild(mConnectLayout);
-	mainLayout->addChild(mDisconnectLayout);
-	mainLayout->addChild(mLoadLastAppButton);
-	mainLayout->addChild(mosynclogo);
-	mainLayout->addChild(mInfoIcon);
+	mMainLayout->addChild(mLogo);
+	mMainLayout->addChild(mConnectLayout);
+	mMainLayout->addChild(mDisconnectLayout);
+	mMainLayout->addChild(mLoadLastAppButton);
+	mMainLayout->addChild(mMosynclogo);
+	mMainLayout->addChild(mInfoIcon);
 
-	mLoginScreen->setMainWidget(mainLayout);
+	mLoginScreen->setMainWidget(mMainLayout);
+}
+
+void LoginScreen::rebuildScreenLayout(int screenHeight, int screenWidth, MAUtil::String os, int orientation)
+{
+	// on wp7 the layout changes look glitchy so we'll set the layout after all the
+	// repositioning has been done
+	mLoginScreen->setMainWidget(NULL);
+
+	int centerH, buttonWidth, buttonHeight, buttonSpacing, editBoxHeight, logoWidth,
+		layoutTop, labelHeight, labelWidth, labelSpacing, layoutHeight, ipBoxButtonSpacing;
+	centerH = screenWidth / 2;
+
+	bool isLandscape = false;
+	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		isLandscape = true;
+	}
+
+	buttonWidth = (int)((float)screenWidth * 0.75);
+	if (isLandscape)
+	{
+		buttonHeight = (int)((float)screenHeight * 0.15);
+	}
+	else
+	{
+		buttonHeight = (int)((float)screenWidth * 0.15);
+	}
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
+	{
+		buttonWidth = (int)((float)screenWidth * 0.4);
+	}
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
+	{
+		buttonHeight = (int)((float)screenWidth * 0.07);
+	}
+	buttonSpacing = (int)((float)buttonHeight * 0.3);
+	if(os.find("Windows", 0) >= 0)
+	{
+		buttonSpacing = (int)((float)buttonHeight * 0.1);
+	}
+	editBoxHeight = (int)((float)screenHeight * 0.07);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		editBoxHeight = (int)((float)screenHeight * 0.02);
+	}
+	logoWidth = (int)((float)screenWidth * 0.75);
+	layoutTop = (int)((float)screenHeight * 0.3);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		layoutTop = (int)((float)screenHeight * 0.25);
+	}
+	labelHeight = (int)((float)screenHeight * 0.05);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		labelHeight = (int)((float)screenHeight * 0.025);
+	}
+	labelWidth = screenWidth;
+	if(os.find("Android", 0) >= 0)
+	{
+		labelWidth = buttonWidth;
+	}
+	labelSpacing = (int)((float)screenHeight * 0.02);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		labelSpacing = (int)((float)labelSpacing * 0.01);
+	}
+	layoutHeight = (buttonHeight + buttonSpacing) * 2;
+	ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
+
+	mLogo->setWidth(logoWidth);
+	mLogo->setPosition(centerH - logoWidth/2, screenHeight / 12);
+
+	mServerConnectButton->setWidth(buttonWidth);
+	mServerConnectButton->setHeight(buttonHeight);
+
+	mServerIPBox->setWidth(buttonWidth);
+	mServerIPBox->setPosition(centerH - buttonWidth/2,layoutHeight - buttonHeight - editBoxHeight - ipBoxButtonSpacing);
+
+	mServerIPLabel->setWidth(labelWidth);
+	mServerIPLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight - editBoxHeight - ipBoxButtonSpacing);
+
+	mConnectLayout->setWidth(screenWidth);
+	mConnectLayout->setHeight(layoutHeight);
+	mConnectLayout->setPosition(0, layoutTop);
+
+	mServerDisconnectButton->setWidth(buttonWidth);
+	mServerDisconnectButton->setHeight(buttonHeight);
+
+	mInstructionsLabel->setWidth(labelWidth);
+	mInstructionsLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight - ipBoxButtonSpacing);
+
+	mConnectedToLabel->setWidth(labelWidth);
+	mConnectedToLabel->setPosition(centerH - labelWidth/2, layoutHeight - buttonHeight - labelHeight * 2 - labelSpacing - ipBoxButtonSpacing);
+
+	mDisconnectLayout->setWidth(screenWidth);
+	mDisconnectLayout->setHeight(layoutHeight);
+	mDisconnectLayout->setPosition(0, layoutTop);
+
+	mLoadLastAppButton->setWidth(buttonWidth);
+	mLoadLastAppButton->setHeight(buttonHeight);
+	mLoadLastAppButton->setPosition(centerH - buttonWidth/2, layoutTop + layoutHeight + buttonSpacing);
+
+	mInfoIcon->setPosition((int)(screenWidth * 0.85), (int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
+
+	mMosynclogo->setPosition((int)(screenWidth * 0.05),(int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
+
+	// we need to set new values for some widgets for the landscape mode
+	if (isLandscape)
+	{
+		mServerConnectButton->setPosition(centerH - buttonWidth/2, layoutHeight - buttonHeight + buttonSpacing);
+		mServerDisconnectButton->setPosition(centerH - buttonWidth/2, layoutHeight - buttonHeight + buttonSpacing);
+		mInfoIcon->setSize((int)(screenHeight * 0.1),(int)(screenHeight * 0.1));
+		mMosynclogo->setHeight((int)(screenHeight * 0.1));
+	}
+	else
+	{
+		mServerConnectButton->setPosition(centerH - buttonWidth/2, layoutHeight - buttonHeight);
+		mServerDisconnectButton->setPosition(centerH - buttonWidth/2, layoutHeight - buttonHeight);
+		mInfoIcon->setSize((int)(screenWidth * 0.1),(int)(screenWidth * 0.1));
+		mMosynclogo->setHeight((int)(screenWidth * 0.1));
+	}
+
+	mBackground->setSize(screenWidth, screenHeight);
+
+	mMainLayout->setSize(screenWidth, screenHeight);
+
+	mLoginScreen->setMainWidget(mMainLayout);
 }
 
 /**
@@ -347,3 +498,14 @@ void LoginScreen::defaultAddress(const char *serverAddress)
 	mServerIPBox->setText(serverAddress);
 }
 
+/**
+ * This method is called the orientation changes
+ * @param newOrientation The new screen orientation. One of the values: MA_SCREEN_ORIENTATION_PORTRAIT,
+ * MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN, MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT, MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT.
+ * @param newScreenHeight The new screen height after orientation has changed.
+ * @param newScreenWidth The new screen width after oritentation has changed.
+ */
+void LoginScreen::orientationChanged(int newOrientation, int newScreenHeight, int newScreenWidth)
+{
+	rebuildScreenLayout(newScreenHeight, newScreenWidth, mOS, newOrientation);
+}

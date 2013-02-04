@@ -27,18 +27,23 @@ MA 02110-1301, USA.
 #define LOGINSCREEN_H_
 
 #include "ReloadClient.h"
+#include "LoginScreenWidget.h"
+#include "LoginScreenListener.h"
 
 class ReloadClient;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 
-class LoginScreen : public ButtonListener, EditBoxListener
+class LoginScreen : public ButtonListener, EditBoxListener, LoginScreenListener
 {
+	void rebuildScreenLayout(int screenHeight, int screenWidth, String os, int orientation);
 public:
 	LoginScreen(ReloadClient *client);
 
-	void initializeScreen(MAUtil::String &os);
+	~LoginScreen();
+
+	void initializeScreen(MAUtil::String &os, int orientation);
 
 	/**
 	 * Called by the system when the user clicks a button
@@ -70,8 +75,17 @@ public:
 
 	void defaultAddress(const char *serverAddress);
 
+	/**
+	 * This method is called the orientation changes
+	 * @param newOrientation The new screen orientation. One of the values: MA_SCREEN_ORIENTATION_PORTRAIT,
+	 * MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN, MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT, MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT.
+	 * @param newScreenHeight The new screen height after orientation has changed.
+	 * @param newScreenWidth The new screen width after oritentation has changed.
+	 */
+	virtual void orientationChanged(int newOrientation, int newScreenHeight, int newScreenWidth);
+
 private:
-	Screen *mLoginScreen;
+	LoginScreenWidget *mLoginScreen;
 
 	ImageButton *mInfoIcon;
 
@@ -93,7 +107,21 @@ private:
 
 	Label *mConnectedToLabel;
 
+	Label *mServerIPLabel;
+
+	Label *mInstructionsLabel;
+
+	Image* mLogo;
+
+	Image* mMosynclogo;
+
+	Image *mBackground;
+
+	RelativeLayout* mMainLayout;
+
 	ReloadClient *mReloadClient;
+
+	MAUtil::String mOS;
 };
 
 
