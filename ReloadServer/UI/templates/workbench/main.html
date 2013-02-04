@@ -1,16 +1,17 @@
 <textarea>
 // Welcome to the JavaScript Workbench!
 // 
-// When you are connected to a device, you can evaluate JavScript
-// code on it by selecting text in this editor and click the "Do It"
-// or "Print It" button.
+// When you are connected to a device, you can evaluate JavaScript
+// code on it by selecting text in this editor and click "Do selection".
 //
-// For example try out the following lines (one at a time):
-mosync.rlog('Hello World')
-1+2
+// Error messages and return values are shown under the "Log" tab
+// (undefined return values are generally not shown).
+//
+// For example, try out the following lines (one at a time):
+mosync.rlog('Hello World') // Displayed in Log tab
 mosync.app.openExternalURL('http://maps.google.com/')
-mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC)
-mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_PORTRAIT)
 mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_LANDSCAPE)
+mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_PORTRAIT)
+mosync.app.screenSetOrientation(mosync.SCREEN_ORIENTATION_DYNAMIC)
 document.body.innerHTML = '<h1>Hello World</h1>'
 </textarea>
