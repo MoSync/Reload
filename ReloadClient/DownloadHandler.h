@@ -83,6 +83,13 @@ public:
 	void addDownloadListener(MAUtil::DownloadListener* listener);
 
 	/**
+	 * Check if a download is in progress.
+	 * @return true if there is a download in progress,
+	 * false if not.
+	 */
+	bool isDownloading();
+
+	/**
 	 * Download data from the server.
 	 */
 	int startDownload(const char* url);
@@ -90,7 +97,7 @@ public:
 	/**
 	 * Cancel any ongoing download.
 	 */
-	void cancelDownload();
+	int cancelDownload();
 
 public:
 

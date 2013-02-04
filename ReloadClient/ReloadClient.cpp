@@ -640,6 +640,12 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 		maPanic(0, "RELOAD: downloadBundle file size is invalid");
 	}
 
+	// If there is an ongoing download, then cancel it.
+	if (mDownloadHandler.isDownloading())
+	{
+		mDownloadHandler.cancelDownload();
+	}
+
 	// Create download request.
 	MAUtil::String jsonRequest("{"
 		"\"method\":\"client.getBundle\","
@@ -663,6 +669,7 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 	// Save the file size so that we can verify the download.
 	mBundleSize = fileSize;
 
+	// Start the download.
 	int result = mDownloadHandler.startDownload(url.c_str());
 	if (result > 0)
 	{
@@ -898,5 +905,5 @@ void ReloadClient::showConnectionErrorMessage(int errorCode)
 
 	LOG("@@@ RELOAD: showConnectionErrorMessage: %s", errorMessage.c_str());
 
-	maAlert("Network Status:", errorMessage.c_str(), "OK", NULL, NULL);
+	maAlert("Network Status", errorMessage.c_str(), "OK", NULL, NULL);
 }
