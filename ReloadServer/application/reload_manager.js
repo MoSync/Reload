@@ -602,85 +602,116 @@ var rpcFunctions = {
         console.log("Path to Project  : " + pathToLocalFiles);
         console.log("Path to TempFiles: " + pathToTempBundle);
 
-        ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
+        if(weinreDebug) {
 
-            if (err) {
-                console.log('Copy Process      : Error-' + err);
+            try {
+
+                ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
+                    if (err) {
+                        console.log('Copy Process      : Error-' + err);
+                    }
+                    console.log('Copy Process      : Successfull');
+
+                    self.debugInjection(projectDir, function (){
+
+                        
+                            //INJECT WEINRE SCRIPT
+                            //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
+                            //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
+                            console.log("Server IP         : "+vars.globals.ip);
+                            var injectedScript = "<script src=\"http://" + vars.globals.ip +
+                                                 ":8080/target/target-script-min.js\"></script>";
+
+                            var pathOfIndexHTML =   pathToTempBundle +
+                                                    vars.globals.fileSeparator + "index.html";
+
+                            console.log("Path to index.html: " + pathOfIndexHTML);
+                            var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
+
+                            injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
+
+                            fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+
+                            console.log("WEINRE Injection  : Successfull");
+
+                            console.log("----------- C r e a t e   B u n d l e ---------");
+                            var exec = require('child_process').exec;
+
+                            function puts(error, stdout, stderr)
+                            {
+                                console.log("stdout: " + stdout);
+                                console.log("stderr: " + stderr);
+                                console.log("error : " + error);
+                                callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                                         projectDir + "/LocalFiles.bin");
+
+                                // Delete TempBundle directory
+                                self.removeRecursive(pathToTempBundle, function (error, status){
+                                    if(!error) {
+                                        console.log("Delete Temp: Successfull");
+                                    }
+                                    else {
+                                        console.log("Delete Temp: Error-" + error);
+                                    }
+                                });
+                            }
+
+                            var bundleCommand = "bin\\win\\Bundle.exe";
+
+                            if (vars.globals.localPlatform.indexOf("darwin") >=0)
+                            {
+                              bundleCommand = "bin/mac/Bundle";
+                            }
+                            else if (vars.globals.localPlatform.indexOf("linux") >=0)
+                            {
+                              bundleCommand = "bin/linux/Bundle";
+                            }
+
+                            var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
+                                vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  +
+                                vars.globals.fileSeparator + "LocalFiles.bin\"";
+                            exec(command, puts);
+                    });
+                });
+            } catch(err) {
+                console.log("Error in bundleApp: " + err);
             }
-            console.log('Copy Process      : Successfull');
+        } else {
+            try {
 
-            self.debugInjection(projectDir, function (){
+                console.log("----------- C r e a t e   B u n d l e ---------");
+                var exec = require('child_process').exec;
 
-                try {
-                    // WEINRE injection
-                    // The script is injected only in the bundle.
-                    // The user is unaware of the injection in his source files
-                    //Checking if weinreDebug is enabled
-                    if(weinreDebug) {
-                        //INJECT WEINRE SCRIPT
-                        //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
-                        //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
-                        console.log("Server IP         : "+vars.globals.ip);
-                        var injectedScript = "<script src=\"http://" + vars.globals.ip +
-                                             ":8080/target/target-script-min.js\"></script>";
-
-                        var pathOfIndexHTML =   pathToTempBundle +
-                                                vars.globals.fileSeparator + "index.html";
-
-                        console.log("Path to index.html: " + pathOfIndexHTML);
-                        var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
-
-                        injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
-
-                        fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
-
-                        console.log("WEINRE Injection  : Successfull");
-                    }
-
-                    console.log("----------- C r e a t e   B u n d l e ---------");
-                    var exec = require('child_process').exec;
-
-                    function puts(error, stdout, stderr)
-                    {
-                        console.log("stdout: " + stdout);
-                        console.log("stderr: " + stderr);
-                        console.log("error : " + error);
-                        callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
-                                 projectDir + "/LocalFiles.bin");
-
-                        // Delete TempBundle directory
-                        self.removeRecursive(pathToTempBundle, function (error, status){
-                            if(!error) {
-                                console.log("Delete Temp: Successfull");
-                            }
-                            else {
-                                console.log("Delete Temp: Error-" + error);
-                            }
-                        });
-                    }
-
-                    var bundleCommand = "bin\\win\\Bundle.exe";
-
-                    if (vars.globals.localPlatform.indexOf("darwin") >=0)
-                    {
-                      bundleCommand = "bin/mac/Bundle";
-                    }
-                    else if (vars.globals.localPlatform.indexOf("linux") >=0)
-                    {
-                      bundleCommand = "bin/linux/Bundle";
-                    }
-
-                    var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
-                        vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  +
-                        vars.globals.fileSeparator + "LocalFiles.bin\"";
-                    exec(command, puts);
-                                }
-                catch(err)
+                function puts(error, stdout, stderr)
                 {
-                    console.log("Error in bundleApp: " + err);
+                    console.log("stdout: " + stdout);
+                    console.log("stderr: " + stderr);
+                    console.log("error : " + error);
+                    callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                             projectDir + "/LocalFiles.bin");
                 }
-            });
-        });
+
+                var bundleCommand = "bin\\win\\Bundle.exe";
+
+                if (vars.globals.localPlatform.indexOf("darwin") >=0)
+                {
+                  bundleCommand = "bin/mac/Bundle";
+                }
+                else if (vars.globals.localPlatform.indexOf("linux") >=0)
+                {
+                  bundleCommand = "bin/linux/Bundle";
+                }
+
+                var command =  bundleCommand + " -in \"" + pathToLocalFiles + "\" -out \"" +
+                    vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  +
+                    vars.globals.fileSeparator + "LocalFiles.bin\"";
+                exec(command, puts);
+            }
+            catch(err)
+            {
+                console.log("Error in bundleApp: " + err);
+            }
+        }
     },
 
     /**
@@ -1171,7 +1202,11 @@ var rpcFunctions = {
                             projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
-            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"));
+            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
+            debugNotice =   "/**\n" + 
+                            " * NOTICE: The try catch statement is automaticaly added\n" + 
+                            " * when the project is reloaded in debug mode.\n" +
+                            " */\n";
 
         /**
          * Load the index.html file and parse it to a new window object
@@ -1186,9 +1221,7 @@ var rpcFunctions = {
          */
 
         var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
-            $(this).html("try {  eval(unescape(\"" +
-                                escape("try {" + $(this).html() + "} catch(w) { mosync.rlog(w.toString()); }") +
-                            "\"));  } catch (e) { mosync.rlog(e.stack); };");
+            $(this).html(debugNotice + "try {" + $(this).html() + " } catch (e) { mosync.rlog(e.stack); };");
         });
         console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
 
@@ -1210,9 +1243,7 @@ var rpcFunctions = {
                     if( s.isFile() ) {
                         var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
 
-                        jsFileData = "try { eval(unescape(\"" + 
-                                        escape("try {" + jsFileData + "} catch(w) { mosync.rlog(w.toString()); }") +
-                                      "\"));  } catch (e) { 'EX' + mosync.rlog(e.toString()); };";
+                        jsFileData = debugNotice + "try {" + jsFileData + "} catch (e) { mosync.rlog(e.stack); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
                 } catch (e) {
@@ -1239,9 +1270,7 @@ var rpcFunctions = {
 
                         var inlineCode = $(this).attr(i);
 
-                        $(element).attr(i, "try { eval(unescape(\"" +
-                                                    escape("try {" + inlineCode + "} catch(w) { mosync.rlog(w.toString()); }") +
-                                                    "\"));  } catch (e) { mosync.rlog('I' + e.toString()); };");
+                        $(element).attr(i, debugNotice + "try {" + inlineCode + "} catch (e) { mosync.rlog(e.stack); };");
                     }
                 }
             }
