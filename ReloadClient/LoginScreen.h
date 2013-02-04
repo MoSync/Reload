@@ -37,7 +37,7 @@ using namespace NativeUI; // WebView widget.
 
 class LoginScreen : public ButtonListener, EditBoxListener, LoginScreenListener
 {
-	void rebuildScreenLayout(int screenHeight, int screenWidth, String os);
+	void rebuildScreenLayout(int screenHeight, int screenWidth, String os, int orientation);
 public:
 	LoginScreen(ReloadClient *client);
 
