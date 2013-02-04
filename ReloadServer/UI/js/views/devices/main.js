@@ -4,30 +4,48 @@ define([
     'backbone',
     'socket.io',
     'models/devices/devices',
-    'text!../../../templates/devices/main.html'
-], function($, _, Backbone, io, DevicesModel, devicesTemplate){
+    'views/devices/device_list_dialog',
+    'text!../../../templates/devices/info.html'
+], function($, _, Backbone, io,
+            DevicesModel,
+            DeviceListDialog,
+            devicesInfoTemplate){
 
     var DevicesView = Backbone.View.extend({
 
-        timer: null,
         devices: [],
+
+        events: {
+            'click a.open-dialog': 'openDialog'
+        },
 
         initialize: function (options) {
 
             console.log(options);
             this.parent = options.parent;
 
-            _.bindAll(this, 'render', 'close', 'updateDeviceList');
+            _.bindAll(this,
+                      'render',
+                      'close',
+                      'updateDeviceList',
+                      'openDialog'
+                     );
 
             var socket = io.connect('http://localhost:8283');
 
             var self = this;
             socket.on('devices', function (data) {
+                console.log('socket response');
                 console.log('data ' + JSON.stringify(data.msg));
                 self.devices = data.msg;
                 self.render();
             });
             this.model = new DevicesModel();
+        },
+
+        openDialog: function () {
+            var deviceListDialog = new DeviceListDialog( {devices: this.devices} );
+            deviceListDialog.render();
         },
 
         render: function () {
@@ -37,11 +55,14 @@ define([
             var self = this;
             if (this.devices.length === 0) {
                 this.model.getDevices(function(res) {
+                    console.log('rpc call');
                     self.devices = res;
                     // Redraw device list.
                     self.updateDeviceList();
                 });
             }
+
+            console.log(this.devices.length);
 
             // Update device list instantly on render
             this.updateDeviceList();
@@ -58,18 +79,11 @@ define([
             this.remove();
             Backbone.View.prototype.remove.call(this);
 
-            // Clear timer.
-            clearInterval(this.timer);
-            this.timer = null;
-
             // Empty device list.
             this.devices = [];
         },
 
         updateDeviceList: function() {
-            // Clear previous content to prevent endless accumulation of
-            // HTML.
-            this.$el.empty();
 
             this.parent.deviceCount = 0;
 
@@ -77,21 +91,15 @@ define([
                 console.log('no connected');
                 this.$el.html( '<center>No clients connected.</center>' );
             } else {
-                var data = {};
-                var self = this;
-                _(this.devices).each(function(d){
-                    data.platform   = d.platform;
-                    data.name       = d.name;
-                    data.uuid       = d.uuid;
-                    data.version    = d.version;
-
-                    var compiledTemplate = _.template( devicesTemplate, { data: data } );
-                    self.$el.append( compiledTemplate );
-
-                    self.parent.deviceCount++;
+                var s = (this.devices.length > 1)? 's' : '';
+                var compiledTemplate = _.template( devicesInfoTemplate, {
+                    count: this.devices.length,
+                    s: s
                 });
+                this.$el.html( compiledTemplate );
+
+                this.parent.deviceCount = this.devices.length;
             }
-            $('#device-list').html( this.$el );
         }
     });
 
