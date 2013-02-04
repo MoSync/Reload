@@ -242,7 +242,8 @@ iframe {
     width: 32px;
     height: 21px;
     -webkit-mask-image:url('/img/clearConsoleButtonGlyph.png');
-    background-color: rgba(0, 0, 0, 0.75);
+    background: url("/img/clearConsoleButtonGlyph.png");
+    background-color: rgba(0, 0, 0, 0);
     margin: -2px 0 0 0;
 }
 #content #log-controls form {
