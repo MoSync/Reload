@@ -8,6 +8,8 @@ define([
     var DocsView = Backbone.View.extend({
 
         name: 'docs',
+        tagName: 'div',
+        className: 'docs',
 
         render: function () {
 

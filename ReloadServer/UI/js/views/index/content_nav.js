@@ -40,7 +40,7 @@ define([
 
         render: function () {
             console.log('render menu');
-            var items = $('<li data-name="index" class="active"><a href="/#">Home</a></li>');
+            var items = $('<li data-name="index" class="active"><a href="/#">Quick Start</a></li>');
 
             // Weinre works only in webkit for now :(
             if ($.browser.webkit) {
@@ -49,7 +49,7 @@ define([
 
             items.append($('<li data-name="log"><a href="/#/log">Log</a></li>'));
             items.append($('<li data-name="workbench"><a href="/#/workbench">Workbench</a></li>'));
-            items.append($('<li data-name="docs"><a href="/#/docs">Docs</a></li>'));
+            items.append($('<li data-name="docs"><a href="/#/docs">API Reference</a></li>'));
             items.append($('<li data-name="feedback" class="pull-right"><a href="/#/feedback">Send us feedback!</a></li>'));
 
             var nav = this.$el.html(items);

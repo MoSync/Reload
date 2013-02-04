@@ -16,13 +16,22 @@ define([
 
         messages: $('<dl id="scroller" class="dl-horizontal">'),
 
+        scrollPosition: 0,
+
+        firstScroll: true,
+
         events: {
-            'click a#clear':         'clear'
+            'click a#clear': 'clear'
         },
 
         initialize: function () {
 
-            _.bindAll(this, 'render', 'close', 'clear', 'updateLog');
+            _.bindAll(this,
+                      'render',
+                      'close',
+                      'clear',
+                      'updateLog',
+                      'restoreScroll');
 
             var self = this;
             var socket = io.connect('http://localhost:8283');
@@ -40,9 +49,25 @@ define([
             // Rebind all events in case close() was called.
             this.delegateEvents();
 
-            //// Update log on render() so we don't have to wait for
-            //// interval timer.
-            //this.updateLog();
+            // Restore scroll position.
+            this.restoreScroll();
+        },
+
+        restoreScroll: function () {
+            var self = this;
+            // A hack to wait for scroller element to render and apply
+            // scroll position to it.
+            setTimeout(function () {
+                var scroll = document.getElementById('scroller');
+                scroll.scrollTop = self.scrollPosition;
+
+                // Save scroll position on manual scroll.
+                $(scroll).bind('scroll', function () {
+                    self.scrollPosition = scroll.scrollTop;
+                    console.log(scroll.scrollTop);
+                });
+
+            }, 100);
         },
 
         close: function () {
@@ -68,10 +93,9 @@ define([
             this.messages.empty();
         },
 
-        firstScroll: true,
         updateLog: function(data) {
 
-            console.log(data);
+            console.log(this.scrollPosition);
 
             var compiledTemplate = _.template( messageTemplate, {
                 header: data.type,
@@ -85,7 +109,10 @@ define([
             var doScroll;
 
             // We are at the bottom.
-            if ((scroller.scrollTop+scroller.clientHeight) === (scroller.scrollHeight-20)){
+            if (
+                ((scroller.scrollTop+scroller.clientHeight) === (scroller.scrollHeight-20))
+                || ((scroller.scrollTop+scroller.clientHeight) === (scroller.scrollHeight-19))
+            ){
                 doScroll = true;
             } else {
                 doScroll = false;
@@ -100,6 +127,9 @@ define([
             if (doScroll) {
                 scroller.scrollTop += 20;
             }
+
+            // Save scroller position for later restore.
+            this.scrollPosition = scroller.scrollTop;
         }
     });
 

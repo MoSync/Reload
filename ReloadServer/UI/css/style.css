@@ -7,11 +7,11 @@ iframe {
     height: 100%;
 }
 
-ul {
+#bar-left ul {
     list-style: none;
     margin: 0;
 }
-ul li {
+#bar-left ul li {
     display: inline-block;
 }
 
@@ -26,6 +26,12 @@ ul li {
     border-bottom: 1px solid rgb(184, 184, 184);
     background: rgb(216, 221, 228);
 }
+#banner #banner-message {
+    height: 40px;
+    padding: 10px;
+    display: none;
+}
+
 #banner #mosync-logo {
     width: 91px;
     height: 30px;
@@ -35,11 +41,18 @@ ul li {
     background-position: 0 5px;
 }
 #banner #reload-logo {
+    min-width: 301px;
     width: 148px;
     height: 40px;
     float: left;
     background: url('../img/Reload-logo-top.png') no-repeat;
     background-position: 10px 5px;
+}
+#banner #banner-content {
+    position: relative;
+    margin: 0 0 0 301px;
+    height: 40px;
+    white-space: nowrap;
 }
 
 #bar-left {
@@ -137,11 +150,34 @@ ul li {
     padding-top: 10px;
 }
 
+
 #main-content #content {
     position: absolute;
     background: #fff;
     top: 51px;
     bottom: 41px;
+    overflow: auto;
+}
+
+#main-content #content h1 {
+    font-size: 25px;
+    color: #888;
+}
+#main-content #content h3 {
+    font-size: 18px;
+    color: #888;
+    padding-left: 10px;
+    background: #eee;
+}
+#main-content #content .capital {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ccc;
+    margin: 10px;
+}
+
+#main-content #content .docs {
+    height: 100%;
 }
 
 #main-content #console {
@@ -161,7 +197,8 @@ ul li {
     bottom: 0;
 }
 
-#content .dl-horizontal {
+#content .dl-horizontal,
+.CodeMirror {
     position: absolute;
     width: 100%;
     top: 0;
@@ -170,6 +207,10 @@ ul li {
     margin: 0;
     border-bottom: 1px solid #bdbdbd;
 }
+.CodeMirror {
+    height:auto;
+}
+
 #content .dl-horizontal dt {
     width: 100px;
 
@@ -218,7 +259,7 @@ ul li {
 
 .project-list {
     position: absolute;
-    top: 99px;
+    top: 97px;
     bottom: 241px;
     width: 100%;
     overflow: auto;
