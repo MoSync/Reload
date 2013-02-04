@@ -3,12 +3,17 @@ define([
     'underscore',
     'backbone',
     'models/workbench/workbench',
-    'text!../../../templates/workbench/main.html'
-], function($, _, Backbone, WorkbenchModel, workbenchTemplate){
+    'text!../../../templates/workbench/main.html',
+    'text!../../../templates/workbench/controls.html'
+], function($, _, Backbone, WorkbenchModel, workbenchTemplate, controlsTemplate){
 
     var WorkbenchView = Backbone.View.extend({
 
         name: 'workbench',
+
+        events: {
+            'click #do-selection': 'doit'
+        },
 
         initialize: function() {
 
@@ -16,7 +21,8 @@ define([
                 'render',
                 'close',
                 'createUI',
-                'saveData');
+                'saveData',
+                'doit');
 
             this.model = new WorkbenchModel();
 
@@ -27,10 +33,14 @@ define([
 
             var self = this;
 
-            var compiledTemplate = _.template(workbenchTemplate, {});
-            self.$el.html(compiledTemplate);
+            // Render controls.
+            var compiledTemplate = _.template(controlsTemplate, {});
+            self.$el.append(compiledTemplate);
 
-            var editorHolder = self.$el.find("div > textarea");
+            compiledTemplate = _.template(workbenchTemplate, {});
+            self.$el.append(compiledTemplate);
+
+            var editorHolder = self.$el.find("textarea");
 
             self.editor = CodeMirror.fromTextArea(
                 editorHolder.get(0),
@@ -60,11 +70,19 @@ define([
             };
         },
 
+        doit: function (e) {
+            e.preventDefault();
+            if (this.editor.somethingSelected()) {
+                var script = this.editor.getSelection();
+                this.model.doit(script);
+            }
+        },
         saveData: function(instance, changeObj) {
             this.model.setData(this.editor.getValue());
         },
 
         render: function() {
+            this.delegateEvents();
 
             var self = this;
 

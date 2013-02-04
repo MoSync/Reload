@@ -46,6 +46,7 @@ define([
                     console.log(resp.result);
                     // Add to collection on successful creation.
                     self.projectList.add(project);
+                    self.projectList.rePopulate();
                     console.log(resp);
                 };
 

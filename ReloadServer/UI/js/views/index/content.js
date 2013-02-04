@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'models/index/serverip',
     'text!../../../templates/index/content.html'
-], function($, _, Backbone, contentTemplate){
+], function($, _, Backbone, ServerIpModel, contentTemplate){
 
     var ContentView = Backbone.View.extend({
 
@@ -11,12 +12,14 @@ define([
 
             _.bindAll(this, 'render');
 
+            var serveIpModel = new ServerIpModel();
+            serveIpModel.on( 'change', function(){
+                $('.serverip').html(serveIpModel.get('ip'));
+            });
         },
 
         render: function () {
-            var data = {};
-
-            var compiledTemplate = _.template( contentTemplate, data );
+            var compiledTemplate = _.template( contentTemplate, {} );
             this.$el.html( compiledTemplate );
             return this.$el;
         },
