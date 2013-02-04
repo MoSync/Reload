@@ -38,70 +38,77 @@ LoginScreen::~LoginScreen()
 	mLoginScreen->removeLoginScreenListener(this);
 }
 
-void LoginScreen::initializeScreen(MAUtil::String &os)
+void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 {
 	// set the os string
 	mOS = os;
-
-	// Android and Windows Phone.
-	maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
-
-	// iOS and Windows Phone.
-	maScreenSetSupportedOrientations(
-		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
-		MA_SCREEN_ORIENTATION_PORTRAIT |
-		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
 
 	maScreenSetFullscreen(1);
 	MAExtent ex = maGetScrSize();
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);
 
-	int centerH = screenWidth / 2;
-	int buttonWidth = (int)((float)screenWidth * 0.75);
+	int centerH, buttonWidth, buttonHeight, buttonSpacing, editBoxHeight, logoWidth,
+		layoutTop, labelHeight, labelWidth, labelSpacing, layoutHeight, ipBoxButtonSpacing;
+	centerH = screenWidth / 2;
+
+	bool isLandscape = false;
+	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		isLandscape = true;
+	}
+
+	buttonWidth = (int)((float)screenWidth * 0.75);
+	if (isLandscape)
+	{
+		buttonHeight = (int)((float)screenHeight * 0.15);
+	}
+	else
+	{
+		buttonHeight = (int)((float)screenWidth * 0.15);
+	}
 	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonWidth = (int)((float)screenWidth * 0.4);
 	}
-	int buttonHeight = (int)((float)screenWidth * 0.15);
 	if(screenHeight > 1000 && os.find("Android", 0) < 0)
 	{
 		buttonHeight = (int)((float)screenWidth * 0.07);
 	}
-	int buttonSpacing = (int)((float)buttonHeight * 0.3);
+	buttonSpacing = (int)((float)buttonHeight * 0.3);
 	if(os.find("Windows", 0) >= 0)
 	{
 		buttonSpacing = (int)((float)buttonHeight * 0.1);
 	}
-	int editBoxHeight = (int)((float)screenHeight * 0.07);
+	editBoxHeight = (int)((float)screenHeight * 0.07);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		editBoxHeight = (int)((float)screenHeight * 0.02);
 	}
-	int logoWidth = (int)((float)screenWidth * 0.75);
-	int layoutTop = (int)((float)screenHeight * 0.3);
+	logoWidth = (int)((float)screenWidth * 0.75);
+	layoutTop = (int)((float)screenHeight * 0.3);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		layoutTop = (int)((float)screenHeight * 0.25);
 	}
-	int labelHeight = (int)((float)screenHeight * 0.05);
+	labelHeight = (int)((float)screenHeight * 0.05);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelHeight = (int)((float)screenHeight * 0.025);
 	}
-	int labelWidth = screenWidth;
+	labelWidth = screenWidth;
 	if(os.find("Android", 0) >= 0)
 	{
 		labelWidth = buttonWidth;
 	}
-	int labelSpacing = (int)((float)screenHeight * 0.02);
+	labelSpacing = (int)((float)screenHeight * 0.02);
 	if(screenHeight > 1000  && os.find("Android", 0) < 0)
 	{
 		labelSpacing = (int)((float)labelSpacing * 0.01);
 	}
-	int layoutHeight = (buttonHeight + buttonSpacing) * 2;
-	int ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
+	layoutHeight = (buttonHeight + buttonSpacing) * 2;
+	ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
 
 	mLoginScreen = new LoginScreenWidget();
 	mLoginScreen->addLoginScreenListener(this);
@@ -179,7 +186,6 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		((Button*)mServerDisconnectButton)->addButtonListener(this);
 	}
 
-
 	mServerDisconnectButton->setText("Disconnect");
 	mServerDisconnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mServerDisconnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
@@ -235,7 +241,6 @@ void LoginScreen::initializeScreen(MAUtil::String &os)
 		mLoadLastAppButton = new Button();
 		((Button*)mLoadLastAppButton)->addButtonListener(this);
 	}
-
 
 	mLoadLastAppButton->setText("Reload last app");
 	mLoadLastAppButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
@@ -297,98 +302,56 @@ void LoginScreen::rebuildScreenLayout(int screenHeight, int screenWidth, MAUtil:
 		isLandscape = true;
 	}
 
+	buttonWidth = (int)((float)screenWidth * 0.75);
 	if (isLandscape)
 	{
-		buttonWidth = (int)((float)screenWidth * 0.75);
-		if(screenHeight > 1000 && os.find("Android", 0) < 0)
-		{
-			buttonWidth = (int)((float)screenWidth * 0.4);
-		}
 		buttonHeight = (int)((float)screenHeight * 0.15);
-		if(screenHeight > 1000 && os.find("Android", 0) < 0)
-		{
-			buttonHeight = (int)((float)screenWidth * 0.07);
-		}
-		buttonSpacing = (int)((float)buttonHeight * 0.3);
-		if(os.find("Windows", 0) >= 0)
-		{
-			buttonSpacing = (int)((float)buttonHeight * 0.1);
-		}
-		editBoxHeight = (int)((float)screenHeight * 0.07);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			editBoxHeight = (int)((float)screenHeight * 0.02);
-		}
-		logoWidth = (int)((float)screenWidth * 0.75);
-		layoutTop = (int)((float)screenHeight * 0.3);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			layoutTop = (int)((float)screenHeight * 0.25);
-		}
-		labelHeight = (int)((float)screenHeight * 0.05);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			labelHeight = (int)((float)screenHeight * 0.025);
-		}
-		labelWidth = screenWidth;
-		if(os.find("Android", 0) >= 0)
-		{
-			labelWidth = buttonWidth;
-		}
-		labelSpacing = (int)((float)screenHeight * 0.02);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			labelSpacing = (int)((float)labelSpacing * 0.01);
-		}
-		layoutHeight = (buttonHeight + buttonSpacing) * 2;
-		ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
 	}
 	else
 	{
-		buttonWidth = (int)((float)screenWidth * 0.75);
-		if(screenHeight > 1000 && os.find("Android", 0) < 0)
-		{
-			buttonWidth = (int)((float)screenWidth * 0.4);
-		}
 		buttonHeight = (int)((float)screenWidth * 0.15);
-		if(screenHeight > 1000 && os.find("Android", 0) < 0)
-		{
-			buttonHeight = (int)((float)screenWidth * 0.07);
-		}
-		buttonSpacing = (int)((float)buttonHeight * 0.3);
-		if(os.find("Windows", 0) >= 0)
-		{
-			buttonSpacing = (int)((float)buttonHeight * 0.1);
-		}
-		editBoxHeight = (int)((float)screenHeight * 0.07);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			editBoxHeight = (int)((float)screenHeight * 0.02);
-		}
-		logoWidth = (int)((float)screenWidth * 0.75);
-		layoutTop = (int)((float)screenHeight * 0.3);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			layoutTop = (int)((float)screenHeight * 0.25);
-		}
-		labelHeight = (int)((float)screenHeight * 0.05);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			labelHeight = (int)((float)screenHeight * 0.025);
-		}
-		labelWidth = screenWidth;
-		if(os.find("Android", 0) >= 0)
-		{
-			labelWidth = buttonWidth;
-		}
-		labelSpacing = (int)((float)screenHeight * 0.02);
-		if(screenHeight > 1000  && os.find("Android", 0) < 0)
-		{
-			labelSpacing = (int)((float)labelSpacing * 0.01);
-		}
-		layoutHeight = (buttonHeight + buttonSpacing) * 2;
-		ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
 	}
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
+	{
+		buttonWidth = (int)((float)screenWidth * 0.4);
+	}
+	if(screenHeight > 1000 && os.find("Android", 0) < 0)
+	{
+		buttonHeight = (int)((float)screenWidth * 0.07);
+	}
+	buttonSpacing = (int)((float)buttonHeight * 0.3);
+	if(os.find("Windows", 0) >= 0)
+	{
+		buttonSpacing = (int)((float)buttonHeight * 0.1);
+	}
+	editBoxHeight = (int)((float)screenHeight * 0.07);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		editBoxHeight = (int)((float)screenHeight * 0.02);
+	}
+	logoWidth = (int)((float)screenWidth * 0.75);
+	layoutTop = (int)((float)screenHeight * 0.3);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		layoutTop = (int)((float)screenHeight * 0.25);
+	}
+	labelHeight = (int)((float)screenHeight * 0.05);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		labelHeight = (int)((float)screenHeight * 0.025);
+	}
+	labelWidth = screenWidth;
+	if(os.find("Android", 0) >= 0)
+	{
+		labelWidth = buttonWidth;
+	}
+	labelSpacing = (int)((float)screenHeight * 0.02);
+	if(screenHeight > 1000  && os.find("Android", 0) < 0)
+	{
+		labelSpacing = (int)((float)labelSpacing * 0.01);
+	}
+	layoutHeight = (buttonHeight + buttonSpacing) * 2;
+	ipBoxButtonSpacing = (int)((float)screenHeight * 0.03);
 
 	mLogo->setWidth(logoWidth);
 	mLogo->setPosition(centerH - logoWidth/2, screenHeight / 12);

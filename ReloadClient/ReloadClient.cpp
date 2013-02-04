@@ -270,7 +270,8 @@ void ReloadClient::createScreens()
 {
 	// Create login screen and loading screen.
 	mLoginScreen = new LoginScreen(this);
-	mLoginScreen->initializeScreen(mOS);
+	int orientation = maScreenGetCurrentOrientation();
+	mLoginScreen->initializeScreen(mOS, orientation);
 	mLoadingScreen = new LoadingScreen(this);
 	mLoadingScreen->initializeScreen(mOS);
 

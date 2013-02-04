@@ -43,7 +43,7 @@ public:
 
 	~LoginScreen();
 
-	void initializeScreen(MAUtil::String &os);
+	void initializeScreen(MAUtil::String &os, int orientation);
 
 	/**
 	 * Called by the system when the user clicks a button
