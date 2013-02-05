@@ -97,10 +97,23 @@ define([
 
             console.log(this.scrollPosition);
 
+            var header, label;
+            label = 'info'; // CSS style.
+            header = 'Log'; // Log line prefix.
+
+            console.log(data.msg.indexOf('Error:'));
+            if (0 === data.msg.indexOf('javascript:')) {
+                header = 'Workbench';
+                data.msg = data.msg.substr(11);
+            } else if (0 <= data.msg.indexOf('Error:')) {
+                header = 'Error';
+                label = 'important';
+            }
+
             var compiledTemplate = _.template( messageTemplate, {
-                header: data.type,
+                header: header,
                 message: data.msg,
-                label: data.type
+                label: label
             });
             this.messages.append( compiledTemplate );
 
