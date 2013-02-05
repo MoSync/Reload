@@ -194,7 +194,7 @@ var create = function (port) {
                 var md = vars.MsgDispatcher;
                 md.dispatch({
                     target: 'log',
-                    msg: unescape(unescape(message.params))
+                    msg: unescape(unescape(message.params)).replace("\n","</br>")
                 });
             }
         }
