@@ -1,5 +1,5 @@
 
-#  Copyright (C) 2012  MoSync AB
+#  Copyright (C) 2013  MoSync AB
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
@@ -97,53 +97,53 @@ sh "platypus -y -P ./Reload.platypus ./Reload.app"
 FileUtils.cd main_dir
 
 
-sh "hdiutil attach ReloadAppTemplates/MoSync_Reload_BETA_Template.dmg"
-FileUtils.mkdir_p "Build/#{time_stamp}/MoSync_Reload_BETA_Windows/server"
-FileUtils.mkdir_p "Build/#{time_stamp}/MoSync_Reload_BETA_Linux/server"
+sh "hdiutil attach ReloadAppTemplates/MoSync_Reload_Template.dmg"
+FileUtils.mkdir_p "Build/#{time_stamp}/MoSync_Reload_Windows/server"
+FileUtils.mkdir_p "Build/#{time_stamp}/MoSync_Reload_Linux/server"
 
-FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/Android Client"
-FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/iOS Client"
-FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/WP7 Client"
-FileUtils.rm_rf "/Volumes/MoSync Reload (BETA)/Reload.app"
-FileUtils.cp_r "ReloadLauncher/Mac/Reload.app", "/Volumes/MoSync Reload (BETA)/"
+FileUtils.rm_rf "/Volumes/MoSync Reload/Android Client"
+FileUtils.rm_rf "/Volumes/MoSync Reload/iOS Client"
+FileUtils.rm_rf "/Volumes/MoSync Reload/WP7 Client"
+FileUtils.rm_rf "/Volumes/MoSync Reload/Reload.app"
+FileUtils.cp_r "ReloadLauncher/Mac/Reload.app", "/Volumes/MoSync Reload/"
 
 puts "Copying Clients"
-FileUtils.cp_r "ReloadClient/Clients/Android", "/Volumes/MoSync Reload (BETA)/Android Client"
-FileUtils.cp_r "ReloadClient/Clients/iOS", "/Volumes/MoSync Reload (BETA)/iOS Client"
-FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "/Volumes/MoSync Reload (BETA)/WP7 Client"
-FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reload_BETA_Windows/Android Client"
-FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_BETA_Windows/iOS Client"
-FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_BETA_Windows/WP7 Client"
-FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reload_BETA_Linux/Android Client"
-FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_BETA_Linux/iOS Client"
-FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_BETA_Linux/WP7 Client"
+FileUtils.cp_r "ReloadClient/Clients/Android", "/Volumes/MoSync Reload/Android Client"
+FileUtils.cp_r "ReloadClient/Clients/iOS", "/Volumes/MoSync Reload/iOS Client"
+FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "/Volumes/MoSync Reload/WP7 Client"
+FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reload_Windows/Android Client"
+FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Windows/iOS Client"
+FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Windows/WP7 Client"
+FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reload_Linux/Android Client"
+FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Linux/iOS Client"
+FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Linux/WP7 Client"
 
 puts "Copying Readme"
-FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSync Reload (BETA)/"
-FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_BETA_Windows"
-FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_BETA_Linux"
+FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSync Reload/"
+FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_Windows"
+FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_Linux"
 
-FileUtils.cp_r "Licenses", "/Volumes/MoSync Reload (BETA)/"
-FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_BETA_Windows"
-FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_BETA_Linux"
+FileUtils.cp_r "Licenses", "/Volumes/MoSync Reload/"
+FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_Windows"
+FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_Linux"
 
 
 
 files_to_copy.each { |item|
-  FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_BETA_Windows/server"
-  FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_BETA_Linux/server"
+  FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_Windows/server"
+  FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_Linux/server"
 }
-sh "cp -rf ReloadAppTemplates/MoSync_Reload_BETA_2_Windows/* Build/#{time_stamp}/MoSync_Reload_BETA_Windows"
-sh "cp -rf ReloadAppTemplates/MoSync_Reload_BETA_2_Linux/* Build/#{time_stamp}/MoSync_Reload_BETA_Linux"
+sh "cp -rf ReloadAppTemplates/MoSync_Reload_Windows/* Build/#{time_stamp}/MoSync_Reload_Windows"
+sh "cp -rf ReloadAppTemplates/MoSync_Reload_Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"
 
 puts "creating final Mac Package"
-sh "hdiutil detach -force /Volumes/MoSync\\ Reload\\ \\(BETA\\)/"
-sh "hdiutil convert  ReloadAppTemplates/MoSync_Reload_BETA_Template.dmg -format UDZO -imagekey zlib-level=9 -o  Build/#{time_stamp}/MoSync_Reload_BETA_OSX_#{time_stamp}.dmg"
+sh "hdiutil detach -force /Volumes/MoSync\\ Reload/"
+sh "hdiutil convert  ReloadAppTemplates/MoSync_Reload_Template.dmg -format UDZO -imagekey zlib-level=9 -o  Build/#{time_stamp}/MoSync_Reload_OSX_#{time_stamp}.dmg"
 
 puts "Creating final Windows Package"
 FileUtils.cd "Build/#{time_stamp}"
-sh "zip -9r MoSync_Reload_BETA_Windows_#{time_stamp}.zip MoSync_Reload_BETA_Windows"
+sh "zip -9r MoSync_Reload_Windows_#{time_stamp}.zip MoSync_Reload_Windows"
 
 puts "Creating final Linux Package"
 
-sh "tar -jcvf MoSync_Reload_BETA_Linux_#{time_stamp}.tar.bz2 MoSync_Reload_BETA_Linux"
+sh "tar -jcvf MoSync_Reload_Linux_#{time_stamp}.tar.bz2 MoSync_Reload_Linux"
