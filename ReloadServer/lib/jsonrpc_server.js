@@ -77,8 +77,7 @@ create = function(port) {
                 break;
 
                 case 'log':
-                    var type = (msg.msg.indexOf("Error") === -1)? 'info' : 'important';
-                    socket.emit('log', { type: type, msg: msg.msg });
+                    socket.emit('log', { msg: msg.msg });
                 break;
                 default:
                     console.log('Unknown target ' + msg.target);
