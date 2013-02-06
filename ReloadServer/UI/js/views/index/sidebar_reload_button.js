@@ -21,7 +21,10 @@ define([
 
             this.parent = options.parent;
 
-            _.bindAll(this, 'render', 'reload', 'debug');
+            _.bindAll(this,
+                      'render',
+                      'reload',
+                      'debug');
 
             this.model = new SidebarReloadButtonModel();
 
@@ -48,9 +51,7 @@ define([
                 return;
             }
 
-            // TODO Make an extra pull for device list before trying to
-            // reload.
-            // Check if any devices are connected.
+            // Check if any device is connected.
             if (this.parent.deviceCount === 0) {
                 alert ('Please connect a device.');
                 return;
