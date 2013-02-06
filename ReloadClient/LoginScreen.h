@@ -37,13 +37,26 @@ using namespace NativeUI; // WebView widget.
 
 class LoginScreen : public ButtonListener, EditBoxListener, LoginScreenListener
 {
-	void rebuildScreenLayout(int screenHeight, int screenWidth, String os, int orientation);
+	void rebuildScreenLayout(int screenWidth, int screenHeight, String os, int orientation);
 public:
 	LoginScreen(ReloadClient *client);
 
 	~LoginScreen();
 
 	void initializeScreen(MAUtil::String &os, int orientation);
+
+	void createBackgroundImage(int screenWidth, int screenHeight);
+	void createLogo();
+	void createMenuLayout();
+	void createConnectedLayout();
+	void createDisconnectedLayout();
+	void createBottomLayout(int screenWidth, int screenHeight);
+
+	int positionLogoLayout(int screenWidth, int screenHeight, float screenRatio);
+
+	int positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio);
+
+	int positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio);
 
 	/**
 	 * Called by the system when the user clicks a button
@@ -82,7 +95,7 @@ public:
 	 * @param newScreenHeight The new screen height after orientation has changed.
 	 * @param newScreenWidth The new screen width after oritentation has changed.
 	 */
-	virtual void orientationChanged(int newOrientation, int newScreenHeight, int newScreenWidth);
+	virtual void orientationChanged(int newOrientation, int newScreenWidth, int newScreenHeight);
 
 private:
 	LoginScreenWidget *mLoginScreen;
