@@ -52,11 +52,17 @@ public:
 	void createDisconnectedLayout();
 	void createBottomLayout(int screenWidth, int screenHeight);
 
-	int positionLogoLayout(int screenWidth, int screenHeight, float screenRatio);
+	int positionLogoLayout(int screenWidth, int screenHeight,
+			float screenRatio, float logoTopRatio, float logoWidthRatio);
 
-	int positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio);
+	int positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+			float widgetWidthRatio, float widgetLeftRatio,
+			float labelHeightRatio, float labelSpacingRatio,
+			float editBoxHeightRatio, float buttonheightRatio, float buttonSpacingRatio);
 
-	int positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio);
+	int positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+			float logoWidthRatio, float logoHeightRatio, float logoTopRatio, float logoLeftRatio,
+			float infoWidthRatio, float infoLeftRatio, float infoTopRatio);
 
 	/**
 	 * Called by the system when the user clicks a button

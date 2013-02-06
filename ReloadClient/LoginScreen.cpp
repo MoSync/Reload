@@ -52,7 +52,6 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	mLoginScreen->addLoginScreenListener(this);
 
 	mMainLayout = new RelativeLayout();
-	mMainLayout->setSize(screenWidth, screenHeight);
 
 	createBackgroundImage(screenWidth, screenHeight);
 	createLogo();
@@ -62,17 +61,25 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
+		mMainLayout->setSize(screenHeight, screenWidth);
+
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenHeight, screenWidth, 0.10);
-		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY, 0.80);
-		positionBottomLayout(screenHeight, screenWidth, menuBottomY, 0.10);
+		int logoBottomY = positionLogoLayout(screenHeight, screenWidth, 0.25, 0.25, 0.6);
+		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY, 0.65,
+				0.8, 0.1, 0.08, 0.02, 0.14, 0.25, 0.05);
+		positionBottomLayout(screenHeight, screenWidth, menuBottomY, 0.10,
+				0.3, 0.6, 0.1, 0.05, 0.07, 0.7, -0.2);
 	}
 	else
 	{
+		mMainLayout->setSize(screenWidth, screenHeight);
+
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10);
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20, 0.25, 0.75);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70,
+				0.8, 0.1, 0.08, 0.02, 0.1, 0.15, 0.03);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10,
+				0.3, 0.6, 0.1, 0.05, 0.1, 0.7, 0.1);
 	}
 
 	mMainLayout->addChild(mLoadLastAppButton);
@@ -88,20 +95,26 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 	// repositioning has been done
 	mLoginScreen->setMainWidget(NULL);
 
+	mMainLayout->setSize(screenWidth, screenHeight);
+
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10);
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.25, 0.25, 0.6);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.65,
+				0.8, 0.1, 0.08, 0.02, 0.14, 0.25, 0.05);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10,
+				0.3, 0.6, 0.1, 0.05, 0.07, 0.7, -0.2);
 	}
 	else
 	{
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10);
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20, 0.25, 0.75);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70,
+				0.8, 0.1, 0.08, 0.02, 0.08, 0.15, 0.03);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10,
+				0.3, 0.6, 0.1, 0.05, 0.1, 0.7, 0.1);
 	}
 
 	mLoginScreen->setMainWidget(mMainLayout);
@@ -259,43 +272,37 @@ void LoginScreen::createBottomLayout(int screenWidth, int screenHeight)
 	mInfoIcon->setPosition((int)(screenWidth * 0.85), (int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
 }
 
-int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio)
+int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio, float logoTopRatio, float logoWidthRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
 
-	// 25% above
-	int aboveHeight = (int)((float)height * 0.25);
+	int aboveHeight = (int)((float)height * logoTopRatio);
 
-	// 50% will be the logo
-	int logoWidth = (int)((float)screenWidth * 0.75);
+	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
 	mLogo->setWidth(logoWidth);
+
 	int centerH = screenWidth / 2;
 	mLogo->setPosition(centerH - logoWidth/2, aboveHeight);
 
 	return height;
 }
 
-int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio)
+int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+					float widgetWidthRatio, float widgetLeftRatio,
+					float labelHeightRatio, float labelSpacingRatio,
+					float editBoxHeightRatio, float buttonheightRatio, float buttonSpacingRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
 	// every widget will occupy 60% of the screen width
-	int widgetWidth = (int)((float)screenWidth * 0.8);
+	int widgetWidth = (int)((float)screenWidth * widgetWidthRatio);
 	// the left position will be 20% of the screen, as well as the right distance to the edge
-	int widgetLeft = (int)((float)screenWidth * 0.1);
+	int widgetLeft = (int)((float)screenWidth * widgetLeftRatio);
 
-	int labelHeight = (int)((float)height * 0.08);
-	int labelSpacing = (int)((float)height * 0.02);
-	int editBoxHeight = (int)((float)height * 0.08);
-	if(screenHeight > 1000  && mOS.find("Android", 0) < 0)
-	{
-		editBoxHeight = (int)((float)height * 0.04);
-	}
-	else
-	{
-		editBoxHeight = (int)((float)height * 0.10);
-	}
-	int buttonSpacing = (int)((float)height * 0.03);
-	int buttonHeight = (int)((float)height * 0.15);
+	int labelHeight = (int)((float)height * labelHeightRatio);
+	int labelSpacing = (int)((float)height * labelSpacingRatio);
+	int editBoxHeight = (int)((float)height * editBoxHeightRatio);
+	int buttonHeight = (int)((float)height * buttonheightRatio);
+	int buttonSpacing = (int)((float)height * buttonSpacingRatio);
 
 	mServerIPLabel->setWidth(widgetWidth);
 	mServerIPLabel->setPosition(widgetLeft, labelSpacing);
@@ -332,23 +339,26 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 	return top + height;
 }
 
-int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio)
+int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+					float logoWidthRatio, float logoHeightRatio, float logoTopRatio, float logoLeftRatio,
+					float infoWidthRatio, float infoLeftRatio, float infoTopRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
 
-	int logoWidth = (int)((float)screenWidth * 0.3);
-	int infoWidth = (int)((float)screenWidth * 0.1);
-	int logoLeft = (int)((float)screenWidth * 0.05);
-	int infoLeft = (int)((float)screenWidth * 0.7);
+	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
+	int infoWidth = (int)((float)screenWidth * infoWidthRatio);
+	int logoLeft = (int)((float)screenWidth * logoLeftRatio);
+	int infoLeft = (int)((float)screenWidth * infoLeftRatio);
 	int logoInfoDistance = (int)(screenWidth - logoWidth - infoWidth - logoLeft * 2);
-	int logoHeight = (int)((float)height * 0.6);
-	int logoTop = (int)((float)height * 0.1);
+	int logoHeight = (int)((float)height * logoHeightRatio);
+	int logoTop = (int)((float)height * logoTopRatio);
+	int infoTop = (int)((float)height * infoTopRatio);
 
 	mMosynclogo->setHeight(logoHeight);
-	mInfoIcon->setSize(infoWidth,infoWidth);
-
 	mMosynclogo->setPosition(logoLeft, top + logoTop);
-	mInfoIcon->setPosition(logoLeft + logoWidth + logoInfoDistance, top + logoTop);
+
+	mInfoIcon->setSize(infoWidth,infoWidth);
+	mInfoIcon->setPosition(logoLeft + logoWidth + logoInfoDistance, top + infoTop);
 
 	return top + height;
 }
