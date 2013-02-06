@@ -72,6 +72,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
 		mMainLayout->setSize(screenHeight, screenWidth);
+		mBackground->setSize(screenHeight, screenWidth);
 
 		// the reload logo layout will represent 30% of the screen
 		int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
@@ -100,6 +101,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	else
 	{
 		mMainLayout->setSize(screenWidth, screenHeight);
+		mBackground->setSize(screenWidth, screenHeight);
 
 		// the reload logo layout will represent 30% of the screen
 		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
@@ -140,6 +142,7 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 	mLoginScreen->setMainWidget(NULL);
 
 	mMainLayout->setSize(screenWidth, screenHeight);
+	mBackground->setSize(screenWidth, screenHeight);
 
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
