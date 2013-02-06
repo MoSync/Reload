@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include "LoginScreen.h"
+#include "LoginScreenUtils.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -38,6 +39,15 @@ LoginScreen::~LoginScreen()
 	mLoginScreen->removeLoginScreenListener(this);
 }
 
+/**
+ * Creates the screen, the layouts, the widgets and positions everything.
+ * @param os A string containing the current os.
+ * @param orientation One of the values:
+ * 		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
+ * 		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+ * 		MA_SCREEN_ORIENTATION_PORTRAIT
+ * 		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+ */
 void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 {
 	// set the os string
@@ -54,9 +64,9 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	mMainLayout = new RelativeLayout();
 
 	createBackgroundImage(screenWidth, screenHeight);
-	createLogo();
+	createLogoLayout();
 	createMenuLayout();
-	createBottomLayout(screenWidth, screenHeight);
+	createBottomLayout();
 
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
@@ -64,22 +74,56 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 		mMainLayout->setSize(screenHeight, screenWidth);
 
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenHeight, screenWidth, 0.25, 0.25, 0.6);
-		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY, 0.65,
-				0.8, 0.1, 0.08, 0.02, 0.14, 0.25, 0.05);
-		positionBottomLayout(screenHeight, screenWidth, menuBottomY, 0.10,
-				0.3, 0.6, 0.1, 0.05, 0.07, 0.7, -0.2);
+		int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
+				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				LOGO_TOP_LANDSCAPE_RATIO,
+				LOGO_WIDTH_LANDSCAPE_RATIO);
+		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY,
+				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
+				MENU_WIDGET_LEFT_LANDSCAPE_RATIO,
+				MENU_LABEL_HEIGHT_LANDSCAPE_RATIO,
+				MENU_LABEL_SPACING_LANDSCAPE_RATIO,
+				MENU_EDIT_BOX_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_SPACING_LANDSCAPE_RATIO);
+		positionBottomLayout(screenHeight, screenWidth, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_TOP_LANDSCAPE_RATIO,
+				BOTTOM_INFO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_INFO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);
 	}
 	else
 	{
 		mMainLayout->setSize(screenWidth, screenHeight);
 
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20, 0.25, 0.75);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70,
-				0.8, 0.1, 0.08, 0.02, 0.1, 0.15, 0.03);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10,
-				0.3, 0.6, 0.1, 0.05, 0.1, 0.7, 0.1);
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				LOGO_TOP_PORTRAIT_RATIO,
+				LOGO_WIDTH_PORTRAIT_RATIO);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
+				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
+				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
+				MENU_LABEL_SPACING_PORTRAIT_RATIO,
+				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_TOP_PORTRAIT_RATIO,
+				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
 	}
 
 	mMainLayout->addChild(mLoadLastAppButton);
@@ -101,25 +145,64 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.25, 0.25, 0.6);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.65,
-				0.8, 0.1, 0.08, 0.02, 0.14, 0.25, 0.05);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10,
-				0.3, 0.6, 0.1, 0.05, 0.07, 0.7, -0.2);
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				LOGO_TOP_LANDSCAPE_RATIO,
+				LOGO_WIDTH_LANDSCAPE_RATIO);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
+				MENU_WIDGET_LEFT_LANDSCAPE_RATIO,
+				MENU_LABEL_HEIGHT_LANDSCAPE_RATIO,
+				MENU_LABEL_SPACING_LANDSCAPE_RATIO,
+				MENU_EDIT_BOX_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_SPACING_LANDSCAPE_RATIO);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_TOP_LANDSCAPE_RATIO,
+				BOTTOM_INFO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_INFO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);
 	}
 	else
 	{
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight, 0.20, 0.25, 0.75);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY, 0.70,
-				0.8, 0.1, 0.08, 0.02, 0.08, 0.15, 0.03);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY, 0.10,
-				0.3, 0.6, 0.1, 0.05, 0.1, 0.7, 0.1);
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				LOGO_TOP_PORTRAIT_RATIO,
+				LOGO_WIDTH_PORTRAIT_RATIO);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
+				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
+				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
+				MENU_LABEL_SPACING_PORTRAIT_RATIO,
+				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_TOP_PORTRAIT_RATIO,
+				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
 	}
 
 	mLoginScreen->setMainWidget(mMainLayout);
 }
 
+/**
+ * Creates and adds the background image to the main layout.
+ * @param screenWidth Used to set the background image width.
+ * @param screenHeight Used to set the background image height.
+ */
 void LoginScreen::createBackgroundImage(int screenWidth, int screenHeight)
 {
 	mBackground = new Image();
@@ -133,7 +216,11 @@ void LoginScreen::createBackgroundImage(int screenWidth, int screenHeight)
 	}
 }
 
-void LoginScreen::createLogo()
+/**
+ * Creates the upper layout of the main screen (that contains the Reload logo)
+ * and adds it to the main layout.
+ */
+void LoginScreen::createLogoLayout()
 {
 	//The reload Logo
 	mLogo = new Image();
@@ -145,6 +232,10 @@ void LoginScreen::createLogo()
 	mMainLayout->addChild(mLogo);
 }
 
+/**
+ * Creates the middle layout of the main screen (that contains the menu)
+ * and adds it to the main layout.
+ */
 void LoginScreen::createMenuLayout()
 {
 	createConnectedLayout();
@@ -169,6 +260,9 @@ void LoginScreen::createMenuLayout()
 	mLoadLastAppButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 }
 
+/**
+ * Creates the connected layout and adds it to the menu layout.
+ */
 void LoginScreen::createConnectedLayout()
 {
 	//Label for the server IP edit box
@@ -207,6 +301,9 @@ void LoginScreen::createConnectedLayout()
 	mMainLayout->addChild(mConnectLayout);
 }
 
+/**
+ * Creates the disconnected layout and adds it to the menu layout.
+ */
 void LoginScreen::createDisconnectedLayout()
 {
 	//Some instructions for the user
@@ -255,23 +352,32 @@ void LoginScreen::createDisconnectedLayout()
 	mMainLayout->addChild(mDisconnectLayout);
 }
 
-void LoginScreen::createBottomLayout(int screenWidth, int screenHeight)
+/**
+ * Creates and adds the bottom layout (that contains the MoSync logo
+ * and the info button) to the main layout.
+ */
+void LoginScreen::createBottomLayout()
 {
 	//A little MoSync logo at the lower left of the screen
 	mMosynclogo = new Image();
 	mMosynclogo->setImage(MOSYNC_IMAGE);
 	mMosynclogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	mMosynclogo->setPosition((int)(screenWidth * 0.05),(int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
 
 	//The info icon
 	mInfoIcon = new ImageButton();
 	mInfoIcon->addButtonListener(this);
 	mInfoIcon->setBackgroundImage(INFO_ICON);
-
-	//mInfoIcon->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	mInfoIcon->setPosition((int)(screenWidth * 0.85), (int)(screenHeight * 0.95) - (int)(screenWidth * 0.1) / 2);
 }
 
+/**
+ * Positions the upper layout (containing the Reload logo) on the main layout.
+ * @param screenWidth The device screen width.
+ * @param screenHeight The device screen height.
+ * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+ * @param logoTopRatio The logo top ratio (based on the layout height).
+ * @param logoWidthRatio The logo width ratio (based on the layout width).
+ * @return Returns the lower x coordinate of the layout after positioning.
+ */
 int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio, float logoTopRatio, float logoWidthRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
@@ -287,10 +393,25 @@ int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float scr
 	return height;
 }
 
+/**
+ * Positions the menu layout on the main layout.
+ * @param screenWidth The device screen width.
+ * @param screenHeight The device screen height.
+ * @param top The top position of the layout.
+ * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+ * @param widgetWidthRatio The menu widget width ratio (based on the layout width).
+ * @param widgetLeftRatio The menu widget left ratio (based on the layout width).
+ * @param labelHeightRatio The label height ratio (based on the layout height).
+ * @param labelSpacingRatio The label spacing ratio (based on the layout height).
+ * @param editBoxHeightRatio The ip edit box height ratio (based on the layout height).
+ * @param buttonHeightRatio The button height ratio (based on the layout height).
+ * @param buttonSpacingRatio The button spacing ratio (based on the layout height).
+ * @return Returns the lower x coordinate of the layout after positioning.
+ */
 int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
 					float widgetWidthRatio, float widgetLeftRatio,
 					float labelHeightRatio, float labelSpacingRatio,
-					float editBoxHeightRatio, float buttonheightRatio, float buttonSpacingRatio)
+					float editBoxHeightRatio, float buttonHeightRatio, float buttonSpacingRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
 	// every widget will occupy 60% of the screen width
@@ -301,7 +422,7 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 	int labelHeight = (int)((float)height * labelHeightRatio);
 	int labelSpacing = (int)((float)height * labelSpacingRatio);
 	int editBoxHeight = (int)((float)height * editBoxHeightRatio);
-	int buttonHeight = (int)((float)height * buttonheightRatio);
+	int buttonHeight = (int)((float)height * buttonHeightRatio);
 	int buttonSpacing = (int)((float)height * buttonSpacingRatio);
 
 	mServerIPLabel->setWidth(widgetWidth);
@@ -339,8 +460,24 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 	return top + height;
 }
 
+/**
+ * Positions the bottom layout (that contains the MoSync logo and the info button)
+ * on the main layout.
+ * @param screenWidth The device screen width.
+ * @param screenHeight The device screen height.
+ * @param top The top position of the layout.
+ * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+ * @param logoWidthRatio The logo height ratio (based on the layout height).
+ * @param logoHeightRatio The logo width ratio (based on the layout width).
+ * @param logoLeftRatio The logo left ratio (based on the layout width).
+ * @param logoTopRatio The logo top ratio (based on the layout height).
+ * @param infoWidthRatio The info button width ratio (based on the layout width).
+ * @param infoLeftRatio The info button left ratio (based on the layout width).
+ * @param infoTopRatio The logo top ratio (based on the layout height).
+ * @return Returns the lower x coordinate of the layout after positioning.
+ */
 int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
-					float logoWidthRatio, float logoHeightRatio, float logoTopRatio, float logoLeftRatio,
+					float logoWidthRatio, float logoHeightRatio, float logoLeftRatio, float logoTopRatio,
 					float infoWidthRatio, float infoLeftRatio, float infoTopRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
