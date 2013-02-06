@@ -31,13 +31,10 @@ define([
 
         addProject: function (e) {
             e.preventDefault();
-
             var self = this;
-
             var project = new ProjectModel();
 
             project.on('change', function() {
-
                 var options     = {};
                 options.url     = 'http://localhost:8283';
 
@@ -47,7 +44,6 @@ define([
                     // Add to collection on successful creation.
                     self.projectList.add(project);
                     self.projectList.rePopulate();
-                    console.log(resp);
                 };
 
                 options.error   = function (resp) {
