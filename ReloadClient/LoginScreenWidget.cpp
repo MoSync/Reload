@@ -79,7 +79,7 @@ void LoginScreenWidget::orientationDidChange()
 	// announce the screen listeners if the orientation has changed
 	for (int i = 0; i < mLoginScreenListeners.size(); i++)
 	{
-		mLoginScreenListeners[i]->orientationChanged(orientation,screenHeight,screenWidth);
+		mLoginScreenListeners[i]->orientationChanged(orientation,screenWidth,screenHeight);
 	}
 }
 
