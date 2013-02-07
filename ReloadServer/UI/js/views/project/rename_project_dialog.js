@@ -9,7 +9,8 @@ define([
 
         events: {
             'click button#submit': 'submit',
-            'click button#close': 'close'
+            'click button[data-dismiss]': 'close',
+            'keypress input#project-name': 'captureKeys'
         },
 
         initialize: function (options) {
@@ -23,6 +24,13 @@ define([
             });
 
             this.$el = $(this.compiledTemplate);
+        },
+
+        captureKeys: function (e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                this.submit();
+            }
         },
 
         submit: function () {
