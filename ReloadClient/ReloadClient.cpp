@@ -178,15 +178,34 @@ ReloadClient::~ReloadClient()
 
 void ReloadClient::setScreenOrientation()
 {
-	// Android and Windows Phone.
-	maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
+	char buffer[64];
+	maGetSystemProperty(
+		"mosync.device.OS",
+		buffer,
+		64);
+	MAUtil::String os = buffer;
 
-	// iOS and Windows Phone.
-	maScreenSetSupportedOrientations(
-		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
-		MA_SCREEN_ORIENTATION_PORTRAIT |
-		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	// Android orientation events not implemented.
+	if(os.find("Android", 0) < 0)
+	{
+		// Android and Windows Phone.
+		maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
+
+		// iOS and Windows Phone.
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	}
+	else
+	{
+		maScreenSetOrientation(SCREEN_ORIENTATION_PORTRAIT);
+
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	}
 }
 
 void ReloadClient::initializeWebView()
