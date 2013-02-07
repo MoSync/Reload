@@ -5,37 +5,38 @@
     </div>
     <div class="modal-body">
 
-<form class="form-horizontal">
+        <form class="form-horizontal">
 
-    <div class="control-group">
-        <div class="control-label" for="project-name">Project Type</div>
-        <div class="controls">
-            <label class="radio inline">
-                <input type="radio" name="projectType" id="optionsRadios"
-                value="web" checked>
-                Web based
-            </label>
-            <label class="radio inline">
-                <input type="radio" name="projectType" id="optionsRadios"
-                value="native">
-                Native UI based
-            </label>
-        </div>
+            <div class="control-group">
+                <div class="control-label" for="project-name">Project Type</div>
+                <div class="controls">
+                    <label class="radio inline">
+                        <input type="radio" name="projectType" id="optionsRadios"
+                        value="web" checked>
+                        Web based
+                    </label>
+                    <label class="radio inline">
+                        <input type="radio" name="projectType" id="optionsRadios"
+                        value="native">
+                        Native UI based
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="project-name">Project Name</label>
+                <div class="controls">
+                    <input type="text" name="project-name" id="project-name"
+                    placeholder="Project Name" value="">
+                </div>
+            </div>
+
+        </form>
+
+
     </div>
-
-    <div class="control-group">
-        <label class="control-label" for="project-name">Project Name</label>
-        <div class="controls">
-            <input type="text" name="project-name" id="project-name"
-            placeholder="Project Name" value="">
-        </div>
-    </div>
-
-</form>
-
-
     <div class="modal-footer">
-        <button id="close" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
         <button id="submit" class="btn btn-primary">Create Project</button>
     </div>
 </div>
