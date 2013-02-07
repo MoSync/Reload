@@ -9,7 +9,8 @@ define([
 
         events: {
             'click button#submit': 'submit',
-            'click button#close': 'close'
+            'click button#close': 'close',
+            'keypress input#workspace-path': 'captureKeys'
         },
 
         initialize: function (options) {
@@ -19,6 +20,17 @@ define([
 
             var compiledTemplate = _.template( dialogTemplate, { path: this.projectList.path } );
             this.$el = $(compiledTemplate);
+        },
+
+        captureKeys: function (e) {
+            e.preventDefault();
+
+            if (e.keyCode !== 13) {
+                $('#workspace-path').val($('#workspace-path').val() + String.fromCharCode(e.keyCode));
+                return;
+            }
+
+            this.submit();
         },
 
         submit: function () {
