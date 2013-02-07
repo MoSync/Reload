@@ -20,5 +20,4 @@
 ./bin/mac/node main.js &
 ./bin/mac/node node_modules/weinre/weinre --boundHost -all- &
 sleep 1
-open http://localhost:8283
 wait %1
