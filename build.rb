@@ -36,6 +36,17 @@ File.open("ReloadServer/build.dat", "w") do |file|
   file.puts(time_stamp);
 end
 
+puts "Updating the templates"
+
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/index.html", "ReloadServer/templates/NativeUITemplate/LocalFiles/"
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/wormhole.js", "ReloadServer/templates/NativeUITemplate/LocalFiles/js"
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/main.cpp", "ReloadServer/templates/NativeUITemplate/LocalFiles/"
+
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/index.html", "ReloadServer/templates/ReloadTemplate/LocalFiles/"
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/wormhole.js", "ReloadServer/templates/ReloadTemplate/LocalFiles/js"
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/main.cpp", "ReloadServer/templates/ReloadTemplate/LocalFiles/"
+
+puts "making the information files"
 FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
 FileUtils.cp ENV['MOSYNCDIR'] + "/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
 FileUtils.rm_rf "ReloadServer/UI/docs"
