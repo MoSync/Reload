@@ -139,7 +139,10 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 {
 	// on wp7 the layout changes look glitchy so we'll set the layout after all the
 	// repositioning has been done
-	mLoginScreen->setMainWidget(NULL);
+	if(mOS.find("Windows", 0) >= 0)
+	{
+		mLoginScreen->setMainWidget(NULL);
+	}
 
 	mMainLayout->setSize(screenWidth, screenHeight);
 	mBackground->setSize(screenWidth, screenHeight);
@@ -198,7 +201,10 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
 	}
 
-	mLoginScreen->setMainWidget(mMainLayout);
+	if(mOS.find("Windows", 0) >= 0)
+	{
+		mLoginScreen->setMainWidget(mMainLayout);
+	}
 }
 
 /**
@@ -429,7 +435,12 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 	int buttonSpacing = (int)((float)height * buttonSpacingRatio);
 
 	mServerIPLabel->setWidth(widgetWidth);
-	mServerIPLabel->setPosition(widgetLeft, labelSpacing);
+	int labelLeft = widgetLeft;
+	if(mOS.find("Windows", 0) >= 0)
+	{
+		labelLeft = (int)((float)screenWidth * MENU_LABEL_WINDOWS_PHONE_LEFT_RATIO);
+	}
+	mServerIPLabel->setPosition(labelLeft, labelSpacing);
 
 	mServerIPBox->setWidth(widgetWidth);
 	mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
