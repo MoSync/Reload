@@ -9,7 +9,7 @@ define([
 
         events: {
             'click button#submit': 'submit',
-            'click button#close': 'close',
+            'click button[data-dismiss]': 'close',
             'keypress input#workspace-path': 'captureKeys'
         },
 
@@ -23,14 +23,10 @@ define([
         },
 
         captureKeys: function (e) {
-            e.preventDefault();
-
-            if (e.keyCode !== 13) {
-                $('#workspace-path').val($('#workspace-path').val() + String.fromCharCode(e.keyCode));
-                return;
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                this.submit();
             }
-
-            this.submit();
         },
 
         submit: function () {
