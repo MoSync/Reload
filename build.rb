@@ -146,6 +146,7 @@ files_to_copy.each { |item|
 }
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Windows/* Build/#{time_stamp}/MoSync_Reload_Windows"
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"
+sh "cp -rf ReloadLauncher/Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"
 
 puts "creating final Mac Package"
 sh "hdiutil detach -force /Volumes/MoSync\\ Reload/"
