@@ -32,7 +32,7 @@ time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 
 #Write the version information to the file for use in the server  and client
 File.open("ReloadServer/build.dat", "w") do |file|
-  file.puts("MoSync Reload Version #{version}")
+  file.puts("#{version}")
   file.puts(time_stamp);
 end
 
