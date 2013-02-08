@@ -68,6 +68,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	createMenuLayout();
 	createBottomLayout();
 
+	mCurrentOrientation = orientation;
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
@@ -147,6 +148,7 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 	mMainLayout->setSize(screenWidth, screenHeight);
 	mBackground->setSize(screenWidth, screenHeight);
 
+	mCurrentOrientation = orientation;
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
@@ -505,6 +507,21 @@ int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top
 	int logoTop = (int)((float)height * logoTopRatio);
 	int infoTop = (int)((float)height * infoTopRatio);
 
+	// the mosync logo not positioned correctly at the left side of the screen on
+	// iPhone devices (on iPad, it was ok) so right now we need to set the width
+	// property depending on the orientation
+	if (mOS.find("iPhone") >= 0)
+	{
+		if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+				mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+		{
+			mMosynclogo->setWidth(logoWidth/2);
+		}
+		else
+		{
+			mMosynclogo->setWidth(logoWidth);
+		}
+	}
 	mMosynclogo->setHeight(logoHeight);
 	mMosynclogo->setPosition(logoLeft, top + logoTop);
 
