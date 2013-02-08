@@ -39,7 +39,7 @@ public:
 	 * @param newScreenHeight The new screen height after orientation has changed.
 	 * @param newScreenWidth The new screen width after oritentation has changed.
 	 */
-	virtual void orientationChanged(int newOrientation, int newScreenHeight, int newScreenWidth) = 0;
+	virtual void orientationChanged(int newOrientation, int newScreenWidth, int newScreenHeight) = 0;
 };
 
 

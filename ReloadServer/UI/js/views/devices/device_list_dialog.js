@@ -10,7 +10,7 @@ define([
 
         events: {
             'click button#submit': 'submit',
-            'click button#close': 'close'
+            'click button[data-dismiss]': 'close'
         },
 
         initialize: function (options) {
@@ -25,7 +25,6 @@ define([
         },
 
         close: function () {
-            console.log('close');
             var self = this;
 
             // Don't remove until transition is complete.
