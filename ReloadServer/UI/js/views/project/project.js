@@ -182,7 +182,7 @@ define([
             };
 
             options.error   = function (resp) {
-                console.log('could not remove project folder');
+                console.log('could not reload project folder');
                 console.log(resp);
             };
 

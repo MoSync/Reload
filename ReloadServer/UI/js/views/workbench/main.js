@@ -68,15 +68,18 @@ define([
                     self.model.doit(script);
                 }
             };
+
         },
 
         doit: function (e) {
-            e.preventDefault();
+            if (e) { e.preventDefault(); }
             if (this.editor.somethingSelected()) {
                 var script = this.editor.getSelection();
                 this.model.doit(script);
+                console.log('doit');
             }
         },
+
         saveData: function(instance, changeObj) {
             this.model.setData(this.editor.getValue());
         },
@@ -95,6 +98,17 @@ define([
                 }
             });
 
+            // Detect CTRL+r key combination.
+            this.keyHandler = function (e) {
+                console.log(e.which);
+                if(e.ctrlKey && e.which === 69) { // CTRL+E
+                    e.preventDefault();
+                    self.doit();
+                    return false;
+                }
+            };
+            $(document).keydown(this.keyHandler);
+
             setTimeout(function() {
                 self.editor.refresh();
                 self.editor.focus();
@@ -105,9 +119,12 @@ define([
 
         close: function () {
 
+            console.log('close workbench');
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();
+            // Unbind keydown event from document object.
+            $(document).unbind('keydown', this.keyHandler);
 
             //Remove view from DOM
             this.remove();

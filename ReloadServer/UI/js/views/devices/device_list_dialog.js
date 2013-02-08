@@ -17,7 +17,6 @@ define([
             _.bindAll(this, 'render', 'submit', 'close');
 
             this.devices = options.devices;
-            console.log(options.devices);
         },
 
         submit: function () {
