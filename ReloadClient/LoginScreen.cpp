@@ -58,7 +58,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);
 
-	mLoginScreen = new LoginScreenWidget();
+	mLoginScreen = new LoginScreenWidget(mOS);
 	mLoginScreen->addLoginScreenListener(this);
 
 	mMainLayout = new RelativeLayout();
