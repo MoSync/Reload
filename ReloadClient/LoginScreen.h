@@ -218,6 +218,8 @@ private:
 	ReloadClient *mReloadClient;
 
 	MAUtil::String mOS;
+
+	int mCurrentOrientation;
 };
 
 

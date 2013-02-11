@@ -68,6 +68,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	createMenuLayout();
 	createBottomLayout();
 
+	mCurrentOrientation = orientation;
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
@@ -139,11 +140,21 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 {
 	// on wp7 the layout changes look glitchy so we'll set the layout after all the
 	// repositioning has been done
-	mLoginScreen->setMainWidget(NULL);
+	if(mOS.find("Windows", 0) >= 0)
+	{
+	//	mLoginScreen->setMainWidget(NULL);
+	}
 
 	mMainLayout->setSize(screenWidth, screenHeight);
 	mBackground->setSize(screenWidth, screenHeight);
 
+	mCurrentOrientation = orientation;
+
+	// windows phone 7 orientation animation is glitchy - this is a small
+	// fix for the wp7 platform - when going from portrait to landscape, the
+	// repositioning is done from top to bottom but when going from landscape
+	// to portrait, all the elements are repositioned bottom-up in order
+	// to have a somehow smoother animation
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
@@ -173,20 +184,9 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 	}
 	else
 	{
-		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
-				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
-				LOGO_TOP_PORTRAIT_RATIO,
-				LOGO_WIDTH_PORTRAIT_RATIO);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
-				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
-				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
-				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
-				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
-				MENU_LABEL_SPACING_PORTRAIT_RATIO,
-				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
-				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
-				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
+		int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
+		int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
+
 		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
 				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
@@ -196,9 +196,25 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
 				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
 				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
+		positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
+				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
+				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
+				MENU_LABEL_SPACING_PORTRAIT_RATIO,
+				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
+		positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				LOGO_TOP_PORTRAIT_RATIO,
+				LOGO_WIDTH_PORTRAIT_RATIO);
 	}
 
-	mLoginScreen->setMainWidget(mMainLayout);
+	if(mOS.find("Windows", 0) >= 0)
+	{
+	//	mLoginScreen->setMainWidget(mMainLayout);
+	}
 }
 
 /**
@@ -429,36 +445,67 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 	int buttonSpacing = (int)((float)height * buttonSpacingRatio);
 
 	mServerIPLabel->setWidth(widgetWidth);
-	mServerIPLabel->setPosition(widgetLeft, labelSpacing);
+	int labelLeft = widgetLeft;
+	if(mOS.find("Windows", 0) >= 0)
+	{
+		labelLeft = (int)((float)screenWidth * MENU_LABEL_WINDOWS_PHONE_LEFT_RATIO);
+	}
 
 	mServerIPBox->setWidth(widgetWidth);
-	mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
 
 	mServerConnectButton->setWidth(widgetWidth);
 	mServerConnectButton->setHeight(buttonHeight);
-	mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
 
 	mConnectLayout->setWidth(screenWidth);
 	mConnectLayout->setHeight(height);
-	mConnectLayout->setPosition(0, top);
 
 	mConnectedToLabel->setWidth(widgetWidth);
-	mConnectedToLabel->setPosition(widgetLeft, labelSpacing);
 
 	mInstructionsLabel->setWidth(widgetWidth);
-	mInstructionsLabel->setPosition(widgetLeft, labelSpacing * 2 + labelHeight);
 
 	mServerDisconnectButton->setWidth(widgetWidth);
 	mServerDisconnectButton->setHeight(buttonHeight);
-	mServerDisconnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
 
 	mDisconnectLayout->setWidth(screenWidth);
 	mDisconnectLayout->setHeight(height);
-	mDisconnectLayout->setPosition(0, top);
 
 	mLoadLastAppButton->setWidth(widgetWidth);
 	mLoadLastAppButton->setHeight(buttonHeight);
-	mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+
+	// windows phone 7 orientation animation is glitchy - this is a small
+	// fix for the wp7 platform - when going from portrait to landscape, the
+	// repositioning is done from top to bottom but when going from landscape
+	// to portrait, all the elements are repositioned bottom-up in order
+	// to have a somehow smoother animation
+	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		mServerIPLabel->setPosition(labelLeft, labelSpacing);
+		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
+		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mConnectLayout->setPosition(0, top);
+
+		mInstructionsLabel->setPosition(widgetLeft, labelSpacing * 2 + labelHeight);
+		mServerDisconnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mConnectedToLabel->setPosition(widgetLeft, labelSpacing);
+		mDisconnectLayout->setPosition(0, top);
+
+		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+	}
+	else
+	{
+		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+
+		mDisconnectLayout->setPosition(0, top);
+		mConnectedToLabel->setPosition(widgetLeft, labelSpacing);
+		mServerDisconnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mInstructionsLabel->setPosition(widgetLeft, labelSpacing * 2 + labelHeight);
+
+		mConnectLayout->setPosition(0, top);
+		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
+		mServerIPLabel->setPosition(labelLeft, labelSpacing);
+	}
 
 	return top + height;
 }
@@ -494,6 +541,21 @@ int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top
 	int logoTop = (int)((float)height * logoTopRatio);
 	int infoTop = (int)((float)height * infoTopRatio);
 
+	// the mosync logo not positioned correctly at the left side of the screen on
+	// iPhone devices (on iPad, it was ok) so right now we need to set the width
+	// property depending on the orientation
+	if (mOS.find("iPhone") >= 0)
+	{
+		if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+				mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+		{
+			mMosynclogo->setWidth(logoWidth/2);
+		}
+		else
+		{
+			mMosynclogo->setWidth(logoWidth);
+		}
+	}
 	mMosynclogo->setHeight(logoHeight);
 	mMosynclogo->setPosition(logoLeft, top + logoTop);
 
