@@ -89,6 +89,7 @@ create = function(port) {
 
     });
 
+    vars.methods.startWebUI();
     console.log('Server started listening on port: ' + port);
 };
 

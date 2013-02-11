@@ -156,6 +156,29 @@ var methods = {
 		});
         
     },
+
+    startWebUI: function () {
+        var exec = require('child_process').exec,
+            command = "";
+        function puts(error, stdout, stderr) {
+            console.log("stdout: " + stdout);
+            console.log("stderr: " + stderr);
+            console.log("error: " + error);
+        }
+
+        if((globals.localPlatform.indexOf("darwin") >= 0)) {
+
+            command = "open http://localhost:8283";
+        }
+        else {
+
+            command = "start http://localhost:8283";
+        }
+
+        exec(command, puts);
+
+        return;
+    },
 };
 
 var MsgDispatcher = function() {
