@@ -140,10 +140,6 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 {
 	// on wp7 the layout changes look glitchy so we'll set the layout after all the
 	// repositioning has been done
-	if(mOS.find("Windows", 0) >= 0)
-	{
-	//	mLoginScreen->setMainWidget(NULL);
-	}
 
 	mMainLayout->setSize(screenWidth, screenHeight);
 	mBackground->setSize(screenWidth, screenHeight);
@@ -209,11 +205,6 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight, MAUtil:
 				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				LOGO_TOP_PORTRAIT_RATIO,
 				LOGO_WIDTH_PORTRAIT_RATIO);
-	}
-
-	if(mOS.find("Windows", 0) >= 0)
-	{
-	//	mLoginScreen->setMainWidget(mMainLayout);
 	}
 }
 
@@ -659,5 +650,16 @@ void LoginScreen::defaultAddress(const char *serverAddress)
  */
 void LoginScreen::orientationChanged(int newOrientation, int newScreenWidth, int newScreenHeight)
 {
+	// on wp7 the screen size on landscape has the same values as portrait
+	// so we need to swap those values
+	if ((newOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+			newOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
+			mOS.find("Windows", 0) >= 0)
+	{
+		int aux = newScreenWidth;
+		newScreenWidth = newScreenHeight;
+		newScreenHeight = aux;
+	}
+
 	rebuildScreenLayout(newScreenWidth, newScreenHeight, mOS, newOrientation);
 }
