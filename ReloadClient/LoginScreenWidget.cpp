@@ -68,14 +68,6 @@ void LoginScreenWidget::orientationDidChange()
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);
 
-	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
-			orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
-	{
-		int aux = screenWidth;
-		screenWidth = screenHeight;
-		screenHeight = aux;
-	}
-
 	// announce the screen listeners if the orientation has changed
 	for (int i = 0; i < mLoginScreenListeners.size(); i++)
 	{
