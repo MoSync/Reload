@@ -17,6 +17,7 @@ define([
             _.bindAll(this, 'render', 'submit', 'close');
 
             this.devices = options.devices;
+            console.log(options.devices);
         },
 
         submit: function () {
@@ -39,6 +40,7 @@ define([
             var data = {};
             var devices = $('<div>');
             _(this.devices).each(function(d){
+                data.address    = d.address;
                 data.platform   = d.platform;
                 data.name       = d.name;
                 data.uuid       = d.uuid;
