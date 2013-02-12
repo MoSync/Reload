@@ -41,8 +41,9 @@ class LoginScreenWidget:
 public:
 	/**
 	 * Constructor.
+	 * @param os The current os.
 	 */
-	LoginScreenWidget();
+	LoginScreenWidget(MAUtil::String os);
 
 	/**
 	 * Destructor.
@@ -77,6 +78,11 @@ private:
 	 * Array with login screen listeners.
 	 */
 	MAUtil::Vector<LoginScreenListener*> mLoginScreenListeners;
+
+	/**
+	 * The current os.
+	 */
+	MAUtil::String mOS;
 };
 
 #endif /* LOGINSCREENWIDGET_H_ */
