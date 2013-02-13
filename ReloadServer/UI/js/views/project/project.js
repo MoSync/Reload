@@ -211,6 +211,12 @@ define([
         },
 
         removeProject: function () {
+            var c = confirm('Are you sure you want to delete ' +
+                            this.model.get('name') + ' ?');
+            if (!c) {
+                return;
+            }
+
             var options     = {};
             options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
