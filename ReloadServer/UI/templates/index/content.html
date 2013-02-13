@@ -15,7 +15,7 @@
             <a target="_blank" href="http://www.mosync.com/content/using-mosync-reload">Guides & Tutorials</a>
             </li>
             <li>
-            <a target="_blank" href="http://www.mosync.com/mobile-development-forums/technologies/mosync-reload">Discusscion forum</a>
+            <a target="_blank" href="http://www.mosync.com/mobile-development-forums/technologies/mosync-reload">Discussion forum</a>
             </li>
             <li>
             <a data-target-tab="docs" href="/#/docs">Wormhole API Reference</a>
@@ -24,7 +24,7 @@
     </div>
 </div>
     <div class="row-fluid">
-        <h3>Connecting a Device</h3>
+        <h3>Connecting to a Device</h3>
     </div>
     <div class="row-fluid">
         <div class="span3">
@@ -33,9 +33,8 @@
                     <span class="capital">1.</span>
                 </div>
                 <div class="span10">
-                    Get the Reload Client and install it on your
-                    device/emulator (full instructions
-                    <a target="_blank" href="http://www.mosync.com/documentation/manualpages/installing-mosync-reload">here</a>).
+                    <a target="_blank" href="http://www.mosync.com/documentation/manualpages/installing-mosync-reload">Install the Reload Client</a> on your
+                    device/emulator.
                 </div>
             </div>
         </div>
@@ -45,7 +44,7 @@
                     <span class="capital">2.</span>
                 </div>
                 <div class="span10">
-                    Start the Reload Client on the device/emulator.
+                    Launch the Reload Client on the device/emulator.
                 </div>
             </div>
         </div>
@@ -69,7 +68,7 @@
                 </div>
                 <div class="span10">
                     In the Reload Client, click <strong>Connect</strong>.
-                    (When connected, the client details will be shown below, left.)
+                    (Connected clients are shown in the bottom left panel.)
                 </div>
             </div>
         </div>
@@ -85,7 +84,8 @@
                     <span class="capital">1.</span>
                 </div>
                 <div class="span10">
-                    Click ”New Project”.
+                    Click the <button class="btn btn-mini">New
+                        Project</button> button.<br />
                 </div>
             </div>
         </div>
@@ -114,7 +114,8 @@
                     <span class="capital">3.</span>
                 </div>
                 <div class="span10">
-                    Name your project (lowercase, alphanumeric characters and underscores only, no spaces).
+                    Name your project (lowercase, alphanumeric characters
+                    and underscores only, no spaces).
                 </div>
             </div>
         </div>
@@ -124,8 +125,10 @@
                     <span class="capital">4.</span>
                 </div>
                 <div class="span10">
-                    Click <strong>Create Project</strong>.<br />
-                    Your project will be created with the needed HTML, CSS and JavaScript files.
+                    Click the <button class="btn btn-mini
+                        btn-primary">Create Project</button> button.
+                    (Your project will be created with the needed HTML,
+                    CSS and JavaScript files.)
                 </div>
             </div>
         </div>
@@ -161,7 +164,9 @@
                     <span class="capital">3.</span>
                 </div>
                 <div class="span10">
-                    Edit the HTML, JavaScript and CSS files, as desired, and save your changes.
+                    Open the files you wish to edit in your favourite editor.
+                    (To get started, edit <strong>index.html</strong>, make some changes,
+                    save and Reload to see the result.)
                 </div>
             </div>
         </div>
@@ -186,14 +191,15 @@
                     <span class="capital">2.</span>
                 </div>
                 <div class="span10">
-                    Click the Reload button.<br />
+                    Click the <button class="btn btn-primary
+                        btn-mini">Reload</button> button.<br />
                     Your project will be loaded/reloaded on the device/emulator and executed.
                 </div>
             </div>
         </div>
     </div>
     <div class="row-fluid">
-        <h3>Debugging Using mosync.rlog</h3>
+        <h3>Debugging with weinre (WebKit browsers only)</h3>
     </div>
     <div class="row-fluid">
         <div class="span3">
@@ -202,9 +208,8 @@
                     <span class="capital">1.</span>
                 </div>
                 <div class="span10">
-                    Add <strong>rlog</strong> statements to your JavaScript code, for example:
-                    <code>mosync.rlog("Hello World");</code><br />
-                    (<a target="_blank" href="http://www.mosync.com/documentation/manualpages/debugging-javascript-rlog">Tutorial</a>)
+                    Highlight the project’s name.<br />
+                    (Note that winre works only in WebKit browsers like Google Chrome or Apple Safari.)
                 </div>
             </div>
         </div>
@@ -214,7 +219,10 @@
                     <span class="capital">2.</span>
                 </div>
                 <div class="span10">
-                    Click the <strong>Reload</strong> button.
+                    Click the <button class="btn
+                        btn-mini">Debug</button> button.<br />
+                    Your project will be loaded/reloaded on the
+                    device/emulator and executed in debug mode.
                 </div>
             </div>
         </div>
@@ -224,8 +232,105 @@
                     <span class="capital">3.</span>
                 </div>
                 <div class="span10">
-                    As your code executes, the rlog output will be displayed
-                    here on the <a data-target-tab="log" href="#/log">Log</a> tab.
+                    Go to the <a href="/#/debug">Debug</a> tab.
+                    <strong>Note:</strong> If you move to other tabs in Reload,
+                    winre disconnects, and you need to select the device in
+                    the <strong>Targets</strong> list again to enable winre.
+                </div>
+            </div>
+        </div>
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">4.</span>
+                </div>
+                <div class="span10">
+                    Use winre tools such as the DOM element inspector
+                    and console log to debug your app.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <h3>Using the Workbench</h3>
+    </div>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">1.</span>
+                </div>
+                <div class="span10">
+                    Select the <a href="/#/workbench">Workbench</a> tab.
+                </div>
+            </div>
+        </div>
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">2.</span>
+                </div>
+                <div class="span10">
+                    In the Workbench editor, you can evaluate JavaScript by
+                    <ul>
+                        <li>typing some JavaScript code</li>
+                        <li>selecting the code you wish to run</li>
+                        <li>clicking <i class="icon-play"></i> <strong>Run selected code</strong>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">3.</span>
+                </div>
+                <div class="span10">
+                    Output from <code>mosync.rlog</code> and any debug
+                    information will appear in the <a href="/#/log">Log</a> tab.
+                    If you select a JavaScript
+                    expression that returns a value, it will be shown in the Log tab
+                    (return values of type "undefined" are not displayed).
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <h3>Using mosync.rlog</h3>
+    </div>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">1.</span>
+                </div>
+                <div class="span10">
+                    To display log messages, add <strong>mosync.rlog</strong> statements to your
+                    JavaScript code, for example:
+                    <code>mosync.rlog("Hello World");</code><br />
+                    (For further details, read the <a target="_blank" href="http://www.mosync.com/documentation/manualpages/debugging-javascript-rlog">tutorial</a>.)
+                </div>
+            </div>
+        </div>
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">2.</span>
+                </div>
+                <div class="span10">
+                    Reaload your app by clicking the <button class="btn btn-primary
+                        btn-mini">Reload</button> button.<br />
+                </div>
+            </div>
+        </div>
+        <div class="span3">
+            <div class="row-fluid">
+                <div class="span2">
+                    <span class="capital">3.</span>
+                </div>
+                <div class="span10">
+                    As your code executes, the mosync.rlog output will be displayed
+                    under the <a data-target-tab="log" href="#/log">Log</a> tab.
                 </div>
             </div>
         </div>

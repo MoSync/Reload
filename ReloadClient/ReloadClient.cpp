@@ -160,7 +160,7 @@ ReloadClient::ReloadClient()
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
 
-	//setScreenOrientation(); // Turned off. Use JS to set screen orientation.
+	setScreenOrientation();
 	initializeWebView();
 	initializeVariables();
 	initializeFiles();
@@ -178,15 +178,34 @@ ReloadClient::~ReloadClient()
 
 void ReloadClient::setScreenOrientation()
 {
-	// Android and Windows Phone.
-	maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
+	char buffer[64];
+	maGetSystemProperty(
+		"mosync.device.OS",
+		buffer,
+		64);
+	MAUtil::String os = buffer;
 
-	// iOS and Windows Phone.
-	maScreenSetSupportedOrientations(
-		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
-		MA_SCREEN_ORIENTATION_PORTRAIT |
-		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	// Android orientation events not implemented.
+	if(os.find("Android", 0) < 0)
+	{
+		// Android and Windows Phone.
+		maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
+
+		// iOS and Windows Phone.
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
+			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	}
+	else
+	{
+		maScreenSetOrientation(SCREEN_ORIENTATION_PORTRAIT);
+
+		maScreenSetSupportedOrientations(
+			MA_SCREEN_ORIENTATION_PORTRAIT |
+			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+	}
 }
 
 void ReloadClient::initializeWebView()
@@ -270,7 +289,8 @@ void ReloadClient::createScreens()
 {
 	// Create login screen and loading screen.
 	mLoginScreen = new LoginScreen(this);
-	mLoginScreen->initializeScreen(mOS);
+	int orientation = maScreenGetCurrentOrientation();
+	mLoginScreen->initializeScreen(mOS, orientation);
 	mLoadingScreen = new LoadingScreen(this);
 	mLoadingScreen->initializeScreen(mOS);
 
@@ -640,6 +660,12 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 		maPanic(0, "RELOAD: downloadBundle file size is invalid");
 	}
 
+	// If there is an ongoing download, then cancel it.
+	if (mDownloadHandler.isDownloading())
+	{
+		mDownloadHandler.cancelDownload();
+	}
+
 	// Create download request.
 	MAUtil::String jsonRequest("{"
 		"\"method\":\"client.getBundle\","
@@ -663,6 +689,7 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 	// Save the file size so that we can verify the download.
 	mBundleSize = fileSize;
 
+	// Start the download.
 	int result = mDownloadHandler.startDownload(url.c_str());
 	if (result > 0)
 	{
@@ -705,21 +732,12 @@ void ReloadClient::downloadHTML()
 
 void ReloadClient::evaluateScript(const String& script)
 {
-
 	String url = "javascript:";
 	url += "try{var res=eval(unescape('";
 	url += script;
 	url += "'));";
-	url += "mosync.rlog('javascript:'+JSON.stringify(res))}";
-	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
-/*
-	String url = "javascript:";
-	url += "try{var res=eval(unescape('";
-	url += script;
-	url += "'));";
-	url += "}";
-	url += "catch(err){mosync.rlog('javascript:'+JSON.stringify(err))}";
-*/
+	url += "if (typeof res!=='undefined'){mosync.rlog('javascript:'+JSON.stringify(res))}}";
+	url += "catch(err){mosync.rlog('javascript:'+err)}";
 	getWebView()->openURL(url);
 }
 
@@ -752,8 +770,8 @@ void ReloadClient::launchSavedApp()
 	getWebView()->setVisible(true);
 	showWebView();
 	String baseURL = "file://" + fullAppPath;
-	//getWebView()->setBaseUrl(baseURL);
-	getWebView()->openURL(baseURL + "index.html");
+	getWebView()->setBaseUrl(baseURL);
+	getWebView()->openURL("index.html");
 
 	// Set status variables.
 	mHasPage = true;
@@ -898,5 +916,5 @@ void ReloadClient::showConnectionErrorMessage(int errorCode)
 
 	LOG("@@@ RELOAD: showConnectionErrorMessage: %s", errorMessage.c_str());
 
-	maAlert("Network Status:", errorMessage.c_str(), "OK", NULL, NULL);
+	maAlert("Network Status", errorMessage.c_str(), "OK", NULL, NULL);
 }

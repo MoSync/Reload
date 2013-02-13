@@ -118,6 +118,8 @@ var create = function (port) {
 
     function generateDeviceInfoListJSON() {
 
+        console.log('--- tcp_server.js: generateDeviceInfoListJSON() ---');
+        console.log(vars.globals.clientList);
         var infoListJSON = [];
 
         vars.globals.clientList.forEach(function(c){
@@ -192,7 +194,7 @@ var create = function (port) {
                 var md = vars.MsgDispatcher;
                 md.dispatch({
                     target: 'log',
-                    msg: unescape(unescape(message.params))
+                    msg: unescape(unescape(message.params)).replace("\n","</br>")
                 });
             }
         }

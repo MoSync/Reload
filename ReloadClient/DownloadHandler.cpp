@@ -53,6 +53,11 @@ void DownloadHandler::addDownloadListener(DownloadListener* listener)
 	mDownloader.addDownloadListener(listener);
 }
 
+bool DownloadHandler::isDownloading()
+{
+	return mDownloader.isDownloading();
+}
+
 int DownloadHandler::startDownload(const char* url)
 {
 	// Do not start if there already is a download in progress.
@@ -66,9 +71,9 @@ int DownloadHandler::startDownload(const char* url)
 	return result;
 }
 
-void DownloadHandler::cancelDownload()
+int DownloadHandler::cancelDownload()
 {
-	mDownloader.cancelDownloading();
+	return mDownloader.cancelDownloading();
 }
 
 // ========== DownloadListener protocol ==========

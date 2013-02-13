@@ -10,7 +10,8 @@ define([
 
         events: {
             'click button#submit': 'submit',
-            'click button#close': 'close'
+            'click button[data-dismiss]': 'close',
+            'keypress input#project-name': 'captureKeys'
         },
 
         initialize: function (options) {
@@ -24,9 +25,15 @@ define([
             this.projectList = options.projectList;
         },
 
+        captureKeys: function (e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                this.submit();
+            }
+        },
+
         submit: function () {
 
-            console.log('hej');
             var errors = [];
             var type = 'web';
             var rdolist = document.getElementsByName("projectType");

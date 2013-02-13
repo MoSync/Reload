@@ -9,7 +9,8 @@ define([
 
         events: {
             'click button#submit': 'submit',
-            'click button#close': 'close'
+            'click button[data-dismiss]': 'close',
+            'keypress input#workspace-path': 'captureKeys'
         },
 
         initialize: function (options) {
@@ -19,6 +20,13 @@ define([
 
             var compiledTemplate = _.template( dialogTemplate, { path: this.projectList.path } );
             this.$el = $(compiledTemplate);
+        },
+
+        captureKeys: function (e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                this.submit();
+            }
         },
 
         submit: function () {
