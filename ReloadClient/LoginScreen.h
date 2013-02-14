@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -16,139 +16,215 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
- * @file LoginScreen.h
+
+/*
+ * LoginScreen.h
  *
- *  Created on: Feb 27, 2012
- *      Author: Iraklis Rossis
+ *  Created on: Feb 4, 2013
+ *      Author: Spiridon Alexandru
  */
 
 #ifndef LOGINSCREEN_H_
 #define LOGINSCREEN_H_
 
-#include "LoginScreenWidget.h"
+#include <NativeUI/Widgets.h>
+
 #include "ReloadUIListener.h"
 
-class ReloadClient;
-class ReloadTabScreen;
-class ConnectionScreen;
-class WorkspaceScreen;
+using namespace MAUtil;
+using namespace NativeUI;
 
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
-
-class LoginScreen : public ReloadUIListener
+class LoginScreen:
+	public Screen, ButtonListener, EditBoxListener
 {
 public:
 	/**
 	 * Constructor.
-	 * @param client The ReloadClient that will handle all the reload business logic.
+	 * @param os The current os.
 	 */
-	LoginScreen(ReloadClient *client);
+	LoginScreen(MAUtil::String os, int orientation);
 
+	/**
+	 * Destructor.
+	 */
 	~LoginScreen();
 
 	/**
+	 * Sets the default IP address of the server.
+	 * @param ipAddress The server IP default address.
+	 */
+	void setDefaultIPAddress(const char *ipAddress);
+
+	/**
+	 * Add a reload UI event listener.
+	 * @param listener The listener that will receive reload UI events.
+	 */
+	void addReloadUIListener(ReloadUIListener* listener);
+
+	/**
+	 * Remove a reload UI listener.
+	 * @param listener The listener that receives reload UI events.
+	 */
+	void removeReloadUIListener(ReloadUIListener* listener);
+
+private:
+	/**
 	 * Creates the screen, the layouts, the widgets and positions everything.
-	 * @param os A string containing the current os.
-	 * @param orientation One of the values:
-	 * 		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
-	 * 		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
-	 * 		MA_SCREEN_ORIENTATION_PORTRAIT
-	 * 		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
 	 */
-	void initializeScreen(MAUtil::String &os, int orientation);
+	void initializeScreen();
 
 	/**
-	 * Called when the client has connected to the server.
-	 * @param serverAddress The server IP address.
+	 * Creates and adds the background image to the main layout.
+	 * @param screenWidth Used to set the background image width.
+	 * @param screenHeight Used to set the background image height.
 	 */
-	void connectedTo(const char *serverAddress);
+	void createBackgroundImage(int screenWidth, int screenHeight);
 
 	/**
-	 * Called when the client has disconnected from the server.
+	 * Creates the upper layout of the main screen (that contains the Reload logo)
+	 * and adds it to the main layout.
 	 */
-	void disconnected();
+	void createLogoLayout();
 
 	/**
-	 * Show the login screen in the connected state
-	 * with the "connected" controls visible.
+	 * Creates the middle layout of the main screen (that contains the menu)
+	 * and adds it to the main layout.
 	 */
-	void showConnectedScreen();
+	void createMenuLayout();
 
 	/**
-	 * Show the login screen in the not connected state.
+	 * Creates the connected layout and adds it to the menu layout.
 	 */
-	void showNotConnectedScreen();
+	void createConnectedLayout();
 
 	/**
-	 * Sets the default address (will appear inside the connect EditBox).
-	 * @param serverAddress The default server address.
+	 * Creates and adds the bottom layout (that contains the MoSync logo
+	 * and the info button) to the main layout.
 	 */
-	void defaultAddress(const char *serverAddress);
+	void createBottomLayout();
 
 	/**
-	 * Called when the connect button is clicked.
-	 * @param address The address contained by the connect EditBox.
+	 * Positions the upper layout (containing the Reload logo) on the main layout.
+	 * @param screenWidth The device screen width.
+	 * @param screenHeight The device screen height.
+	 * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+	 * @param logoTopRatio The logo top ratio (based on the layout height).
+	 * @param logoWidthRatio The logo width ratio (based on the layout width).
+	 * @return Returns the lower x coordinate of the layout after positioning.
 	 */
-	virtual void connectButtonClicked(String address);
+	int positionLogoLayout(int screenWidth, int screenHeight,
+			float screenRatio, float logoTopRatio, float logoWidthRatio);
 
 	/**
-	 * Called when the disconnect button is clicked.
+	 * Positions the menu layout on the main layout.
+	 * @param screenWidth The device screen width.
+	 * @param screenHeight The device screen height.
+	 * @param top The top position of the layout.
+	 * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+	 * @param widgetWidthRatio The menu widget width ratio (based on the layout width).
+	 * @param widgetLeftRatio The menu widget left ratio (based on the layout width).
+	 * @param labelHeightRatio The label height ratio (based on the layout height).
+	 * @param labelSpacingRatio The label spacing ratio (based on the layout height).
+	 * @param editBoxHeightRatio The ip edit box height ratio (based on the layout height).
+	 * @param buttonHeightRatio The button height ratio (based on the layout height).
+	 * @param buttonSpacingRatio The button spacing ratio (based on the layout height).
+	 * @return Returns the lower x coordinate of the layout after positioning.
 	 */
-	virtual void disconnectButtonClicked();
+	int positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+			float widgetWidthRatio, float widgetLeftRatio,
+			float labelHeightRatio, float labelSpacingRatio,
+			float editBoxHeightRatio, float buttonHeightRatio, float buttonSpacingRatio);
 
 	/**
-	 * Called when the reload last app button is clicked.
+	 * Positions the bottom layout (that contains the MoSync logo and the info button)
+	 * on the main layout.
+	 * @param screenWidth The device screen width.
+	 * @param screenHeight The device screen height.
+	 * @param top The top position of the layout.
+	 * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+	 * @param logoWidthRatio The logo height ratio (based on the layout height).
+	 * @param logoHeightRatio The logo width ratio (based on the layout width).
+	 * @param logoLeftRatio The logo left ratio (based on the layout width).
+	 * @param logoTopRatio The logo top ratio (based on the layout height).
+	 * @param infoWidthRatio The info button width ratio (based on the layout width).
+	 * @param infoLeftRatio The info button left ratio (based on the layout width).
+	 * @param infoTopRatio The logo top ratio (based on the layout height).
+	 * @return Returns the lower x coordinate of the layout after positioning.
 	 */
-	virtual void reloadLastAppButtonClicked();
+	int positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+			float logoWidthRatio, float logoHeightRatio, float logoLeftRatio, float logoTopRatio,
+			float infoWidthRatio, float infoLeftRatio, float infoTopRatio);
 
 	/**
-	 * Called when the info button is clicked.
+	 * Repositions all the screen widgets/layouts.
+	 * @param screenWidth The current screen width.
+	 * @param screenHeight The current screen height.
 	 */
-	virtual void infoButtonClicked();
+	void rebuildScreenLayout(int screenWidth, int screenHeight);
+
+	/**
+	 * Called by the system when the user clicks a button
+	 * @param button The button that was clicked
+	 */
+	void buttonClicked(Widget *button);
+
+	/**
+	 * On iOS, it's called when the return button is clicked on
+	 * a virtual keyboard
+	 * @param editBox The editbox using the virtual keyboard
+	 */
+	void editBoxReturn(EditBox* editBox);
+
+	/**
+	 * Called just before the screen begins rotating.
+	 */
+	virtual void orientationWillChange();
+
+	/**
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
+	 */
+	virtual void orientationDidChange();
 
 private:
 	/**
-	 * Shows or hides the reload tab screen (containing the connection screen and the
-	 * workspace screen).
-	 * @param show If true, the reload tab screen is pushed into the main stack screen and poped
-	 * 	otherwise.
+	 * Array with login screen listeners.
 	 */
-	void showTabScreen(bool show);
-
-private:
-	/**
-	 * The ReloadClient the handles the business logic of tha application.
-	 */
-	ReloadClient *mReloadClient;
+	MAUtil::Vector<ReloadUIListener*> mReloadUIListeners;
 
 	/**
-	 * A string containing the current operating system.
+	 * The current os.
 	 */
-	String mOS;
+	MAUtil::String mOS;
 
 	/**
-	 * The login screen containing the connection options and the reload last app option.
+	 * The current screen orientation.
 	 */
-	LoginScreenWidget *mLoginScreen;
+	int mCurrentOrientation;
 
 	/**
-	 * The main application tab screen, containing the ConnectionScreen and the WorkspaceScreen
+	 * The TextWidgets declared here are instantiated as either
+	 * Buttons or ImageButtons depending on the platform
 	 */
-	ReloadTabScreen *mReloadTabScreen;
+	TextWidget *mServerConnectButton;
 
-	/**
-	 * The connected screen, containing options for reloading last app and
-	 * for disconnecting from the server.
-	 */
-	ConnectionScreen *mConnectionScreen;
+	TextWidget *mLoadLastAppButton;
 
-	/**
-	 * The workspace screen, containing a list with the workspace projects.
-	 */
-	WorkspaceScreen *mWorkspaceScreen;
+	ImageButton *mInfoIcon;
+
+	EditBox *mServerIPBox;
+
+	RelativeLayout *mConnectLayout;
+
+	Label *mServerIPLabel;
+
+	Image* mLogo;
+
+	Image* mMosynclogo;
+
+	Image *mBackground;
+
+	RelativeLayout* mMainLayout;
 };
-
 
 #endif /* LOGINSCREEN_H_ */

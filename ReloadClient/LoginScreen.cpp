@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -16,174 +16,612 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
- * @file LoginScreen.cpp
+/*
+ * LoginScreen.cpp
  *
- *  Created on: Feb 27, 2012
- *      Author: Iraklis Rossis
+ *  Created on: Feb 4, 2013
+ *      Author: Spiridon Alexandru
  */
 
-#include "ReloadClient.h"
 #include "LoginScreen.h"
-#include "MainStackScreen.h"
-#include "ReloadTabScreen.h"
-#include "ConnectionScreen.h"
-#include "WorkspaceScreen.h"
+#include "LoginScreenUtils.h"
+#include "MAHeaders.h"
 
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
+#define ORIENTATION_PORTRAIT "Portrait"
+#define ORIENTATION_PORTRAIT_UPSIDE_DOWN "Portrait upside down"
+#define ORIENTATION_LANDSCAPE_LEFT "Landscape left"
+#define ORIENTATION_LANDSCAPE_RIGHT "Landscape right"
+
+using namespace MAUtil;
+using namespace NativeUI;
 
 /**
  * Constructor.
- * @param client The ReloadClient that will handle all the reload business logic.
+ * @param os The current os.
  */
-LoginScreen::LoginScreen(ReloadClient *client) :
-		mLoginScreen(NULL),
-		mReloadTabScreen(NULL),
-		mConnectionScreen(NULL),
-		mWorkspaceScreen(NULL)
+LoginScreen::LoginScreen(MAUtil::String os, int orientation):
+	Screen()
 {
-	mReloadClient = client;
+	this->mOS = os;
+	this->mCurrentOrientation = orientation;
+
+	initializeScreen();
 }
 
+/**
+ * Destructor.
+ */
 LoginScreen::~LoginScreen()
 {
-	mLoginScreen->removeReloadUIListener(this);
+	mReloadUIListeners.clear();
+}
+
+/**
+ * Sets the default IP address of the server.
+ * @param ipAddress The server IP default address.
+ */
+void LoginScreen::setDefaultIPAddress(const char *serverAddress)
+{
+	mServerIPBox->setText(serverAddress);
 }
 
 /**
  * Creates the screen, the layouts, the widgets and positions everything.
- * @param os A string containing the current os.
- * @param orientation One of the values:
- * 		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
- * 		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
- * 		MA_SCREEN_ORIENTATION_PORTRAIT
- * 		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
  */
-void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
+void LoginScreen::initializeScreen()
 {
-	mOS = os;
+	maScreenSetFullscreen(1);
+	MAExtent ex = maGetScrSize();
+	int screenWidth = EXTENT_X(ex);
+	int screenHeight = EXTENT_Y(ex);
 
-	mLoginScreen = new LoginScreenWidget(os, orientation);
-	mLoginScreen->addReloadUIListener(this);
+	mMainLayout = new RelativeLayout();
 
-	MainStackScreen::getInstance()->push(mLoginScreen);
-	MainStackScreen::getInstance()->show();
-}
+	createBackgroundImage(screenWidth, screenHeight);
+	createLogoLayout();
+	createMenuLayout();
+	createBottomLayout();
 
-/**
- * Called when the client has connected to the server.
- * @param serverAddress The server IP address.
- */
-void LoginScreen::connectedTo(const char *serverAddress)
-{
-	//Success, show the disconnect controls
-	String conTo = "Connected to: ";
-	conTo += serverAddress;
-
-	showTabScreen(true);
-	mConnectionScreen->fillConnectionData(conTo.c_str());
-}
-
-/**
- * Called when the client has disconnected from the server.
- */
-void LoginScreen::disconnected()
-{
-	showTabScreen(false);
-}
-
-/**
- * Show the login screen in the connected state
- * with the "connected" controls visible.
- */
-void LoginScreen::showConnectedScreen()
-{
-	showTabScreen(true);
-}
-
-/**
- * Show the login screen in the not connected state.
- */
-void LoginScreen::showNotConnectedScreen()
-{
-	showTabScreen(false);
-}
-
-/**
- * Sets the default address (will appear inside the connect EditBox).
- * @param serverAddress The default server address.
- */
-void LoginScreen::defaultAddress(const char *serverAddress)
-{
-	mLoginScreen->setDefaultIPAddress(serverAddress);
-}
-
-/**
- * Shows or hides the reload tab screen (containing the connection screen and the
- * workspace screen).
- * @param show If true, the reload tab screen is pushed into the main stack screen and poped
- * 	otherwise.
- */
-void LoginScreen::showTabScreen(bool show)
-{
-	if (show)
+	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+		mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
-		if (mReloadTabScreen == NULL)
-		{
-			mReloadTabScreen = new ReloadTabScreen();
+		mMainLayout->setSize(screenHeight, screenWidth);
+		mBackground->setSize(screenHeight, screenWidth);
 
-			int orientation = maScreenGetCurrentOrientation();
-			mConnectionScreen = new ConnectionScreen(mOS, orientation);
-			mConnectionScreen->setTitle("Reload");
-			mConnectionScreen->addReloadUIListener(this);
-
-			mReloadTabScreen->addTab(mConnectionScreen);
-
-			mWorkspaceScreen = new WorkspaceScreen();
-			mWorkspaceScreen->setTitle("Workspace");
-			mReloadTabScreen->addTab(mWorkspaceScreen);
-		}
-
-		MainStackScreen::getInstance()->push(mReloadTabScreen);
+		// the reload logo layout will represent 30% of the screen
+		int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
+				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				LOGO_TOP_LANDSCAPE_RATIO,
+				LOGO_WIDTH_LANDSCAPE_RATIO);
+		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY,
+				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
+				MENU_WIDGET_LEFT_LANDSCAPE_RATIO,
+				MENU_LABEL_HEIGHT_LANDSCAPE_RATIO,
+				MENU_LABEL_SPACING_LANDSCAPE_RATIO,
+				MENU_EDIT_BOX_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_SPACING_LANDSCAPE_RATIO);
+		positionBottomLayout(screenHeight, screenWidth, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_TOP_LANDSCAPE_RATIO,
+				BOTTOM_INFO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_INFO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);
 	}
 	else
 	{
-		MainStackScreen::getInstance()->pop();
+		mMainLayout->setSize(screenWidth, screenHeight);
+		mBackground->setSize(screenWidth, screenHeight);
+
+		// the reload logo layout will represent 30% of the screen
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				LOGO_TOP_PORTRAIT_RATIO,
+				LOGO_WIDTH_PORTRAIT_RATIO);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
+				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
+				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
+				MENU_LABEL_SPACING_PORTRAIT_RATIO,
+				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_TOP_PORTRAIT_RATIO,
+				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
+	}
+
+	mMainLayout->addChild(mLoadLastAppButton);
+	mMainLayout->addChild(mMosynclogo);
+	mMainLayout->addChild(mInfoIcon);
+
+	this->setMainWidget(mMainLayout);
+}
+
+/**
+ * Repositions all the screen widgets/layouts.
+ * @param screenWidth The current screen width.
+ * @param screenHeight The current screen height.
+ */
+void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
+{
+	mMainLayout->setSize(screenWidth, screenHeight);
+	mBackground->setSize(screenWidth, screenHeight);
+
+	// windows phone 7 orientation animation is glitchy - this is a small
+	// fix for the wp7 platform - when going from portrait to landscape, the
+	// repositioning is done from top to bottom but when going from landscape
+	// to portrait, all the elements are repositioned bottom-up in order
+	// to have a somehow smoother animation
+	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		// the reload logo layout will represent 30% of the screen
+		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				LOGO_TOP_LANDSCAPE_RATIO,
+				LOGO_WIDTH_LANDSCAPE_RATIO);
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
+				MENU_WIDGET_LEFT_LANDSCAPE_RATIO,
+				MENU_LABEL_HEIGHT_LANDSCAPE_RATIO,
+				MENU_LABEL_SPACING_LANDSCAPE_RATIO,
+				MENU_EDIT_BOX_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO,
+				MENU_BUTTON_SPACING_LANDSCAPE_RATIO);
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_HEIGHT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_LOGO_TOP_LANDSCAPE_RATIO,
+				BOTTOM_INFO_WIDTH_LANDSCAPE_RATIO,
+				BOTTOM_INFO_LEFT_LANDSCAPE_RATIO,
+				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);
+	}
+	else
+	{
+		int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
+		int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
+
+		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_LOGO_TOP_PORTRAIT_RATIO,
+				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
+				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
+				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
+		positionMenuLayout(screenWidth, screenHeight, logoBottomY,
+				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
+				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
+				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
+				MENU_LABEL_SPACING_PORTRAIT_RATIO,
+				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
+				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
+		positionLogoLayout(screenWidth, screenHeight,
+				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
+				LOGO_TOP_PORTRAIT_RATIO,
+				LOGO_WIDTH_PORTRAIT_RATIO);
 	}
 }
 
 /**
- * Called when the connect button is clicked.
- * @param address The address contained by the connect EditBox.
+ * Creates and adds the background image to the main layout.
+ * @param screenWidth Used to set the background image width.
+ * @param screenHeight Used to set the background image height.
  */
-void LoginScreen::connectButtonClicked(String address)
+void LoginScreen::createBackgroundImage(int screenWidth, int screenHeight)
 {
-	mReloadClient->connectToServer(address.c_str());
+	mBackground = new Image();
+	mBackground->setSize(screenWidth, screenHeight);
+	mBackground->setImage(BACKGROUND);
+	mBackground->setScaleMode(IMAGE_SCALE_XY);
+
+	if(mOS.find("Windows", 0) < 0)
+	{
+		mMainLayout->addChild(mBackground);
+	}
 }
 
 /**
- * Called when the disconnect button is clicked.
+ * Creates the upper layout of the main screen (that contains the Reload logo)
+ * and adds it to the main layout.
  */
-void LoginScreen::disconnectButtonClicked()
+void LoginScreen::createLogoLayout()
 {
-	mReloadClient->disconnectFromServer();
+	//The reload Logo
+	mLogo = new Image();
+	mLogo->setImage(LOGO_IMAGE);
+	mLogo->wrapContentHorizontally();
+	mLogo->wrapContentVertically();
+	mLogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+
+	mMainLayout->addChild(mLogo);
 }
 
 /**
- * Called when the reload last app button is clicked.
+ * Creates the middle layout of the main screen (that contains the menu)
+ * and adds it to the main layout.
  */
-void LoginScreen::reloadLastAppButtonClicked()
+void LoginScreen::createMenuLayout()
 {
-	//Just load whatever app we have already extracted
-	mReloadClient->launchSavedApp();
+	createConnectedLayout();
+
+	//Button that loads the last loaded app
+	if(mOS == "iPhone OS")
+	{
+		mLoadLastAppButton = new ImageButton();
+		((ImageButton*)mLoadLastAppButton)->addButtonListener(this);
+		((ImageButton*)mLoadLastAppButton)->setBackgroundImage(RELOAD_BG);
+		mLoadLastAppButton->setFontColor(0x000000);
+	}
+	else
+	{
+		mLoadLastAppButton = new Button();
+		((Button*)mLoadLastAppButton)->addButtonListener(this);
+	}
+
+	mLoadLastAppButton->setText("Reload last app");
+	mLoadLastAppButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mLoadLastAppButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 }
 
 /**
- * Called when the info button is clicked.
+ * Creates the connected layout and adds it to the menu layout.
  */
-void LoginScreen::infoButtonClicked()
+void LoginScreen::createConnectedLayout()
 {
-	//Show the info screen
-	maMessageBox("Reload Client Info",mReloadClient->getInfo().c_str());
+	//Label for the server IP edit box
+	mServerIPLabel = new Label();
+	mServerIPLabel->setText("Server IP:");
+	mServerIPLabel->setFontColor(0xFFFFFF);
+	mServerIPLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mServerIPLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+
+	//The edit box that receives the server IP
+	mServerIPBox = new EditBox();
+	mServerIPBox->addEditBoxListener(this);
+
+	//The connect to server button
+	if(mOS == "iPhone OS") //Android image buttons do not support text
+	{
+		mServerConnectButton = new ImageButton();
+		((ImageButton*)mServerConnectButton)->addButtonListener(this);
+		((ImageButton*)mServerConnectButton)->setBackgroundImage(CONNECT_BG);
+		mServerConnectButton->setFontColor(0x000000);
+	}
+	else
+	{
+		mServerConnectButton = new Button();
+		((Button*)mServerConnectButton)->addButtonListener(this);
+	}
+	mServerConnectButton->setText("Connect");
+	mServerConnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mServerConnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+
+	mConnectLayout = new RelativeLayout();
+	mConnectLayout->addChild(mServerIPLabel);
+	mConnectLayout->addChild(mServerIPBox);
+	mConnectLayout->addChild(mServerConnectButton);
+
+	mMainLayout->addChild(mConnectLayout);
 }
+
+/**
+ * Creates and adds the bottom layout (that contains the MoSync logo
+ * and the info button) to the main layout.
+ */
+void LoginScreen::createBottomLayout()
+{
+	//A little MoSync logo at the lower left of the screen
+	mMosynclogo = new Image();
+	mMosynclogo->setImage(MOSYNC_IMAGE);
+	mMosynclogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+
+	//The info icon
+	mInfoIcon = new ImageButton();
+	mInfoIcon->addButtonListener(this);
+	mInfoIcon->setBackgroundImage(INFO_ICON);
+}
+
+/**
+ * Positions the upper layout (containing the Reload logo) on the main layout.
+ * @param screenWidth The device screen width.
+ * @param screenHeight The device screen height.
+ * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+ * @param logoTopRatio The logo top ratio (based on the layout height).
+ * @param logoWidthRatio The logo width ratio (based on the layout width).
+ * @return Returns the lower x coordinate of the layout after positioning.
+ */
+int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio, float logoTopRatio, float logoWidthRatio)
+{
+	int height = (int)((float)screenHeight * screenRatio);
+
+	int aboveHeight = (int)((float)height * logoTopRatio);
+
+	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
+	mLogo->setWidth(logoWidth);
+
+	int centerH = screenWidth / 2;
+	mLogo->setPosition(centerH - logoWidth/2, aboveHeight);
+
+	return height;
+}
+
+/**
+ * Positions the menu layout on the main layout.
+ * @param screenWidth The device screen width.
+ * @param screenHeight The device screen height.
+ * @param top The top position of the layout.
+ * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+ * @param widgetWidthRatio The menu widget width ratio (based on the layout width).
+ * @param widgetLeftRatio The menu widget left ratio (based on the layout width).
+ * @param labelHeightRatio The label height ratio (based on the layout height).
+ * @param labelSpacingRatio The label spacing ratio (based on the layout height).
+ * @param editBoxHeightRatio The ip edit box height ratio (based on the layout height).
+ * @param buttonHeightRatio The button height ratio (based on the layout height).
+ * @param buttonSpacingRatio The button spacing ratio (based on the layout height).
+ * @return Returns the lower x coordinate of the layout after positioning.
+ */
+int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+					float widgetWidthRatio, float widgetLeftRatio,
+					float labelHeightRatio, float labelSpacingRatio,
+					float editBoxHeightRatio, float buttonHeightRatio, float buttonSpacingRatio)
+{
+	int height = (int)((float)screenHeight * screenRatio);
+	// every widget will occupy 60% of the screen width
+	int widgetWidth = (int)((float)screenWidth * widgetWidthRatio);
+	// the left position will be 20% of the screen, as well as the right distance to the edge
+	int widgetLeft = (int)((float)screenWidth * widgetLeftRatio);
+
+	int labelHeight = (int)((float)height * labelHeightRatio);
+	int labelSpacing = (int)((float)height * labelSpacingRatio);
+	int editBoxHeight = (int)((float)height * editBoxHeightRatio);
+	int buttonHeight = (int)((float)height * buttonHeightRatio);
+	int buttonSpacing = (int)((float)height * buttonSpacingRatio);
+
+	mServerIPLabel->setWidth(widgetWidth);
+	int labelLeft = widgetLeft;
+	if(mOS.find("Windows", 0) >= 0)
+	{
+		labelLeft = (int)((float)screenWidth * MENU_LABEL_WINDOWS_PHONE_LEFT_RATIO);
+	}
+
+	mServerIPBox->setWidth(widgetWidth);
+
+	mServerConnectButton->setWidth(widgetWidth);
+	mServerConnectButton->setHeight(buttonHeight);
+
+	mConnectLayout->setWidth(screenWidth);
+	mConnectLayout->setHeight(height);
+
+	mLoadLastAppButton->setWidth(widgetWidth);
+	mLoadLastAppButton->setHeight(buttonHeight);
+
+	// windows phone 7 orientation animation is glitchy - this is a small
+	// fix for the wp7 platform - when going from portrait to landscape, the
+	// repositioning is done from top to bottom but when going from landscape
+	// to portrait, all the elements are repositioned bottom-up in order
+	// to have a somehow smoother animation
+	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		mServerIPLabel->setPosition(labelLeft, labelSpacing);
+		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
+		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mConnectLayout->setPosition(0, top);
+
+		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+	}
+	else
+	{
+		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+
+		mConnectLayout->setPosition(0, top);
+		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
+		mServerIPLabel->setPosition(labelLeft, labelSpacing);
+	}
+
+	return top + height;
+}
+
+/**
+ * Positions the bottom layout (that contains the MoSync logo and the info button)
+ * on the main layout.
+ * @param screenWidth The device screen width.
+ * @param screenHeight The device screen height.
+ * @param top The top position of the layout.
+ * @param screenRatio Defines how much space the layout will occupy on the Y axix.
+ * @param logoWidthRatio The logo height ratio (based on the layout height).
+ * @param logoHeightRatio The logo width ratio (based on the layout width).
+ * @param logoLeftRatio The logo left ratio (based on the layout width).
+ * @param logoTopRatio The logo top ratio (based on the layout height).
+ * @param infoWidthRatio The info button width ratio (based on the layout width).
+ * @param infoLeftRatio The info button left ratio (based on the layout width).
+ * @param infoTopRatio The logo top ratio (based on the layout height).
+ * @return Returns the lower x coordinate of the layout after positioning.
+ */
+int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+					float logoWidthRatio, float logoHeightRatio, float logoLeftRatio, float logoTopRatio,
+					float infoWidthRatio, float infoLeftRatio, float infoTopRatio)
+{
+	int height = (int)((float)screenHeight * screenRatio);
+
+	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
+	int infoWidth = (int)((float)screenWidth * infoWidthRatio);
+	int logoLeft = (int)((float)screenWidth * logoLeftRatio);
+	int infoLeft = (int)((float)screenWidth * infoLeftRatio);
+	int logoInfoDistance = (int)(screenWidth - logoWidth - infoWidth - logoLeft * 2);
+	int logoHeight = (int)((float)height * logoHeightRatio);
+	int logoTop = (int)((float)height * logoTopRatio);
+	int infoTop = (int)((float)height * infoTopRatio);
+
+	// the mosync logo not positioned correctly at the left side of the screen on
+	// iPhone devices (on iPad, it was ok) so right now we need to set the width
+	// property depending on the orientation
+	if (mOS.find("iPhone") >= 0)
+	{
+		if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+				mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+		{
+			mMosynclogo->setWidth(logoWidth/2);
+		}
+		else
+		{
+			mMosynclogo->setWidth(logoWidth);
+		}
+	}
+	mMosynclogo->setHeight(logoHeight);
+	mMosynclogo->setPosition(logoLeft, top + logoTop);
+
+	mInfoIcon->setSize(infoWidth,infoWidth);
+	mInfoIcon->setPosition(logoLeft + logoWidth + logoInfoDistance, top + infoTop);
+
+	return top + height;
+}
+
+/**
+ * On iOS, it's called when the return button is clicked on
+ * a virtual keyboard
+ * @param editBox The editbox using the virtual keyboard
+ */
+void LoginScreen::editBoxReturn(EditBox* editBox)
+{
+	editBox->hideKeyboard();
+}
+
+/**
+ * Called by the system when the user clicks a button
+ * @param button The button that was clicked
+ */
+void LoginScreen::buttonClicked(Widget *button)
+{
+	//Trim the beggining and end of the string of any spaces.
+	int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
+	int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
+	lastCharPos = (lastCharPos != String::npos)?lastCharPos - 1:mServerIPBox->getText().length() - 1;
+	String address = mServerIPBox->getText().substr(firstCharPos, lastCharPos - firstCharPos + 1);
+
+	if(button == mServerConnectButton)
+	{
+		// announce the screen listeners that the connect button was clicked
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mReloadUIListeners[i]->connectButtonClicked(address);
+		}
+
+		mServerIPBox->hideKeyboard(); //Needed for iOS
+	}
+	else if(button == mLoadLastAppButton)
+	{
+		// announce the screen listeners that the reload last app button was clicked
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mReloadUIListeners[i]->reloadLastAppButtonClicked();
+		}
+	}
+	else if(button == mInfoIcon)
+	{
+		// announce the screen listeners that the info button was clicked
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mReloadUIListeners[i]->infoButtonClicked();
+		}
+	}
+}
+
+/**
+ * Called just before the screen begins rotating.
+ */
+void LoginScreen::orientationWillChange()
+{
+	int orientation = maScreenGetCurrentOrientation();
+	MAExtent ex = maGetScrSize();
+	int screenWidth = EXTENT_X(ex);
+	int screenHeight = EXTENT_Y(ex);
+
+	rebuildScreenLayout(screenWidth, screenHeight);
+}
+
+/**
+ * Called after the screen orientation has changed.
+ * Available only on iOS and Windows Phone 7.1 platforms.
+ */
+void LoginScreen::orientationDidChange()
+{
+	int orientation = maScreenGetCurrentOrientation();
+	mCurrentOrientation = orientation;
+
+	// on iOS the layouts are repositioned on orientation will change
+	if (mOS.find("iPhone") < 0)
+	{
+
+		MAExtent ex = maGetScrSize();
+		int screenWidth = EXTENT_X(ex);
+		int screenHeight = EXTENT_Y(ex);
+
+		// on wp7 the screen size on landscape has the same values as portrait
+		// so we need to swap those values
+		if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+				orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
+				mOS.find("Windows", 0) >= 0)
+		{
+			int aux = screenWidth;
+			screenWidth = screenHeight;
+			screenHeight = aux;
+		}
+
+		rebuildScreenLayout(screenWidth, screenHeight);
+	}
+}
+
+/**
+ * Add a reload UI event listener.
+ * @param listener The listener that will receive reload UI events.
+ */
+void LoginScreen::addReloadUIListener(ReloadUIListener* listener)
+{
+    for (int i = 0; i < mReloadUIListeners.size(); i++)
+    {
+        if (listener == mReloadUIListeners[i])
+        {
+            return;
+        }
+    }
+
+    mReloadUIListeners.add(listener);
+}
+
+/**
+ * Remove a reload UI listener.
+ * @param listener The listener that receives reload UI events.
+ */
+void LoginScreen::removeReloadUIListener(ReloadUIListener* listener)
+{
+	for (int i = 0; i < mReloadUIListeners.size(); i++)
+	{
+		if (listener == mReloadUIListeners[i])
+		{
+			mReloadUIListeners.remove(i);
+			break;
+		}
+	}
+}
+
