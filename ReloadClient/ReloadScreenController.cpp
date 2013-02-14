@@ -25,10 +25,10 @@ MA 02110-1301, USA.
 
 #include "ReloadClient.h"
 #include "ReloadScreenController.h"
-#include "MainStackScreen.h"
-#include "ReloadTabScreen.h"
-#include "ConnectionScreen.h"
-#include "WorkspaceScreen.h"
+#include "View/MainStackScreen.h"
+#include "View/ReloadTabScreen.h"
+#include "View/ConnectionScreen.h"
+#include "View/WorkspaceScreen.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.

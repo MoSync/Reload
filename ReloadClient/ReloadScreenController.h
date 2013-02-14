@@ -26,8 +26,8 @@ MA 02110-1301, USA.
 #ifndef RELOADSCREENCONTROLLER_H_
 #define RELOADSCREENCONTROLLER_H_
 
-#include "LoginScreen.h"
-#include "ReloadUIListener.h"
+#include "View/LoginScreen.h"
+#include "View/ReloadUIListener.h"
 
 class ReloadClient;
 class ReloadTabScreen;

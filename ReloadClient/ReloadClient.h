@@ -38,7 +38,7 @@ MA 02110-1301, USA.
 #include <yajl/YAJLDom.h>
 
 #include "ReloadScreenController.h"
-#include "LoadingScreen.h"
+#include "View/LoadingScreen.h"
 #include "SocketHandler.h"
 #include "DownloadHandler.h"
 #include "MAHeaders.h"
