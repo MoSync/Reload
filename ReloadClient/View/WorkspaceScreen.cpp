@@ -24,7 +24,10 @@ WorkspaceScreen::WorkspaceScreen() :
 	createMainLayout();
 
 	//Set the moblet to receive events from the button
-	mButton->addButtonListener(this);
+	mRefreshButton->addButtonListener(this);
+	mListView->addListViewListener(this);
+
+	// TODO SA: get all the projects from the server
 }
 
 /**
@@ -32,8 +35,8 @@ WorkspaceScreen::WorkspaceScreen() :
  */
 WorkspaceScreen::~WorkspaceScreen()
 {
-	mButton->removeButtonListener(this);
-//	mListView->removeListViewListener(this);
+	mRefreshButton->removeButtonListener(this);
+	mListView->removeListViewListener(this);
 }
 
 /**
@@ -44,33 +47,35 @@ void WorkspaceScreen::createMainLayout() {
 	mMainLayout = new VerticalLayout();
 	Screen::setMainWidget(mMainLayout);
 
-//	mListView = new ListView(LIST_VIEW_TYPE_ALPHABETICAL);
+	mRefreshButton = new Button();
+	mRefreshButton->setText("Refresh projects");
+	mRefreshButton->fillSpaceHorizontally();
+
+	mListView = new ListView(LIST_VIEW_TYPE_ALPHABETICAL);
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
-/*	for (int i = 0; i <= 4; i++)
+	for (int i = 0; i <= 4; i++)
 	{
 		ListViewSection* section = new ListViewSection(LIST_VIEW_SECTION_TYPE_ALPHABETICAL);
 		MAUtil::String sectionTitle = "A";
 		sectionTitle[0] += i;
 		section->setTitle(sectionTitle);
 		section->setHeaderText(sectionTitle);
-		section->setFooterText("footer");
 
 		mListView->addChild(section);
 		for (int j = 0; j <= 3; j++)
 		{
 			ListViewItem* item = new ListViewItem();
-			MAUtil::String itemText = sectionTitle + "0";
-			itemText[1] += j;
+			MAUtil::String itemText = "Project " + sectionTitle + "0";
 			item->setText(itemText);
-			item->setSubtitle("some subtitle text");
+			item->setSubtitle("project type");
 			section->addItem(item);
 		}
+	}
 
-	} */
-
-//	mMainLayout->addChild(mListView);
+	mMainLayout->addChild(mListView);
+	mMainLayout->addChild(mRefreshButton);
 }
 
 
@@ -81,7 +86,10 @@ void WorkspaceScreen::createMainLayout() {
 */
 void WorkspaceScreen::buttonClicked(Widget* button)
 {
-
+	if (button == mRefreshButton)
+	{
+		// TODO SA: refresh all projects (get them from the server)
+	}
 }
 
 /**

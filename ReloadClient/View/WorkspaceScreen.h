@@ -18,7 +18,7 @@ using namespace NativeUI;
 
 class WorkspaceScreen:
 	public Screen,
-//	public ListViewListener,
+	public ListViewListener,
 	public ButtonListener
 {
 
@@ -74,7 +74,7 @@ private:
 	/**
 	 *
 	 */
-	Button* mButton;
+	Button* mRefreshButton;
 
 	/**
 	 * The alphabetical list view.
