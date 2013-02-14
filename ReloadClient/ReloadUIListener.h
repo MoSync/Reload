@@ -27,31 +27,31 @@
 #define RELOADUILISTENER_H_
 
 /**
- * \brief Listener for list screen events.
+ * \brief Listener for reload UI events.
  */
 class ReloadUIListener
 {
 public:
 	/**
-	 *
+	 * Called when the connect button is clicked.
+	 * @param address The address contained by the connect EditBox.
 	 */
-	virtual void connectButtonClicked(MAUtil::String address);
+	virtual void connectButtonClicked(MAUtil::String address) = 0;
 
 	/**
-	 *
+	 * Called when the disconnect button is clicked.
 	 */
-	virtual void disconnectButtonClicked();
+	virtual void disconnectButtonClicked() = 0;
 
 	/**
-	 *
+	 * Called when the reload last app button is clicked.
 	 */
-	virtual void reloadLastAppButtonClicked();
+	virtual void reloadLastAppButtonClicked() = 0;
 
 	/**
-	 *
+	 * Called when the info button is clicked.
 	 */
-	virtual void infoButtonClicked();
+	virtual void infoButtonClicked() = 0;
 };
-
 
 #endif /* RELOADUILISTENER_H_ */

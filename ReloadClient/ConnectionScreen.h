@@ -1,8 +1,26 @@
 /*
+Copyright (C) 2013 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/*
  * ConnectionScreen.h
  *
  *  Created on: Jan 31, 2013
- *      Author: spiri
+ *      Author: Spiridon Alexandru
  */
 
 #ifndef CONNECTIONSCREEN_H_
@@ -10,7 +28,6 @@
 
 #include <maapi.h>
 #include <MAUtil/util.h>
-
 #include "ReloadUIListener.h"
 
 // Include all the wrappers.
@@ -40,14 +57,14 @@ public:
 	void fillConnectionData(const char* address);
 
 	/**
-	 * Add a login screen event listener.
-	 * @param listener The listener that will receive login screen events.
+	 * Add a reload UI event listener.
+	 * @param listener The listener that will receive reload UI events.
 	 */
 	void addReloadUIListener(ReloadUIListener* listener);
 
 	/**
-	 * Remove the login screen listener.
-	 * @param listener The listener that receives login screen events.
+	 * Remove a reload UI listener.
+	 * @param listener The listener that receives reload UI events.
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
 
@@ -63,12 +80,6 @@ private:
 	 * @param screenHeight Used to set the background image height.
 	 */
 	void createBackgroundImage(int screenWidth, int screenHeight);
-
-	/**
-	 * Creates the upper layout of the main screen (that contains the Reload logo)
-	 * and adds it to the main layout.
-	 */
-	void createLogoLayout();
 
 	/**
 	 * Creates the middle layout of the main screen (that contains the menu)
@@ -140,9 +151,9 @@ private:
 			float infoWidthRatio, float infoLeftRatio, float infoTopRatio);
 
 	/**
-	 *
-	 * @param screenWidth
-	 * @param screenHeight
+	 * Repositions all the screen widgets/layouts.
+	 * @param screenWidth The current screen width.
+	 * @param screenHeight The current screen height.
 	 */
 	void rebuildScreenLayout(int screenWidth, int screenHeight);
 
@@ -175,9 +186,10 @@ private:
 	 */
 	MAUtil::String mOS;
 
+	/**
+	 * The current screen orientation.
+	 */
 	int mCurrentOrientation;
-
-	ImageButton *mInfoIcon;
 
 	/**
 	 * The TextWidgets declared here are instantiated as either
@@ -187,6 +199,8 @@ private:
 	TextWidget *mServerDisconnectButton;
 
 	TextWidget *mLoadLastAppButton;
+
+	ImageButton *mInfoIcon;
 
 	RelativeLayout *mDisconnectLayout;
 

@@ -39,6 +39,8 @@ ConnectionScreen::ConnectionScreen(MAUtil::String os, int orientation) :
 ConnectionScreen::~ConnectionScreen()
 {
 	((Button*)mServerDisconnectButton)->removeButtonListener(this);
+
+	mReloadUIListeners.clear();
 }
 
 /**
@@ -63,7 +65,6 @@ void ConnectionScreen::initializeScreen()
 	mMainLayout = new RelativeLayout();
 
 	createBackgroundImage(screenWidth, screenHeight);
-	createLogoLayout();
 	createMenuLayout();
 	createBottomLayout();
 
@@ -73,13 +74,8 @@ void ConnectionScreen::initializeScreen()
 		mMainLayout->setSize(screenHeight, screenWidth);
 		mBackground->setSize(screenHeight, screenWidth);
 
-		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
-				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
-				LOGO_TOP_LANDSCAPE_RATIO,
-				LOGO_WIDTH_LANDSCAPE_RATIO);
-		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY,
-				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, 0,
+				CONNECTION_MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
 				MENU_WIDGET_LEFT_LANDSCAPE_RATIO,
 				MENU_LABEL_HEIGHT_LANDSCAPE_RATIO,
@@ -102,13 +98,8 @@ void ConnectionScreen::initializeScreen()
 		mMainLayout->setSize(screenWidth, screenHeight);
 		mBackground->setSize(screenWidth, screenHeight);
 
-		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
-				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
-				LOGO_TOP_PORTRAIT_RATIO,
-				LOGO_WIDTH_PORTRAIT_RATIO);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
-				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, 0,
+				CONNECTION_MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
 				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
 				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
@@ -134,6 +125,11 @@ void ConnectionScreen::initializeScreen()
 	this->setMainWidget(mMainLayout);
 }
 
+/**
+ * Repositions all the screen widgets/layouts.
+ * @param screenWidth The current screen width.
+ * @param screenHeight The current screen height.
+ */
 void ConnectionScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 {
 	mMainLayout->setSize(screenWidth, screenHeight);
@@ -147,13 +143,8 @@ void ConnectionScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
-		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
-				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
-				LOGO_TOP_LANDSCAPE_RATIO,
-				LOGO_WIDTH_LANDSCAPE_RATIO);
-		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
-				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
+		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, 0,
+				CONNECTION_MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
 				MENU_WIDGET_LEFT_LANDSCAPE_RATIO,
 				MENU_LABEL_HEIGHT_LANDSCAPE_RATIO,
@@ -173,8 +164,8 @@ void ConnectionScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 	}
 	else
 	{
-		int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
-		int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
+		//int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
+		int menuBottomY = (int)(screenHeight * CONNECTION_MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
 
 		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
 				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
@@ -185,8 +176,8 @@ void ConnectionScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
 				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
 				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
-		positionMenuLayout(screenWidth, screenHeight, logoBottomY,
-				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
+		positionMenuLayout(screenWidth, screenHeight, 0,
+				CONNECTION_MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
 				MENU_WIDGET_LEFT_PORTRAIT_RATIO,
 				MENU_LABEL_HEIGHT_PORTRAIT_RATIO,
@@ -194,10 +185,6 @@ void ConnectionScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
 				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
 				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
-		positionLogoLayout(screenWidth, screenHeight,
-				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
-				LOGO_TOP_PORTRAIT_RATIO,
-				LOGO_WIDTH_PORTRAIT_RATIO);
 	}
 }
 
@@ -217,22 +204,6 @@ void ConnectionScreen::createBackgroundImage(int screenWidth, int screenHeight)
 	{
 		mMainLayout->addChild(mBackground);
 	}
-}
-
-/**
- * Creates the upper layout of the main screen (that contains the Reload logo)
- * and adds it to the main layout.
- */
-void ConnectionScreen::createLogoLayout()
-{
-	//The reload Logo
-	mLogo = new Image();
-	mLogo->setImage(LOGO_IMAGE);
-	mLogo->wrapContentHorizontally();
-	mLogo->wrapContentVertically();
-	mLogo->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-
-	mMainLayout->addChild(mLogo);
 }
 
 /**
@@ -426,7 +397,6 @@ int ConnectionScreen::positionMenuLayout(int screenWidth, int screenHeight, int 
 	return top + height;
 }
 
-
 /**
  * Positions the bottom layout (that contains the MoSync logo and the info button)
  * on the main layout.
@@ -561,8 +531,8 @@ void ConnectionScreen::orientationDidChange()
 }
 
 /**
- * Add a login screen event listener.
- * @param listener The listener that will receive login screen events.
+ * Add a reload UI event listener.
+ * @param listener The listener that will receive reload UI events.
  */
 void ConnectionScreen::addReloadUIListener(ReloadUIListener* listener)
 {
@@ -578,8 +548,8 @@ void ConnectionScreen::addReloadUIListener(ReloadUIListener* listener)
 }
 
 /**
- * Remove the login screen listener.
- * @param listener The listener that receives login screen events.
+ * Remove a reload UI listener.
+ * @param listener The listener that receives reload UI events.
  */
 void ConnectionScreen::removeReloadUIListener(ReloadUIListener* listener)
 {

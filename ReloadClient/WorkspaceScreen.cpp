@@ -25,7 +25,6 @@ WorkspaceScreen::WorkspaceScreen() :
 
 	//Set the moblet to receive events from the button
 	mButton->addButtonListener(this);
-//	mListView->addListViewListener(this);
 }
 
 /**

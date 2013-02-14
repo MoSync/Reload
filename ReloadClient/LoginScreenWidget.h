@@ -50,20 +50,20 @@ public:
 	~LoginScreenWidget();
 
 	/**
-	 *
-	 * @param ipAddress
+	 * Sets the default IP address of the server.
+	 * @param ipAddress The server IP default address.
 	 */
 	void setDefaultIPAddress(const char *ipAddress);
 
 	/**
-	 * Add a login screen event listener.
-	 * @param listener The listener that will receive login screen events.
+	 * Add a reload UI event listener.
+	 * @param listener The listener that will receive reload UI events.
 	 */
 	void addReloadUIListener(ReloadUIListener* listener);
 
 	/**
-	 * Remove the login screen listener.
-	 * @param listener The listener that receives login screen events.
+	 * Remove a reload UI listener.
+	 * @param listener The listener that receives reload UI events.
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
 
@@ -156,12 +156,11 @@ private:
 			float infoWidthRatio, float infoLeftRatio, float infoTopRatio);
 
 	/**
-	 *
-	 * @param screenWidth
-	 * @param screenHeight
+	 * Repositions all the screen widgets/layouts.
+	 * @param screenWidth The current screen width.
+	 * @param screenHeight The current screen height.
 	 */
 	void rebuildScreenLayout(int screenWidth, int screenHeight);
-
 
 	/**
 	 * Called by the system when the user clicks a button
@@ -198,11 +197,10 @@ private:
 	 */
 	MAUtil::String mOS;
 
+	/**
+	 * The current screen orientation.
+	 */
 	int mCurrentOrientation;
-
-	ImageButton *mInfoIcon;
-
-	EditBox *mServerIPBox;
 
 	/**
 	 * The TextWidgets declared here are instantiated as either
@@ -211,6 +209,10 @@ private:
 	TextWidget *mServerConnectButton;
 
 	TextWidget *mLoadLastAppButton;
+
+	ImageButton *mInfoIcon;
+
+	EditBox *mServerIPBox;
 
 	RelativeLayout *mConnectLayout;
 

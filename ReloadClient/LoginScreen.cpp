@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  *      Author: Iraklis Rossis
  */
 
+#include "ReloadClient.h"
 #include "LoginScreen.h"
 #include "MainStackScreen.h"
 #include "ReloadTabScreen.h"
@@ -32,6 +33,10 @@ MA 02110-1301, USA.
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 
+/**
+ * Constructor.
+ * @param client The ReloadClient that will handle all the reload business logic.
+ */
 LoginScreen::LoginScreen(ReloadClient *client) :
 		mLoginScreen(NULL),
 		mReloadTabScreen(NULL),
@@ -65,6 +70,29 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 	MainStackScreen::getInstance()->push(mLoginScreen);
 	MainStackScreen::getInstance()->show();
 }
+
+/**
+ * Called when the client has connected to the server.
+ * @param serverAddress The server IP address.
+ */
+void LoginScreen::connectedTo(const char *serverAddress)
+{
+	//Success, show the disconnect controls
+	String conTo = "Connected to: ";
+	conTo += serverAddress;
+
+	showTabScreen(true);
+	mConnectionScreen->fillConnectionData(conTo.c_str());
+}
+
+/**
+ * Called when the client has disconnected from the server.
+ */
+void LoginScreen::disconnected()
+{
+	showTabScreen(false);
+}
+
 /**
  * Show the login screen in the connected state
  * with the "connected" controls visible.
@@ -82,23 +110,20 @@ void LoginScreen::showNotConnectedScreen()
 	showTabScreen(false);
 }
 
-void LoginScreen::connectedTo(const char *serverAddress)
+/**
+ * Sets the default address (will appear inside the connect EditBox).
+ * @param serverAddress The default server address.
+ */
+void LoginScreen::defaultAddress(const char *serverAddress)
 {
-	//Success, show the disconnect controls
-	String conTo = "Connected to: ";
-	conTo += serverAddress;
-
-	showTabScreen(true);
-	mConnectionScreen->fillConnectionData(conTo.c_str());
-}
-
-void LoginScreen::disconnected()
-{
-	showTabScreen(false);
+	mLoginScreen->setDefaultIPAddress(serverAddress);
 }
 
 /**
- *
+ * Shows or hides the reload tab screen (containing the connection screen and the
+ * workspace screen).
+ * @param show If true, the reload tab screen is pushed into the main stack screen and poped
+ * 	otherwise.
  */
 void LoginScreen::showTabScreen(bool show)
 {
@@ -128,13 +153,9 @@ void LoginScreen::showTabScreen(bool show)
 	}
 }
 
-void LoginScreen::defaultAddress(const char *serverAddress)
-{
-	mLoginScreen->setDefaultIPAddress(serverAddress);
-}
-
 /**
- *
+ * Called when the connect button is clicked.
+ * @param address The address contained by the connect EditBox.
  */
 void LoginScreen::connectButtonClicked(String address)
 {
@@ -142,16 +163,7 @@ void LoginScreen::connectButtonClicked(String address)
 }
 
 /**
- *
- */
-void LoginScreen::infoButtonClicked()
-{
-	//Show the info screen
-	maMessageBox("Reload Client Info",mReloadClient->getInfo().c_str());
-}
-
-/**
- *
+ * Called when the disconnect button is clicked.
  */
 void LoginScreen::disconnectButtonClicked()
 {
@@ -159,10 +171,19 @@ void LoginScreen::disconnectButtonClicked()
 }
 
 /**
- *
+ * Called when the reload last app button is clicked.
  */
 void LoginScreen::reloadLastAppButtonClicked()
 {
 	//Just load whatever app we have already extracted
 	mReloadClient->launchSavedApp();
+}
+
+/**
+ * Called when the info button is clicked.
+ */
+void LoginScreen::infoButtonClicked()
+{
+	//Show the info screen
+	maMessageBox("Reload Client Info",mReloadClient->getInfo().c_str());
 }

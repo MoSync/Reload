@@ -57,6 +57,15 @@ LoginScreenWidget::~LoginScreenWidget()
 }
 
 /**
+ * Sets the default IP address of the server.
+ * @param ipAddress The server IP default address.
+ */
+void LoginScreenWidget::setDefaultIPAddress(const char *serverAddress)
+{
+	mServerIPBox->setText(serverAddress);
+}
+
+/**
  * Creates the screen, the layouts, the widgets and positions everything.
  */
 void LoginScreenWidget::initializeScreen()
@@ -140,6 +149,11 @@ void LoginScreenWidget::initializeScreen()
 	this->setMainWidget(mMainLayout);
 }
 
+/**
+ * Repositions all the screen widgets/layouts.
+ * @param screenWidth The current screen width.
+ * @param screenHeight The current screen height.
+ */
 void LoginScreenWidget::rebuildScreenLayout(int screenWidth, int screenHeight)
 {
 	mMainLayout->setSize(screenWidth, screenHeight);
@@ -428,7 +442,6 @@ int LoginScreenWidget::positionMenuLayout(int screenWidth, int screenHeight, int
 	return top + height;
 }
 
-
 /**
  * Positions the bottom layout (that contains the MoSync logo and the info button)
  * on the main layout.
@@ -485,15 +498,6 @@ int LoginScreenWidget::positionBottomLayout(int screenWidth, int screenHeight, i
 }
 
 /**
- *
- * @param ipAddress
- */
-void LoginScreenWidget::setDefaultIPAddress(const char *serverAddress)
-{
-	mServerIPBox->setText(serverAddress);
-}
-
-/**
  * On iOS, it's called when the return button is clicked on
  * a virtual keyboard
  * @param editBox The editbox using the virtual keyboard
@@ -543,7 +547,6 @@ void LoginScreenWidget::buttonClicked(Widget *button)
 	}
 }
 
-
 /**
  * Called just before the screen begins rotating.
  */
@@ -590,8 +593,8 @@ void LoginScreenWidget::orientationDidChange()
 }
 
 /**
- * Add a login screen event listener.
- * @param listener The listener that will receive login screen events.
+ * Add a reload UI event listener.
+ * @param listener The listener that will receive reload UI events.
  */
 void LoginScreenWidget::addReloadUIListener(ReloadUIListener* listener)
 {
@@ -607,8 +610,8 @@ void LoginScreenWidget::addReloadUIListener(ReloadUIListener* listener)
 }
 
 /**
- * Remove the login screen listener.
- * @param listener The listener that receives login screen events.
+ * Remove a reload UI listener.
+ * @param listener The listener that receives reload UI events.
  */
 void LoginScreenWidget::removeReloadUIListener(ReloadUIListener* listener)
 {

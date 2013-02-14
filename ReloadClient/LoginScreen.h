@@ -26,7 +26,6 @@ MA 02110-1301, USA.
 #ifndef LOGINSCREEN_H_
 #define LOGINSCREEN_H_
 
-#include "ReloadClient.h"
 #include "LoginScreenWidget.h"
 #include "ReloadUIListener.h"
 
@@ -41,6 +40,10 @@ using namespace NativeUI; // WebView widget.
 class LoginScreen : public ReloadUIListener
 {
 public:
+	/**
+	 * Constructor.
+	 * @param client The ReloadClient that will handle all the reload business logic.
+	 */
 	LoginScreen(ReloadClient *client);
 
 	~LoginScreen();
@@ -57,6 +60,17 @@ public:
 	void initializeScreen(MAUtil::String &os, int orientation);
 
 	/**
+	 * Called when the client has connected to the server.
+	 * @param serverAddress The server IP address.
+	 */
+	void connectedTo(const char *serverAddress);
+
+	/**
+	 * Called when the client has disconnected from the server.
+	 */
+	void disconnected();
+
+	/**
 	 * Show the login screen in the connected state
 	 * with the "connected" controls visible.
 	 */
@@ -67,48 +81,72 @@ public:
 	 */
 	void showNotConnectedScreen();
 
-	void connectedTo(const char *serverAddress);
-
-	void disconnected();
-
+	/**
+	 * Sets the default address (will appear inside the connect EditBox).
+	 * @param serverAddress The default server address.
+	 */
 	void defaultAddress(const char *serverAddress);
 
 	/**
-	 *
+	 * Called when the connect button is clicked.
+	 * @param address The address contained by the connect EditBox.
 	 */
 	virtual void connectButtonClicked(String address);
 
 	/**
-	 *
-	 */
-	virtual void infoButtonClicked();
-
-	/**
-	 *
+	 * Called when the disconnect button is clicked.
 	 */
 	virtual void disconnectButtonClicked();
 
 	/**
-	 *
+	 * Called when the reload last app button is clicked.
 	 */
 	virtual void reloadLastAppButtonClicked();
+
+	/**
+	 * Called when the info button is clicked.
+	 */
+	virtual void infoButtonClicked();
+
 private:
 	/**
-	 *
+	 * Shows or hides the reload tab screen (containing the connection screen and the
+	 * workspace screen).
+	 * @param show If true, the reload tab screen is pushed into the main stack screen and poped
+	 * 	otherwise.
 	 */
 	void showTabScreen(bool show);
 
 private:
+	/**
+	 * The ReloadClient the handles the business logic of tha application.
+	 */
 	ReloadClient *mReloadClient;
 
+	/**
+	 * A string containing the current operating system.
+	 */
 	String mOS;
 
+	/**
+	 * The login screen containing the connection options and the reload last app option.
+	 */
 	LoginScreenWidget *mLoginScreen;
 
-	ConnectionScreen *mConnectionScreen;
-
+	/**
+	 * The main application tab screen, containing the ConnectionScreen and the WorkspaceScreen
+	 */
 	ReloadTabScreen *mReloadTabScreen;
 
+	/**
+	 * The connected screen, containing options for reloading last app and
+	 * for disconnecting from the server.
+	 */
+	ConnectionScreen *mConnectionScreen;
+
+	/**
+	 * The workspace screen, containing a list with the workspace projects.
+	 */
 	WorkspaceScreen *mWorkspaceScreen;
 };
 
