@@ -17,19 +17,19 @@
  */
 
 /*
- * LoginScreenListener.h
+ * ReloadUIListener.h
  *
  *  Created on: Feb 4, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef LOGINSCREENLISTENER_H_
-#define LOGINSCREENLISTENER_H_
+#ifndef RELOADUILISTENER_H_
+#define RELOADUILISTENER_H_
 
 /**
  * \brief Listener for list screen events.
  */
-class LoginScreenListener
+class ReloadUIListener
 {
 public:
 	/**
@@ -40,8 +40,18 @@ public:
 	/**
 	 *
 	 */
+	virtual void disconnectButtonClicked();
+
+	/**
+	 *
+	 */
+	virtual void reloadLastAppButtonClicked();
+
+	/**
+	 *
+	 */
 	virtual void infoButtonClicked();
 };
 
 
-#endif /* LOGINSCREENLISTENER_H_ */
+#endif /* RELOADUILISTENER_H_ */

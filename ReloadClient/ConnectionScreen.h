@@ -1,59 +1,43 @@
 /*
-Copyright (C) 2013 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
-
-/*
- * LoginScreenWidget.h
+ * ConnectionScreen.h
  *
- *  Created on: Feb 4, 2013
- *      Author: Spiridon Alexandru
+ *  Created on: Jan 31, 2013
+ *      Author: spiri
  */
 
-#ifndef LOGINSCREENWIDGET_H_
-#define LOGINSCREENWIDGET_H_
+#ifndef CONNECTIONSCREEN_H_
+#define CONNECTIONSCREEN_H_
 
-#include <NativeUI/Widgets.h>
+#include <maapi.h>
+#include <MAUtil/util.h>
 
 #include "ReloadUIListener.h"
 
-using namespace MAUtil;
+// Include all the wrappers.
+#include <NativeUI/Widgets.h>
+
 using namespace NativeUI;
 
-class LoginScreenWidget:
-	public Screen, ButtonListener, EditBoxListener
+class ConnectionScreen:
+	public Screen,
+	public ButtonListener
 {
 public:
 	/**
 	 * Constructor.
-	 * @param os The current os.
 	 */
-	LoginScreenWidget(MAUtil::String os, int orientation);
+	ConnectionScreen(MAUtil::String os, int orientation);
 
 	/**
 	 * Destructor.
 	 */
-	~LoginScreenWidget();
+	~ConnectionScreen();
 
 	/**
 	 *
-	 * @param ipAddress
+	 * @param address
 	 */
-	void setDefaultIPAddress(const char *ipAddress);
+	void fillConnectionData(const char* address);
 
 	/**
 	 * Add a login screen event listener.
@@ -93,9 +77,9 @@ private:
 	void createMenuLayout();
 
 	/**
-	 * Creates the connected layout and adds it to the menu layout.
+	 * Creates the disconnected layout and adds it to the menu layout.
 	 */
-	void createConnectedLayout();
+	void createDisconnectedLayout();
 
 	/**
 	 * Creates and adds the bottom layout (that contains the MoSync logo
@@ -162,19 +146,12 @@ private:
 	 */
 	void rebuildScreenLayout(int screenWidth, int screenHeight);
 
-
-	/**
-	 * Called by the system when the user clicks a button
-	 * @param button The button that was clicked
-	 */
-	void buttonClicked(Widget *button);
-
-	/**
-	 * On iOS, it's called when the return button is clicked on
-	 * a virtual keyboard
-	 * @param editBox The editbox using the virtual keyboard
-	 */
-	void editBoxReturn(EditBox* editBox);
+    /**
+	* This method is called if the touch-up event was inside the
+	* bounds of the button.
+	* @param button The button object that generated the event.
+	*/
+	virtual void buttonClicked(Widget* button);
 
 	/**
 	 * Called just before the screen begins rotating.
@@ -202,19 +179,20 @@ private:
 
 	ImageButton *mInfoIcon;
 
-	EditBox *mServerIPBox;
-
 	/**
 	 * The TextWidgets declared here are instantiated as either
 	 * Buttons or ImageButtons depending on the platform
 	 */
-	TextWidget *mServerConnectButton;
+
+	TextWidget *mServerDisconnectButton;
 
 	TextWidget *mLoadLastAppButton;
 
-	RelativeLayout *mConnectLayout;
+	RelativeLayout *mDisconnectLayout;
 
-	Label *mServerIPLabel;
+	Label *mConnectedToLabel;
+
+	Label *mInstructionsLabel;
 
 	Image* mLogo;
 
@@ -225,4 +203,5 @@ private:
 	RelativeLayout* mMainLayout;
 };
 
-#endif /* LOGINSCREENWIDGET_H_ */
+
+#endif /* CONNECTIONSCREEN_H_ */

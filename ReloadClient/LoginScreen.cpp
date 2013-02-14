@@ -25,18 +25,25 @@ MA 02110-1301, USA.
 
 #include "LoginScreen.h"
 #include "MainStackScreen.h"
+#include "ReloadTabScreen.h"
+#include "ConnectionScreen.h"
+#include "WorkspaceScreen.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 
-LoginScreen::LoginScreen(ReloadClient *client)
+LoginScreen::LoginScreen(ReloadClient *client) :
+		mLoginScreen(NULL),
+		mReloadTabScreen(NULL),
+		mConnectionScreen(NULL),
+		mWorkspaceScreen(NULL)
 {
 	mReloadClient = client;
 }
 
 LoginScreen::~LoginScreen()
 {
-	mLoginScreen->removeLoginScreenListener(this);
+	mLoginScreen->removeReloadUIListener(this);
 }
 
 /**
@@ -50,8 +57,10 @@ LoginScreen::~LoginScreen()
  */
 void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
 {
+	mOS = os;
+
 	mLoginScreen = new LoginScreenWidget(os, orientation);
-	mLoginScreen->addLoginScreenListener(this);
+	mLoginScreen->addReloadUIListener(this);
 
 	MainStackScreen::getInstance()->push(mLoginScreen);
 	MainStackScreen::getInstance()->show();
@@ -62,9 +71,7 @@ void LoginScreen::initializeScreen(MAUtil::String &os, int orientation)
  */
 void LoginScreen::showConnectedScreen()
 {
-//	mConnectLayout->setVisible(false);
-//	mDisconnectLayout->setVisible(true);
-//	mLoginScreen->show();
+	showTabScreen(true);
 }
 
 /**
@@ -72,9 +79,7 @@ void LoginScreen::showConnectedScreen()
  */
 void LoginScreen::showNotConnectedScreen()
 {
-//	mConnectLayout->setVisible(true);
-//	mDisconnectLayout->setVisible(false);
-//	mLoginScreen->show();
+	showTabScreen(false);
 }
 
 void LoginScreen::connectedTo(const char *serverAddress)
@@ -82,20 +87,50 @@ void LoginScreen::connectedTo(const char *serverAddress)
 	//Success, show the disconnect controls
 	String conTo = "Connected to: ";
 	conTo += serverAddress;
-//	mConnectedToLabel->setText(conTo.c_str());
-//	mConnectLayout->setVisible(false);
-//	mDisconnectLayout->setVisible(true);
+
+	showTabScreen(true);
+	mConnectionScreen->fillConnectionData(conTo.c_str());
 }
 
 void LoginScreen::disconnected()
 {
-//	mConnectLayout->setVisible(true);
-//	mDisconnectLayout->setVisible(false);
+	showTabScreen(false);
+}
+
+/**
+ *
+ */
+void LoginScreen::showTabScreen(bool show)
+{
+	if (show)
+	{
+		if (mReloadTabScreen == NULL)
+		{
+			mReloadTabScreen = new ReloadTabScreen();
+
+			int orientation = maScreenGetCurrentOrientation();
+			mConnectionScreen = new ConnectionScreen(mOS, orientation);
+			mConnectionScreen->setTitle("Reload");
+			mConnectionScreen->addReloadUIListener(this);
+
+			mReloadTabScreen->addTab(mConnectionScreen);
+
+			mWorkspaceScreen = new WorkspaceScreen();
+			mWorkspaceScreen->setTitle("Workspace");
+			mReloadTabScreen->addTab(mWorkspaceScreen);
+		}
+
+		MainStackScreen::getInstance()->push(mReloadTabScreen);
+	}
+	else
+	{
+		MainStackScreen::getInstance()->pop();
+	}
 }
 
 void LoginScreen::defaultAddress(const char *serverAddress)
 {
-//	mServerIPBox->setText(serverAddress);
+	mLoginScreen->setDefaultIPAddress(serverAddress);
 }
 
 /**
@@ -103,7 +138,7 @@ void LoginScreen::defaultAddress(const char *serverAddress)
  */
 void LoginScreen::connectButtonClicked(String address)
 {
-//	mReloadClient->connectToServer(address.c_str());
+	mReloadClient->connectToServer(address.c_str());
 }
 
 /**
@@ -113,4 +148,21 @@ void LoginScreen::infoButtonClicked()
 {
 	//Show the info screen
 	maMessageBox("Reload Client Info",mReloadClient->getInfo().c_str());
+}
+
+/**
+ *
+ */
+void LoginScreen::disconnectButtonClicked()
+{
+	mReloadClient->disconnectFromServer();
+}
+
+/**
+ *
+ */
+void LoginScreen::reloadLastAppButtonClicked()
+{
+	//Just load whatever app we have already extracted
+	mReloadClient->launchSavedApp();
 }

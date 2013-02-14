@@ -28,14 +28,17 @@ MA 02110-1301, USA.
 
 #include "ReloadClient.h"
 #include "LoginScreenWidget.h"
-#include "LoginScreenListener.h"
+#include "ReloadUIListener.h"
 
 class ReloadClient;
+class ReloadTabScreen;
+class ConnectionScreen;
+class WorkspaceScreen;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
 
-class LoginScreen : public LoginScreenListener
+class LoginScreen : public ReloadUIListener
 {
 public:
 	LoginScreen(ReloadClient *client);
@@ -79,10 +82,34 @@ public:
 	 *
 	 */
 	virtual void infoButtonClicked();
+
+	/**
+	 *
+	 */
+	virtual void disconnectButtonClicked();
+
+	/**
+	 *
+	 */
+	virtual void reloadLastAppButtonClicked();
 private:
+	/**
+	 *
+	 */
+	void showTabScreen(bool show);
+
+private:
+	ReloadClient *mReloadClient;
+
+	String mOS;
+
 	LoginScreenWidget *mLoginScreen;
 
-	ReloadClient *mReloadClient;
+	ConnectionScreen *mConnectionScreen;
+
+	ReloadTabScreen *mReloadTabScreen;
+
+	WorkspaceScreen *mWorkspaceScreen;
 };
 
 

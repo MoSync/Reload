@@ -1,49 +1,34 @@
 /*
-Copyright (C) 2013 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
-/*
- * LoginScreenWidget.cpp
+ * ConnectionScreen.cpp
  *
- *  Created on: Feb 4, 2013
- *      Author: Spiridon Alexandru
+ *  Created on: Jan 31, 2013
+ *      Author: spiri
  */
 
-#include "LoginScreenWidget.h"
+#include <conprint.h>
+#include <wchar.h>
+#include <ma.h>
+#include <maassert.h>
+#include <mawstring.h>
+#include <mastdlib.h>
+
+#include "ConnectionScreen.h"
+#include "MainStackScreen.h"
 #include "LoginScreenUtils.h"
 #include "MAHeaders.h"
 
-#define ORIENTATION_PORTRAIT "Portrait"
-#define ORIENTATION_PORTRAIT_UPSIDE_DOWN "Portrait upside down"
-#define ORIENTATION_LANDSCAPE_LEFT "Landscape left"
-#define ORIENTATION_LANDSCAPE_RIGHT "Landscape right"
-
-using namespace MAUtil;
-using namespace NativeUI;
+using namespace MAUtil; // Class Moblet
+using namespace NativeUI; // WebView widget.
 
 /**
  * Constructor.
- * @param os The current os.
  */
-LoginScreenWidget::LoginScreenWidget(MAUtil::String os, int orientation):
-	Screen()
+ConnectionScreen::ConnectionScreen(MAUtil::String os, int orientation) :
+	Screen(),
+	mMainLayout(NULL)
 {
-	this->mOS = os;
-	this->mCurrentOrientation = orientation;
+	mOS = os;
+	mCurrentOrientation = orientation;
 
 	initializeScreen();
 }
@@ -51,15 +36,24 @@ LoginScreenWidget::LoginScreenWidget(MAUtil::String os, int orientation):
 /**
  * Destructor.
  */
-LoginScreenWidget::~LoginScreenWidget()
+ConnectionScreen::~ConnectionScreen()
 {
-	mReloadUIListeners.clear();
+	((Button*)mServerDisconnectButton)->removeButtonListener(this);
+}
+
+/**
+ *
+ * @param address
+ */
+void ConnectionScreen::fillConnectionData(const char* address)
+{
+	mConnectedToLabel->setText(address);
 }
 
 /**
  * Creates the screen, the layouts, the widgets and positions everything.
  */
-void LoginScreenWidget::initializeScreen()
+void ConnectionScreen::initializeScreen()
 {
 	maScreenSetFullscreen(1);
 	MAExtent ex = maGetScrSize();
@@ -140,7 +134,7 @@ void LoginScreenWidget::initializeScreen()
 	this->setMainWidget(mMainLayout);
 }
 
-void LoginScreenWidget::rebuildScreenLayout(int screenWidth, int screenHeight)
+void ConnectionScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 {
 	mMainLayout->setSize(screenWidth, screenHeight);
 	mBackground->setSize(screenWidth, screenHeight);
@@ -212,7 +206,7 @@ void LoginScreenWidget::rebuildScreenLayout(int screenWidth, int screenHeight)
  * @param screenWidth Used to set the background image width.
  * @param screenHeight Used to set the background image height.
  */
-void LoginScreenWidget::createBackgroundImage(int screenWidth, int screenHeight)
+void ConnectionScreen::createBackgroundImage(int screenWidth, int screenHeight)
 {
 	mBackground = new Image();
 	mBackground->setSize(screenWidth, screenHeight);
@@ -229,7 +223,7 @@ void LoginScreenWidget::createBackgroundImage(int screenWidth, int screenHeight)
  * Creates the upper layout of the main screen (that contains the Reload logo)
  * and adds it to the main layout.
  */
-void LoginScreenWidget::createLogoLayout()
+void ConnectionScreen::createLogoLayout()
 {
 	//The reload Logo
 	mLogo = new Image();
@@ -245,9 +239,9 @@ void LoginScreenWidget::createLogoLayout()
  * Creates the middle layout of the main screen (that contains the menu)
  * and adds it to the main layout.
  */
-void LoginScreenWidget::createMenuLayout()
+void ConnectionScreen::createMenuLayout()
 {
-	createConnectedLayout();
+	createDisconnectedLayout();
 
 	//Button that loads the last loaded app
 	if(mOS == "iPhone OS")
@@ -269,51 +263,60 @@ void LoginScreenWidget::createMenuLayout()
 }
 
 /**
- * Creates the connected layout and adds it to the menu layout.
+ * Creates the disconnected layout and adds it to the menu layout.
  */
-void LoginScreenWidget::createConnectedLayout()
+void ConnectionScreen::createDisconnectedLayout()
 {
-	//Label for the server IP edit box
-	mServerIPLabel = new Label();
-	mServerIPLabel->setText("Server IP:");
-	mServerIPLabel->setFontColor(0xFFFFFF);
-	mServerIPLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	mServerIPLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	//Some instructions for the user
+	mInstructionsLabel = new Label();
+	mInstructionsLabel->setText("Use the Reload Web UI to load an app");
+	mInstructionsLabel->setFontColor(0xFFFFFF);
+	mInstructionsLabel->setMaxNumberOfLines(2);
+	mInstructionsLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mInstructionsLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
-	//The edit box that receives the server IP
-	mServerIPBox = new EditBox();
-	mServerIPBox->addEditBoxListener(this);
+	//Label with the Server IP
+	mConnectedToLabel = new Label();
+	mConnectedToLabel->setFontColor(0xFFFFFF);
+	mConnectedToLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mConnectedToLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
-	//The connect to server button
-	if(mOS == "iPhone OS") //Android image buttons do not support text
+	//The disconnect button
+	if(mOS == "iPhone OS")
 	{
-		mServerConnectButton = new ImageButton();
-		((ImageButton*)mServerConnectButton)->addButtonListener(this);
-		((ImageButton*)mServerConnectButton)->setBackgroundImage(CONNECT_BG);
-		mServerConnectButton->setFontColor(0x000000);
+		mServerDisconnectButton = new ImageButton();
+		((ImageButton*)mServerDisconnectButton)->addButtonListener(this);
+		((ImageButton*)mServerDisconnectButton)->setBackgroundImage(CONNECT_BG);
+		mServerDisconnectButton->setFontColor(0x000000);
 	}
 	else
 	{
-		mServerConnectButton = new Button();
-		((Button*)mServerConnectButton)->addButtonListener(this);
+		mServerDisconnectButton = new Button();
+		((Button*)mServerDisconnectButton)->addButtonListener(this);
 	}
-	mServerConnectButton->setText("Connect");
-	mServerConnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	mServerConnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
-	mConnectLayout = new RelativeLayout();
-	mConnectLayout->addChild(mServerIPLabel);
-	mConnectLayout->addChild(mServerIPBox);
-	mConnectLayout->addChild(mServerConnectButton);
+	mServerDisconnectButton->setText("Disconnect");
+	mServerDisconnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mServerDisconnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
-	mMainLayout->addChild(mConnectLayout);
+	/*
+	 * The mConnectLayout and mDisconnectLayout are placed
+	 * on top of each other inside a relative layout, and
+	 * each is only shown when needed.
+	 */
+	mDisconnectLayout = new RelativeLayout();
+	mDisconnectLayout->addChild(mConnectedToLabel);
+	mDisconnectLayout->addChild(mInstructionsLabel);
+	mDisconnectLayout->addChild(mServerDisconnectButton);
+
+	mMainLayout->addChild(mDisconnectLayout);
 }
 
 /**
  * Creates and adds the bottom layout (that contains the MoSync logo
  * and the info button) to the main layout.
  */
-void LoginScreenWidget::createBottomLayout()
+void ConnectionScreen::createBottomLayout()
 {
 	//A little MoSync logo at the lower left of the screen
 	mMosynclogo = new Image();
@@ -335,7 +338,7 @@ void LoginScreenWidget::createBottomLayout()
  * @param logoWidthRatio The logo width ratio (based on the layout width).
  * @return Returns the lower x coordinate of the layout after positioning.
  */
-int LoginScreenWidget::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio, float logoTopRatio, float logoWidthRatio)
+int ConnectionScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio, float logoTopRatio, float logoWidthRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
 
@@ -365,7 +368,7 @@ int LoginScreenWidget::positionLogoLayout(int screenWidth, int screenHeight, flo
  * @param buttonSpacingRatio The button spacing ratio (based on the layout height).
  * @return Returns the lower x coordinate of the layout after positioning.
  */
-int LoginScreenWidget::positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+int ConnectionScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, float screenRatio,
 					float widgetWidthRatio, float widgetLeftRatio,
 					float labelHeightRatio, float labelSpacingRatio,
 					float editBoxHeightRatio, float buttonHeightRatio, float buttonSpacingRatio)
@@ -382,20 +385,15 @@ int LoginScreenWidget::positionMenuLayout(int screenWidth, int screenHeight, int
 	int buttonHeight = (int)((float)height * buttonHeightRatio);
 	int buttonSpacing = (int)((float)height * buttonSpacingRatio);
 
-	mServerIPLabel->setWidth(widgetWidth);
-	int labelLeft = widgetLeft;
-	if(mOS.find("Windows", 0) >= 0)
-	{
-		labelLeft = (int)((float)screenWidth * MENU_LABEL_WINDOWS_PHONE_LEFT_RATIO);
-	}
+	mConnectedToLabel->setWidth(widgetWidth);
 
-	mServerIPBox->setWidth(widgetWidth);
+	mInstructionsLabel->setWidth(widgetWidth);
 
-	mServerConnectButton->setWidth(widgetWidth);
-	mServerConnectButton->setHeight(buttonHeight);
+	mServerDisconnectButton->setWidth(widgetWidth);
+	mServerDisconnectButton->setHeight(buttonHeight);
 
-	mConnectLayout->setWidth(screenWidth);
-	mConnectLayout->setHeight(height);
+	mDisconnectLayout->setWidth(screenWidth);
+	mDisconnectLayout->setHeight(height);
 
 	mLoadLastAppButton->setWidth(widgetWidth);
 	mLoadLastAppButton->setHeight(buttonHeight);
@@ -408,10 +406,10 @@ int LoginScreenWidget::positionMenuLayout(int screenWidth, int screenHeight, int
 	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
-		mServerIPLabel->setPosition(labelLeft, labelSpacing);
-		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
-		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
-		mConnectLayout->setPosition(0, top);
+		mInstructionsLabel->setPosition(widgetLeft, labelSpacing * 2 + labelHeight);
+		mServerDisconnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mConnectedToLabel->setPosition(widgetLeft, labelSpacing);
+		mDisconnectLayout->setPosition(0, top);
 
 		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
 	}
@@ -419,10 +417,10 @@ int LoginScreenWidget::positionMenuLayout(int screenWidth, int screenHeight, int
 	{
 		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
 
-		mConnectLayout->setPosition(0, top);
-		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
-		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
-		mServerIPLabel->setPosition(labelLeft, labelSpacing);
+		mDisconnectLayout->setPosition(0, top);
+		mConnectedToLabel->setPosition(widgetLeft, labelSpacing);
+		mServerDisconnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mInstructionsLabel->setPosition(widgetLeft, labelSpacing * 2 + labelHeight);
 	}
 
 	return top + height;
@@ -445,7 +443,7 @@ int LoginScreenWidget::positionMenuLayout(int screenWidth, int screenHeight, int
  * @param infoTopRatio The logo top ratio (based on the layout height).
  * @return Returns the lower x coordinate of the layout after positioning.
  */
-int LoginScreenWidget::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+int ConnectionScreen::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
 					float logoWidthRatio, float logoHeightRatio, float logoLeftRatio, float logoTopRatio,
 					float infoWidthRatio, float infoLeftRatio, float infoTopRatio)
 {
@@ -485,45 +483,19 @@ int LoginScreenWidget::positionBottomLayout(int screenWidth, int screenHeight, i
 }
 
 /**
- *
- * @param ipAddress
- */
-void LoginScreenWidget::setDefaultIPAddress(const char *serverAddress)
+* This method is called if the touch-up event was inside the
+* bounds of the button.
+* @param button The button object that generated the event.
+*/
+void ConnectionScreen::buttonClicked(Widget* button)
 {
-	mServerIPBox->setText(serverAddress);
-}
-
-/**
- * On iOS, it's called when the return button is clicked on
- * a virtual keyboard
- * @param editBox The editbox using the virtual keyboard
- */
-void LoginScreenWidget::editBoxReturn(EditBox* editBox)
-{
-	editBox->hideKeyboard();
-}
-
-/**
- * Called by the system when the user clicks a button
- * @param button The button that was clicked
- */
-void LoginScreenWidget::buttonClicked(Widget *button)
-{
-	//Trim the beggining and end of the string of any spaces.
-	int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
-	int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
-	lastCharPos = (lastCharPos != String::npos)?lastCharPos - 1:mServerIPBox->getText().length() - 1;
-	String address = mServerIPBox->getText().substr(firstCharPos, lastCharPos - firstCharPos + 1);
-
-	if(button == mServerConnectButton)
+	if(button == mServerDisconnectButton)
 	{
-		// announce the screen listeners that the connect button was clicked
+		// announce the screen listeners that the disconnect button was clicked
 		for (int i = 0; i < mReloadUIListeners.size(); i++)
 		{
-			mReloadUIListeners[i]->connectButtonClicked(address);
+			mReloadUIListeners[i]->disconnectButtonClicked();
 		}
-
-		mServerIPBox->hideKeyboard(); //Needed for iOS
 	}
 	else if(button == mLoadLastAppButton)
 	{
@@ -543,11 +515,10 @@ void LoginScreenWidget::buttonClicked(Widget *button)
 	}
 }
 
-
 /**
  * Called just before the screen begins rotating.
  */
-void LoginScreenWidget::orientationWillChange()
+void ConnectionScreen::orientationWillChange()
 {
 	int orientation = maScreenGetCurrentOrientation();
 	MAExtent ex = maGetScrSize();
@@ -561,7 +532,7 @@ void LoginScreenWidget::orientationWillChange()
  * Called after the screen orientation has changed.
  * Available only on iOS and Windows Phone 7.1 platforms.
  */
-void LoginScreenWidget::orientationDidChange()
+void ConnectionScreen::orientationDidChange()
 {
 	int orientation = maScreenGetCurrentOrientation();
 	mCurrentOrientation = orientation;
@@ -593,7 +564,7 @@ void LoginScreenWidget::orientationDidChange()
  * Add a login screen event listener.
  * @param listener The listener that will receive login screen events.
  */
-void LoginScreenWidget::addReloadUIListener(ReloadUIListener* listener)
+void ConnectionScreen::addReloadUIListener(ReloadUIListener* listener)
 {
     for (int i = 0; i < mReloadUIListeners.size(); i++)
     {
@@ -610,7 +581,7 @@ void LoginScreenWidget::addReloadUIListener(ReloadUIListener* listener)
  * Remove the login screen listener.
  * @param listener The listener that receives login screen events.
  */
-void LoginScreenWidget::removeReloadUIListener(ReloadUIListener* listener)
+void ConnectionScreen::removeReloadUIListener(ReloadUIListener* listener)
 {
 	for (int i = 0; i < mReloadUIListeners.size(); i++)
 	{
@@ -621,4 +592,3 @@ void LoginScreenWidget::removeReloadUIListener(ReloadUIListener* listener)
 		}
 	}
 }
-
