@@ -33,13 +33,14 @@ class LoginScreenListener
 {
 public:
 	/**
-	 * This method is called the orientation changes
-	 * @param newOrientation The new screen orientation. One of the values: MA_SCREEN_ORIENTATION_PORTRAIT,
-	 * MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN, MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT, MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT.
-	 * @param newScreenHeight The new screen height after orientation has changed.
-	 * @param newScreenWidth The new screen width after oritentation has changed.
+	 *
 	 */
-	virtual void orientationChanged(int newOrientation, int newScreenWidth, int newScreenHeight) = 0;
+	virtual void connectButtonClicked(MAUtil::String address);
+
+	/**
+	 *
+	 */
+	virtual void infoButtonClicked();
 };
 
 
