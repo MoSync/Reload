@@ -46,7 +46,7 @@ var globals = {
 
 	// Server configs for Collection of statistics
 	statsRequestOptions: {
-        host: 'mosyncdev.devcloud.acquia-sites.com',
+        host: 'www.mosync.com',
         port: '80',
         path: '/reload_stats',
         method: 'POST'
@@ -54,7 +54,7 @@ var globals = {
 
     // Server configs for Feedback
     feedbackRequestOptions: {
-        host: 'mosyncdev.devcloud.acquia-sites.com',
+        host: 'www.mosync.com',
         port: '80',
         path: '/reload_feedback',
         method: 'POST'
