@@ -2,6 +2,19 @@ var buster = require('buster');
 var request = require('request');
 var net = require('net');
 
+/*
+ * RPC test suit on top of buster.js
+ * Buster.JS on the command-line requires Node.js 0.6.3 or newer and
+ * npm.
+ *
+ * == Install Buster ==
+ * $ npm install -g buster
+ *
+ * == Run tests ==
+ * $ buster test
+ *
+ * Docs @ busterjs.org
+ */
 buster.testCase("RPC", {
     /*
      * Creates a new workspace directory to isolate operations of
@@ -456,10 +469,48 @@ buster.testCase("RPC", {
     },
 
     "//reloadProject": function(done) {
-        done();
+        var self, result, projectName, projectType;
+        projectName = 'ProjectToReload';
+        projectType = 'web';
+        self = this;
+
+        // Create project to reload.
+        request.post({
+            headers:  this.headers,
+            url:      this.url,
+            body:     JSON.stringify({
+                "method":  "manager.createNewProject",
+                "params":  [projectName, projectType],
+                "id":      null
+            })
+        }, function(error, response, body) {
+            // Reload project.
+            request.post({
+                headers:  self.headers,
+                url:      self.url,
+                body:     JSON.stringify({
+                    "method":  "manager.reloadProject",
+                    "params":  [projectName, false],
+                    "id":      null
+                })
+            }, function(error, response, body) {
+                // Cleanup.
+                request.post({
+                    headers:  self.headers,
+                    url:      self.url,
+                    body:     JSON.stringify({
+                        "method":  "manager.removeProject",
+                        "params":  [projectName],
+                        "id":      null
+                    })
+                }, function(error, response, body) {
+                    done();
+                });
+            });
+        });
     },
+
     "//reloadInDebugMode": function(done) {
         done();
     },
-
 });
