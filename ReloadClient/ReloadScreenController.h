@@ -108,6 +108,12 @@ public:
 	 */
 	virtual void infoButtonClicked();
 
+	/**
+	 * Checks if the login screen is visible.
+	 * @return true if the login screen is visible, false otherwise.
+	 */
+	bool loginScreenVisible();
+
 private:
 	/**
 	 * Shows or hides the reload tab screen (containing the connection screen and the

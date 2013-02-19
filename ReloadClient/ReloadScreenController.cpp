@@ -67,8 +67,10 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 	mLoginScreen = new LoginScreen(os, orientation);
 	mLoginScreen->addReloadUIListener(this);
 
-	MainStackScreen::getInstance()->push(mLoginScreen);
-	MainStackScreen::getInstance()->show();
+//	MainStackScreen::getInstance()->push(mLoginScreen);
+//	MainStackScreen::getInstance()->show();
+	mLoginScreen->setVisible(true);
+	mLoginScreen->show();
 }
 
 /**
@@ -120,6 +122,15 @@ void ReloadScreenController::defaultAddress(const char *serverAddress)
 }
 
 /**
+ * Checks if the login screen is visible.
+ * @return true if the login screen is visible, false otherwise.
+ */
+bool ReloadScreenController::loginScreenVisible()
+{
+	return mLoginScreen->isVisible();
+}
+
+/**
  * Shows or hides the reload tab screen (containing the connection screen and the
  * workspace screen).
  * @param show If true, the reload tab screen is pushed into the main stack screen and poped
@@ -137,19 +148,25 @@ void ReloadScreenController::showTabScreen(bool show)
 			mConnectionScreen = new ConnectionScreen(mOS, orientation);
 			mConnectionScreen->setTitle("Reload");
 			mConnectionScreen->addReloadUIListener(this);
-
 			mReloadTabScreen->addTab(mConnectionScreen);
 
 			mWorkspaceScreen = new WorkspaceScreen();
 			mWorkspaceScreen->setTitle("Workspace");
 			mReloadTabScreen->addTab(mWorkspaceScreen);
+
+			mReloadTabScreen->setActiveTab(0);
 		}
 
-		MainStackScreen::getInstance()->push(mReloadTabScreen);
+		mReloadTabScreen->show();
+		mLoginScreen->setVisible(false);
+		lprintfln("TAB SCREEN VISIBLE!!!!!!!!!!!!!!!!!!!");
+	//	MainStackScreen::getInstance()->push(mReloadTabScreen);
 	}
 	else
 	{
-		MainStackScreen::getInstance()->pop();
+		mLoginScreen->setVisible(true);
+		mLoginScreen->show();
+	//	MainStackScreen::getInstance()->pop();
 	}
 }
 

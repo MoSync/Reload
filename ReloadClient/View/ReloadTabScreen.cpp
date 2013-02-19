@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 MoSync AB
+ Copyright (C) 2013 MoSync AB
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License,
@@ -37,7 +37,6 @@ ReloadTabScreen::ReloadTabScreen() :
 	mMainLayout(NULL)
 {
     this->addTabScreenListener(this);
-    this->setActiveTab(0);
 }
 
 /**
