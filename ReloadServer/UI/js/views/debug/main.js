@@ -26,7 +26,6 @@ define([
         },
 
         close: function () {
-            console.log('close debug');
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();

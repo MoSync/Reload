@@ -4,11 +4,13 @@ define([
     'backbone',
     'models/project/project',
     'views/project/rename_project_dialog',
+    'views/project/remove_project_dialog',
     'text!../../../templates/project/project.html',
     'text!../../../templates/project/controls.html'
 ], function($, _, Backbone,
             ProjectModel,
             RenameProjectDialog,
+            RemoveProjectDialog,
             projectTemplate,
             controlsTemplate){
 
@@ -211,34 +213,37 @@ define([
         },
 
         removeProject: function () {
-            var c = confirm('Are you sure you want to delete ' +
-                            this.model.get('name') + ' ?');
-            if (!c) {
-                return;
-            }
-
-            var options     = {};
-            options.url     = 'http://localhost:8283';
-            options.rpcMsg  = {
-                method: 'manager.removeProject',
-                params: [this.model.get('name')],
-                id: 0
-            };
-
             var self = this;
-            options.success = function (resp) {
-                console.log(resp.result);
-                self.projectList.remove(self.model);
-                self.projectList.rePopulate();
-                self.parent.selectedProject = null;
-            };
+            this.model.on('change:destroy', function() {
+                var options     = {};
+                options.url     = 'http://localhost:8283';
+                options.rpcMsg  = {
+                    method: 'manager.removeProject',
+                    params: [self.model.get('name')],
+                    id: 0
+                };
 
-            options.error   = function (resp) {
-                console.log('could not remove project folder');
-                console.log(resp);
-            };
+                options.success = function (resp) {
+                    console.log(resp.result);
+                    self.projectList.remove(self.model);
+                    self.model.destroy();
+                    self.projectList.rePopulate();
+                    self.parent.selectedProject = null;
+                };
 
-            this.projectList.rpc(options);
+                options.error   = function (resp) {
+                    console.log('could not remove project folder');
+                    console.log(resp);
+                };
+
+                self.projectList.rpc(options);
+            });
+
+
+            var dialog = new RemoveProjectDialog({
+                project: this.model
+            });
+            dialog.render();
         }
 
     });
