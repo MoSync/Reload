@@ -7,7 +7,7 @@ define([
 
     var DebugView = Backbone.View.extend({
 
-        name: 'debug',
+        name: 'weinre',
 
         className: 'weinre',
 

@@ -20,7 +20,7 @@ define([
             // Define URL routes
             '':         'index',
             'editor':   'showEditor',
-            'debug':    'showDebug',
+            'weinre':   'showDebug',
             'devices':  'showDevices',
             'log':      'showLog',
             'workbench':'showWorkbench',
