@@ -44,7 +44,7 @@ define([
 
             // Weinre works only in webkit for now :(
             if ($.browser.webkit) {
-                items.append($('<li data-name="debug"><a href="/#/debug">Debug</a></li>'));
+                items.append($('<li data-name="weinre"><a href="/#/weinre">Weinre (Beta)</a></li>'));
             }
 
             items.append($('<li data-name="workbench"><a href="/#/workbench">Workbench</a></li>'));
