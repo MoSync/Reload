@@ -41,6 +41,7 @@ define([
         render: function () {
             console.log('render menu');
             var items = $('<li data-name="index" class="active"><a href="/#">Quick Start</a></li>');
+            items.append($('<li data-name="examples"><a href="/#/examples">Examples</a></li>'));
 
             // Weinre works only in webkit for now :(
             if ($.browser.webkit) {
