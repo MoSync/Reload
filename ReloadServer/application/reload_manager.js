@@ -1040,6 +1040,45 @@ var rpcFunctions = {
     },
 
     /**
+     * (RPC): Removes a workspace directory.
+     */
+    removeWorkspace: function (workspacePath, sendResponse) {
+        var self, responseSent, response;
+
+        self = this;
+        responseSent = false;
+        response = { hasError: false, data: workspacePath };
+
+        // check if parameter passing was correct
+        if (typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        console.log("--- Removing workspace " + workspacePath);
+
+        path.exists(workspacePath, function(exists) {
+            if(exists) {
+                self.removeRecursive(workspacePath, function (error, status){
+                    if(!error) {
+                        console.log("Succesfull deletion of directory " + workspacePath);
+                        response = {hasError: false, data: "Succesfull deletion of " + workspacePath};
+                    } else {
+                        console.log("Error in deletion of " + workspacePath);
+                        response = {hasError: true, data: "Error deleting project: " + error};
+                    }
+                });
+            } else {
+                console.log('--- ' + workspacePath + ' does not exist');
+            }
+        });
+
+        if(sendResponse !== undefined && !responseSent) {
+            sendResponse(response);
+            responseSent = true;
+        }
+    },
+
+    /**
      * (RPC): Sets a configuration option to specified value
      */
     setConfig: function (option, value, sendResponse ) {

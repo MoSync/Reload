@@ -24,6 +24,15 @@
     </div>
 </div>
     <div class="row-fluid">
+            <span class="label label-important">
+                Important
+            </span>
+            If you are using a project not created by this version of Reload, 
+            you should update the project (wormhole.js). 
+            For further details, read the <a target="_blank" href="http://www.mosync.com/documentation/manualpages/update-wormhole">tutorial</a>.
+    </div>
+
+    <div class="row-fluid">
         <h3>Connecting to a Device</h3>
     </div>
     <div class="row-fluid">
@@ -33,7 +42,8 @@
                     <span class="capital">1.</span>
                 </div>
                 <div class="span10">
-                    <a target="_blank" href="http://www.mosync.com/documentation/manualpages/installing-mosync-reload">Install the Reload Client</a> on your
+                    <a target="_blank"
+                        href="http://www.mosync.com/documentation/manualpages/installing-mosync-reload">Install the latest Reload Client</a> on your
                     device/emulator.
                 </div>
             </div>
@@ -199,7 +209,7 @@
         </div>
     </div>
     <div class="row-fluid">
-        <h3>Debugging with weinre (WebKit browsers only)</h3>
+        <h3>Element inspection with Weinre (WebKit browsers only)</h3>
     </div>
     <div class="row-fluid">
         <div class="span3">
@@ -209,7 +219,7 @@
                 </div>
                 <div class="span10">
                     Highlight the project’s name.<br />
-                    (Note that winre works only in WebKit browsers like Google Chrome or Apple Safari.)
+                    (Note that Weinre works only in WebKit browsers like Google Chrome or Apple Safari.)
                 </div>
             </div>
         </div>
@@ -220,9 +230,9 @@
                 </div>
                 <div class="span10">
                     Click the <button class="btn
-                        btn-mini">Debug</button> button.<br />
+                        btn-mini">Inspect</button> button.<br />
                     Your project will be loaded/reloaded on the
-                    device/emulator and executed in debug mode.
+                    device/emulator and executed in inspect mode.
                 </div>
             </div>
         </div>
@@ -232,10 +242,11 @@
                     <span class="capital">3.</span>
                 </div>
                 <div class="span10">
-                    Go to the <a href="/#/debug">Debug</a> tab.
+                    Go to the <a href="/#/weinre">Weinre</a> tab.
                     <strong>Note:</strong> If you move to other tabs in Reload,
-                    winre disconnects, and you need to select the device in
-                    the <strong>Targets</strong> list again to enable winre.
+                    Weinre disconnects, and you need to select the device in
+                    the <strong>Targets</strong> list again to enable
+                    Weinre.
                 </div>
             </div>
         </div>
@@ -245,8 +256,8 @@
                     <span class="capital">4.</span>
                 </div>
                 <div class="span10">
-                    Use winre tools such as the DOM element inspector
-                    and console log to debug your app.
+                    Use Weinre tools such as the DOM element inspector
+                    and console log to inspect your app.
                 </div>
             </div>
         </div>

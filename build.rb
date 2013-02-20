@@ -31,7 +31,7 @@ time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 
 #Write the version information to the file for use in the server  and client
 File.open("ReloadServer/build.dat", "w") do |file|
-  file.puts("MoSync Reload Version #{version}")
+  file.puts("#{version}")
   file.puts(time_stamp);
 end
 
@@ -113,20 +113,20 @@ FileUtils.mkdir_p "Build/#{time_stamp}/MoSync_Reload_Linux/server"
 
 FileUtils.rm_rf "/Volumes/MoSyncReload/Android Client"
 FileUtils.rm_rf "/Volumes/MoSyncReload/iOS Client"
-FileUtils.rm_rf "/Volumes/MoSyncReload/WP7 Client"
+FileUtils.rm_rf "/Volumes/MoSyncReload/WindowsPhone Client"
 FileUtils.rm_rf "/Volumes/MoSyncReload/Reload.app"
 FileUtils.cp_r "ReloadLauncher/Mac/Reload.app", "/Volumes/MoSyncReload/"
 
 puts "Copying Clients"
 FileUtils.cp_r "ReloadClient/Clients/Android", "/Volumes/MoSyncReload/Android Client"
 FileUtils.cp_r "ReloadClient/Clients/iOS", "/Volumes/MoSyncReload/iOS Client"
-FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "/Volumes/MoSyncReload/WP7 Client"
+FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "/Volumes/MoSyncReload/WindowsPhone Client"
 FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reload_Windows/Android Client"
 FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Windows/iOS Client"
-FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Windows/WP7 Client"
+FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Windows/WindowsPhone Client"
 FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reload_Linux/Android Client"
 FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Linux/iOS Client"
-FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Linux/WP7 Client"
+FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Linux/WindowsPhone Client"
 
 puts "Copying Readme"
 FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSyncReload/"
