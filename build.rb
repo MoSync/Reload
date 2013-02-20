@@ -1,4 +1,3 @@
-
 #  Copyright (C) 2013  MoSync AB
 
 #  This program is free software: you can redistribute it and/or modify
@@ -40,11 +39,11 @@ puts "Updating the templates"
 
 FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/index.html", "ReloadServer/templates/NativeUITemplate/LocalFiles/"
 FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/wormhole.js", "ReloadServer/templates/NativeUITemplate/LocalFiles/js"
-FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/main.cpp", "ReloadServer/templates/NativeUITemplate/LocalFiles/"
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS NativeUI Project/main.cpp", "ReloadServer/templates/NativeUITemplate/"
 
 FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/index.html", "ReloadServer/templates/ReloadTemplate/LocalFiles/"
 FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/wormhole.js", "ReloadServer/templates/ReloadTemplate/LocalFiles/js"
-FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/main.cpp", "ReloadServer/templates/ReloadTemplate/LocalFiles/"
+FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/main.cpp", "ReloadServer/templates/ReloadTemplate/"
 
 puts "making the information files"
 FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
