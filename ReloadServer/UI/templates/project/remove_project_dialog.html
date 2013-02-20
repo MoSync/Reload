@@ -1,0 +1,15 @@
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Confirm deletion of <%= name %></h3>
+    </div>
+    <div class="modal-body">
+        <%= name %> will be removed from the project list and all
+        corresponding files deleted from the file system.
+    </div>
+    <div class="modal-footer">
+        <button id="close" class="btn" data-dismiss="modal"
+            aria-hidden="true">Cancel</button>
+        <button id="submit" class="btn btn-primary">Remove</button>
+    </div>
+</div>

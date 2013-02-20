@@ -35,10 +35,12 @@ using namespace NativeUI;
 
 /**
  * Constructor.
+ * @param os The current os.
  */
-LoginScreenWidget::LoginScreenWidget():
+LoginScreenWidget::LoginScreenWidget(MAUtil::String os):
 	Screen()
 {
+	this->mOS = os;
 }
 
 /**
@@ -54,7 +56,16 @@ LoginScreenWidget::~LoginScreenWidget()
  */
 void LoginScreenWidget::orientationWillChange()
 {
+	int orientation = maScreenGetCurrentOrientation();
+	MAExtent ex = maGetScrSize();
+	int screenWidth = EXTENT_X(ex);
+	int screenHeight = EXTENT_Y(ex);
 
+	// announce the screen listeners if the orientation has changed
+	for (int i = 0; i < mLoginScreenListeners.size(); i++)
+	{
+		mLoginScreenListeners[i]->orientationChanged(orientation,screenWidth,screenHeight);
+	}
 }
 
 /**
@@ -63,23 +74,19 @@ void LoginScreenWidget::orientationWillChange()
  */
 void LoginScreenWidget::orientationDidChange()
 {
-	int orientation = maScreenGetCurrentOrientation();
-	MAExtent ex = maGetScrSize();
-	int screenWidth = EXTENT_X(ex);
-	int screenHeight = EXTENT_Y(ex);
-
-	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
-			orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	// on iOS the layouts are repositioned on orientation will change
+	if (mOS.find("iPhone") < 0)
 	{
-		int aux = screenWidth;
-		screenWidth = screenHeight;
-		screenHeight = aux;
-	}
+		int orientation = maScreenGetCurrentOrientation();
+		MAExtent ex = maGetScrSize();
+		int screenWidth = EXTENT_X(ex);
+		int screenHeight = EXTENT_Y(ex);
 
-	// announce the screen listeners if the orientation has changed
-	for (int i = 0; i < mLoginScreenListeners.size(); i++)
-	{
-		mLoginScreenListeners[i]->orientationChanged(orientation,screenWidth,screenHeight);
+		// announce the screen listeners if the orientation has changed
+		for (int i = 0; i < mLoginScreenListeners.size(); i++)
+		{
+			mLoginScreenListeners[i]->orientationChanged(orientation,screenWidth,screenHeight);
+		}
 	}
 }
 
