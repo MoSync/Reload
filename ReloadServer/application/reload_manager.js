@@ -1024,7 +1024,7 @@ var rpcFunctions = {
 
         console.log("Changing workspace to " + newWorkspacePath);
 
-        path.exists(newWorkspacePath, function(exists) {
+        fs.exists(newWorkspacePath, function(exists) {
 
             if(exists) {
 
@@ -1159,9 +1159,19 @@ var rpcFunctions = {
                 if (exists) {
 
                     var data = String(fs.readFileSync('lastWorkspace.dat', "utf8"));
+
                     if(data != "") {
 
-                        self.setRootWorkspacePath(data);
+                        fs.exists(data, function (exists) {
+                            if(exists) {
+                                self.setRootWorkspacePath(data);
+                            } else {
+                                self.setRootWorkspacePath(defaultPath);
+                                self.changeWorkspacePath(defaultPath);
+                            }
+                        });
+
+                        
                     }
                     else {
 
