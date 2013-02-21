@@ -13,7 +13,6 @@ define([
 
         getDevices: function (callback) {
 
-            console.log('get devices');
             var options     = {};
             options.url     = 'http://localhost:8283';
             options.rpcMsg  = {

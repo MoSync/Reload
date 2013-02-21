@@ -20,7 +20,6 @@ define([
 
             var self = this;
             options.success = function (resp) {
-                console.log('Got server info ' + resp.result);
                 var o = JSON.parse(resp.result);
                 self.set({ version: o.version });
                 self.set({ timestamp: o.timestamp });

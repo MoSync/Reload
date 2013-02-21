@@ -8,7 +8,9 @@ define([
     var ExampleView = Backbone.View.extend({
 
         events: {
-            'click a.thumbnail': 'highlight'
+            'click a.thumbnail':    function (e) { e.preventDefault(); },
+            'click button.reload':  'reload',
+            'click button.copy':    'copy'
         },
 
         initialize: function () {
@@ -16,7 +18,14 @@ define([
         },
 
         render: function () {
-            var data = {};
+            // Redelegate events if this view was closed.
+            this.delegateEvents();
+
+            console.log(this.model);
+            var data = {
+                name: this.model.get('name'),
+                description: this.model.get('description')
+            };
             var compiledTemplate = _.template( template, data );
             return this.$el.html( compiledTemplate );
         },
@@ -33,7 +42,15 @@ define([
 
         highlight: function (e) {
             e.preventDefault();
-            console.log('highlight');
+        },
+
+        reload: function (e) {
+            e.preventDefault();
+            console.log('reload ' + this.model.get('name'));
+        },
+        copy: function (e) {
+            e.preventDefault();
+            console.log('copy');
         }
     });
 

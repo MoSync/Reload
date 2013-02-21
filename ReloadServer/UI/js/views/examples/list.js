@@ -3,63 +3,56 @@ define([
     'underscore',
     'backbone',
     'collections/examples',
-    'views/examples/example',
-    'text!../../../templates/examples/list.html'
-], function($, _, Backbone, ExampleCollection, ExampleView, exampleListTemplate) {
+    'views/examples/example'
+], function($, _, Backbone, ExampleCollection, ExampleView) {
 
     var ExamplesView = Backbone.View.extend({
 
-        events: {
-            'click a.thumbnail': 'highlight'
-        },
+        subViews: [],
 
         initialize: function () {
             _.bindAll(this,
                       'render',
                       'close',
-                      'highlight');
+                      'appendExampleView');
 
-            this.collection = new ExampleCollection();
         },
 
         render: function () {
             var self = this;
+            this.collection = new ExampleCollection();
+            this.collection.on('add', this.appendExampleView);
+
+            if (!this.$el.is(':empty')) {
+                this.$el.empty();
+            }
+
             _(this.collection.models).each(function (model) {
                 self.appendExampleView(model);
             }, this);
 
-            var compiledTemplate = _.template( exampleListTemplate );
-            return this.$el.html( compiledTemplate );
+            //var compiledTemplate = _.template( exampleListTemplate );
+            return this.$el;
         },
 
         close: function () {
-            //COMPLETELY UNBIND THE VIEW
-            this.undelegateEvents();
-            this.$el.removeData().unbind();
+            var i;
+            for (i = 0; i<this.subViews.length; i++) {
+                this.subViews[i].close();
+                this.subViews.splice(i, 1);
+            }
 
             //Remove view from DOM
             this.remove();
             Backbone.View.prototype.remove.call(this);
         },
 
-        highlight: function (e) {
-            e.preventDefault();
-            console.log('highlight');
-        },
-
         appendExampleView: function (model) {
-            console.log('appendExampleView');
             var ev = new ExampleView({
                 model: model
             });
-
-
-            $('#examples').append( ev.render() );
-        },
-
-        rebuildEvents: function () {
-            this.delegateEvents();
-            console.log('rebuildevents');
+            this.subViews.push(ev);
+            this.$el.append( ev.render() );
         }
     });
 

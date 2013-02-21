@@ -1,10 +1,11 @@
 require.config({
     paths: {
-        'jquery':     'vendor/jquery-1.7.2.min',
-        'underscore': 'vendor/underscore-1.4.3.min',
-        'backbone':   'vendor/backbone-0.9.2.min',
-        'bootstrap':  'vendor/bootstrap.min',
-        'socket.io':  '/socket.io/socket.io.js'
+        'jquery':      'vendor/jquery-1.7.2.min',
+        'underscore':  'vendor/underscore-1.4.3.min',
+        'backbone':    'vendor/backbone-0.9.2.min',
+        'bootstrap':   'vendor/bootstrap.min',
+        'stacktrace':  'vendor/stacktrace',
+        'socket.io':   '/socket.io/socket.io.js'
     },
     // Define non AMD modules
     shim: {
@@ -15,11 +16,13 @@ require.config({
             deps: ["underscore", "jquery", "bootstrap"],
             exports: "Backbone"
         },
+        stacktrace: {
+            exports: 'printStackTrace'
+        },
         'bootstrap': {
             deps: ["jquery"],
             exports: "$.fn.popover"
         }
-
     }
 });
 

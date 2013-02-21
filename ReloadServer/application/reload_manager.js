@@ -119,6 +119,51 @@ var rpcFunctions = {
     },
 
     /**
+     * (RPC): Read a remove list of example projects.
+     */
+    getExampleList: function (sendResponse) {
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        var options = {
+            host: 'localhost',
+            port: '8283',
+            path: '/feed/feed.json',
+            method: 'GET'
+        }
+
+        options.headers = {
+            'Content-Type': 'text/pain'
+        };
+
+        // Set up the request
+        var request = http.request(options, function(res) {
+            console.log('!!!!!!');
+            var output = '';
+            console.log(options.host + ':' + res.statusCode);
+            res.setEncoding('utf8');
+
+            res.on('data', function (chunk) {
+                output += chunk;
+            });
+
+            res.on('end', function() {
+                var obj = JSON.parse(output);
+                console.log(obj);
+                sendResponse({hasError: false, data: obj});
+            });
+        });
+
+        request.on('error', function(e) {
+            console.log('Could not establish connection with Localhost: ' + e.message);
+        });
+        request.end();
+        sendResponse({hasError: false, data: obj});
+    },
+
+    /**
      * (RPC): Returns the Project list with attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
