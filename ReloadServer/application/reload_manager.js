@@ -732,7 +732,7 @@ var rpcFunctions = {
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
 
-                var command = "open " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                var command = "open " + this.fixPathUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                         this.fixPathsUnix(projectFolder) + "/LocalFiles";
             }
             else if ((vars.globals.localPlatform.indexOf("linux") >=0)) {
@@ -740,12 +740,12 @@ var rpcFunctions = {
                 var commandStat = fs.statSync("/usr/bin/nautilus");
                 if(commandStat.isFile()) {
 
-                  var command = "nautilus " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                  var command = "nautilus " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                               this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
                 else {
 
-                  var command = "dolphin " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                  var command = "dolphin " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                              this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
             }
