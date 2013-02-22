@@ -7,7 +7,7 @@ define([
 
     var DebugView = Backbone.View.extend({
 
-        name: 'debug',
+        name: 'weinre',
 
         className: 'weinre',
 
@@ -26,7 +26,6 @@ define([
         },
 
         close: function () {
-            console.log('close debug');
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();
