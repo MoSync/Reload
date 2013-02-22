@@ -1,8 +1,33 @@
 define([
-   'underscore',
-   'backbone'
+       'underscore',
+       'backbone'
 ], function(_, Backbone){
     var ProjectModel = Backbone.Model.extend({
+        reload: function (debug) {
+            var d = debug || false;
+            console.log('!!! Reloading ' + this.get('name') + ' with debug flag: ' + d);
+
+            var options     = {};
+            options.url     = 'http://localhost:8283';
+            options.rpcMsg  = {
+                method: 'manager.reloadProject',
+                params: [this.get('name'), d],
+                id: 0
+            };
+
+            options.success = function (resp) {
+                console.log('reload successful');
+                console.log(resp);
+            };
+
+            options.error   = function (resp) {
+                console.log('could not reload');
+                console.log(resp);
+            };
+
+            this.rpc(options);
+        }
+
     });
     // Return the model for the module
     return ProjectModel;

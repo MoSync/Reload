@@ -46,7 +46,13 @@ define([
 
         reload: function (e) {
             e.preventDefault();
+            // Call to ExampleProject::reload()
+            // this.model is set in collections/examples.js
             console.log('reload ' + this.model.get('name'));
+            console.log('ExampleView::reload()');
+            var attrs = _.clone(this.model.attributes);
+            console.log(attrs);
+            this.model.reload(attrs);
         },
         copy: function (e) {
             e.preventDefault();

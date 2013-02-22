@@ -1,12 +1,12 @@
 define([
    'underscore',
    'backbone',
-   'models/project/project'
-], function(_, Backbone, ProjectModel){
+   'models/example/example'
+], function(_, Backbone, ExampleModel){
 
     var ExampleCollection = Backbone.Collection.extend({
 
-        model: ProjectModel,
+        model: ExampleModel,
 
         initialize: function () {
             _.bindAll(this, 'populate');
@@ -26,7 +26,7 @@ define([
 
             options.success = function (resp) {
                 _.map(resp.result.feed, function (p) {
-                    self.push(new ProjectModel(p));
+                    self.push(new ExampleModel(p));
                 });
             };
 

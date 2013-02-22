@@ -5,6 +5,9 @@ var path  = require('path');
 var ncp   = require('../node_modules/ncp');
 var cheerio = require('cheerio');
 var http = require('http');
+var url = require('url');
+
+var unzip = require('unzip');
 
 /**
  * The functions that are available for remote calling
@@ -119,7 +122,7 @@ var rpcFunctions = {
     },
 
     /**
-     * (RPC): Read a remove list of example projects.
+     * (RPC): Read a remote list of example projects.
      */
     getExampleList: function (sendResponse) {
         //check if parameter passing was correct
@@ -140,9 +143,7 @@ var rpcFunctions = {
 
         // Set up the request
         var request = http.request(options, function(res) {
-            console.log('!!!!!!');
             var output = '';
-            console.log(options.host + ':' + res.statusCode);
             res.setEncoding('utf8');
 
             res.on('data', function (chunk) {
@@ -161,6 +162,83 @@ var rpcFunctions = {
         });
         request.end();
         sendResponse({hasError: false, data: obj});
+    },
+
+    reloadExample: function (opts, sendResponse) {
+        var opts, options, file_name, home_dir, download_dir, file;
+        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+        download_dir = home_dir + '/.reload/examples';
+
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        opts = JSON.parse(opts);
+
+        // Download
+        //console.log('Download zip: ' + opts.url);
+        //console.log('Options:');
+        //console.log(url.parse(opts.url));
+
+        file_name = url.parse(opts.url).pathname.split('/').pop();
+
+        // Create download directory if it does not exist.
+        path.exists(download_dir, function(exists) {
+            if (!exists){
+                console.log("Download dir does not exist. Create it!");
+                console.log(download_dir);
+                fs.mkdir(home_dir+'/.reload', 0755, function(e) {
+                    if (!e) {
+                        fs.mkdir(home_dir+'/.reload/examples', 0755, function(e) {
+                            if (!e) {
+                                console.log('Done creating ~/.reload/examples/');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        // Stream to file.
+        file = fs.createWriteStream(download_dir + vars.globals.fileSeparator + file_name);
+
+        options = {
+            host:    url.parse(opts.url).hostname,
+            port:    url.parse(opts.url).port,
+            path:    url.parse(opts.url).pathname,
+            method:  'GET'
+        };
+
+        var request = http.request(options, function (res) {
+            res.on('data', function(chunk){
+                file.write(chunk);
+            });
+
+            res.on('end', function(){
+                file.end();
+                //console.log('transfer complete ' + download_dir + vars.globals.fileSeparator + file_name);
+
+                //console.log('unpacking' + download_dir + vars.globals.fileSeparator);
+
+                // Unpack
+                fs.createReadStream(download_dir + vars.globals.fileSeparator + file_name)
+                .pipe(unzip.Extract({ path: download_dir + vars.globals.fileSeparator }));
+                //console.log('unpack complete to ' + download_dir + vars.globals.fileSeparator);
+
+                //Reload.
+
+            });
+        });
+
+        request.on('error', function(e) {
+            console.log('Could not establish connection with '
+                        + opts.url
+                        + ' : '
+                        + e.message);
+        });
+        request.end();
+
+        console.log('reload_manager::reloadExample()');
+        console.log(opts);
     },
 
     /**
