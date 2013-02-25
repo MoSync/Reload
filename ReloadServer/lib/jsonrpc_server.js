@@ -89,7 +89,10 @@ create = function(port) {
 
     });
 
-    vars.methods.startWebUI();
+    if(vars.globals.openBrowser) {
+        vars.methods.startWebUI();    
+    }
+    
     console.log('Server started listening on port: ' + port);
 };
 
