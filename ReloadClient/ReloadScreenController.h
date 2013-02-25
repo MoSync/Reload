@@ -116,12 +116,14 @@ public:
 
 private:
 	/**
-	 * Shows or hides the reload tab screen (containing the connection screen and the
-	 * workspace screen).
-	 * @param show If true, the reload tab screen is pushed into the main stack screen and poped
-	 * 	otherwise.
+	 * Pushes the workspace screen into the main stack.
 	 */
-	void showTabScreen(bool show);
+	void pushWorkspaceScreen();
+
+	/**
+	 * Pops the workspace screen from the stack.
+	 */
+	void popWorkspaceScreen();
 
 private:
 	/**
@@ -138,17 +140,6 @@ private:
 	 * The login screen containing the connection options and the reload last app option.
 	 */
 	LoginScreen *mLoginScreen;
-
-	/**
-	 * The main application tab screen, containing the ConnectionScreen and the WorkspaceScreen
-	 */
-	ReloadTabScreen *mReloadTabScreen;
-
-	/**
-	 * The connected screen, containing options for reloading last app and
-	 * for disconnecting from the server.
-	 */
-	ConnectionScreen *mConnectionScreen;
 
 	/**
 	 * The workspace screen, containing a list with the workspace projects.

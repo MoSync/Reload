@@ -39,8 +39,6 @@ using namespace NativeUI; // WebView widget.
  */
 ReloadScreenController::ReloadScreenController(ReloadClient *client) :
 		mLoginScreen(NULL),
-		mReloadTabScreen(NULL),
-		mConnectionScreen(NULL),
 		mWorkspaceScreen(NULL)
 {
 	mReloadClient = client;
@@ -49,6 +47,7 @@ ReloadScreenController::ReloadScreenController(ReloadClient *client) :
 ReloadScreenController::~ReloadScreenController()
 {
 	mLoginScreen->removeReloadUIListener(this);
+	mWorkspaceScreen->addReloadUIListener(this);
 }
 
 /**
@@ -67,10 +66,8 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 	mLoginScreen = new LoginScreen(os, orientation);
 	mLoginScreen->addReloadUIListener(this);
 
-//	MainStackScreen::getInstance()->push(mLoginScreen);
-//	MainStackScreen::getInstance()->show();
-	mLoginScreen->setVisible(true);
-	mLoginScreen->show();
+	MainStackScreen::getInstance()->push(mLoginScreen);
+	MainStackScreen::getInstance()->show();
 }
 
 /**
@@ -83,8 +80,7 @@ void ReloadScreenController::connectedTo(const char *serverAddress)
 	String conTo = "Connected to: ";
 	conTo += serverAddress;
 
-	showTabScreen(true);
-	mConnectionScreen->fillConnectionData(conTo.c_str());
+	pushWorkspaceScreen();
 }
 
 /**
@@ -92,7 +88,7 @@ void ReloadScreenController::connectedTo(const char *serverAddress)
  */
 void ReloadScreenController::disconnected()
 {
-	showTabScreen(false);
+	popWorkspaceScreen();
 }
 
 /**
@@ -101,7 +97,7 @@ void ReloadScreenController::disconnected()
  */
 void ReloadScreenController::showConnectedScreen()
 {
-	showTabScreen(true);
+	pushWorkspaceScreen();
 }
 
 /**
@@ -109,7 +105,7 @@ void ReloadScreenController::showConnectedScreen()
  */
 void ReloadScreenController::showNotConnectedScreen()
 {
-	showTabScreen(false);
+	popWorkspaceScreen();
 }
 
 /**
@@ -131,42 +127,31 @@ bool ReloadScreenController::loginScreenVisible()
 }
 
 /**
- * Shows or hides the reload tab screen (containing the connection screen and the
- * workspace screen).
- * @param show If true, the reload tab screen is pushed into the main stack screen and poped
- * 	otherwise.
+ * Pushes the workspace screen into the main stack.
  */
-void ReloadScreenController::showTabScreen(bool show)
+void ReloadScreenController::pushWorkspaceScreen()
 {
-	if (show)
+	if (mWorkspaceScreen == NULL)
 	{
-		if (mReloadTabScreen == NULL)
-		{
-			mReloadTabScreen = new ReloadTabScreen();
-
-			int orientation = maScreenGetCurrentOrientation();
-			mConnectionScreen = new ConnectionScreen(mOS, orientation);
-			mConnectionScreen->setTitle("Reload");
-			mConnectionScreen->addReloadUIListener(this);
-			mReloadTabScreen->addTab(mConnectionScreen);
-
-			mWorkspaceScreen = new WorkspaceScreen();
-			mWorkspaceScreen->setTitle("Workspace");
-			mReloadTabScreen->addTab(mWorkspaceScreen);
-
-			mReloadTabScreen->setActiveTab(0);
-		}
-
-		mReloadTabScreen->show();
-		mLoginScreen->setVisible(false);
-		lprintfln("TAB SCREEN VISIBLE!!!!!!!!!!!!!!!!!!!");
-	//	MainStackScreen::getInstance()->push(mReloadTabScreen);
+		mWorkspaceScreen = new WorkspaceScreen();
+		mWorkspaceScreen->setTitle("Workspace");
+		mWorkspaceScreen->addReloadUIListener(this);
 	}
-	else
+
+	MainStackScreen::getInstance()->push(mWorkspaceScreen);
+}
+
+/**
+ * Pops the workspace screen from the stack.
+ */
+void ReloadScreenController::popWorkspaceScreen()
+{
+	int screenCount = MainStackScreen::getInstance()->countChildWidgets();
+	lprintfln("Stack screen size %d:", screenCount);
+
+	if (screenCount >= 2)
 	{
-		mLoginScreen->setVisible(true);
-		mLoginScreen->show();
-	//	MainStackScreen::getInstance()->pop();
+		MainStackScreen::getInstance()->pop();
 	}
 }
 

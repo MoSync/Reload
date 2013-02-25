@@ -334,7 +334,6 @@ void ReloadClient::openWormhole(MAHandle webViewHandle)
  */
 void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 {
-	lprintfln("KEY PRESS EVENT!!");
 	if (mRunningApp)
 	{
 		// Forward to PhoneGap MessageHandler.

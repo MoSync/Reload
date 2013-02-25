@@ -31,8 +31,10 @@ MA 02110-1301, USA.
 
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
+#include "ReloadUIListener.h"
 
 using namespace NativeUI;
+using namespace MAUtil;
 
 class WorkspaceScreen:
 	public Screen,
@@ -50,6 +52,18 @@ public:
 	 * Destructor.
 	 */
 	~WorkspaceScreen();
+
+	/**
+	 * Add a reload UI event listener.
+	 * @param listener The listener that will receive reload UI events.
+	 */
+	void addReloadUIListener(ReloadUIListener* listener);
+
+	/**
+	 * Remove a reload UI listener.
+	 * @param listener The listener that receives reload UI events.
+	 */
+	void removeReloadUIListener(ReloadUIListener* listener);
 
 private:
 	/**
@@ -72,27 +86,26 @@ private:
 	virtual void listViewItemClicked(
 		ListView* listView,
 		ListViewItem* listViewItem);
-
-	/**
-	 * This method is called when a segmented/alphabetical list view item is clicked.
-	 * @param listView The list view object that generated the event.
-	 * @param listViewSection The ListViewSection object that contains the selected item.
-	 * @param listViewItem The ListViewItem objet clicked.
-	 */
-	virtual void segmentedListViewItemClicked(
-		ListView* listView,
-		ListViewSection* listViewSection,
-		ListViewItem* listViewItem);
 private:
+	/**
+	 * Array with login screen listeners.
+	 */
+	MAUtil::Vector<ReloadUIListener*> mReloadUIListeners;
+
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
 
 	/**
-	 *
+	 * The button that refreshes the workspace project list.
 	 */
 	Button* mRefreshButton;
+
+	/**
+	 * The button that disconnects us from the server.
+	 */
+	Button *mDisconnectButton;
 
 	/**
 	 * The alphabetical list view.

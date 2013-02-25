@@ -43,6 +43,7 @@ WorkspaceScreen::WorkspaceScreen() :
 
 	//Set the moblet to receive events from the button
 	mRefreshButton->addButtonListener(this);
+	mDisconnectButton->addButtonListener(this);
 	mListView->addListViewListener(this);
 
 	// TODO SA: get all the projects from the server
@@ -54,7 +55,10 @@ WorkspaceScreen::WorkspaceScreen() :
 WorkspaceScreen::~WorkspaceScreen()
 {
 	mRefreshButton->removeButtonListener(this);
+	mDisconnectButton->removeButtonListener(this);
 	mListView->removeListViewListener(this);
+
+	mReloadUIListeners.clear();
 }
 
 /**
@@ -69,27 +73,16 @@ void WorkspaceScreen::createMainLayout() {
 	mRefreshButton->setText("Refresh projects");
 	mRefreshButton->fillSpaceHorizontally();
 
-	mListView = new ListView(LIST_VIEW_TYPE_ALPHABETICAL);
+	mListView = new ListView();
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
-	for (int i = 0; i <= 4; i++)
+	for (int i = 0; i <= 9; i++)
 	{
-		ListViewSection* section = new ListViewSection(LIST_VIEW_SECTION_TYPE_ALPHABETICAL);
-		MAUtil::String sectionTitle = "A";
-		sectionTitle[0] += i;
-		section->setTitle(sectionTitle);
-		section->setHeaderText(sectionTitle);
-
-		mListView->addChild(section);
-		for (int j = 0; j <= 3; j++)
-		{
-			ListViewItem* item = new ListViewItem();
-			MAUtil::String itemText = "Project " + sectionTitle + "0";
-			item->setText(itemText);
-			item->setSubtitle("project type");
-			section->addItem(item);
-		}
+		ListViewItem* item = new ListViewItem();
+		MAUtil::String itemText = "Project " + MAUtil::integerToString(i);
+		item->setText(itemText);
+		mListView->addChild(item);
 	}
 
 	mMainLayout->addChild(mListView);
@@ -123,15 +116,34 @@ void WorkspaceScreen::listViewItemClicked(
 }
 
 /**
- * This method is called when a segmented/alphabetical list view item is clicked.
- * @param listView The list view object that generated the event.
- * @param listViewSection The ListViewSection object that contains the selected item.
- * @param listViewItem The ListViewItem objet clicked.
+ * Add a reload UI event listener.
+ * @param listener The listener that will receive reload UI events.
  */
-void WorkspaceScreen::segmentedListViewItemClicked(
-	ListView* listView,
-	ListViewSection* listViewSection,
-	ListViewItem* listViewItem)
+void WorkspaceScreen::addReloadUIListener(ReloadUIListener* listener)
 {
+    for (int i = 0; i < mReloadUIListeners.size(); i++)
+    {
+        if (listener == mReloadUIListeners[i])
+        {
+            return;
+        }
+    }
 
+    mReloadUIListeners.add(listener);
+}
+
+/**
+ * Remove a reload UI listener.
+ * @param listener The listener that receives reload UI events.
+ */
+void WorkspaceScreen::removeReloadUIListener(ReloadUIListener* listener)
+{
+	for (int i = 0; i < mReloadUIListeners.size(); i++)
+	{
+		if (listener == mReloadUIListeners[i])
+		{
+			mReloadUIListeners.remove(i);
+			break;
+		}
+	}
 }
