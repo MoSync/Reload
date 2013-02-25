@@ -14,7 +14,7 @@ vars.globals.currentWorkingPath = process.cwd();
 
 process.argv.forEach(function (value, index, array) {
 
-	if( value === "-nobrowser") {
+	if (value === "-nobrowser") {
 		vars.globals.openBrowser = false;
 	}
 });
