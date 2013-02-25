@@ -63,6 +63,9 @@ MA 02110-1301, USA.
 #define MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO 0.25
 #define MENU_BUTTON_SPACING_LANDSCAPE_RATIO 0.05
 
+#define CONNECTION_MENU_SCREEN_HEIGHT_PORTRAIT_RATIO 0.75
+#define CONNECTION_MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO 0.60
+
 /**
  * The bottom part of the screen contains the MoSync logo and the info button.
  * Here are defined a couple of values used to position the two widgets.

@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 #ifndef LOADINGSCREEN_H_
 #define LOADINGSCREEN_H_
 
-#include "ReloadClient.h"
+#include "../ReloadClient.h"
 
 class ReloadClient;
 

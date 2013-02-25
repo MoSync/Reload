@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -16,43 +16,62 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/**
- * @file LoginScreen.h
+
+/*
+ * LoginScreen.h
  *
- *  Created on: Feb 27, 2012
- *      Author: Iraklis Rossis
+ *  Created on: Feb 4, 2013
+ *      Author: Spiridon Alexandru
  */
 
 #ifndef LOGINSCREEN_H_
 #define LOGINSCREEN_H_
 
-#include "ReloadClient.h"
-#include "LoginScreenWidget.h"
-#include "LoginScreenListener.h"
+#include <NativeUI/Widgets.h>
 
-class ReloadClient;
+#include "ReloadUIListener.h"
 
-using namespace MAUtil; // Class Moblet
-using namespace NativeUI; // WebView widget.
+using namespace MAUtil;
+using namespace NativeUI;
 
-class LoginScreen : public ButtonListener, EditBoxListener, LoginScreenListener
+class LoginScreen:
+	public Screen, ButtonListener, EditBoxListener
 {
-	void rebuildScreenLayout(int screenWidth, int screenHeight, String os, int orientation);
 public:
-	LoginScreen(ReloadClient *client);
+	/**
+	 * Constructor.
+	 * @param os The current os.
+	 */
+	LoginScreen(MAUtil::String os, int orientation);
 
+	/**
+	 * Destructor.
+	 */
 	~LoginScreen();
 
 	/**
-	 * Creates the screen, the layouts, the widgets and positions everything.
-	 * @param os A string containing the current os.
-	 * @param orientation One of the values:
-	 * 		MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
-	 * 		MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
-	 * 		MA_SCREEN_ORIENTATION_PORTRAIT
-	 * 		MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+	 * Sets the default IP address of the server.
+	 * @param ipAddress The server IP default address.
 	 */
-	void initializeScreen(MAUtil::String &os, int orientation);
+	void setDefaultIPAddress(const char *ipAddress);
+
+	/**
+	 * Add a reload UI event listener.
+	 * @param listener The listener that will receive reload UI events.
+	 */
+	void addReloadUIListener(ReloadUIListener* listener);
+
+	/**
+	 * Remove a reload UI listener.
+	 * @param listener The listener that receives reload UI events.
+	 */
+	void removeReloadUIListener(ReloadUIListener* listener);
+
+private:
+	/**
+	 * Creates the screen, the layouts, the widgets and positions everything.
+	 */
+	void initializeScreen();
 
 	/**
 	 * Creates and adds the background image to the main layout.
@@ -77,11 +96,6 @@ public:
 	 * Creates the connected layout and adds it to the menu layout.
 	 */
 	void createConnectedLayout();
-
-	/**
-	 * Creates the disconnected layout and adds it to the menu layout.
-	 */
-	void createDisconnectedLayout();
 
 	/**
 	 * Creates and adds the bottom layout (that contains the MoSync logo
@@ -142,6 +156,13 @@ public:
 			float infoWidthRatio, float infoLeftRatio, float infoTopRatio);
 
 	/**
+	 * Repositions all the screen widgets/layouts.
+	 * @param screenWidth The current screen width.
+	 * @param screenHeight The current screen height.
+	 */
+	void rebuildScreenLayout(int screenWidth, int screenHeight);
+
+	/**
 	 * Called by the system when the user clicks a button
 	 * @param button The button that was clicked
 	 */
@@ -155,37 +176,31 @@ public:
 	void editBoxReturn(EditBox* editBox);
 
 	/**
-	 * Show the login screen in the connected state
-	 * with the "connected" controls visible.
+	 * Called just before the screen begins rotating.
 	 */
-	void showConnectedScreen();
+	virtual void orientationWillChange();
 
 	/**
-	 * Show the login screen in the not connected state.
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
 	 */
-	void showNotConnectedScreen();
-
-	void connectedTo(const char *serverAddress);
-
-	void disconnected();
-
-	void defaultAddress(const char *serverAddress);
-
-	/**
-	 * This method is called the orientation changes
-	 * @param newOrientation The new screen orientation. One of the values: MA_SCREEN_ORIENTATION_PORTRAIT,
-	 * MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN, MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT, MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT.
-	 * @param newScreenHeight The new screen height after orientation has changed.
-	 * @param newScreenWidth The new screen width after oritentation has changed.
-	 */
-	virtual void orientationChanged(int newOrientation, int newScreenWidth, int newScreenHeight);
+	virtual void orientationDidChange();
 
 private:
-	LoginScreenWidget *mLoginScreen;
+	/**
+	 * Array with login screen listeners.
+	 */
+	MAUtil::Vector<ReloadUIListener*> mReloadUIListeners;
 
-	ImageButton *mInfoIcon;
+	/**
+	 * The current os.
+	 */
+	MAUtil::String mOS;
 
-	EditBox *mServerIPBox;
+	/**
+	 * The current screen orientation.
+	 */
+	int mCurrentOrientation;
 
 	/**
 	 * The TextWidgets declared here are instantiated as either
@@ -193,19 +208,15 @@ private:
 	 */
 	TextWidget *mServerConnectButton;
 
-	TextWidget *mServerDisconnectButton;
-
 	TextWidget *mLoadLastAppButton;
+
+	ImageButton *mInfoIcon;
+
+	EditBox *mServerIPBox;
 
 	RelativeLayout *mConnectLayout;
 
-	RelativeLayout *mDisconnectLayout;
-
-	Label *mConnectedToLabel;
-
 	Label *mServerIPLabel;
-
-	Label *mInstructionsLabel;
 
 	Image* mLogo;
 
@@ -214,13 +225,6 @@ private:
 	Image *mBackground;
 
 	RelativeLayout* mMainLayout;
-
-	ReloadClient *mReloadClient;
-
-	MAUtil::String mOS;
-
-	int mCurrentOrientation;
 };
-
 
 #endif /* LOGINSCREEN_H_ */

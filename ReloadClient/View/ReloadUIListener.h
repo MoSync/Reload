@@ -17,30 +17,41 @@
  */
 
 /*
- * LoginScreenListener.h
+ * ReloadUIListener.h
  *
  *  Created on: Feb 4, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef LOGINSCREENLISTENER_H_
-#define LOGINSCREENLISTENER_H_
+#ifndef RELOADUILISTENER_H_
+#define RELOADUILISTENER_H_
 
 /**
- * \brief Listener for list screen events.
+ * \brief Listener for reload UI events.
  */
-class LoginScreenListener
+class ReloadUIListener
 {
 public:
 	/**
-	 * This method is called the orientation changes
-	 * @param newOrientation The new screen orientation. One of the values: MA_SCREEN_ORIENTATION_PORTRAIT,
-	 * MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN, MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT, MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT.
-	 * @param newScreenHeight The new screen height after orientation has changed.
-	 * @param newScreenWidth The new screen width after oritentation has changed.
+	 * Called when the connect button is clicked.
+	 * @param address The address contained by the connect EditBox.
 	 */
-	virtual void orientationChanged(int newOrientation, int newScreenWidth, int newScreenHeight) = 0;
+	virtual void connectButtonClicked(MAUtil::String address) = 0;
+
+	/**
+	 * Called when the disconnect button is clicked.
+	 */
+	virtual void disconnectButtonClicked() = 0;
+
+	/**
+	 * Called when the reload last app button is clicked.
+	 */
+	virtual void reloadLastAppButtonClicked() = 0;
+
+	/**
+	 * Called when the info button is clicked.
+	 */
+	virtual void infoButtonClicked() = 0;
 };
 
-
-#endif /* LOGINSCREENLISTENER_H_ */
+#endif /* RELOADUILISTENER_H_ */

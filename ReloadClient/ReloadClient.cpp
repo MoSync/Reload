@@ -169,7 +169,7 @@ ReloadClient::ReloadClient()
 	createNetworkHandlers();
 
 	// Show first screen.
-	mLoginScreen->showNotConnectedScreen();
+	mReloadScreenController->showNotConnectedScreen();
 }
 
 ReloadClient::~ReloadClient()
@@ -288,14 +288,14 @@ void ReloadClient::initializeFiles()
 void ReloadClient::createScreens()
 {
 	// Create login screen and loading screen.
-	mLoginScreen = new LoginScreen(this);
+	mReloadScreenController = new ReloadScreenController(this);
 	int orientation = maScreenGetCurrentOrientation();
-	mLoginScreen->initializeScreen(mOS, orientation);
+	mReloadScreenController->initializeScreen(mOS, orientation);
 	mLoadingScreen = new LoadingScreen(this);
 	mLoadingScreen->initializeScreen(mOS);
 
 	// Set the most recently used server IP address.
-	mLoginScreen->defaultAddress(mServerAddress.c_str());
+	mReloadScreenController->defaultAddress(mServerAddress.c_str());
 }
 
 void ReloadClient::createMessageHandlers()
@@ -334,6 +334,7 @@ void ReloadClient::openWormhole(MAHandle webViewHandle)
  */
 void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 {
+	lprintfln("KEY PRESS EVENT!!");
 	if (mRunningApp)
 	{
 		// Forward to PhoneGap MessageHandler.
@@ -343,7 +344,14 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	{
 		if (MAK_BACK == keyCode)
 		{
-			exit();
+			if (mReloadScreenController->loginScreenVisible())
+			{
+				exit();
+			}
+			else
+			{
+				disconnectFromServer();
+			}
 		}
 	}
 }
@@ -359,7 +367,7 @@ void ReloadClient::exit()
 	{
 		// Close the running app and show the start screen.
 		mRunningApp = false;
-		mLoginScreen->showConnectedScreen();
+		mReloadScreenController->showConnectedScreen();
 	}
 	else
 	{
@@ -443,7 +451,7 @@ void ReloadClient::socketHandlerConnected(int result)
 		LOG("@@@ RELOAD connected to: %s", mServerAddress.c_str());
 
 		// Tell UI we are connected.
-		mLoginScreen->connectedTo(mServerAddress.c_str());
+		mReloadScreenController->connectedTo(mServerAddress.c_str());
 
 		// Send info about this device to the server.
 		sendClientDeviceInfo();
@@ -482,7 +490,7 @@ void ReloadClient::socketHandlerDisconnected(int result)
 	}
 
 	// Go back to the login screen.
-	mLoginScreen->showNotConnectedScreen();
+	mReloadScreenController->showNotConnectedScreen();
 }
 
 /**
@@ -504,7 +512,7 @@ void ReloadClient::socketHandlerMessageReceived(const char* message)
 		//showConErrorMessage(result);
 
 		// Go back to the login screen.
-		mLoginScreen->showNotConnectedScreen();
+		mReloadScreenController->showNotConnectedScreen();
 	}
 }
 
@@ -571,7 +579,7 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 void ReloadClient::cancelDownload()
 {
 	mDownloadHandler.cancelDownload();
-	mLoginScreen->showConnectedScreen();
+	mReloadScreenController->showConnectedScreen();
 }
 
 void ReloadClient::connectToServer(const char* serverAddress)
@@ -598,7 +606,7 @@ void ReloadClient::disconnectFromServer()
 {
 	// Close the socket, and show the connect controls again.
 	mSocketHandler.closeConnection();
-	mLoginScreen->disconnected();
+	mReloadScreenController->disconnected();
 }
 
 // ========== Server message handling  ==========
