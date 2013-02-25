@@ -239,6 +239,7 @@ iframe {
     background: linear-gradient(to bottom,  #ededed 0%,#dddddd 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
 }
+
 #content #log-controls form {
     margin: 0 20px 20px 0;
     float: right;
