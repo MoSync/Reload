@@ -16,7 +16,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-
 /*
  * LoginScreen.h
  *
@@ -41,6 +40,7 @@ public:
 	/**
 	 * Constructor.
 	 * @param os The current os.
+	 * @param orientation The current device orientation.
 	 */
 	LoginScreen(MAUtil::String os, int orientation);
 

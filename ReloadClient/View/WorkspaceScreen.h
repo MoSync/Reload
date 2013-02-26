@@ -45,8 +45,10 @@ class WorkspaceScreen:
 public:
 	/**
 	 * Constructor.
+	 * @param os The current os.
+	 * @param orientation The current device orientation.
 	 */
-	WorkspaceScreen();
+	WorkspaceScreen(MAUtil::String os, int orientation);
 
 	/**
 	 * Destructor.
@@ -86,6 +88,18 @@ private:
 	virtual void listViewItemClicked(
 		ListView* listView,
 		ListViewItem* listViewItem);
+
+	/**
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
+	 */
+	virtual void orientationDidChange();
+
+	/**
+	 * Sets the screen height/width values and the screen width ratio
+	 * for the save and reload buttons.
+	 */
+	void setScreenValues();
 private:
 	/**
 	 * Array with login screen listeners.
@@ -123,6 +137,31 @@ private:
 	 * Used to identify which list view item button has been clicked.
 	 */
 	MAUtil::Vector<Button*> mReloadButtons;
+
+	/**
+	 * The platform the client is running on.
+	 */
+	MAUtil::String mOS;
+
+	/**
+	 * The device screen width.
+	 */
+	int mScreenWidth;
+
+	/**
+	 * The device screen height.
+	 */
+	int mScreenHeight;
+
+	/**
+	 * The save button screen width ratio.
+	 */
+	float mSaveButtonWidthRatio;
+
+	/**
+	 * The reload button screen width ratio.
+	 */
+	float mReloadButtonWidthRatio;
 };
 
 #endif /* WORKSPACESCREEN_H_ */

@@ -122,7 +122,8 @@ void ReloadScreenController::pushWorkspaceScreen()
 {
 	if (mWorkspaceScreen == NULL)
 	{
-		mWorkspaceScreen = new WorkspaceScreen();
+		int orientation = maScreenGetCurrentOrientation();
+		mWorkspaceScreen = new WorkspaceScreen(mOS, orientation);
 		mWorkspaceScreen->setTitle("Workspace");
 		mWorkspaceScreen->addReloadUIListener(this);
 	}
@@ -135,7 +136,7 @@ void ReloadScreenController::pushWorkspaceScreen()
  */
 void ReloadScreenController::popWorkspaceScreen()
 {
-	int screenCount = MainStackScreen::getInstance()->countChildWidgets();
+	int screenCount = MainStackScreen::getInstance()->getStackSize();
 
 	if (screenCount >= 2)
 	{

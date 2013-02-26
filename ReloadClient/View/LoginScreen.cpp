@@ -38,6 +38,7 @@ using namespace NativeUI;
 /**
  * Constructor.
  * @param os The current os.
+ * @param orientation The current device orientation.
  */
 LoginScreen::LoginScreen(MAUtil::String os, int orientation):
 	Screen()
@@ -572,7 +573,6 @@ void LoginScreen::orientationDidChange()
 	// on iOS the layouts are repositioned on orientation will change
 	if (mOS.find("iPhone") < 0)
 	{
-
 		MAExtent ex = maGetScrSize();
 		int screenWidth = EXTENT_X(ex);
 		int screenHeight = EXTENT_Y(ex);

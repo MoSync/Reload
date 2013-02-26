@@ -31,14 +31,19 @@ MA 02110-1301, USA.
 #include <mastdlib.h>
 
 #include "WorkspaceScreen.h"
+#include "WorkspaceScreenUtils.h"
 
 /**
  * Constructor.
+ * @param os The current os.
+ * @param orientation The current device orientation.
  */
-WorkspaceScreen::WorkspaceScreen() :
+WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation) :
 	Screen(),
 	mMainLayout(NULL)
 {
+	mOS = os;
+	setScreenValues();
 	createMainLayout();
 
 	//Set the moblet to receive events from the buttons and listview
@@ -90,11 +95,13 @@ void WorkspaceScreen::createMainLayout() {
 
 		Button* saveButton = new Button();
 		saveButton->setText("Save " + MAUtil::integerToString(i));
+		saveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
 		saveButton->addButtonListener(this);
 		mSaveButtons.add(saveButton);
 
 		Button* reloadButton = new Button();
 		reloadButton->setText("Reload " + MAUtil::integerToString(i));
+		reloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
 		reloadButton->addButtonListener(this);
 		mReloadButtons.add(reloadButton);
 
@@ -127,10 +134,8 @@ void WorkspaceScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mDisconnectButton)
 	{
-		mRefreshButton->setText("DIISCONENN");
 		for (int i = 0; i < mReloadUIListeners.size(); i++)
 		{
-			mRefreshButton->setText("DIISCONENN");
 			mReloadUIListeners[i]->disconnectButtonClicked();
 		}
 	}
@@ -200,5 +205,58 @@ void WorkspaceScreen::removeReloadUIListener(ReloadUIListener* listener)
 			mReloadUIListeners.remove(i);
 			break;
 		}
+	}
+}
+
+/**
+ * Called after the screen orientation has changed.
+ * Available only on iOS and Windows Phone 7.1 platforms.
+ */
+void WorkspaceScreen::orientationDidChange()
+{
+	setScreenValues();
+
+	for (int i = 0; i < mSaveButtons.size(); i++)
+	{
+		Button* saveButton = mSaveButtons[i];
+		Button* reloadButton = mReloadButtons[i];
+
+		saveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
+		reloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
+	}
+}
+
+/**
+ * Sets the screen height/width values and the screen width ratio
+ * for the save and reload buttons.
+ */
+void WorkspaceScreen::setScreenValues()
+{
+	int orientation = maScreenGetCurrentOrientation();
+	MAExtent ex = maGetScrSize();
+	mScreenWidth = EXTENT_X(ex);
+	mScreenHeight = EXTENT_Y(ex);
+
+	// on wp7 the screen size on landscape has the same values as portrait
+	// so we need to swap those values
+	if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+			orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
+			mOS.find("Windows", 0) >= 0)
+	{
+		int aux = mScreenWidth;
+		mScreenWidth = mScreenHeight;
+		mScreenHeight = aux;
+	}
+
+	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+	{
+		mSaveButtonWidthRatio = SAVE_BUTTON_LANDSCAPE_WIDTH_RATIO;
+		mReloadButtonWidthRatio = RELOAD_BUTTON_LANDSCAPE_WIDTH_RATIO;
+	}
+	else
+	{
+		mSaveButtonWidthRatio = SAVE_BUTTON_PORTRAIT_WIDTH_RATIO;
+		mReloadButtonWidthRatio = RELOAD_BUTTON_PORTRAIT_WIDTH_RATIO;
 	}
 }
