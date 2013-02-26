@@ -69,7 +69,7 @@ var accumulator = (function()
                 // TODO: Add some error/recovery handling
                 // in case the data is garbled and header
                 // not found.
-                console.log("tcp_server.js/accumulator: cannot find magic header");
+                console.log("tcp_server.js/accumulator: cannot find magic header", 0);
                 return null;
             }
 
@@ -180,7 +180,7 @@ var create = function (port) {
                 socket.deviceInfo.address = socket.remoteAddress;
                 generateDeviceInfoListJSON();
                 console.log("Client " + socket.remoteAddress +
-                    " (" + socket.deviceInfo.name + ") has connected." )
+                    " (" + socket.deviceInfo.name + ") has connected.", 0 )
             }
             // The device sent a log message.
             else if (message.message == "remoteLogRequest")
@@ -243,7 +243,7 @@ var create = function (port) {
                     "Client " +
                     address + " (" +
                     socket.deviceInfo.name +
-                    ") has disconnected.");
+                    ") has disconnected.", 0);
 
                 for (var i = 0; i < vars.globals.clientList.length; i++)
                 {
@@ -276,11 +276,10 @@ var create = function (port) {
         }
         catch(err)
         {
-            console.log("Error in saveClient: " + err);
+            console.log("Error in saveClient: " + err, 0);
         }
     }
-
-    console.log("Opening TCP socket on port: " + port);
+    console.log("Opening TCP socket on port: " + port, 0);
     var server = net.createServer(saveClient);
     server.listen(7000);
 

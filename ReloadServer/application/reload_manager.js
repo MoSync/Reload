@@ -44,7 +44,7 @@ var sendToAllClients = function(jsonMessage) {
             var result = client.write(fullMessage, "ascii");
         }
         catch (err) {
-            console.log("@@@ reload_manager.js: sendToAllClients error: " + err)
+            console.log("@@@ reload_manager.js: sendToAllClients error: " + err, 0)
 
             // Remove this client from the list since we have problems with it.
             var index = vars.globals.clientList.indexOf(client);
@@ -72,6 +72,8 @@ var rpcFunctions = {
             vars.globals.ip = socket.address().address;
             if (sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
+            } else {
+                console.log("Server IP: " + vars.globals.ip, 0);
             }
             socket.end();
         });
@@ -113,7 +115,9 @@ var rpcFunctions = {
 
         var versionInfoJSON = JSON.stringify({"version":vars.globals.versionInfo[0],
                                               "timestamp": vars.globals.versionInfo[1]});
-        console.log(versionInfoJSON);
+
+        console.log(vars.globals.versionInfo[0].replace(/^\s+|\s+$/g,'') + "  " + 
+                    vars.globals.versionInfo[1].replace(/^\s+|\s+$/g,''), 0);
 
         sendResponse({hasError: false, data: versionInfoJSON});
     },
@@ -158,7 +162,7 @@ var rpcFunctions = {
 
                 if(!exist) {
                     console.log("Creating the workspace directory " +
-                                vars.globals.rootWorkspacePath);
+                                vars.globals.rootWorkspacePath, 0);
                     fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);
                 }
 
@@ -193,7 +197,7 @@ var rpcFunctions = {
             });
         }
         catch (err) {
-            console.log("Error in findProjects: " + err);
+            console.log("ERROR in findProjects: " + err, 0);
         }
     },
 
@@ -219,7 +223,7 @@ var rpcFunctions = {
                 try {
                     console.log(
                         "Creating new project: " + projectName +
-                        ", of type " + projectType);
+                        ", of type " + projectType, 0);
 
                     var templateName = "ReloadTemplate";
                     if (projectType)
@@ -237,11 +241,12 @@ var rpcFunctions = {
                     var exec = require('child_process').exec;
 
                     function resultCommand(error, stdout, stderr) {
-                        console.log("stdout: " + stdout);
-                        console.log("stderr: " + stderr);
+                        
+                        console.log("stdout: " + stdout, 2);
                         if (error)
                         {
-                            console.log("error: " + error);
+                            console.log("ERROR stderr: " + stderr, 0);
+                            console.log("ERROR error: " + error, 0);
                         }
 
                         var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
@@ -279,12 +284,12 @@ var rpcFunctions = {
                                                          vars.globals.fileSeparator +
                                                          projectName + "\"";
                     }
-                    console.log("Command: " + command);
+                    console.log("Command: " + command, 2);
                     exec(command, resultCommand);
                 }
                 catch(err)
                 {
-                    console.log("Error in createNewProject: " + err);
+                    console.log("ERROR in createNewProject: " + err, 0);
                     sendResponse({hasError: true, data: "Error in createNewProject: " + err});
                 }
             }
@@ -309,15 +314,15 @@ var rpcFunctions = {
         // Delete directory
         this.removeRecursive(projectPath, function (error, status){
             if(!error) {
-                console.log("Succesfull deletion of directory " + projectPath);
+                console.log("Succesfull deletion of directory " + projectPath, 0);
                 if (!responseSent) {
                     sendResponse({hasError: false, data: "Succesfull deletion of project " + projectName});
                     responseSent = true;
                 }
             }
             else {
-                console.log("Error in deletion of directory " + projectPath);
-                console.log("Error deleting project: " + error);
+                console.log("ERROR in deletion of directory " + projectPath, 0);
+                console.log("ERROR deleting project: " + error, 0);
                 if (!responseSent) {
                     sendResponse({hasError: true, data: "Error deleting project: " + error});
                     responseSent = true;
@@ -431,17 +436,18 @@ var rpcFunctions = {
         if(typeof sendResponse !== 'function') return false;
 
         try {
-            console.log("Renaming Project from " + oldName + " to " + newName );
+            console.log("Renaming Project from " + oldName + " to " + newName, 0);
 
             var exec = require('child_process').exec;
             var respond = sendResponse;
 
             function resultCommand(error, stdout, stderr) {
-                console.log("stdout: " + stdout);
-                console.log("stderr: " + stderr);
+                
+                console.log("stdout: " + stdout, 2);
                 if (error)
                 {
-                    console.log("error: " + error);
+                    console.log("ERROR stderr: " + stderr, 0);
+                    console.log("ERROR error: " + error, 0);
                 }
 
                 var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
@@ -475,11 +481,11 @@ var rpcFunctions = {
                                           oldName +
                               "\" \"" + newName + "\"";
             }
-            console.log("Command: " + command);
+            console.log("Command: " + command, 2);
             exec(command, resultCommand);
         }
         catch(err) {
-            console.log("Error in renameProject(" + oldname + ", " + newName + "): " + err);
+            console.log("ERROR in renameProject(" + oldname + ", " + newName + "): " + err, 0);
             sendResponse({hasError: true, data: "Error in renameProject(" + oldname + ", " + newName + "): " + err});
         }
     },
@@ -608,7 +614,7 @@ var rpcFunctions = {
 
                 ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
                     if (err) {
-                        console.log('Copy Process      : Error-' + err);
+                        console.log('ERROR Copy Process      : Error-' + err, 0);
                     }
                     console.log('Copy Process      : Successfull');
 
@@ -640,8 +646,11 @@ var rpcFunctions = {
                             function puts(error, stdout, stderr)
                             {
                                 console.log("stdout: " + stdout);
-                                console.log("stderr: " + stderr);
-                                console.log("error : " + error);
+                                if (error) {
+                                    console.log("ERROR stderr: " + stderr, 0);
+                                    console.log("ERROR error : " + error, 0);
+                                }
+                                
                                 callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
                                          projectDir + "/LocalFiles.bin");
 
@@ -674,7 +683,7 @@ var rpcFunctions = {
                     });
                 });
             } catch(err) {
-                console.log("Error in bundleApp: " + err);
+                console.log("ERROR in bundleApp: " + err, 0);
             }
         } else {
             try {
@@ -685,8 +694,11 @@ var rpcFunctions = {
                 function puts(error, stdout, stderr)
                 {
                     console.log("stdout: " + stdout);
-                    console.log("stderr: " + stderr);
-                    console.log("error : " + error);
+                    if (error){
+                        console.log("stderr: " + stderr, 0);
+                        console.log("error : " + error, 0);
+                    }
+                                        
                     callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
                              projectDir + "/LocalFiles.bin");
                 }
@@ -709,7 +721,7 @@ var rpcFunctions = {
             }
             catch(err)
             {
-                console.log("Error in bundleApp: " + err);
+                console.log("Error in bundleApp: " + err, 0);
             }
         }
     },
@@ -724,10 +736,11 @@ var rpcFunctions = {
 
         try {
             var exec = require('child_process').exec;
+
+            console.log("stdout: " + stdout);
             function puts(error, stdout, stderr) {
-                console.log("stdout: " + stdout);
-                console.log("stderr: " + stderr);
-                console.log("error: " + error);
+                console.log("ERROR stderr: " + stderr, 0);
+                console.log("ERROR error: " + error, 0);
             }
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
@@ -757,7 +770,7 @@ var rpcFunctions = {
             sendResponse({hasError: false, data: ""});
         }
         catch(err) {
-            console.log("Error in openProjectFolder: " + err);
+            console.log("ERROR in openProjectFolder: " + err, 0);
             sendResponse({hasError: true, data: "Error in openProjectFolder: " + err});
         }
     },
@@ -851,7 +864,7 @@ var rpcFunctions = {
         }
         catch(err) {
 
-            console.log("Error in startDebugging: " + err);
+            console.log("ERROR in startDebugging: " + err, 0);
         }
     },
 
@@ -924,7 +937,7 @@ var rpcFunctions = {
 
         postRequest.on('error', function(e) {
             sendResponse({hasError: true, data: "Could not establish connection with Mosync."});
-            console.log('Could not establish connection with MoSync: ' + e.message);
+            console.log('ERROR Could not establish connection with MoSync: ' + e.message, 0);
         });
         // post the data
         postRequest.write(postData);
@@ -1015,7 +1028,7 @@ var rpcFunctions = {
 
         var self = this;
 
-        console.log("Changing workspace to " + newWorkspacePath);
+        console.log("Changing workspace to " + newWorkspacePath, 0);
 
         path.exists(newWorkspacePath, function(exists) {
 
@@ -1026,7 +1039,7 @@ var rpcFunctions = {
             }
             else {
 
-                console.log("workspace does not exist");
+                console.log("workspace does not exist", 0);
                 fs.mkdirSync(newWorkspacePath);
                 self.setRootWorkspacePath(newWorkspacePath);
                 self.findProjects(function(){},sendResponse);
@@ -1060,15 +1073,15 @@ var rpcFunctions = {
             if(exists) {
                 self.removeRecursive(workspacePath, function (error, status){
                     if(!error) {
-                        console.log("Succesfull deletion of directory " + workspacePath);
+                        console.log("Succesfull deletion of directory " + workspacePath, 0);
                         response = {hasError: false, data: "Succesfull deletion of " + workspacePath};
                     } else {
-                        console.log("Error in deletion of " + workspacePath);
-                        response = {hasError: true, data: "Error deleting project: " + error};
+                        console.log("ERROR in deletion of " + workspacePath, 0);
+                        response = {hasError: true, data: "ERROR deleting project: " + error};
                     }
                 });
             } else {
-                console.log('--- ' + workspacePath + ' does not exist');
+                console.log('ERROR ' + workspacePath + ' does not exist', 0);
             }
         });
 
@@ -1158,7 +1171,7 @@ var rpcFunctions = {
                     }
                     else {
 
-                        console.log("Error reading last workspace path, reverting to default");
+                        console.log("ERROR reading last workspace path, reverting to default", 0);
                         self.setRootWorkspacePath(defaultPath);
                         self.changeWorkspacePath(defaultPath);
                     }
@@ -1172,7 +1185,7 @@ var rpcFunctions = {
         }
         catch(err) {
 
-            console.log("Error in getLatestPath: " + err);
+            console.log("ERROR in getLatestPath: " + err, 0);
         }
     },
 
@@ -1183,7 +1196,7 @@ var rpcFunctions = {
     setRootWorkspacePath : function (path){
 
         vars.globals.rootWorkspacePath = path;
-        console.log("Using workspace at :" + path);
+        console.log("Using workspace at: " + path, 0);
 
         try {
 
@@ -1191,7 +1204,7 @@ var rpcFunctions = {
         }
         catch(err) {
 
-            console.log("Error in setRootWorkspacePath: " + err);
+            console.log("ERROR in setRootWorkspacePath: " + err, 0);
         }
     },
 
@@ -1286,7 +1299,8 @@ var rpcFunctions = {
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
                 } catch (e) {
-                    console.log(e);
+                    console.log("ERROR in debugInjection:", 0);
+                    console.log(e, 0);
                 }
             }
         });

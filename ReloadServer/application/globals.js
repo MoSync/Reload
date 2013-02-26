@@ -60,7 +60,9 @@ var globals = {
         method: 'POST'
     },
 
-    openBrowser: true
+    openBrowser: true,
+
+    logLevel: 0,
 };
 
 var methods = {
@@ -97,8 +99,7 @@ var methods = {
 				statistics = createNewStatsFile();
 			}
 			callback(statistics);
-
-		});	
+		});
 	},
 
 	saveStats: function (statistics) {
@@ -121,7 +122,7 @@ var methods = {
 				fs.readFile(process.cwd() + globals.fileSeparator + "config.dat", 
                     "utf8", 
                     function(err, data){
-                        console.log(data);
+						console.log(data);
                         if (err) throw err;
 
                         var config = JSON.parse(data);
@@ -163,9 +164,12 @@ var methods = {
         var exec = require('child_process').exec,
             command = "";
         function puts(error, stdout, stderr) {
-            console.log("stdout: " + stdout);
-            console.log("stderr: " + stderr);
-            console.log("error: " + error);
+
+        	if (error) {
+        		console.log("stdout: " + stdout, 0);
+	            console.log("stderr: " + stderr, 0);
+	            console.log("error: " + error, 0);
+        	}
         }
 
         if((globals.localPlatform.indexOf("darwin") >= 0)) {
@@ -180,7 +184,7 @@ var methods = {
         exec(command, puts);
 
         return;
-    },
+    }
 };
 
 var MsgDispatcher = function() {
