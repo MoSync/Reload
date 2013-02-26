@@ -109,10 +109,15 @@ public:
 	virtual void infoButtonClicked();
 
 	/**
-	 * Checks if the login screen is visible.
-	 * @return true if the login screen is visible, false otherwise.
+	 * Called when the refresh workspace projects is cliecked.
 	 */
-	bool loginScreenVisible();
+	virtual void refreshWorkspaceProjectsButtonClicked();
+
+	/**
+	 * If the stack screen has only one screen, the application should exit.
+	 * @return true if the application should exit, false otherwise.
+	 */
+	bool shouldExit();
 
 private:
 	/**

@@ -41,12 +41,10 @@ WorkspaceScreen::WorkspaceScreen() :
 {
 	createMainLayout();
 
-	//Set the moblet to receive events from the button
+	//Set the moblet to receive events from the buttons and listview
 	mRefreshButton->addButtonListener(this);
 	mDisconnectButton->addButtonListener(this);
 	mListView->addListViewListener(this);
-
-	// TODO SA: get all the projects from the server
 }
 
 /**
@@ -73,6 +71,10 @@ void WorkspaceScreen::createMainLayout() {
 	mRefreshButton->setText("Refresh projects");
 	mRefreshButton->fillSpaceHorizontally();
 
+	mDisconnectButton = new Button();
+	mDisconnectButton->setText("Disconnect");
+	mDisconnectButton->fillSpaceHorizontally();
+
 	mListView = new ListView();
 
 	// the list view doesn't automatically sort its elements - the
@@ -80,11 +82,30 @@ void WorkspaceScreen::createMainLayout() {
 	for (int i = 0; i <= 9; i++)
 	{
 		ListViewItem* item = new ListViewItem();
-		MAUtil::String itemText = "Project " + MAUtil::integerToString(i);
-		item->setText(itemText);
-		mListView->addChild(item);
+
+		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
+		Label* projectNameLabel = new Label();
+		projectNameLabel->setText("Project " + MAUtil::integerToString(i));
+		projectNameLabel->fillSpaceHorizontally();
+
+		Button* saveButton = new Button();
+		saveButton->setText("Save " + MAUtil::integerToString(i));
+		saveButton->addButtonListener(this);
+		mSaveButtons.add(saveButton);
+
+		Button* reloadButton = new Button();
+		reloadButton->setText("Reload " + MAUtil::integerToString(i));
+		reloadButton->addButtonListener(this);
+		mReloadButtons.add(reloadButton);
+
+		itemHorizontalLayout->addChild(projectNameLabel);
+		itemHorizontalLayout->addChild(saveButton);
+		itemHorizontalLayout->addChild(reloadButton);
+
+		mListView->addChild(itemHorizontalLayout);
 	}
 
+	mMainLayout->addChild(mDisconnectButton);
 	mMainLayout->addChild(mListView);
 	mMainLayout->addChild(mRefreshButton);
 }
@@ -99,7 +120,41 @@ void WorkspaceScreen::buttonClicked(Widget* button)
 {
 	if (button == mRefreshButton)
 	{
-		// TODO SA: refresh all projects (get them from the server)
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mReloadUIListeners[i]->refreshWorkspaceProjectsButtonClicked();
+		}
+	}
+	else if (button == mDisconnectButton)
+	{
+		mRefreshButton->setText("DIISCONENN");
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mRefreshButton->setText("DIISCONENN");
+			mReloadUIListeners[i]->disconnectButtonClicked();
+		}
+	}
+	else
+	{
+		// check if a save button was clicked
+		for (int i = 0; i < mSaveButtons.size(); i++)
+		{
+			if (button == mSaveButtons[i])
+			{
+				// TODO SA: add logic
+				return;
+			}
+		}
+
+		// check if a reload button was clicked
+		for (int i = 0; i < mReloadButtons.size(); i++)
+		{
+			if (button == mReloadButtons[i])
+			{
+				// TODO SA: add logic
+				return;
+			}
+		}
 	}
 }
 

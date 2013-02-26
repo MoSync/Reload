@@ -44,6 +44,11 @@ public:
 	virtual void disconnectButtonClicked() = 0;
 
 	/**
+	 * Called when the refresh workspace projects is cliecked.
+	 */
+	virtual void refreshWorkspaceProjectsButtonClicked() = 0;
+
+	/**
 	 * Called when the reload last app button is clicked.
 	 */
 	virtual void reloadLastAppButtonClicked() = 0;

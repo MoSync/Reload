@@ -343,9 +343,14 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	{
 		if (MAK_BACK == keyCode)
 		{
-			if (mReloadScreenController->loginScreenVisible())
+			if (mReloadScreenController->shouldExit())
 			{
-				exit();
+				// on wp7, we cannot exit the application programmatically - the
+				// system closes the application on back button press
+				if (mOS.find("Windows", 0) < 0)
+				{
+					exit();
+				}
 			}
 			else
 			{

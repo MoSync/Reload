@@ -111,6 +111,18 @@ private:
 	 * The alphabetical list view.
 	 */
 	ListView* mListView;
+
+	/**
+	 * An array containing the list view item save buttons.
+	 * Used to identify which list view item button has been clicked.
+	 */
+	MAUtil::Vector<Button*> mSaveButtons;
+
+	/**
+	 * An array containing the list view item reload buttons.
+	 * Used to identify which list view item button has been clicked.
+	 */
+	MAUtil::Vector<Button*> mReloadButtons;
 };
 
 #endif /* WORKSPACESCREEN_H_ */

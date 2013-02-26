@@ -26,8 +26,6 @@ MA 02110-1301, USA.
 #include "ReloadClient.h"
 #include "ReloadScreenController.h"
 #include "View/MainStackScreen.h"
-#include "View/ReloadTabScreen.h"
-#include "View/ConnectionScreen.h"
 #include "View/WorkspaceScreen.h"
 
 using namespace MAUtil; // Class Moblet
@@ -47,7 +45,7 @@ ReloadScreenController::ReloadScreenController(ReloadClient *client) :
 ReloadScreenController::~ReloadScreenController()
 {
 	mLoginScreen->removeReloadUIListener(this);
-	mWorkspaceScreen->addReloadUIListener(this);
+	mWorkspaceScreen->removeReloadUIListener(this);
 }
 
 /**
@@ -118,15 +116,6 @@ void ReloadScreenController::defaultAddress(const char *serverAddress)
 }
 
 /**
- * Checks if the login screen is visible.
- * @return true if the login screen is visible, false otherwise.
- */
-bool ReloadScreenController::loginScreenVisible()
-{
-	return mLoginScreen->isVisible();
-}
-
-/**
  * Pushes the workspace screen into the main stack.
  */
 void ReloadScreenController::pushWorkspaceScreen()
@@ -147,7 +136,6 @@ void ReloadScreenController::pushWorkspaceScreen()
 void ReloadScreenController::popWorkspaceScreen()
 {
 	int screenCount = MainStackScreen::getInstance()->countChildWidgets();
-	lprintfln("Stack screen size %d:", screenCount);
 
 	if (screenCount >= 2)
 	{
@@ -188,4 +176,25 @@ void ReloadScreenController::infoButtonClicked()
 {
 	//Show the info screen
 	maMessageBox("Reload Client Info",mReloadClient->getInfo().c_str());
+}
+
+/**
+ * Called when the refresh workspace projects is cliecked.
+ */
+void ReloadScreenController::refreshWorkspaceProjectsButtonClicked()
+{
+	// TODO: refresh workspace projects logic
+}
+
+/**
+ * If the stack screen has only one screen, the application should exit.
+ * @return true if the application should exit, false otherwise.
+ */
+bool ReloadScreenController::shouldExit()
+{
+	if (MainStackScreen::getInstance()->getStackSize() > 1)
+	{
+		return false;
+	}
+	return true;
 }
