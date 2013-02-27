@@ -6,24 +6,31 @@ var sys = require('sys'),
 
 
 var log = function (logText, level) {
-	/*if (arguments.length > 2){
-		sys.puts("Error console.log invalid number parameters: " + arguments.length +
-				 "instead of 2.");
-		return;
-	}*/
+	
+	function colorize (logText) {
+		var red = '\u001b[31m', 
+			blue = '\u001b[34m', 
+			reset = '\u001b[0m';
+
+		if (typeof logText === "string" && logText.indexOf("ERROR") >= 0) {
+
+			console.dlog( red + logText + reset);
+		} else {
+
+			console.dlog(logText);
+		}
+	}
+	
 
 	if (typeof level === 'undefined') {
 		
 		if (vars.globals.logLevel == 2) {
-			console.dlog(logText);
-			//sys.inspect(logText);
+			colorize(logText);
 		}
 	} else {
 
-		//sys.puts(vars.globals.logLevel);
 		if (level <= vars.globals.logLevel) {
-			console.dlog(logText);
-			//sys.puts(sys.inspect(logText));
+			colorize(logText);
 		}
 	}	
 }
