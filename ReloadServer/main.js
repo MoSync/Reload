@@ -12,6 +12,13 @@ var os  = require('os'),
 vars.globals.localPlatform = os.platform();
 vars.globals.currentWorkingPath = process.cwd();
 
+process.argv.forEach(function (value, index, array) {
+
+	if (value === "-nobrowser") {
+		vars.globals.openBrowser = false;
+	}
+});
+
 //Platform specific considerations for getting the home directory
 if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||
    (vars.globals.localPlatform.indexOf("linux") >=0)) {

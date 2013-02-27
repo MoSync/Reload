@@ -58,7 +58,9 @@ var globals = {
         port: '80',
         path: '/reload_feedback',
         method: 'POST'
-    }
+    },
+
+    openBrowser: true
 };
 
 var methods = {
