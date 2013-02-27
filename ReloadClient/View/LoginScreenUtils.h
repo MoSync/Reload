@@ -27,6 +27,14 @@ MA 02110-1301, USA.
 #define LOGINSCREENUTILS_H_
 
 /**
+ * Text resources for UI elements
+ */
+#define SERVER_IP_LABEL_TEXT "Server IP:"
+#define CONNECT_BUTTON_TEXT "Connect"
+#define FIND_SERVERS_BUTTON_TEXT "Find servers"
+#define LOAD_STORED_PROJECTS_TEXT "Load stored projects"
+
+/**
  * The logo is the top part of the screen. Here are defined
  * a couple of values used to position the logo elements.
  */

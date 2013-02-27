@@ -17,30 +17,25 @@ MA 02110-1301, USA.
 */
 
 /*
- * WorkspaceScreenUtils.h
+ * StoredProjectsScreenUtils.h
  *
- *  Created on: Feb 26, 2013
+ *  Created on: Feb 27, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef WORKSPACESCREENUTILS_H_
-#define WORKSPACESCREENUTILS_H_
+#ifndef STOREDPROJECTSSCREENUTILS_H_
+#define STOREDPROJECTSSCREENUTILS_H_
 
 /**
  * Text resources for UI elements
  */
-#define DISCONNECT_BUTTON_TEXT "Disconnect"
-#define REFRESH_LIST_BUTTON_TEXT "Refresh projects"
-#define SAVE_BUTTON_TEXT "Save"
-#define RELOAD_BUTTON_TEXT "Reload"
+#define LOAD_BUTTON_TEXT "Load"
 
 /**
  * UI elements ratios
  */
-#define SAVE_BUTTON_PORTRAIT_WIDTH_RATIO 0.3
-#define RELOAD_BUTTON_PORTRAIT_WIDTH_RATIO 0.35
+#define LOAD_BUTTON_PORTRAIT_WIDTH_RATIO 0.35
 
-#define SAVE_BUTTON_LANDSCAPE_WIDTH_RATIO 0.3
-#define RELOAD_BUTTON_LANDSCAPE_WIDTH_RATIO 0.35
+#define LOAD_BUTTON_LANDSCAPE_WIDTH_RATIO 0.35
 
-#endif /* WORKSPACESCREENUTILS_H_ */
+#endif /* STOREDPROJECTSSCREENUTILS_H_ */

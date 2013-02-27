@@ -143,7 +143,8 @@ void LoginScreen::initializeScreen()
 				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
 	}
 
-	mMainLayout->addChild(mLoadLastAppButton);
+	mMainLayout->addChild(mFindServersButton);
+	mMainLayout->addChild(mLoadStoredProjectsButton);
 	mMainLayout->addChild(mMosynclogo);
 	mMainLayout->addChild(mInfoIcon);
 
@@ -267,20 +268,24 @@ void LoginScreen::createMenuLayout()
 	//Button that loads the last loaded app
 	if(mOS == "iPhone OS")
 	{
-		mLoadLastAppButton = new ImageButton();
-		((ImageButton*)mLoadLastAppButton)->addButtonListener(this);
-		((ImageButton*)mLoadLastAppButton)->setBackgroundImage(RELOAD_BG);
-		mLoadLastAppButton->setFontColor(0x000000);
+		mLoadStoredProjectsButton = new ImageButton();
+		((ImageButton*)mLoadStoredProjectsButton)->addButtonListener(this);
+		((ImageButton*)mLoadStoredProjectsButton)->setBackgroundImage(RELOAD_BG);
+		mLoadStoredProjectsButton->setFontColor(0x000000);
 	}
 	else
 	{
-		mLoadLastAppButton = new Button();
-		((Button*)mLoadLastAppButton)->addButtonListener(this);
+		mLoadStoredProjectsButton = new Button();
+		((Button*)mLoadStoredProjectsButton)->addButtonListener(this);
 	}
 
-	mLoadLastAppButton->setText("Reload last app");
-	mLoadLastAppButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	mLoadLastAppButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mFindServersButton = new Button();
+	((Button*)mFindServersButton)->addButtonListener(this);
+	mFindServersButton->setText(FIND_SERVERS_BUTTON_TEXT);
+
+	mLoadStoredProjectsButton->setText(LOAD_STORED_PROJECTS_TEXT);
+	mLoadStoredProjectsButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mLoadStoredProjectsButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 }
 
 /**
@@ -290,7 +295,7 @@ void LoginScreen::createConnectedLayout()
 {
 	//Label for the server IP edit box
 	mServerIPLabel = new Label();
-	mServerIPLabel->setText("Server IP:");
+	mServerIPLabel->setText(SERVER_IP_LABEL_TEXT);
 	mServerIPLabel->setFontColor(0xFFFFFF);
 	mServerIPLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mServerIPLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
@@ -312,7 +317,7 @@ void LoginScreen::createConnectedLayout()
 		mServerConnectButton = new Button();
 		((Button*)mServerConnectButton)->addButtonListener(this);
 	}
-	mServerConnectButton->setText("Connect");
+	mServerConnectButton->setText(CONNECT_BUTTON_TEXT);
 	mServerConnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mServerConnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
@@ -412,8 +417,11 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 	mConnectLayout->setWidth(screenWidth);
 	mConnectLayout->setHeight(height);
 
-	mLoadLastAppButton->setWidth(widgetWidth);
-	mLoadLastAppButton->setHeight(buttonHeight);
+	mFindServersButton->setWidth(widgetWidth);
+	mFindServersButton->setHeight(buttonHeight);
+
+	mLoadStoredProjectsButton->setWidth(widgetWidth);
+	mLoadStoredProjectsButton->setHeight(buttonHeight);
 
 	// windows phone 7 orientation animation is glitchy - this is a small
 	// fix for the wp7 platform - when going from portrait to landscape, the
@@ -428,11 +436,13 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
 		mConnectLayout->setPosition(0, top);
 
-		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+		mFindServersButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+		mLoadStoredProjectsButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 3 + buttonHeight * 2);
 	}
 	else
 	{
-		mLoadLastAppButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+		mFindServersButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+		mLoadStoredProjectsButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 3 + buttonHeight * 2);
 
 		mConnectLayout->setPosition(0, top);
 		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
@@ -530,12 +540,16 @@ void LoginScreen::buttonClicked(Widget *button)
 
 		mServerIPBox->hideKeyboard(); //Needed for iOS
 	}
-	else if(button == mLoadLastAppButton)
+	else if (button == mFindServersButton)
+	{
+
+	}
+	else if(button == mLoadStoredProjectsButton)
 	{
 		// announce the screen listeners that the reload last app button was clicked
 		for (int i = 0; i < mReloadUIListeners.size(); i++)
 		{
-			mReloadUIListeners[i]->reloadLastAppButtonClicked();
+			mReloadUIListeners[i]->loadStoredProjectsButtonClicked();
 		}
 	}
 	else if(button == mInfoIcon)
@@ -579,14 +593,15 @@ void LoginScreen::orientationDidChange()
 
 		// on wp7 the screen size on landscape has the same values as portrait
 		// so we need to swap those values
-		if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+		// TODO SA: remove this after testing - bug solved
+/*		if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 				orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
 				mOS.find("Windows", 0) >= 0)
 		{
 			int aux = screenWidth;
 			screenWidth = screenHeight;
 			screenHeight = aux;
-		}
+		} */
 
 		rebuildScreenLayout(screenWidth, screenHeight);
 	}

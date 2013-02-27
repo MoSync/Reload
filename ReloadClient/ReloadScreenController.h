@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -33,6 +33,7 @@ class ReloadClient;
 class ReloadTabScreen;
 class ConnectionScreen;
 class WorkspaceScreen;
+class StoredProjectsScreen;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -101,7 +102,7 @@ public:
 	/**
 	 * Called when the reload last app button is clicked.
 	 */
-	virtual void reloadLastAppButtonClicked();
+	virtual void loadStoredProjectsButtonClicked();
 
 	/**
 	 * Called when the info button is clicked.
@@ -150,6 +151,11 @@ private:
 	 * The workspace screen, containing a list with the workspace projects.
 	 */
 	WorkspaceScreen *mWorkspaceScreen;
+
+	/**
+	 * The screen containing projects saved on the device.
+	 */
+	StoredProjectsScreen *mStoredProjectScreen;
 };
 
 

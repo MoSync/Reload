@@ -51,7 +51,7 @@ public:
 	/**
 	 * Called when the reload last app button is clicked.
 	 */
-	virtual void reloadLastAppButtonClicked() = 0;
+	virtual void loadStoredProjectsButtonClicked() = 0;
 
 	/**
 	 * Called when the info button is clicked.

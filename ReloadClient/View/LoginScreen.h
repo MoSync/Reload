@@ -208,7 +208,9 @@ private:
 	 */
 	TextWidget *mServerConnectButton;
 
-	TextWidget *mLoadLastAppButton;
+	TextWidget *mLoadStoredProjectsButton;
+
+	TextWidget *mFindServersButton;
 
 	ImageButton *mInfoIcon;
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2013 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include "ReloadScreenController.h"
 #include "View/MainStackScreen.h"
 #include "View/WorkspaceScreen.h"
+#include "View/StoredProjectsScreen.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -37,7 +38,8 @@ using namespace NativeUI; // WebView widget.
  */
 ReloadScreenController::ReloadScreenController(ReloadClient *client) :
 		mLoginScreen(NULL),
-		mWorkspaceScreen(NULL)
+		mWorkspaceScreen(NULL),
+		mStoredProjectScreen(NULL)
 {
 	mReloadClient = client;
 }
@@ -46,6 +48,7 @@ ReloadScreenController::~ReloadScreenController()
 {
 	mLoginScreen->removeReloadUIListener(this);
 	mWorkspaceScreen->removeReloadUIListener(this);
+	mStoredProjectScreen->removeReloadUIListener(this);
 }
 
 /**
@@ -164,10 +167,18 @@ void ReloadScreenController::disconnectButtonClicked()
 /**
  * Called when the reload last app button is clicked.
  */
-void ReloadScreenController::reloadLastAppButtonClicked()
+void ReloadScreenController::loadStoredProjectsButtonClicked()
 {
 	//Just load whatever app we have already extracted
-	mReloadClient->launchSavedApp();
+	if (mStoredProjectScreen == NULL)
+	{
+		int orientation = maScreenGetCurrentOrientation();
+		mStoredProjectScreen = new StoredProjectsScreen(mOS, orientation);
+		mStoredProjectScreen->setTitle("Stored Projects");
+		mStoredProjectScreen->addReloadUIListener(this);
+	}
+
+	MainStackScreen::getInstance()->push(mStoredProjectScreen);
 }
 
 /**

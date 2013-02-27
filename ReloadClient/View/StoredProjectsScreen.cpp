@@ -17,9 +17,9 @@ MA 02110-1301, USA.
 */
 
 /*
- * WorkspaceScreen.cpp
+ * StoredProjetsScreen.cpp
  *
- *  Created on: Jan 31, 2013
+ *  Created on: Feb 27, 2013
  *      Author: Spiridon Alexandru
  */
 
@@ -30,15 +30,15 @@ MA 02110-1301, USA.
 #include <mawstring.h>
 #include <mastdlib.h>
 
-#include "WorkspaceScreen.h"
-#include "WorkspaceScreenUtils.h"
+#include "StoredProjectsScreen.h"
+#include "StoredProjectsScreenUtils.h"
 
 /**
  * Constructor.
  * @param os The current os.
  * @param orientation The current device orientation.
  */
-WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation) :
+StoredProjectsScreen::StoredProjectsScreen(MAUtil::String os, int orientation) :
 	Screen(),
 	mMainLayout(NULL)
 {
@@ -47,18 +47,14 @@ WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation) :
 	createMainLayout();
 
 	//Set the moblet to receive events from the buttons and listview
-	mRefreshButton->addButtonListener(this);
-	mDisconnectButton->addButtonListener(this);
 	mListView->addListViewListener(this);
 }
 
 /**
  * Destructor.
  */
-WorkspaceScreen::~WorkspaceScreen()
+StoredProjectsScreen::~StoredProjectsScreen()
 {
-	mRefreshButton->removeButtonListener(this);
-	mDisconnectButton->removeButtonListener(this);
 	mListView->removeListViewListener(this);
 
 	mReloadUIListeners.clear();
@@ -67,24 +63,16 @@ WorkspaceScreen::~WorkspaceScreen()
 /**
  * Creates and adds main layout to the screen.
  */
-void WorkspaceScreen::createMainLayout() {
+void StoredProjectsScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
 	Screen::setMainWidget(mMainLayout);
-
-	mRefreshButton = new Button();
-	mRefreshButton->setText(REFRESH_LIST_BUTTON_TEXT);
-	mRefreshButton->fillSpaceHorizontally();
-
-	mDisconnectButton = new Button();
-	mDisconnectButton->setText(DISCONNECT_BUTTON_TEXT);
-	mDisconnectButton->fillSpaceHorizontally();
 
 	mListView = new ListView();
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
-	for (int i = 0; i <= 9; i++)
+	for (int i = 0; i <= 5; i++)
 	{
 		ListViewItem* item = new ListViewItem();
 
@@ -94,28 +82,19 @@ void WorkspaceScreen::createMainLayout() {
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
 
-		Button* saveButton = new Button();
-		saveButton->setText(SAVE_BUTTON_TEXT);
-		saveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
-		saveButton->addButtonListener(this);
-		mSaveButtons.add(saveButton);
-
-		Button* reloadButton = new Button();
-		reloadButton->setText(RELOAD_BUTTON_TEXT);
-		reloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
-		reloadButton->addButtonListener(this);
-		mReloadButtons.add(reloadButton);
+		Button* loadButton = new Button();
+		loadButton->setText(LOAD_BUTTON_TEXT);
+		loadButton->setWidth((int)(mScreenWidth * mLoadButtonWidthRatio));
+		loadButton->addButtonListener(this);
+		mLoadButtons.add(loadButton);
 
 		itemHorizontalLayout->addChild(projectNameLabel);
-		itemHorizontalLayout->addChild(saveButton);
-		itemHorizontalLayout->addChild(reloadButton);
+		itemHorizontalLayout->addChild(loadButton);
 
 		mListView->addChild(itemHorizontalLayout);
 	}
 
-	mMainLayout->addChild(mDisconnectButton);
 	mMainLayout->addChild(mListView);
-	mMainLayout->addChild(mRefreshButton);
 }
 
 
@@ -124,42 +103,15 @@ void WorkspaceScreen::createMainLayout() {
 * bounds of the button.
 * @param button The button object that generated the event.
 */
-void WorkspaceScreen::buttonClicked(Widget* button)
+void StoredProjectsScreen::buttonClicked(Widget* button)
 {
-	if (button == mRefreshButton)
+	// check if a load button was clicked
+	for (int i = 0; i < mLoadButtons.size(); i++)
 	{
-		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		if (button == mLoadButtons[i])
 		{
-			mReloadUIListeners[i]->refreshWorkspaceProjectsButtonClicked();
-		}
-	}
-	else if (button == mDisconnectButton)
-	{
-		for (int i = 0; i < mReloadUIListeners.size(); i++)
-		{
-			mReloadUIListeners[i]->disconnectButtonClicked();
-		}
-	}
-	else
-	{
-		// check if a save button was clicked
-		for (int i = 0; i < mSaveButtons.size(); i++)
-		{
-			if (button == mSaveButtons[i])
-			{
-				// TODO SA: add logic
-				return;
-			}
-		}
-
-		// check if a reload button was clicked
-		for (int i = 0; i < mReloadButtons.size(); i++)
-		{
-			if (button == mReloadButtons[i])
-			{
-				// TODO SA: add logic
-				return;
-			}
+			// TODO SA: add logic
+			return;
 		}
 	}
 }
@@ -169,7 +121,7 @@ void WorkspaceScreen::buttonClicked(Widget* button)
  * @param listView The list view object that generated the event.
  * @param listViewItem The ListViewItem object that was clicked.
  */
-void WorkspaceScreen::listViewItemClicked(
+void StoredProjectsScreen::listViewItemClicked(
 	ListView* listView,
 	ListViewItem* listViewItem)
 {
@@ -180,7 +132,7 @@ void WorkspaceScreen::listViewItemClicked(
  * Add a reload UI event listener.
  * @param listener The listener that will receive reload UI events.
  */
-void WorkspaceScreen::addReloadUIListener(ReloadUIListener* listener)
+void StoredProjectsScreen::addReloadUIListener(ReloadUIListener* listener)
 {
     for (int i = 0; i < mReloadUIListeners.size(); i++)
     {
@@ -197,7 +149,7 @@ void WorkspaceScreen::addReloadUIListener(ReloadUIListener* listener)
  * Remove a reload UI listener.
  * @param listener The listener that receives reload UI events.
  */
-void WorkspaceScreen::removeReloadUIListener(ReloadUIListener* listener)
+void StoredProjectsScreen::removeReloadUIListener(ReloadUIListener* listener)
 {
 	for (int i = 0; i < mReloadUIListeners.size(); i++)
 	{
@@ -213,17 +165,15 @@ void WorkspaceScreen::removeReloadUIListener(ReloadUIListener* listener)
  * Called after the screen orientation has changed.
  * Available only on iOS and Windows Phone 7.1 platforms.
  */
-void WorkspaceScreen::orientationDidChange()
+void StoredProjectsScreen::orientationDidChange()
 {
 	setScreenValues();
 
-	for (int i = 0; i < mSaveButtons.size(); i++)
+	for (int i = 0; i < mLoadButtons.size(); i++)
 	{
-		Button* saveButton = mSaveButtons[i];
-		Button* reloadButton = mReloadButtons[i];
+		Button* loadButton = mLoadButtons[i];
 
-		saveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
-		reloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
+		loadButton->setWidth((int)(mScreenWidth * mLoadButtonWidthRatio));
 	}
 }
 
@@ -231,7 +181,7 @@ void WorkspaceScreen::orientationDidChange()
  * Sets the screen height/width values and the screen width ratio
  * for the save and reload buttons.
  */
-void WorkspaceScreen::setScreenValues()
+void StoredProjectsScreen::setScreenValues()
 {
 	int orientation = maScreenGetCurrentOrientation();
 	MAExtent ex = maGetScrSize();
@@ -252,12 +202,10 @@ void WorkspaceScreen::setScreenValues()
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
-		mSaveButtonWidthRatio = SAVE_BUTTON_LANDSCAPE_WIDTH_RATIO;
-		mReloadButtonWidthRatio = RELOAD_BUTTON_LANDSCAPE_WIDTH_RATIO;
+		mLoadButtonWidthRatio = LOAD_BUTTON_LANDSCAPE_WIDTH_RATIO;
 	}
 	else
 	{
-		mSaveButtonWidthRatio = SAVE_BUTTON_PORTRAIT_WIDTH_RATIO;
-		mReloadButtonWidthRatio = RELOAD_BUTTON_PORTRAIT_WIDTH_RATIO;
+		mLoadButtonWidthRatio = LOAD_BUTTON_PORTRAIT_WIDTH_RATIO;
 	}
 }
