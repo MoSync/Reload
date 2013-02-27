@@ -491,10 +491,10 @@ void ReloadClient::socketHandlerDisconnected(int result)
 	if (0 != result)
 	{
 		showConnectionErrorMessage(result);
-	}
 
-	// Go back to the login screen.
-	mReloadScreenController->showNotConnectedScreen();
+		// Go back to the login screen.
+		mReloadScreenController->showNotConnectedScreen();
+	}
 }
 
 /**
