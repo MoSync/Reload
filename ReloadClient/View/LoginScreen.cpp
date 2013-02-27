@@ -103,7 +103,7 @@ void LoginScreen::initializeScreen()
 				MENU_EDIT_BOX_HEIGHT_LANDSCAPE_RATIO,
 				MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO,
 				MENU_BUTTON_SPACING_LANDSCAPE_RATIO);
-		positionBottomLayout(screenHeight, screenWidth, menuBottomY,
+		positionBottomLayout(screenHeight, screenWidth,
 				BOTTOM_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				BOTTOM_LOGO_WIDTH_LANDSCAPE_RATIO,
 				BOTTOM_LOGO_HEIGHT_LANDSCAPE_RATIO,
@@ -132,7 +132,7 @@ void LoginScreen::initializeScreen()
 				MENU_EDIT_BOX_HEIGHT_PORTRAIT_RATIO,
 				MENU_BUTTON_HEIGHT_PORTRAIT_RATIO,
 				MENU_BUTTON_SPACING_PORTRAIT_RATIO);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+		positionBottomLayout(screenWidth, screenHeight,
 				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
 				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
@@ -183,7 +183,7 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 				MENU_EDIT_BOX_HEIGHT_LANDSCAPE_RATIO,
 				MENU_BUTTON_HEIGHT_LANDSCAPE_RATIO,
 				MENU_BUTTON_SPACING_LANDSCAPE_RATIO);
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+		positionBottomLayout(screenWidth, screenHeight,
 				BOTTOM_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				BOTTOM_LOGO_WIDTH_LANDSCAPE_RATIO,
 				BOTTOM_LOGO_HEIGHT_LANDSCAPE_RATIO,
@@ -198,7 +198,7 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 		int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
 		int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
 
-		positionBottomLayout(screenWidth, screenHeight, menuBottomY,
+		positionBottomLayout(screenWidth, screenHeight,
 				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
 				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
@@ -432,12 +432,12 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
 			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
 		mServerIPLabel->setPosition(labelLeft, labelSpacing);
-		mServerIPBox->setPosition(widgetLeft, labelSpacing + labelHeight);
-		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing);
+		mServerIPBox->setPosition(widgetLeft, labelSpacing * 2 + labelHeight);
+		mServerConnectButton->setPosition(widgetLeft, labelSpacing * 3 + labelHeight + editBoxHeight + buttonSpacing);
 		mConnectLayout->setPosition(0, top);
 
-		mFindServersButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
-		mLoadStoredProjectsButton->setPosition(widgetLeft,top + labelSpacing * 2 + labelHeight + editBoxHeight + buttonSpacing * 3 + buttonHeight * 2);
+		mFindServersButton->setPosition(widgetLeft,top + labelSpacing * 3 + labelHeight + editBoxHeight + buttonSpacing * 2 + buttonHeight);
+		mLoadStoredProjectsButton->setPosition(widgetLeft,top + labelSpacing * 3 + labelHeight + editBoxHeight + buttonSpacing * 3 + buttonHeight * 2);
 	}
 	else
 	{
@@ -469,11 +469,13 @@ int LoginScreen::positionMenuLayout(int screenWidth, int screenHeight, int top, 
  * @param infoTopRatio The logo top ratio (based on the layout height).
  * @return Returns the lower x coordinate of the layout after positioning.
  */
-int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, float screenRatio,
 					float logoWidthRatio, float logoHeightRatio, float logoLeftRatio, float logoTopRatio,
 					float infoWidthRatio, float infoLeftRatio, float infoTopRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
+
+	int top = screenHeight - height;
 
 	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
 	int infoWidth = (int)((float)screenWidth * infoWidthRatio);
@@ -593,15 +595,17 @@ void LoginScreen::orientationDidChange()
 
 		// on wp7 the screen size on landscape has the same values as portrait
 		// so we need to swap those values
-		// TODO SA: remove this after testing - bug solved
-/*		if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
+
+		// TODO SA: remove this after testing - bug solved on wp7 platform - after merging
+		// with the master branch this code will make the UI look bad
+		if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 				orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
 				mOS.find("Windows", 0) >= 0)
 		{
 			int aux = screenWidth;
 			screenWidth = screenHeight;
 			screenHeight = aux;
-		} */
+		}
 
 		rebuildScreenLayout(screenWidth, screenHeight);
 	}

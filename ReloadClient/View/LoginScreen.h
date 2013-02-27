@@ -151,7 +151,7 @@ private:
 	 * @param infoTopRatio The logo top ratio (based on the layout height).
 	 * @return Returns the lower x coordinate of the layout after positioning.
 	 */
-	int positionBottomLayout(int screenWidth, int screenHeight, int top, float screenRatio,
+	int positionBottomLayout(int screenWidth, int screenHeight, float screenRatio,
 			float logoWidthRatio, float logoHeightRatio, float logoLeftRatio, float logoTopRatio,
 			float infoWidthRatio, float infoLeftRatio, float infoTopRatio);
 
