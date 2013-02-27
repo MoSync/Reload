@@ -10,7 +10,8 @@ define([
 
         subViews: [],
 
-        initialize: function () {
+        initialize: function (options) {
+            this.projectCollection = options.projectCollection;
             _.bindAll(this,
                       'render',
                       'close',
@@ -49,7 +50,8 @@ define([
 
         appendExampleView: function (model) {
             var ev = new ExampleView({
-                model: model
+                model: model,
+                projectCollection: this.projectCollection
             });
             this.subViews.push(ev);
             this.$el.append( ev.render() );

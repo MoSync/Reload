@@ -488,6 +488,8 @@ buster.testCase("RPC", {
         });
     },
 
+    "//reloadExample": function() {},
+
     "//reloadProject": function(done) {
         var self, result, projectName, projectType;
         projectName = 'ProjectToReload';

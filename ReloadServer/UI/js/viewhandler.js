@@ -24,7 +24,10 @@ define([
                 if (this.sidebarView) {
                     //console.log('sidebar is already set');
                 } else {
-                    this.sidebarView = new SidebarView( {views: views} );
+                    this.sidebarView = new SidebarView({
+                        views: views,
+                        projectCollection: options.projectCollection
+                    });
                     $('#bar-left').html( this.sidebarView.render() );
                 }
 

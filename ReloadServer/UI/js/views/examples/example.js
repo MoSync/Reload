@@ -13,8 +13,14 @@ define([
             'click button.copy':    'copy'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            var self = this;
+            this.projectCollection = options.projectCollection;
             _.bindAll(this, 'render', 'close');
+            this.model.on('copied', function(){
+                // Update project list.
+                self.projectCollection.rePopulate();
+            });
         },
 
         render: function () {
@@ -48,15 +54,14 @@ define([
             e.preventDefault();
             // Call to ExampleProject::reload()
             // this.model is set in collections/examples.js
-            console.log('reload ' + this.model.get('name'));
-            console.log('ExampleView::reload()');
             var attrs = _.clone(this.model.attributes);
-            console.log(attrs);
             this.model.reload(attrs);
         },
+
         copy: function (e) {
             e.preventDefault();
-            console.log('copy');
+            var attrs = _.clone(this.model.attributes);
+            this.model.copy(attrs);
         }
     });
 

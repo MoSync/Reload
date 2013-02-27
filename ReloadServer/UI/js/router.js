@@ -10,7 +10,8 @@ define([
     'views/log/main',
     'views/workbench/main',
     'views/docs/main',
-    'views/feedback/main'
+    'views/feedback/main',
+    'collections/projects'
 ], function ($, _, Backbone,
              ViewHandler,
              IndexView,
@@ -20,7 +21,9 @@ define([
              LogView,
              WorkbenchView,
              DocsView,
-             FeedbackView) {
+             FeedbackView,
+             ProjectCollection
+            ) {
 
     var ReloadRouter = Backbone.Router.extend({
         initialize: function () {
@@ -31,7 +34,7 @@ define([
             '':           'index',
             'examples':   'showExamples',
             'editor':     'showEditor',
-            'debug':      'showDebug',
+            'weinre':     'showDebug',
             'devices':    'showDevices',
             'log':        'showLog',
             'workbench':  'showWorkbench',
@@ -46,8 +49,12 @@ define([
     var views = {};
 
     var initialize = function () {
+        var projectCollection = new ProjectCollection();
+
         views.indexView     = new IndexView();
-        views.examplesView  = new ExamplesView();
+        views.examplesView  = new ExamplesView({
+            projectCollection: projectCollection
+        });
         views.editorView    = new EditorView();
         views.debugView     = new DebugView();
         views.logView       = new LogView();
@@ -55,7 +62,10 @@ define([
         views.docsView      = new DocsView();
         views.feedbackView  = new FeedbackView();
 
-        var viewHandler = new ViewHandler( {views: views} );
+        var viewHandler = new ViewHandler({
+            views: views,
+            projectCollection: projectCollection
+        });
         var router = new ReloadRouter();
 
         // Listen to router events.

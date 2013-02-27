@@ -9,7 +9,7 @@ define([
             options.rpcMsg  = {
                 method: 'manager.reloadExample',
                 params: [JSON.stringify(opts)],
-                id: 0
+                id: null
             };
 
             options.success = function (resp) {
@@ -26,8 +26,29 @@ define([
         },
 
         // Copy to workspace.
-        copy: function () {
-            // TODO
+        copy: function (opts) {
+            var self = this;
+            var options     = {};
+            options.url     = 'http://localhost:8283';
+            options.rpcMsg  = {
+                method: 'manager.copyExample',
+                params: [JSON.stringify(opts)],
+                id: null
+            };
+
+            options.success = function (resp) {
+                console.log('Copy successful');
+
+                _.extend(self, Backbone.Event);
+                self.trigger('copied');
+            };
+
+            options.error   = function (resp) {
+                console.log('Could not copy example');
+                console.log(resp);
+            };
+
+            this.rpc(options);
         }
 
     });

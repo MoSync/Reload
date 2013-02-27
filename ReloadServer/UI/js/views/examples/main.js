@@ -11,9 +11,9 @@ define([
 
         className: 'span12 pad10',
 
-        initialize: function () {
+        initialize: function (options) {
             _.bindAll(this, 'render', 'close');
-            this.examples = new ExampleListView();
+            this.examples = new ExampleListView({ projectCollection: options.projectCollection });
         },
 
         render: function () {
