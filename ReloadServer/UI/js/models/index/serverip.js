@@ -20,7 +20,6 @@ define([
 
             var self = this;
             options.success = function (resp) {
-                console.log('Got server ip ' + resp.result);
                 self.set({ ip: resp.result });
             };
 

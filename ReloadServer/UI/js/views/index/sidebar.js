@@ -35,7 +35,7 @@ define([
                       'changePath'
                      );
 
-            this.collection = new ProjectCollection();
+            this.collection = options.projectCollection;
             this.collection.on('change:path', this.changePath);
 
             this.model = new StatisticsModel();

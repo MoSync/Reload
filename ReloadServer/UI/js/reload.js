@@ -6,7 +6,8 @@ define([
 ], function ($, _, Backbone, Router) {
 
     var initialize = function () {
-
+        // Make events available everywhere.
+        _.extend({}, Backbone.Event);
         // Display compatibility issues warning.
         if (!$.browser.webkit) {
                 $('#banner-message').show();

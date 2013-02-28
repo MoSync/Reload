@@ -22,17 +22,20 @@ define([
                 $('#content').html( this.currentView.el );
 
                 if (this.sidebarView) {
-                    console.log('sidebar is already set');
+                    //console.log('sidebar is already set');
                 } else {
-                    this.sidebarView = new SidebarView( {views: views} );
+                    this.sidebarView = new SidebarView({
+                        views: views,
+                        projectCollection: options.projectCollection
+                    });
                     $('#bar-left').html( this.sidebarView.render() );
                 }
 
                 if (this.contentNavView) {
-                    console.log('nav is set!');
+                    //console.log('nav is set!');
                     this.contentNavView.setActive(view.name);
                 } else {
-                    console.log('viewhandler: ' + view.name);
+                    //console.log('viewhandler: ' + view.name);
                     this.contentNavView = new ContentNavView();
                     $('#content-nav').html( this.contentNavView.render() );
                     this.contentNavView.setActive(view.name);

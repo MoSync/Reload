@@ -4,13 +4,26 @@ define([
     'backbone',
     'viewhandler',
     'views/index/main',
+    'views/examples/main',
     'views/editor/main',
     'views/debug/main',
     'views/log/main',
     'views/workbench/main',
     'views/docs/main',
-    'views/feedback/main'
-], function ($, _, Backbone, ViewHandler, IndexView, EditorView, DebugView, LogView, WorkbenchView, DocsView, FeedbackView) {
+    'views/feedback/main',
+    'collections/projects'
+], function ($, _, Backbone,
+             ViewHandler,
+             IndexView,
+             ExamplesView,
+             EditorView,
+             DebugView,
+             LogView,
+             WorkbenchView,
+             DocsView,
+             FeedbackView,
+             ProjectCollection
+            ) {
 
     var ReloadRouter = Backbone.Router.extend({
         initialize: function () {
@@ -18,41 +31,49 @@ define([
 
         routes: {
             // Define URL routes
-            '':         'index',
-            'editor':   'showEditor',
-            'weinre':   'showDebug',
-            'devices':  'showDevices',
-            'log':      'showLog',
-            'workbench':'showWorkbench',
-            'docs':     'showDocs',
-            'feedback': 'showFeedback',
+            '':           'index',
+            'examples':   'showExamples',
+            'editor':     'showEditor',
+            'weinre':     'showDebug',
+            'devices':    'showDevices',
+            'log':        'showLog',
+            'workbench':  'showWorkbench',
+            'docs':       'showDocs',
+            'feedback':   'showFeedback',
 
             // Default
-            '*actions': 'defaultAction'
+            '*actions':   'defaultAction'
         }
     });
 
     var views = {};
 
     var initialize = function () {
+        var projectCollection = new ProjectCollection();
 
-        // TODO Check if index view is already rendered and draw it
-        // only if it's not initialized.
-
-        views.indexView = new IndexView();
-        views.editorView = new EditorView();
-        views.debugView = new DebugView();
-        views.logView = new LogView();
+        views.indexView     = new IndexView();
+        views.examplesView  = new ExamplesView({
+            projectCollection: projectCollection
+        });
+        views.editorView    = new EditorView();
+        views.debugView     = new DebugView();
+        views.logView       = new LogView();
         views.workbenchView = new WorkbenchView();
-        views.docsView = new DocsView();
-        views.feedbackView = new FeedbackView();
+        views.docsView      = new DocsView();
+        views.feedbackView  = new FeedbackView();
 
-        var viewHandler = new ViewHandler( {views: views} );
+        var viewHandler = new ViewHandler({
+            views: views,
+            projectCollection: projectCollection
+        });
         var router = new ReloadRouter();
 
         // Listen to router events.
         router.on('route:index', function () {
             viewHandler.show(views.indexView);
+        });
+        router.on('route:showExamples', function () {
+            viewHandler.show(views.examplesView);
         });
         router.on('route:showEditor', function () {
             viewHandler.show(views.editorView);

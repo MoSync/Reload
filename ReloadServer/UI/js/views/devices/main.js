@@ -21,7 +21,6 @@ define([
 
         initialize: function (options) {
 
-            console.log(options);
             this.parent = options.parent;
 
             _.bindAll(this,
@@ -55,14 +54,11 @@ define([
             var self = this;
             if (this.devices.length === 0) {
                 this.model.getDevices(function(res) {
-                    console.log('rpc call');
                     self.devices = res;
                     // Redraw device list.
                     self.updateDeviceList();
                 });
             }
-
-            console.log(this.devices.length);
 
             // Update device list instantly on render
             this.updateDeviceList();
@@ -88,7 +84,6 @@ define([
             this.parent.deviceCount = 0;
 
             if (this.devices.length === 0) {
-                console.log('no connected');
                 this.$el.html( '<center>No clients connected.</center>' );
             } else {
                 var s = (this.devices.length > 1)? 's' : '';
