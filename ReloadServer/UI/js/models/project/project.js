@@ -5,6 +5,7 @@ define([
     var ProjectModel = Backbone.Model.extend({
         reload: function (debug) {
             var d = debug || false;
+            var self = this;
             console.log('!!! Reloading ' + this.get('name') + ' with debug flag: ' + d);
 
             var options     = {};
@@ -18,6 +19,7 @@ define([
             options.success = function (resp) {
                 console.log('reload successful');
                 console.log(resp);
+                self.trigger('reloaded');
             };
 
             options.error   = function (resp) {
