@@ -98,19 +98,27 @@ void WorkspaceScreen::createMainLayout() {
 		saveButton->setText(SAVE_BUTTON_TEXT);
 		saveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
 		saveButton->addButtonListener(this);
+		saveButton->wrapContentHorizontally();
 		mSaveButtons.add(saveButton);
 
 		Button* reloadButton = new Button();
 		reloadButton->setText(RELOAD_BUTTON_TEXT);
 		reloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
 		reloadButton->addButtonListener(this);
+		reloadButton->wrapContentHorizontally();
 		mReloadButtons.add(reloadButton);
+
+		if (mOS.find("iPhone") >= 0)
+		{
+			itemHorizontalLayout->setWidth(item->getWidth());
+		}
 
 		itemHorizontalLayout->addChild(projectNameLabel);
 		itemHorizontalLayout->addChild(saveButton);
 		itemHorizontalLayout->addChild(reloadButton);
+		item->addChild(itemHorizontalLayout);
 
-		mListView->addChild(itemHorizontalLayout);
+		mListView->addChild(item);
 	}
 
 	mMainLayout->addChild(mDisconnectButton);

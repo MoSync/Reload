@@ -43,6 +43,7 @@ using namespace NativeUI;
 LoginScreen::LoginScreen(MAUtil::String os, int orientation):
 	Screen()
 {
+	this->setTitle("Login screen");
 	this->mOS = os;
 	this->mCurrentOrientation = orientation;
 
@@ -93,7 +94,8 @@ void LoginScreen::initializeScreen()
 		int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
 				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				LOGO_TOP_LANDSCAPE_RATIO,
-				LOGO_WIDTH_LANDSCAPE_RATIO);
+				LOGO_WIDTH_LANDSCAPE_RATIO,
+				LOGO_HEIGHT_LANDSCAPE_RATIO);
 		int menuBottomY = positionMenuLayout(screenHeight, screenWidth, logoBottomY,
 				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
@@ -122,7 +124,8 @@ void LoginScreen::initializeScreen()
 		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
 				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				LOGO_TOP_PORTRAIT_RATIO,
-				LOGO_WIDTH_PORTRAIT_RATIO);
+				LOGO_HEIGHT_PORTRAIT_RATIO,
+				LOGO_HEIGHT_PORTRAIT_RATIO);
 		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
 				MENU_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				MENU_WIDGET_WIDTH_PORTRAIT_RATIO,
@@ -173,7 +176,8 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
 				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				LOGO_TOP_LANDSCAPE_RATIO,
-				LOGO_WIDTH_LANDSCAPE_RATIO);
+				LOGO_WIDTH_LANDSCAPE_RATIO,
+				LOGO_HEIGHT_LANDSCAPE_RATIO);
 		int menuBottomY = positionMenuLayout(screenWidth, screenHeight, logoBottomY,
 				MENU_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				MENU_WIDGET_WIDTH_LANDSCAPE_RATIO,
@@ -219,7 +223,8 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 		positionLogoLayout(screenWidth, screenHeight,
 				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				LOGO_TOP_PORTRAIT_RATIO,
-				LOGO_WIDTH_PORTRAIT_RATIO);
+				LOGO_WIDTH_PORTRAIT_RATIO,
+				LOGO_HEIGHT_PORTRAIT_RATIO);
 	}
 }
 
@@ -355,17 +360,26 @@ void LoginScreen::createBottomLayout()
  * @param logoWidthRatio The logo width ratio (based on the layout width).
  * @return Returns the lower x coordinate of the layout after positioning.
  */
-int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio, float logoTopRatio, float logoWidthRatio)
+int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float screenRatio,
+		float logoTopRatio, float logoWidthRatio, float logoHeightRatio)
 {
 	int height = (int)((float)screenHeight * screenRatio);
-
 	int aboveHeight = (int)((float)height * logoTopRatio);
 
 	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
-	mLogo->setWidth(logoWidth);
-
+	int logoHeight = (int)((float)height * logoHeightRatio);
 	int centerH = screenWidth / 2;
-	mLogo->setPosition(centerH - logoWidth/2, aboveHeight);
+
+	if (mOS.find("iPhone") >= 0)
+	{
+		mLogo->setHeight(logoHeight);
+		mLogo->setPosition(centerH - mLogo->getWidth()/2, 0);
+	}
+	else
+	{
+		mLogo->setWidth(logoWidth);
+		mLogo->setPosition(centerH - logoWidth/2, 0);
+	}
 
 	return height;
 }
@@ -570,6 +584,7 @@ void LoginScreen::buttonClicked(Widget *button)
 void LoginScreen::orientationWillChange()
 {
 	int orientation = maScreenGetCurrentOrientation();
+	mCurrentOrientation = orientation;
 	MAExtent ex = maGetScrSize();
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);

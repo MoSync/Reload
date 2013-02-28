@@ -25,6 +25,7 @@ MA 02110-1301, USA.
 
 #include "ReloadClient.h"
 #include "ReloadScreenController.h"
+#include "View/MainStackSingleton.h"
 #include "View/MainStackScreen.h"
 #include "View/WorkspaceScreen.h"
 #include "View/StoredProjectsScreen.h"
@@ -67,8 +68,8 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 	mLoginScreen = new LoginScreen(os, orientation);
 	mLoginScreen->addReloadUIListener(this);
 
-	MainStackScreen::getInstance()->push(mLoginScreen);
-	MainStackScreen::getInstance()->show();
+	MainStackSingleton::getInstance()->push(mLoginScreen);
+	MainStackSingleton::getInstance()->show();
 }
 
 /**
@@ -123,6 +124,7 @@ void ReloadScreenController::defaultAddress(const char *serverAddress)
  */
 void ReloadScreenController::pushWorkspaceScreen()
 {
+	mLoginScreen->setTitle("");
 	if (mWorkspaceScreen == NULL)
 	{
 		int orientation = maScreenGetCurrentOrientation();
@@ -131,7 +133,7 @@ void ReloadScreenController::pushWorkspaceScreen()
 		mWorkspaceScreen->addReloadUIListener(this);
 	}
 
-	MainStackScreen::getInstance()->push(mWorkspaceScreen);
+	MainStackSingleton::getInstance()->push(mWorkspaceScreen);
 }
 
 /**
@@ -139,11 +141,12 @@ void ReloadScreenController::pushWorkspaceScreen()
  */
 void ReloadScreenController::popWorkspaceScreen()
 {
-	int screenCount = MainStackScreen::getInstance()->getStackSize();
+	int screenCount = MainStackSingleton::getInstance()->getStackSize();
 
 	if (screenCount >= 2)
 	{
-		MainStackScreen::getInstance()->pop();
+		MainStackSingleton::getInstance()->pop();
+		mLoginScreen->setTitle("Login screen");
 	}
 }
 
@@ -178,7 +181,7 @@ void ReloadScreenController::loadStoredProjectsButtonClicked()
 		mStoredProjectScreen->addReloadUIListener(this);
 	}
 
-	MainStackScreen::getInstance()->push(mStoredProjectScreen);
+	MainStackSingleton::getInstance()->push(mStoredProjectScreen);
 }
 
 /**
@@ -204,7 +207,7 @@ void ReloadScreenController::refreshWorkspaceProjectsButtonClicked()
  */
 bool ReloadScreenController::shouldExit()
 {
-	if (MainStackScreen::getInstance()->getStackSize() > 1)
+	if (MainStackSingleton::getInstance()->getStackSize() > 1)
 	{
 		return false;
 	}

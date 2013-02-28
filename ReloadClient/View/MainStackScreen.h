@@ -29,13 +29,18 @@ MA 02110-1301, USA.
 #include <NativeUI/Widgets.h>
 using namespace NativeUI;
 
-class MainStackScreen : StackScreen
+class MainStackScreen :
+	public StackScreen
 {
 public:
-   static StackScreen* getInstance();
-private:
-   MainStackScreen();
-   static StackScreen* pSingleton;
+	MainStackScreen();
+
+	~MainStackScreen();
+
+	/**
+	 * Called just before the screen begins rotating.
+	 */
+	virtual void orientationWillChange();
 };
 
 #endif /* MAINSTACKSCREEN_H_ */

@@ -17,36 +17,29 @@ MA 02110-1301, USA.
 */
 
 /*
- * MainStackScreen.cpp
+ * MainStackSingleton.h
  *
- *  Created on: Feb 1, 2013
+ *  Created on: Feb 28, 2013
  *      Author: Spiridon Alexandru
  */
 
-#include "MainStackScreen.h"
 
-#include "LoginScreen.h"
+#ifndef MAINSTACKSINGLETON_H_
+#define MAINSTACKSINGLETON_H_
 
-MainStackScreen::MainStackScreen():
-	StackScreen()
+#include <NativeUI/Widgets.h>
+using namespace NativeUI;
+
+class MainStackScreen;
+
+class MainStackSingleton
 {
-   // do init stuff
-}
+public:
+   static MainStackScreen* getInstance();
 
-MainStackScreen::~MainStackScreen()
-{
+private:
+   MainStackSingleton();
+   static MainStackScreen* pSingleton;
+};
 
-}
-
-/**
- * Called just before the screen begins rotating.
- */
-void MainStackScreen::orientationWillChange()
-{
-	// go through the children and announce the orientation will change event
-	for (int i = 0; i < this->getStackSize(); i++)
-	{
-		LoginScreen *loginScreen = (LoginScreen*)this->getChild(i);
-		loginScreen->orientationWillChange();
-	}
-}
+#endif /* MAINSTACKSINGLETON_H_ */

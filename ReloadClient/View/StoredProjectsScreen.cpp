@@ -30,6 +30,8 @@ MA 02110-1301, USA.
 #include <mawstring.h>
 #include <mastdlib.h>
 
+#include "MainStackSingleton.h"
+#include "MainStackScreen.h"
 #include "StoredProjectsScreen.h"
 #include "StoredProjectsScreenUtils.h"
 
@@ -69,6 +71,7 @@ void StoredProjectsScreen::createMainLayout() {
 	Screen::setMainWidget(mMainLayout);
 
 	mListView = new ListView();
+	mListView->fillSpaceHorizontally();
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
@@ -77,6 +80,7 @@ void StoredProjectsScreen::createMainLayout() {
 		ListViewItem* item = new ListViewItem();
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
+		itemHorizontalLayout->fillSpaceHorizontally();
 		Label* projectNameLabel = new Label();
 		projectNameLabel->setText("Project " + MAUtil::integerToString(i));
 		projectNameLabel->fillSpaceHorizontally();
@@ -86,12 +90,19 @@ void StoredProjectsScreen::createMainLayout() {
 		loadButton->setText(LOAD_BUTTON_TEXT);
 		loadButton->setWidth((int)(mScreenWidth * mLoadButtonWidthRatio));
 		loadButton->addButtonListener(this);
+		loadButton->wrapContentHorizontally();
 		mLoadButtons.add(loadButton);
+
+		if (mOS.find("iPhone") >= 0)
+		{
+			itemHorizontalLayout->setWidth(item->getWidth());
+		}
 
 		itemHorizontalLayout->addChild(projectNameLabel);
 		itemHorizontalLayout->addChild(loadButton);
+		item->addChild(itemHorizontalLayout);
 
-		mListView->addChild(itemHorizontalLayout);
+		mListView->addChild(item);
 	}
 
 	mMainLayout->addChild(mListView);

@@ -67,6 +67,17 @@ public:
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
 
+	/**
+	 * Called just before the screen begins rotating.
+	 */
+	virtual void orientationWillChange();
+
+	/**
+	 * Called after the screen orientation has changed.
+	 * Available only on iOS and Windows Phone 7.1 platforms.
+	 */
+	virtual void orientationDidChange();
+
 private:
 	/**
 	 * Creates the screen, the layouts, the widgets and positions everything.
@@ -110,10 +121,12 @@ private:
 	 * @param screenRatio Defines how much space the layout will occupy on the Y axix.
 	 * @param logoTopRatio The logo top ratio (based on the layout height).
 	 * @param logoWidthRatio The logo width ratio (based on the layout width).
+	 * @param logoHeightRatio The logo height ratio (based on the layout height).
 	 * @return Returns the lower x coordinate of the layout after positioning.
 	 */
 	int positionLogoLayout(int screenWidth, int screenHeight,
-			float screenRatio, float logoTopRatio, float logoWidthRatio);
+			float screenRatio, float logoTopRatio,
+			float logoWidthRatio, float logoHeightRatio);
 
 	/**
 	 * Positions the menu layout on the main layout.
@@ -174,17 +187,6 @@ private:
 	 * @param editBox The editbox using the virtual keyboard
 	 */
 	void editBoxReturn(EditBox* editBox);
-
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	virtual void orientationWillChange();
-
-	/**
-	 * Called after the screen orientation has changed.
-	 * Available only on iOS and Windows Phone 7.1 platforms.
-	 */
-	virtual void orientationDidChange();
 
 private:
 	/**
