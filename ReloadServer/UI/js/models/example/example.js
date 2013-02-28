@@ -4,7 +4,11 @@ define([
 ], function(_, Backbone){
     var ExampleModel = Backbone.Model.extend({
         reload: function (opts) {
-            var options     = {};
+            var self, options;
+
+            self = this;
+
+            options     = {};
             options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.reloadExample',
@@ -13,11 +17,11 @@ define([
             };
 
             options.success = function (resp) {
-                console.log('reload successful');
+                self.trigger('reloaded');
                 console.log(resp);
             };
 
-            options.error   = function (resp) {
+            options.error = function (resp) {
                 console.log('could not reload');
                 console.log(resp);
             };
@@ -38,8 +42,7 @@ define([
 
             options.success = function (resp) {
                 console.log('Copy successful');
-
-                _.extend(self, Backbone.Event);
+                console.log(resp);
                 self.trigger('copied');
             };
 

@@ -231,6 +231,11 @@ var rpcFunctions = {
                                 url: url,
                                 fileSize: stat.size
                             });
+
+                            sendResponse({
+                                success: true,
+                                error: null
+                            });
                         });
                     });
                 });

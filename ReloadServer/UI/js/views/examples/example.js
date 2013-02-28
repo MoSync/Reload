@@ -32,8 +32,8 @@ define([
                 name: this.model.get('name'),
                 description: this.model.get('description')
             };
-            var compiledTemplate = _.template( template, data );
-            return this.$el.html( compiledTemplate );
+            this.compiledTemplate = _.template( template, data );
+            return this.$el.html( this.compiledTemplate );
         },
 
         close: function () {
@@ -52,6 +52,22 @@ define([
 
         reload: function (e) {
             e.preventDefault();
+
+            // Display 'loading' message.
+            var load_sign = $('<div class="loading">').append('loading');
+            this.$el.html($(this.compiledTemplate).append(load_sign));
+
+            // Disable buttons.
+            $('.controls').css({display: 'none'});
+
+            this.model.on('reloaded', function(){
+                // Remove loading message.
+                load_sign.remove();
+
+                // Reenable buttons.
+                $('.controls').css({display: ''});
+            });
+
             // Call to ExampleProject::reload()
             // this.model is set in collections/examples.js
             var attrs = _.clone(this.model.attributes);
@@ -60,6 +76,22 @@ define([
 
         copy: function (e) {
             e.preventDefault();
+
+            // Display 'loading' message.
+            var load_sign = $('<div class="loading">').append('loading');
+            this.$el.html($(this.compiledTemplate).append(load_sign));
+
+            // Disable buttons.
+            $('.controls').css({display: 'none'});
+
+            this.model.on('copied', function(){
+                // Remove loading message.
+                load_sign.remove();
+
+                // Reenable buttons.
+                $('.controls').css({display: ''});
+            });
+
             var attrs = _.clone(this.model.attributes);
             this.model.copy(attrs);
         }

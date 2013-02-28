@@ -1,7 +1,7 @@
 {
     "feed": [
     {"url": "http://localhost:8283/feed/hej.zip"  , "name": "hej"  , "description": "lorem ipsum 1", "screenshot": "screenshot", "timestamp": 123},
-    {"url": "url1" , "name": "name1" , "description": "lorem ipsum 2", "screenshot": "screenshot1", "timestamp": 456},
+    {"url": "http://localhost:8283/feed/mosync-js-error-requirejs-testcase.zip" , "name": "mosync-js-error-requirejs-testcase" , "description": "lorem ipsum 2", "screenshot": "screenshot1", "timestamp": 456},
     {"url": "url2" , "name": "name2" , "description": "lorem ipsum 3", "screenshot": "screenshot2", "timestamp": 789},
     {"url": "url3" , "name": "name3" , "description": "lorem ipsum 4", "screenshot": "screenshot3", "timestamp": 314}
 ]
