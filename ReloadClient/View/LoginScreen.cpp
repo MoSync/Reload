@@ -378,7 +378,7 @@ int LoginScreen::positionLogoLayout(int screenWidth, int screenHeight, float scr
 	else
 	{
 		mLogo->setWidth(logoWidth);
-		mLogo->setPosition(centerH - logoWidth/2, 0);
+		mLogo->setPosition(centerH - logoWidth/2, aboveHeight);
 	}
 
 	return height;

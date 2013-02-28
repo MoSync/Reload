@@ -78,6 +78,7 @@ void StoredProjectsScreen::createMainLayout() {
 	for (int i = 0; i <= 5; i++)
 	{
 		ListViewItem* item = new ListViewItem();
+		item->fillSpaceHorizontally();
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
 		itemHorizontalLayout->fillSpaceHorizontally();
