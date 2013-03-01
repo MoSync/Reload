@@ -8,6 +8,8 @@ define([
 
     var ContentView = Backbone.View.extend({
 
+        className: 'index-content',
+
         initialize: function () {
 
             _.bindAll(this, 'render');

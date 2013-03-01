@@ -37,7 +37,6 @@ define([
         },
 
         debug: function() {
-            console.log('debug');
             this.debugFlag = true;
             this.reload();
         },
@@ -57,26 +56,10 @@ define([
                 return;
             }
 
-            var options     = {};
-            options.url     = 'http://localhost:8283';
-
-            options.rpcMsg  = {
-                method: 'manager.reloadProject',
-                params: [this.parent.selectedProject.get('name'), this.debugFlag],
-                id: 0
-            };
-
-            options.success = function (resp) {
-                console.log('reload');
-                console.log(resp.result);
+            this.parent.selectedProject.on('reloaded', function(){
                 self.parent.views.logView.clear();
-            };
-
-            options.error   = function (resp) {
-                console.log('could not reload');
-                console.log(resp);
-            };
-            this.model.rpc(options);
+            });
+            this.parent.selectedProject.reload(this.debugFlag);
         }
 
     });
