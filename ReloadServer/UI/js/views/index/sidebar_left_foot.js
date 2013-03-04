@@ -12,7 +12,6 @@ define([
 
         initialize: function (options) {
             this.parent = options.parent;
-            console.log(options);
             _.bindAll(this, 'render');
         },
 

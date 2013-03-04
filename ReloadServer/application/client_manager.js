@@ -9,57 +9,55 @@ var vars = require('./globals');
  */
 var rpcFunctions = {
 
-	/**
-	 * Test function used for testing //TODO: remove after testing
-	 */
-	add: function (a, b, sendResponse) {
+    /**
+     * Test function used for testing //TODO: remove after testing
+     */
+    add: function (a, b, sendResponse) {
 
-		//check if parameter passing was correct
+        //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-		var r = a + b + 3;
-		sendResponse({hasError: false, data: r});
-	},
+        var r = a + b + 3;
+        sendResponse({hasError: false, data: r});
+    },
 
-	/**
-	 * Function that send the bundle to the client.
-	 */
-	getBundle: function(bundlePath, sendResponse) {
-		
-		//check if parameter passing was correct
+    /**
+     * Function that send the bundle to the client.
+     */
+    getBundle: function(bundlePath, sendResponse) {
+        
+        //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-		// Set path to the project folder.
-		console.log("MOSYNC: Bundle Path: " + unescape(bundlePath));
+        // Set path to the project folder.
+        console.log("MOSYNC: Bundle Path: " + unescape(bundlePath));
 
-		var data = fs.readFileSync(vars.globals.rootWorkspacePath + 
-								   vars.globals.fileSeparator +
-								   unescape(bundlePath) +
-								   vars.globals.fileSeparator +
-								   "LocalFiles.bin");
-		
-		sendResponse({hasError: false, data: data});
-	},
+        var data = fs.readFileSync(unescape(bundlePath) +
+                                   vars.globals.fileSeparator +
+                                   "LocalFiles.bin");
+        
+        sendResponse({hasError: false, data: data});
+    },
 
-	/**
-	 * UNUSED: This method is replaced with function in
-	 * tcp_server.js.
-	 *
-	 * Function that pushes a log message to gRemoteData[]
-	 * so it can be read from the web browser.
-	 */
-	remoteLog: function (logMessage, sendResponse) {
-		
-		//check if parameter passing was correct
+    /**
+     * UNUSED: This method is replaced with function in
+     * tcp_server.js.
+     *
+     * Function that pushes a log message to gRemoteData[]
+     * so it can be read from the web browser.
+     */
+    remoteLog: function (logMessage, sendResponse) {
+        
+        //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-		console.log("SHOULD NOT BE USED! CLIENT LOG: " + logMessage);
-		console.log(logMessage);
-		
-		vars.globals.gRemoteLogData.push(logMessage);
-		sendResponse({hasError: false, data: ""});
-	}
-	
+        console.log("SHOULD NOT BE USED! CLIENT LOG: " + logMessage);
+        console.log(logMessage);
+        
+        vars.globals.gRemoteLogData.push(logMessage);
+        sendResponse({hasError: false, data: ""});
+    }
+    
 };
 
 rpc.exposeModule('client', rpcFunctions);

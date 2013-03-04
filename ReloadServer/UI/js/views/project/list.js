@@ -37,8 +37,6 @@ define([
         },
 
         close: function () {
-            console.log('close plv');
-
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();

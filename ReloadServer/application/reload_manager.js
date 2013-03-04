@@ -5,6 +5,9 @@ var path  = require('path');
 var ncp   = require('../node_modules/ncp');
 var cheerio = require('cheerio');
 var http = require('http');
+var url = require('url');
+
+var zip = require('unzip');
 
 /**
  * The functions that are available for remote calling
@@ -123,9 +126,306 @@ var rpcFunctions = {
     },
 
     /**
+     * (RPC): Read a remote list of example projects.
+     */
+    getExampleList: function (sendResponse) {
+        //check if parameter passing was correct
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        var options = {
+            host: 'localhost',
+            port: '8283',
+            path: '/feed/feed.json',
+            method: 'GET'
+        }
+
+        options.headers = {
+            'Content-Type': 'text/pain'
+        };
+
+        // Set up the request
+        var request = http.request(options, function(res) {
+            var output = '';
+            res.setEncoding('utf8');
+
+            res.on('data', function (chunk) {
+                output += chunk;
+            });
+
+            res.on('end', function() {
+                var obj = JSON.parse(output);
+                console.log(obj);
+                sendResponse({hasError: false, data: obj});
+            });
+        });
+
+        request.on('error', function(e) {
+            console.log('Could not establish connection with Localhost: ' + e.message);
+        });
+        request.end();
+        sendResponse({hasError: false, data: obj});
+    },
+
+    reloadExample: function (opts, sendResponse) {
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        var self, opts, options, file_name, home_dir, download_dir, file, sep, request;
+
+        self = this;
+        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+        sep = vars.globals.fileSeparator;
+        download_dir = home_dir + '/.reload/examples';
+        opts = JSON.parse(opts);
+        file_name = url.parse(opts.url).pathname.split('/').pop();
+
+        // Create download directory if it does not exist.
+        path.exists(download_dir, function(exists) {
+            if (!exists){
+                console.log("Download dir does not exist. Create it!");
+                console.log(download_dir);
+                fs.mkdir(home_dir+'/.reload', 0755, function(e) {
+                    if (!e) {
+                        fs.mkdir(home_dir+'/.reload/examples', 0755, function(e) {
+                            if (!e) {
+                                console.log('Done creating ~/.reload/examples/');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // Stream to file.
+        file = fs.createWriteStream(download_dir + sep + file_name);
+        options = {
+            host:    url.parse(opts.url).hostname,
+            port:    url.parse(opts.url).port,
+            path:    url.parse(opts.url).pathname,
+            method:  'GET'
+        };
+
+        request = http.request(options, function (res) {
+            res.on('data', function(chunk){
+                file.write(chunk);
+            });
+
+            res.on('end', function(){
+                console.log(file);
+                file.end();
+
+                // Unpack
+                self.unzip(download_dir + sep + file_name, download_dir + sep, function(){
+                    console.log('Finished extraction. Now Reload!');
+                    self.bundleApp(download_dir + vars.globals.fileSeparator + opts.name, false, function(actualPath) {
+                        fs.stat(actualPath, function(err, stat){
+                            console.log('datasize');
+                            console.log(stat.size);
+                            var url = download_dir + vars.globals.fileSeparator + opts.name;
+
+                            console.log("---------- S e n d i n g   B u n d l e --------");
+                            console.log("actualPath: " + actualPath);
+                            console.log("url: " + url);
+
+                            sendToAllClients({
+                                message: 'ReloadBundle',
+                                url: url,
+                                fileSize: stat.size
+                            });
+
+                            sendResponse({
+                                success: true,
+                                error: null
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        request.on('error', function(e) {
+            console.log('Could not establish connection with '
+                        + opts.url
+                        + ' : '
+                        + e.message);
+        });
+        request.end();
+
+        console.log('reload_manager::reloadExample()');
+        console.log(opts);
+    },
+
+    /*
+     * (RPC) Copies a project to current workspace directory.
+     * If a project is not in $HOME/.reload/examples/ it's downloaded to
+     * current workspace dir and unpacked there.
+     */
+    copyExample: function (opts, sendResponse) {
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        var self, opts, home_dir, sep, download_dir;
+
+        self = this;
+        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+        sep = vars.globals.fileSeparator;
+        download_dir = home_dir + '/.reload/examples';
+        opts = JSON.parse(opts);
+
+        // Download file if not already done so.
+        var filePath = download_dir + sep + opts.name + '.zip';
+        console.log(filePath);
+        fs.exists(filePath, function(exists){
+            if (!exists) {
+                self.download(opts.url, vars.globals.rootWorkspacePath, function(res) {
+                    console.log(res.file);
+
+                    // Unpack.
+                    self.unzip(res.file, vars.globals.rootWorkspacePath, function(resp){
+                        console.log('unzip successful');
+                        console.log(resp);
+
+                        // Remove downloaded zip.
+                        fs.unlink(res.file, function(){
+                            console.log(res.file + ' removed');
+                            // Notify callee.
+                            sendResponse({
+                                success: true,
+                                error: null
+                            });
+                        });
+                    });
+                });
+            } else {
+                // If already downloaded, copy to currect workspace and
+                // unzip there. Remove zip file when done.
+                self.copy(filePath, vars.globals.rootWorkspacePath+opts.name+'.zip', function(err){
+
+                    var src = vars.globals.rootWorkspacePath + opts.name + '.zip';
+                    self.unzip(src, vars.globals.rootWorkspacePath, function(err){
+
+                        // Remove copied file.
+                        fs.unlink(src, function(){
+                            console.log(src + ' removed');
+                            // Notify callee.
+                            sendResponse({
+                                success: true,
+                                error: null
+                            });
+                        });
+                    });
+                });
+            }
+        });
+
+        console.log('reload_manager.js::copyExample():260 ' + vars.globals.rootWorkspacePath);
+        console.log(opts);
+
+    },
+    /*
+     * Copies a file.
+     * @src         
+     * @dest        
+     * @callback    
+     */
+    copy: function (src, dest, callback) {
+        console.log('copy() called');
+        console.log('src ' + src );
+        console.log('dst ' + dest );
+        var cbCalled = false;
+
+        var rd = fs.createReadStream(src);
+        rd.on('error', function(err){
+            done(err);
+        });
+
+        var wr = fs.createWriteStream(dest);
+        wr.on('err', function(err){
+            done(err);
+        });
+        wr.on('close', function(){
+            done();
+        });
+        rd.pipe(wr);
+
+        function done(err) {
+            if (!cbCalled) {
+                callback(err);
+                cbCalled = true;
+            }
+        }
+    },
+
+    /*
+     * Unzip a file to a destination directory.
+     * @file        Zip file name including full path.
+     * @dest        Destination directory of unzipped files.
+     * @callback    Called upon completion of unzip.
+     */
+    unzip: function (file, dest, callback) {
+        var res = {};
+        fs.createReadStream(file)
+        .pipe(zip.Extract({ path: dest }))
+        .on('close', function(){
+            console.log('Finished extraction.');
+            res.file = file;
+            callback(res);
+        });
+    },
+
+     /*
+      * Internal method to download a file from a specified URL.
+      *
+      * @location   url pointing to wanted file.
+      * @dest       download directory (no file name at the end)
+      * @callback   Callback is returned with a {file: 'filepath' } object passed.
+      */
+    download: function (location, dest, callback) {
+        var request, options, file, fileName, sep, res;
+
+        fileName = location.split('/').pop();
+        res = {};
+        sep = vars.globals.fileSeparator;
+
+        // Stream to file.
+        file = fs.createWriteStream(dest + sep + fileName);
+        options = {
+            host:    url.parse(location).hostname,
+            port:    url.parse(location).port,
+            path:    url.parse(location).pathname,
+            method:  'GET'
+        };
+
+        request = http.request(options, function (res) {
+            res.on('data', function(chunk){
+                file.write(chunk);
+            });
+
+            res.on('end', function(){
+                file.end();
+                res.file = dest + sep + fileName;
+                callback(res);
+            });
+        });
+
+        request.on('error', function(e) {
+            console.log('Could not establish connection with '
+                        + location
+                        + ' : '
+                        + e.message);
+        });
+        request.end();
+    },
+
+    /**
      * (RPC): Returns the Project list with attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
+        var sep = vars.globals.fileSeparator;
 
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
@@ -141,7 +441,7 @@ var rpcFunctions = {
                     url: "http://localhost:8282/" + p + "/LocalFiles.html",
                     name: p,
                     path: vars.globals.rootWorkspacePath +
-                          vars.globals.fileSeparator + p
+                          sep + p
                 }
                 projectListJSON.push(projectInfo);
 
@@ -496,7 +796,7 @@ var rpcFunctions = {
      *        - Bundles the project folder
      *        - Request the mobile device to "Reload" the project.
      */
-    reloadProject: function (projectPath, debug, sendResponse) {
+    reloadProject: function (projectName, debug, sendResponse) {
 
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') return false;
@@ -519,20 +819,19 @@ var rpcFunctions = {
         sendResponse({hasError: false, data: ""});
 
         // Bundle the app.
+        var projectPath = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectName;
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
 
             // We will send the file size information together with
             // the command as an extra level of integrity checking.
             var data = fs.readFileSync(actualPath);
-            var url = projectPath.replace(
-                "LocalFiles.html",
-                "LocalFiles.bin").replace(
-                    ' ',
-                    '%20');
+            var url = vars.globals.rootWorkspacePath +
+                vars.globals.fileSeparator +
+                projectName;
 
             console.log("---------- S e n d i n g   B u n d l e --------");
             console.log("actualPath: " + actualPath);
-            console.log("url: " + url + "?filesize=" + data.length);
+            console.log("url: " + url);
 
             // Send the new bundle URL to the device clients.
             sendToAllClients({
@@ -543,8 +842,7 @@ var rpcFunctions = {
 
             // Collect Stats Statistics
             if(vars.globals.statistics === true) {
-                var indexPath = vars.globals.rootWorkspacePath +
-                                vars.globals.fileSeparator + projectPath +
+                var indexPath = projectPath +
                                 vars.globals.fileSeparator + "LocalFiles" +
                                 vars.globals.fileSeparator + "index.html";
 
@@ -591,17 +889,12 @@ var rpcFunctions = {
      * and delete the temp directory
      */
     bundleApp: function (projectDir, weinreDebug, callback) {
-
         // copy project files to naother directory which will
         // be bundled
         var self = this,
-            pathToLocalFiles =  vars.globals.rootWorkspacePath +
-                                vars.globals.fileSeparator +
-                                projectDir +
+            pathToLocalFiles =  projectDir +
                                 vars.globals.fileSeparator + "LocalFiles",
-            pathToTempBundle =  vars.globals.rootWorkspacePath +
-                                vars.globals.fileSeparator +
-                                projectDir +
+            pathToTempBundle =  projectDir +
                                 vars.globals.fileSeparator + "TempBundle";
         ncp.limit = 16;
 
@@ -646,13 +939,13 @@ var rpcFunctions = {
                             function puts(error, stdout, stderr)
                             {
                                 console.log("stdout: " + stdout);
+
                                 if (error) {
                                     console.log("ERROR stderr: " + stderr, 0);
                                     console.log("ERROR error : " + error, 0);
                                 }
                                 
-                                callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
-                                         projectDir + "/LocalFiles.bin");
+                                callback(projectDir + "/LocalFiles.bin");
 
                                 // Delete TempBundle directory
                                 self.removeRecursive(pathToTempBundle, function (error, status){
@@ -677,7 +970,7 @@ var rpcFunctions = {
                             }
 
                             var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
-                                vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  +
+                                projectDir  +
                                 vars.globals.fileSeparator + "LocalFiles.bin\"";
                             exec(command, puts);
                     });
@@ -694,13 +987,13 @@ var rpcFunctions = {
                 function puts(error, stdout, stderr)
                 {
                     console.log("stdout: " + stdout);
+                    
                     if (error){
                         console.log("stderr: " + stderr, 0);
                         console.log("error : " + error, 0);
                     }
-                                        
-                    callback(vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
-                             projectDir + "/LocalFiles.bin");
+                    
+                    callback(projectDir + "/LocalFiles.bin");
                 }
 
                 var bundleCommand = "bin\\win\\Bundle.exe";
@@ -715,7 +1008,7 @@ var rpcFunctions = {
                 }
 
                 var command =  bundleCommand + " -in \"" + pathToLocalFiles + "\" -out \"" +
-                    vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectDir  +
+                    projectDir  +
                     vars.globals.fileSeparator + "LocalFiles.bin\"";
                 exec(command, puts);
             }
@@ -1249,9 +1542,7 @@ var rpcFunctions = {
     debugInjection: function (projectName, callback) {
 
         var self = this,
-            indexHtmlPath = vars.globals.rootWorkspacePath +
-                            vars.globals.fileSeparator +
-                            projectName +
+            indexHtmlPath = projectName +
                             vars.globals.fileSeparator + 'TempBundle' +
                             vars.globals.fileSeparator + 'index.html',
             data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
@@ -1283,10 +1574,7 @@ var rpcFunctions = {
         var externalScriptFiles = $("script[src]:not([class='jsdom'])").each(function (index, element){
 
             if( element.attribs.src !== "js/wormhole.js") {
-                var scriptPath = vars.globals.rootWorkspacePath +
-                                 vars.globals.fileSeparator +
-                                 projectName +
-                                 vars.globals.fileSeparator + 'TempBundle' +
+                var scriptPath = vars.globals.fileSeparator + 'TempBundle' +
                                  vars.globals.fileSeparator + self.fixPathsUnix(element.attribs.src);
                 try {
 

@@ -468,6 +468,28 @@ buster.testCase("RPC", {
         });
     },
 
+    "getExampleList": function (done) {
+        var result, expected;
+        expected = {feed: [{}]};
+
+        request.post({
+            headers:  this.headers,
+            url:      this.url,
+            body:     JSON.stringify({
+                "method":  "manager.getExampleList",
+                "params":  [],
+                "id":      null
+            })
+        }, function(error, response, body) {
+            result = JSON.parse(body).result;
+            //buster.log(result);
+            assert.match(result, expected);
+            done();
+        });
+    },
+
+    "//reloadExample": function() {},
+
     "//reloadProject": function(done) {
         var self, result, projectName, projectType;
         projectName = 'ProjectToReload';
