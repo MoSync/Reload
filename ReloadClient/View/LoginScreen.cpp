@@ -611,17 +611,6 @@ void LoginScreen::orientationDidChange()
 		// on wp7 the screen size on landscape has the same values as portrait
 		// so we need to swap those values
 
-		// TODO SA: remove this after testing - bug solved on wp7 platform - after merging
-		// with the master branch this code will make the UI look bad
-		if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
-				orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
-				mOS.find("Windows", 0) >= 0)
-		{
-			int aux = screenWidth;
-			screenWidth = screenHeight;
-			screenHeight = aux;
-		}
-
 		rebuildScreenLayout(screenWidth, screenHeight);
 	}
 }

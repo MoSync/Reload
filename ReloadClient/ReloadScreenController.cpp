@@ -50,6 +50,12 @@ ReloadScreenController::~ReloadScreenController()
 	mLoginScreen->removeReloadUIListener(this);
 	mWorkspaceScreen->removeReloadUIListener(this);
 	mStoredProjectScreen->removeReloadUIListener(this);
+
+	delete mLoginScreen;
+	delete mWorkspaceScreen;
+	delete mStoredProjectScreen;
+
+	delete MainStackSingleton::getInstance();
 }
 
 /**

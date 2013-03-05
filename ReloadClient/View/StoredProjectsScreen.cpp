@@ -200,17 +200,6 @@ void StoredProjectsScreen::setScreenValues()
 	mScreenWidth = EXTENT_X(ex);
 	mScreenHeight = EXTENT_Y(ex);
 
-	// on wp7 the screen size on landscape has the same values as portrait
-	// so we need to swap those values
-	if ((orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
-			orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT) &&
-			mOS.find("Windows", 0) >= 0)
-	{
-		int aux = mScreenWidth;
-		mScreenWidth = mScreenHeight;
-		mScreenHeight = aux;
-	}
-
 	if (orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{

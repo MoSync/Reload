@@ -46,7 +46,7 @@ void MainStackScreen::orientationWillChange()
 	// go through the children and announce the orientation will change event
 	for (int i = 0; i < this->getStackSize(); i++)
 	{
-		LoginScreen *loginScreen = (LoginScreen*)this->getChild(i);
+		Screen *loginScreen = (Screen*)this->getChild(i);
 		loginScreen->orientationWillChange();
 	}
 }
