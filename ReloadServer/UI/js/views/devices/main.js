@@ -20,7 +20,7 @@ define([
         },
 
         initialize: function (options) {
-
+            var self = this;
             this.parent = options.parent;
 
             _.bindAll(this,
@@ -31,8 +31,6 @@ define([
                      );
 
             var socket = io.connect('http://localhost:8283');
-
-            var self = this;
             socket.on('devices', function (data) {
                 console.log('socket response');
                 console.log('data ' + JSON.stringify(data.msg));
@@ -43,7 +41,10 @@ define([
         },
 
         openDialog: function () {
-            var deviceListDialog = new DeviceListDialog( {devices: this.devices} );
+            var deviceListDialog = new DeviceListDialog({
+                devices: this.devices,
+                devicesModel: this.model
+            });
             deviceListDialog.render();
         },
 

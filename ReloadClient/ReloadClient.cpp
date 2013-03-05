@@ -19,7 +19,7 @@ MA 02110-1301, USA.
 /**
  * @file ReloadClient.cpp
  *
- *  Created on: Feb 27, 2012
+ *	Created on: Feb 27, 2012
  *	  Author: Ali Sarrafi, Iraklis Rossis
  */
 
@@ -156,6 +156,7 @@ static void DeleteFolderRecursively(const char *path)
 
 ReloadClient::ReloadClient()
 {
+	lprintfln("@@@ ReloadClient");
 	// Initialize application.
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
@@ -403,7 +404,7 @@ void ReloadClient::onLogMessage(const char* message, const char* url)
 		MAUtil::String json(
 			"{"
 			"\"method\":  \"client.remoteLog\","
-			"\"params\": [   "
+			"\"params\": [	 "
 				"\"" + messageString + "\""
 				"],"
 			"\"id\": 0"
@@ -633,6 +634,12 @@ void ReloadClient::handleJSONMessage(const String& json)
 
 		// Initiate the download.
 		downloadBundle(urlData, fileSize);
+	}
+	// Disconnect from server.
+	else if (message == "Disconnect")
+	{
+		LOG("@@@ disconnect");
+		disconnectFromServer();
 	}
 	// Evaluate a JavaScript string.
 	else if (message == "EvalJS")

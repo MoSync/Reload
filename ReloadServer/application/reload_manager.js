@@ -16,6 +16,20 @@ var zip = require('unzip');
 var vars = require('./globals');
 
 /**
+ * (internal function) Converts a decimal value to 8byte length Hex
+ */
+var toHex8Byte = function (decimal) {
+
+    var finalHex  = decimal.toString(16);
+
+    while (finalHex.length < 8) {
+        finalHex = "0"+finalHex;
+    }
+
+    return finalHex;
+};
+
+/**
  * Send a given message to all connected clients.
  * @param jsonMessage Message in JSON format.
  * The message must contain a field named 'message'
@@ -29,22 +43,8 @@ var sendToAllClients = function(jsonMessage) {
     vars.globals.clientList.forEach(function (client) {
 
         try {
-            // Protocol consists of header "RELOADMSG" followed
-            // by data length encoded as 8 hex didgits, e.g.: "000000F0"
-            // Then string data follows with actual JSON message.
-            // Advantage with hex is that we can read fixed numer of bytes
-            // in the read operation.
-            // Convert to hex:
-            // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
-            // Construct message with proper header.
-            var message = JSON.stringify(jsonMessage);
-            var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
-
-            // Send the message.
-            // TODO: Perhaps make client object that wraps the base socket and
-            // put a send/write method in there.
-            var result = client.write(fullMessage, "ascii");
+            sendToClient(client, jsonMessage);
         }
         catch (err) {
             console.log("@@@ reload_manager.js: sendToAllClients error: " + err)
@@ -59,9 +59,57 @@ var sendToAllClients = function(jsonMessage) {
     });
 };
 
+var sendToClient = function(client, jsonMessage) {
+    try {
+        // Protocol consists of header "RELOADMSG" followed
+        // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+        // Then string data follows with actual JSON message.
+        // Advantage with hex is that we can read fixed numer of bytes
+        // in the read operation.
+        // Convert to hex:
+        // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+
+        // Construct message with proper header.
+        var message = JSON.stringify(jsonMessage);
+        var fullMessage = "RELOADMSG" + toHex8Byte(message.length) + message;
+
+        // Send the message.
+        // TODO: Perhaps make client object that wraps the base socket and
+        // put a send/write method in there.
+        var result = client.write(fullMessage, "ascii");
+    } catch (err) {
+        console.log("@@@ reload_manager.js: sendToClient error: " + err)
+    }
+};
 // TODO: Move non-RPC functions out of this object to make the code
 // mode clean and make rpcFunctions contain only the RPC functions.
 var rpcFunctions = {
+
+    disconnectDevice: function (address, sendResponse) {
+        var response = null;
+        var i, len;
+        len = vars.globals.clientList.length;
+
+        for (i = 0; i < len; i++) {
+            var client = vars.globals.clientList[i];
+            if (client !== undefined && address === client.deviceInfo.address) {
+                response = address + ' closed';
+
+                console.log('!!! sent Disconnect msg to client');
+                sendToClient(client, { message: 'Disconnect' });
+                //client.end();
+                break;
+
+            } else {
+                response = address + ' was not in the list';
+            }
+        }
+
+        sendResponse({
+            success: true,
+            data: response
+        });
+    },
 
     /**
      * (internal function) Used to acquire the server ip address
@@ -1507,18 +1555,6 @@ var rpcFunctions = {
         return pathTemp;
     },
 
-    /**
-     * (internal function) Converts a decimal value to 8byte length Hex
-     */
-    toHex8Byte: function (decimal) {
-
-        var finalHex  = decimal.toString(16);
-
-        while (finalHex.length < 8)
-            finalHex = "0"+finalHex;
-
-        return finalHex;
-    },
 
     /**
      * (internal function) injects evaluation code for error capturing

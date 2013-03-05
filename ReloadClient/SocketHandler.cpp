@@ -170,10 +170,11 @@ void SocketHandler::connReadFinished(Connection* conn, int result)
 		{
 			// NULL-terminate message and call listener callback.
 			mReadBuffer[mReadSize] = 0;
-			mListener->socketHandlerMessageReceived(mReadBuffer);
 
 			// Read next message.
 			readMessageHeader();
+
+			mListener->socketHandlerMessageReceived(mReadBuffer);
 		}
 		else
 		{
