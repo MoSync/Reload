@@ -641,6 +641,10 @@ void ReloadClient::handleJSONMessage(const String& json)
 		String script = (jsonRoot->getValueForKey("script"))->toString();
 		evaluateScript(script);
 	}
+	else if (message == "Disconnect")
+	{
+		this->disconnectFromServer();
+	}
 	else
 	{
 		maPanic(0,"RELOAD: Unknown server message");
@@ -820,6 +824,7 @@ void ReloadClient::sendClientDeviceInfo()
 	char deviceOS[256];
 	char deviceOSVersion[256];
 	char buffer[1024];
+	int protocolVersion = 1;
 
 	maGetSystemProperty(
 		"mosync.device.name",
@@ -858,13 +863,15 @@ void ReloadClient::sendClientDeviceInfo()
 				"\"name\":\"%s\","
 				"\"uuid\":\"%s\","
 				"\"version\":\"%s\","
-				"\"phonegap\":\"1.2.0\""
+				"\"phonegap\":\"1.2.0\","
+				"\"protocolVersion\":\"%d\""
 			"}"
 		"}",
 		deviceOS,
 		deviceName,
 		deviceUUID,
-		deviceOSVersion
+		deviceOSVersion,
+		protocolVersion
 		);
 
 	sendTCPMessage(buffer);

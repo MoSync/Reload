@@ -31,7 +31,10 @@ create = function(port) {
     app.use('/', express.static(path.resolve(__dirname, '../UI')));
 
     app.get('/proccess', function(request, response){
-        
+        console.log("-------------------------------");
+        console.log(request.query.jsonRPC);
+        console.log(JSON.parse(request.query.jsonRPC));
+        console.log("-------------------------------");
         rpc.listen(JSON.parse(request.query.jsonRPC), response);
     });
 

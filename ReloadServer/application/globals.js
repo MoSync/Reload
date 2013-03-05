@@ -63,6 +63,8 @@ var globals = {
     openBrowser: true,
 
     logLevel: 0,
+
+    protocolVersion: 1
 };
 
 var methods = {

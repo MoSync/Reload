@@ -155,32 +155,55 @@ var create = function (port) {
             {
                 // Platform, name, uuid, os version, phonegap version.
                 //message.type == null;
-                if(vars.globals.statistics === true) {
-
-                    // Statistics Collection
-                    vars.methods.loadStats(function (statistics) {
-
-                        var actionTS = new Date().getTime();
-                        
-                        var client = {
-                            localIP: socket.remoteAddress,
-                            platform: message.params.platform,
-                            version: message.params.version,
-                            action: "connect",
-                            actionTS : actionTS
-                        };
-
-                        statistics.clients.push(client);
-                        
-                        vars.methods.saveStats(statistics);
-                    });
-                }
                 
-                socket.deviceInfo = message.params;
-                socket.deviceInfo.address = socket.remoteAddress;
-                generateDeviceInfoListJSON();
-                console.log("Client " + socket.remoteAddress +
-                    " (" + socket.deviceInfo.name + ") has connected.", 0 )
+                // Check for protocol compatibility
+                if(typeof message.params.protocolVersion === 'undefined' ||
+                    message.params.protocolVersion != vars.globals.protocolVersion ) {
+
+                    console.log("ERROR client version is not compatible with server version.", 0);
+                    // Send client disconnection command
+                    try {
+                        // Construct message with proper header.
+                        var message = JSON.stringify( { message: "Disconnect" } );
+                        var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+
+                        var result = socket.write(fullMessage, "ascii");
+                    }
+                    catch (err) {
+                        console.log("ERROR tcp_server.js: processMessage: " + err, 0)
+                    }
+
+                } else {
+                    
+                    if(vars.globals.statistics === true) {
+
+                        // Statistics Collection
+                        vars.methods.loadStats(function (statistics) {
+
+                            var actionTS = new Date().getTime();
+                            
+                            var client = {
+                                localIP: socket.remoteAddress,
+                                platform: message.params.platform,
+                                version: message.params.version,
+                                action: "connect",
+                                actionTS : actionTS
+                            };
+
+                            statistics.clients.push(client);
+                            
+                            vars.methods.saveStats(statistics);
+                        });
+                    }
+                    // Save the socket on the list of connected clients.
+                    vars.globals.clientList.push(socket);
+
+                    socket.deviceInfo = message.params;
+                    socket.deviceInfo.address = socket.remoteAddress;
+                    generateDeviceInfoListJSON();
+                    console.log("Client " + socket.remoteAddress +
+                        " (" + socket.deviceInfo.name + ") has connected.", 0 );
+                }
             }
             // The device sent a log message.
             else if (message.message == "remoteLogRequest")
@@ -204,9 +227,6 @@ var create = function (port) {
     {
         try
         {
-            // Save the socket on the list of connected clients.
-            vars.globals.clientList.push(socket);
-
             // Use ascii encoding.
             socket.setEncoding('ascii');
 
@@ -237,25 +257,27 @@ var create = function (port) {
                             vars.methods.saveStats(statistics);
                         });
                     }
-                }
-
-                console.log(
-                    "Client " +
-                    address + " (" +
-                    socket.deviceInfo.name +
-                    ") has disconnected.", 0);
-
-                for (var i = 0; i < vars.globals.clientList.length; i++)
-                {
-                    if (vars.globals.clientList[i].remoteAddress ==
-                        socket.remoteAddress)
+                    console.log(
+                        "Client " +
+                        address + " (" +
+                        socket.deviceInfo.name +
+                        ") has disconnected.", 0);
+                    for (var i = 0; i < vars.globals.clientList.length; i++)
                     {
+                        if (vars.globals.clientList[i].remoteAddress ==
+                            socket.remoteAddress)
+                        {
 
-                        vars.globals.clientList.splice(i,1);
-                        generateDeviceInfoListJSON();
-                        break;
+                            vars.globals.clientList.splice(i,1);
+                            generateDeviceInfoListJSON();
+                            break;
+                        }
                     }
+                } else {
+                    console.log("Unsupported Client was disconnected from the server.", 0);
+                    console.log(vars.globals.clientList);
                 }
+
             });
 
             // Executed when the client sends data to the server.
