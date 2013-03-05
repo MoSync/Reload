@@ -836,7 +836,7 @@ var rpcFunctions = {
             // Send the new bundle URL to the device clients.
             sendToAllClients({
                 message: 'ReloadBundle',
-                url: url,
+                url: escape(url),
                 fileSize: data.length
             });
 
