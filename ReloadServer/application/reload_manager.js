@@ -510,55 +510,62 @@ var rpcFunctions = {
 
         console.log("Weinre Enabled:" + weinreDebug);
 
-        sendResponse({hasError: false, data: ""});
-
         // Bundle the app.
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
+            try {
 
-            // We will send the file size information together with
-            // the command as an extra level of integrity checking.
-            var data = fs.readFileSync(actualPath);
-            var url = projectPath.replace(
-                "LocalFiles.html",
-                "LocalFiles.bin").replace(
-                    ' ',
-                    '%20');
+                // We will send the file size information together with
+                // the command as an extra level of integrity checking.
 
-            console.log("---------- S e n d i n g   B u n d l e --------");
-            console.log("actualPath: " + actualPath);
-            console.log("url: " + url + "?filesize=" + data.length);
-
-            // Send the new bundle URL to the device clients.
-            sendToAllClients({
-                message: 'ReloadBundle',
-                url: url,
-                fileSize: data.length
-            });
-
-            // Collect Stats Statistics
-            if(vars.globals.statistics === true) {
-                var indexPath = vars.globals.rootWorkspacePath +
-                                vars.globals.fileSeparator + projectPath +
-                                vars.globals.fileSeparator + "LocalFiles" +
-                                vars.globals.fileSeparator + "index.html";
-
-                var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                var data = fs.readFileSync(actualPath);
                 
-                $ = cheerio.load(indexFileData,{
-                    lowerCaseTags: false
-                });
-                var nativeUIProject = $("#NativeUI");
-                vars.methods.loadStats(function (statistics) {
+                var url = projectPath.replace(
+                    "LocalFiles.html",
+                    "LocalFiles.bin").replace(
+                        ' ',
+                        '%20');
 
-                    if(nativeUIProject.length) {
-                        statistics.totalReloadsNative += 1;
-                    } else {
-                        statistics.totalReloadsHTML += 1;
-                    }
-                    
-                    statistics.lastActivityTS = new Date().getTime();
-                    vars.methods.saveStats(statistics);
+                console.log("---------- S e n d i n g   B u n d l e --------");
+                console.log("actualPath: " + actualPath);
+                console.log("url: " + url + "?filesize=" + data.length);
+
+                // Send the new bundle URL to the device clients.
+                sendToAllClients({
+                    message: 'ReloadBundle',
+                    url: url,
+                    fileSize: data.length
                 });
+
+                // Collect Stats Statistics
+                if(vars.globals.statistics === true) {
+                    var indexPath = vars.globals.rootWorkspacePath +
+                                    vars.globals.fileSeparator + projectPath +
+                                    vars.globals.fileSeparator + "LocalFiles" +
+                                    vars.globals.fileSeparator + "index.html";
+
+                    var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                    
+                    $ = cheerio.load(indexFileData,{
+                        lowerCaseTags: false
+                    });
+                    var nativeUIProject = $("#NativeUI");
+                    vars.methods.loadStats(function (statistics) {
+
+                        if(nativeUIProject.length) {
+                            statistics.totalReloadsNative += 1;
+                        } else {
+                            statistics.totalReloadsHTML += 1;
+                        }
+                        
+                        statistics.lastActivityTS = new Date().getTime();
+                        vars.methods.saveStats(statistics);
+                    });
+                }
+
+                sendResponse({hasError: false, data: ""});
+            } catch (e) {
+
+                sendResponse({hasError: true, data: "Error in reloadProject: " + e});
             }
         });
     },
