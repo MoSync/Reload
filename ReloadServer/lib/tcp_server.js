@@ -70,6 +70,8 @@ var accumulator = (function()
                 // in case the data is garbled and header
                 // not found.
                 console.log("tcp_server.js/accumulator: cannot find magic header", 0);
+                console.log("ERROR probably you are using incompatible Client and Server versions", 0);
+
                 return null;
             }
 
@@ -157,14 +159,15 @@ var create = function (port) {
                 //message.type == null;
                 
                 // Check for protocol compatibility
-                if(typeof message.params.protocolVersion === 'undefined' ||
-                    message.params.protocolVersion != vars.globals.protocolVersion ) {
+                if( (typeof message.params.protocolVersion === 'undefined') ||
+                    (message.params.protocolVersion !== vars.globals.protocolVersion) ) {
 
                     console.log("ERROR client version is not compatible with server version.", 0);
                     // Send client disconnection command
                     try {
                         // Construct message with proper header.
-                        var message = JSON.stringify( { message: "Disconnect" } );
+                        var message = JSON.stringify( { message: "Disconnect",
+                                                        data: "Incompatible Client and Server versions"} );
                         var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
 
                         var result = socket.write(fullMessage, "ascii");

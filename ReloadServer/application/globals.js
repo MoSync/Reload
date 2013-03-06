@@ -64,7 +64,7 @@ var globals = {
 
     logLevel: 0,
 
-    protocolVersion: 1
+    protocolVersion: ""
 };
 
 var methods = {

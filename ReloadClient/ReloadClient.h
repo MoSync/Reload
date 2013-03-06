@@ -286,6 +286,11 @@ private:
 	 * Object that handles downloads.
 	 */
 	DownloadHandler mDownloadHandler;
+
+	/**
+	 * Clients Protocol Version
+	 */
+	int mProtocolVersion;
 };
 
 #endif

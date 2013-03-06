@@ -117,10 +117,13 @@ var rpcFunctions = {
         vars.globals.versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
         var versionInfoJSON = JSON.stringify({"version":vars.globals.versionInfo[0],
-                                              "timestamp": vars.globals.versionInfo[1]});
+                                              "timestamp": vars.globals.versionInfo[1],
+                                              "protocolVersion": vars.globals.versionInfo[2]});
+        vars.globals.protocolVersion = vars.globals.versionInfo[2].replace(/^\s+|\s+$/g,'');
 
         console.log(vars.globals.versionInfo[0].replace(/^\s+|\s+$/g,'') + "  " + 
-                    vars.globals.versionInfo[1].replace(/^\s+|\s+$/g,''), 0);
+                    vars.globals.versionInfo[1].replace(/^\s+|\s+$/g,'') + "  " +
+                    vars.globals.protocolVersion, 0);
 
         sendResponse({hasError: false, data: versionInfoJSON});
     },

@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 
 #include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/Encoder.h>
+#include <maapi.h>
 
 #include "ReloadClient.h"
 #include "ReloadNativeUIMessageHandler.h"
@@ -228,6 +229,7 @@ void ReloadClient::initializeVariables()
 	mHasPage = false;
 	mAppsFolder = "apps/";
 	mRunningApp = false;
+	mProtocolVersion = 0;
 
 	// Get the OS we are on.
 	char buffer[64];
@@ -269,6 +271,17 @@ void ReloadClient::initializeFiles()
 		info[size] = '\0';
 		mInfo = info;
 		delete info;
+		MAUtil::String prVersion;
+		char * infoTemp = new char[size + 1];
+		sprintf(infoTemp, "%s",mInfo.c_str());
+
+		prVersion = strtok(infoTemp,"\n");
+		for(int i=0; i < 2; i++)
+		{
+			prVersion = strtok(NULL, "\n");
+		}
+		mProtocolVersion = atoi(prVersion.c_str());
+
 	}
 	else
 	{
@@ -644,6 +657,23 @@ void ReloadClient::handleJSONMessage(const String& json)
 	else if (message == "Disconnect")
 	{
 		this->disconnectFromServer();
+
+		MAUtil::String disconnectData = (jsonRoot->getValueForKey("data")->toString()) + "\n";
+		MAUtil::String finalString = "";
+		int disconnectDataSize = disconnectData.length();
+		int startPos = 0;
+
+		while (startPos < disconnectDataSize)
+		{
+			finalString += disconnectData.substr(startPos,40) + "\n";
+			startPos += 40;
+		}
+
+		// Add \n every 40 characters so alert will be shown
+		// correctly on all devices
+		maAlert("Disconnection",
+				finalString.c_str(),
+				NULL,"OK",NULL);
 	}
 	else
 	{
@@ -824,7 +854,6 @@ void ReloadClient::sendClientDeviceInfo()
 	char deviceOS[256];
 	char deviceOSVersion[256];
 	char buffer[1024];
-	int protocolVersion = 1;
 
 	maGetSystemProperty(
 		"mosync.device.name",
@@ -871,7 +900,7 @@ void ReloadClient::sendClientDeviceInfo()
 		deviceName,
 		deviceUUID,
 		deviceOSVersion,
-		protocolVersion
+		mProtocolVersion
 		);
 
 	sendTCPMessage(buffer);
