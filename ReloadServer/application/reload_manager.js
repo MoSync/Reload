@@ -153,13 +153,25 @@ var rpcFunctions = {
      */
     findProjects: function (callback, sendResponse) {
         try {
+            var self = this;
 
             fs.exists( vars.globals.rootWorkspacePath, function(exist) {
 
                 if(!exist) {
                     console.log("Creating the workspace directory " +
                                 vars.globals.rootWorkspacePath);
-                    fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);
+                    try {
+
+                        fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);    
+                    } catch (e) {
+                        console.log("ERROR in findProjects: " + e, 0);
+                        console.log("Reverting to Default Workspace Path", 0);
+                        
+                        self.getLatestPath(); // Reverting to Default workspace path
+                        self.findProjects(callback,sendResponse);
+                        return true;
+                    }
+                    
                 }
 
                 // Now, check for projects in it
