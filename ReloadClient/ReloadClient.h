@@ -152,6 +152,13 @@ public:
      */
     void disconnectFromServer();
 
+    /**
+     * Shows an alert with the disconnection message from server
+     * @param disconnectData The message that the server sent
+     * 						 when disconnecting the client
+     */
+    void ReloadClient::showDisconnectionMessage (MAUtil::String disconnectData);
+
     // ========== Server message handling  ==========
 
 	/**

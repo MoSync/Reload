@@ -266,22 +266,24 @@ void ReloadClient::initializeFiles()
 	int size = maGetDataSize(INFO_TEXT);
 	if (size > 0)
 	{
+		// Read the whole information resource file
 		char *info = new char[size + 1];
 		maReadData(INFO_TEXT, (void*)info, 0, size);
 		info[size] = '\0';
 		mInfo = info;
 		delete info;
+
+		// Get the Protocol Version from the data read.
 		MAUtil::String prVersion;
 		char * infoTemp = new char[size + 1];
-		sprintf(infoTemp, "%s",mInfo.c_str());
 
+		sprintf(infoTemp, "%s",mInfo.c_str());
 		prVersion = strtok(infoTemp,"\n");
 		for(int i=0; i < 2; i++)
 		{
 			prVersion = strtok(NULL, "\n");
 		}
 		mProtocolVersion = atoi(prVersion.c_str());
-
 	}
 	else
 	{
@@ -614,6 +616,27 @@ void ReloadClient::disconnectFromServer()
 	mLoginScreen->disconnected();
 }
 
+void ReloadClient::showDisconnectionMessage (MAUtil::String disconnectData)
+{
+
+	MAUtil::String finalString = "";
+
+	int disconnectDataSize = disconnectData.length();
+	int startPos = 0;
+
+	while (startPos < disconnectDataSize)
+	{
+		finalString += disconnectData.substr(startPos,40) + "\n";
+		startPos += 40;
+	}
+
+	// Add \n every 40 characters so alert will be shown
+	// correctly on all devices
+	maAlert("Disconnection",
+			finalString.c_str(),
+			NULL,"OK",NULL);
+}
+
 // ========== Server message handling  ==========
 
 /**
@@ -659,21 +682,8 @@ void ReloadClient::handleJSONMessage(const String& json)
 		this->disconnectFromServer();
 
 		MAUtil::String disconnectData = (jsonRoot->getValueForKey("data")->toString()) + "\n";
-		MAUtil::String finalString = "";
-		int disconnectDataSize = disconnectData.length();
-		int startPos = 0;
 
-		while (startPos < disconnectDataSize)
-		{
-			finalString += disconnectData.substr(startPos,40) + "\n";
-			startPos += 40;
-		}
-
-		// Add \n every 40 characters so alert will be shown
-		// correctly on all devices
-		maAlert("Disconnection",
-				finalString.c_str(),
-				NULL,"OK",NULL);
+		this->showDisconnectionMessage(disconnectData);
 	}
 	else
 	{
