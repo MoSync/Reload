@@ -69,7 +69,9 @@ var accumulator = (function()
                 // TODO: Add some error/recovery handling
                 // in case the data is garbled and header
                 // not found.
-                console.log("tcp_server.js/accumulator: cannot find magic header");
+                console.log("tcp_server.js/accumulator: cannot find magic header", 0);
+                console.log("ERROR probably you are using incompatible Client and Server versions", 0);
+
                 return null;
             }
 
@@ -146,6 +148,7 @@ var create = function (port) {
     function processMessage(jsonString, socket)
     {
         // The data is always in JSON format.
+        console.log(jsonString);
         var message = JSON.parse(jsonString);
 
         if (message != undefined);
@@ -155,32 +158,58 @@ var create = function (port) {
             {
                 // Platform, name, uuid, os version, phonegap version.
                 //message.type == null;
-                if(vars.globals.statistics === true) {
-
-                    // Statistics Collection
-                    vars.methods.loadStats(function (statistics) {
-
-                        var actionTS = new Date().getTime();
-                        
-                        var client = {
-                            localIP: socket.remoteAddress,
-                            platform: message.params.platform,
-                            version: message.params.version,
-                            action: "connect",
-                            actionTS : actionTS
-                        };
-
-                        statistics.clients.push(client);
-                        
-                        vars.methods.saveStats(statistics);
-                    });
-                }
                 
-                socket.deviceInfo = message.params;
-                socket.deviceInfo.address = socket.remoteAddress;
-                generateDeviceInfoListJSON();
-                console.log("Client " + socket.remoteAddress +
-                    " (" + socket.deviceInfo.name + ") has connected." )
+                // Check for protocol compatibility
+                console.log("client version: " + message.params.protocolVersion);
+                console.log("server version: " + vars.globals.protocolVersion);
+                if( (typeof message.params.protocolVersion === 'undefined') ||
+                    (message.params.protocolVersion != vars.globals.protocolVersion) ) {
+
+                    console.log("ERROR client version is not compatible with server version.", 0);
+                    // Send client disconnection command
+                    try {
+                        // Construct message with proper header.
+                        var message = JSON.stringify( { message: "Disconnect",
+                                                        data: "Incompatible Client and Server versions"} );
+                        var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+
+                        var result = socket.write(fullMessage, "ascii");
+                    }
+                    catch (err) {
+                        console.log("ERROR tcp_server.js: processMessage: " + err, 0)
+                    }
+
+                } else {
+                    
+                    if(vars.globals.statistics === true) {
+
+                        // Statistics Collection
+                        vars.methods.loadStats(function (statistics) {
+
+                            var actionTS = new Date().getTime();
+                            
+                            var client = {
+                                localIP: socket.remoteAddress,
+                                platform: message.params.platform,
+                                version: message.params.version,
+                                action: "connect",
+                                actionTS : actionTS
+                            };
+
+                            statistics.clients.push(client);
+                            
+                            vars.methods.saveStats(statistics);
+                        });
+                    }
+                    // Save the socket on the list of connected clients.
+                    vars.globals.clientList.push(socket);
+
+                    socket.deviceInfo = message.params;
+                    socket.deviceInfo.address = socket.remoteAddress;
+                    generateDeviceInfoListJSON();
+                    console.log("Client " + socket.remoteAddress +
+                        " (" + socket.deviceInfo.name + ") has connected.", 0 );
+                }
             }
             // The device sent a log message.
             else if (message.message == "remoteLogRequest")
@@ -204,9 +233,6 @@ var create = function (port) {
     {
         try
         {
-            // Save the socket on the list of connected clients.
-            vars.globals.clientList.push(socket);
-
             // Use ascii encoding.
             socket.setEncoding('ascii');
 
@@ -237,25 +263,27 @@ var create = function (port) {
                             vars.methods.saveStats(statistics);
                         });
                     }
-                }
-
-                console.log(
-                    "Client " +
-                    address + " (" +
-                    socket.deviceInfo.name +
-                    ") has disconnected.");
-
-                for (var i = 0; i < vars.globals.clientList.length; i++)
-                {
-                    if (vars.globals.clientList[i].remoteAddress ==
-                        socket.remoteAddress)
+                    console.log(
+                        "Client " +
+                        address + " (" +
+                        socket.deviceInfo.name +
+                        ") has disconnected.", 0);
+                    for (var i = 0; i < vars.globals.clientList.length; i++)
                     {
+                        if (vars.globals.clientList[i].remoteAddress ==
+                            socket.remoteAddress)
+                        {
 
-                        vars.globals.clientList.splice(i,1);
-                        generateDeviceInfoListJSON();
-                        break;
+                            vars.globals.clientList.splice(i,1);
+                            generateDeviceInfoListJSON();
+                            break;
+                        }
                     }
+                } else {
+                    console.log("Unsupported Client was disconnected from the server.", 0);
+                    console.log(vars.globals.clientList);
                 }
+
             });
 
             // Executed when the client sends data to the server.
@@ -276,11 +304,10 @@ var create = function (port) {
         }
         catch(err)
         {
-            console.log("Error in saveClient: " + err);
+            console.log("Error in saveClient: " + err, 0);
         }
     }
-
-    console.log("Opening TCP socket on port: " + port);
+    console.log("Opening TCP socket on port: " + port, 0);
     var server = net.createServer(saveClient);
     server.listen(7000);
 

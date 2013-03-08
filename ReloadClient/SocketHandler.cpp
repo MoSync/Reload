@@ -170,10 +170,15 @@ void SocketHandler::connReadFinished(Connection* conn, int result)
 		{
 			// NULL-terminate message and call listener callback.
 			mReadBuffer[mReadSize] = 0;
+
+			// Read next message. The message can be Disconnect and
+			// close the socket. That's why read is called before
+			// handling the Message
+			readMessageHeader();
+
 			mListener->socketHandlerMessageReceived(mReadBuffer);
 
-			// Read next message.
-			readMessageHeader();
+
 		}
 		else
 		{
