@@ -46,7 +46,7 @@ define([
             this.populate();
         },
 
-        setpath: function () {
+        setpath: function (callback) {
             // Set current workspace path.
             var options     = {};
             options.url     = 'http://localhost:8283';
@@ -59,6 +59,9 @@ define([
             var self = this;
             options.success = function (resp) {
                 self.path = resp.result.path;
+                if(typeof callback !== 'undefined') {
+                    callback();
+                }
             };
 
             options.error   = function (resp) {
