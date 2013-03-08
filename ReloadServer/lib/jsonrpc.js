@@ -9,7 +9,6 @@
 */
 var sys = require('sys');
 
-
 var JSONRPC = {
     
     functions: {},
@@ -26,14 +25,10 @@ var JSONRPC = {
 	*/  
 	listen : function(message, response){
 
-		/*var self = this;
-		this.response = response;*/
 		resObj = response;
 
 		this.handleMessage(message, function(processingResult) {
 			
-			//console.log(processingResult);
-
 			var responseObject = {
 				'id': 0,
 	        	'result': null,
@@ -60,7 +55,7 @@ var JSONRPC = {
 				response.end("");
 	      	}
 	      	else {
-				console.dlog("SENDING RESPONSE: " + JSON.stringify(responseObject));
+				console.log("SENDING RESPONSE: " + JSON.stringify(responseObject),1);
 				response.writeHead(200, {
 							  'Content-Length': JSON.stringify(responseObject).length,
 							  'Content-Type': 'application/json',
@@ -116,7 +111,7 @@ var JSONRPC = {
     * @result Exposes the given function under the given name . Remote functioname 'add'
     *
     * @name expose
-    * @param String mod The function name.
+    * @param String mod The function name. 
     * @param Object object The function to expose. 
     *
     * @type void
@@ -127,7 +122,8 @@ var JSONRPC = {
     },
 
     trace: function(direction, message) {
-        sys.puts('   ' + direction + '   ' + message);
+    	console.log('   ' + direction + '   ' + message, 1);
+        //sys.puts('   ' + direction + '   ' + message);
     },
 
     handleMessage: function( message, callback ) {
