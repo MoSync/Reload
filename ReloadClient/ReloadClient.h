@@ -297,7 +297,7 @@ private:
 	/**
 	 * Clients Protocol Version
 	 */
-	int mProtocolVersion;
+	char* mProtocolVersion;
 };
 
 #endif

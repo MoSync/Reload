@@ -267,23 +267,30 @@ void ReloadClient::initializeFiles()
 	if (size > 0)
 	{
 		// Read the whole information resource file
-		char *info = new char[size + 1];
-		maReadData(INFO_TEXT, (void*)info, 0, size);
-		info[size] = '\0';
-		mInfo = info;
-		delete info;
+		mInfo.resize(size);
+		maReadData(INFO_TEXT, mInfo.pointer(), 0, size);
 
 		// Get the Protocol Version from the data read.
-		MAUtil::String prVersion;
+		const char* prv;
 		char * infoTemp = new char[size + 1];
+		memcpy(infoTemp, mInfo.c_str(), size + 1);
 
-		sprintf(infoTemp, "%s",mInfo.c_str());
-		prVersion = strtok(infoTemp,"\n");
-		for(int i=0; i < 2; i++)
+		int stringsRead = 0;
+		prv = strtok(infoTemp, "\r\n");
+		while(true)
 		{
-			prVersion = strtok(NULL, "\n");
+			if(prv != NULL)
+			{
+				stringsRead++;
+				LOG("@@@RELOAD: %s", prv);
+			}
+			if(stringsRead == 3)
+			{
+				break;
+			}
+			prv = strtok(NULL, "\r\n");
 		}
-		mProtocolVersion = atoi(prVersion.c_str());
+		mProtocolVersion = (char*)prv;
 	}
 	else
 	{
@@ -903,7 +910,7 @@ void ReloadClient::sendClientDeviceInfo()
 				"\"uuid\":\"%s\","
 				"\"version\":\"%s\","
 				"\"phonegap\":\"1.2.0\","
-				"\"protocolVersion\":\"%d\""
+				"\"protocolVersion\":\"%s\""
 			"}"
 		"}",
 		deviceOS,
