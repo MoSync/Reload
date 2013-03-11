@@ -217,12 +217,12 @@ var rpcFunctions = {
             return false;
         }
 
-        var self, opts, options, file_name, home_dir, download_dir, file, sep, request;
+        var self, opts, options, file_name, home_dir, download_dir, file, DS, request;
 
         self = this;
-        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        sep = vars.globals.fileSeparator;
-        download_dir = home_dir + '/.reload/examples';
+        home_dir = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+        DS = vars.globals.fileSeparator;
+        download_dir = home_dir + DS + '.reload' + DS + 'examples';
         opts = JSON.parse(opts);
         file_name = url.parse(opts.url).pathname.split('/').pop();
 
@@ -231,11 +231,11 @@ var rpcFunctions = {
             if (!exists){
                 console.log("Download dir does not exist. Create it!");
                 console.log(download_dir);
-                fs.mkdir(home_dir+'/.reload', 0755, function(e) {
+                fs.mkdir(home_dir + DS + '.reload', 0755, function(e) {
                     if (!e) {
-                        fs.mkdir(home_dir+'/.reload/examples', 0755, function(e) {
+                        fs.mkdir(home_dir + DS + '.reload' + DS + 'examples', 0755, function(e) {
                             if (!e) {
-                                console.log('Done creating ~/.reload/examples/');
+                                console.log('Done creating ' + home_dir + DS + '.reload' + DS + 'examples' + DS);
                             }
                         });
                     }
@@ -244,7 +244,7 @@ var rpcFunctions = {
         });
 
         // Stream to file.
-        file = fs.createWriteStream(download_dir + sep + file_name);
+        file = fs.createWriteStream(download_dir + DS + file_name);
         options = {
             host:    url.parse(opts.url).hostname,
             port:    url.parse(opts.url).port,
@@ -262,7 +262,7 @@ var rpcFunctions = {
                 file.end();
 
                 // Unpack
-                self.unzip(download_dir + sep + file_name, download_dir + sep, function(){
+                self.unzip(download_dir + DS + file_name, download_dir + DS, function(){
                     console.log('Finished extraction. Now Reload!');
                     self.bundleApp(download_dir + vars.globals.fileSeparator + opts.name, false, function(actualPath) {
                         fs.stat(actualPath, function(err, stat){
@@ -312,16 +312,16 @@ var rpcFunctions = {
             return false;
         }
 
-        var self, opts, home_dir, sep, download_dir;
+        var self, opts, home_dir, DS, download_dir;
 
         self = this;
         home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        sep = vars.globals.fileSeparator;
-        download_dir = home_dir + '/.reload/examples';
+        DS = vars.globals.fileSeparator;
+        download_dir = home_dir + DS + '.reload' + DS + 'examples';
         opts = JSON.parse(opts);
 
         // Download file if not already done so.
-        var filePath = download_dir + sep + opts.name + '.zip';
+        var filePath = download_dir + DS + opts.name + '.zip';
         console.log(filePath);
         fs.exists(filePath, function(exists){
             if (!exists) {
@@ -429,14 +429,14 @@ var rpcFunctions = {
       * @callback   Callback is returned with a {file: 'filepath' } object passed.
       */
     download: function (location, dest, callback) {
-        var request, options, file, fileName, sep, res;
+        var request, options, file, fileName, DS, res;
 
         fileName = location.split('/').pop();
         res = {};
-        sep = vars.globals.fileSeparator;
+        DS = vars.globals.fileSeparator;
 
         // Stream to file.
-        file = fs.createWriteStream(dest + sep + fileName);
+        file = fs.createWriteStream(dest + DS + fileName);
         options = {
             host:    url.parse(location).hostname,
             port:    url.parse(location).port,
@@ -451,7 +451,7 @@ var rpcFunctions = {
 
             res.on('end', function(){
                 file.end();
-                res.file = dest + sep + fileName;
+                res.file = dest + DS + fileName;
                 callback(res);
             });
         });
@@ -469,7 +469,7 @@ var rpcFunctions = {
      * (RPC): Returns the Project list with attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
-        var sep = vars.globals.fileSeparator;
+        var DS = vars.globals.fileSeparator;
 
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
@@ -485,7 +485,7 @@ var rpcFunctions = {
                     url: "http://localhost:8282/" + p + "/LocalFiles.html",
                     name: p,
                     path: vars.globals.rootWorkspacePath +
-                          sep + p
+                          DS + p
                 }
                 projectListJSON.push(projectInfo);
 
