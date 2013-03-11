@@ -42,7 +42,8 @@ define([
                 });
             },
 
-            openDialog: function () {
+            openDialog: function (e) {
+                e.preventDefault();
                 var deviceListDialog = new DeviceListDialog({
                     collection: this.collection
                 });
