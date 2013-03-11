@@ -37,11 +37,19 @@ define([
         },
 
         debug: function() {
+            $('#reload-button').removeClass('btn-primary');
+            $('#debug-button').addClass('btn-primary');
             this.debugFlag = true;
             this.reload();
         },
 
         reload: function () {
+
+            if (!this.debugFlag) {
+                $('#reload-button').addClass('btn-primary');
+                $('#debug-button').removeClass('btn-primary');
+            }
+
             var self = this;
 
             // Check if a project is selected.
@@ -60,6 +68,8 @@ define([
                 self.parent.views.logView.clear();
             });
             this.parent.selectedProject.reload(this.debugFlag);
+
+            this.debugFlag = false;
         }
 
     });
