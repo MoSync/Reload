@@ -688,9 +688,12 @@ void ReloadClient::handleJSONMessage(const String& json)
 	{
 		this->disconnectFromServer();
 
-		MAUtil::String disconnectData = (jsonRoot->getValueForKey("data")->toString()) + "\n";
-
-		this->showDisconnectionMessage(disconnectData);
+		YAJLDom::Value* tempstr = jsonRoot->getValueForKey("data");
+		if(!tempstr->isNull())
+		{
+			MAUtil::String disconnectData = (tempstr->toString()) + "\n";
+			this->showDisconnectionMessage(disconnectData);
+		}
 	}
 	else
 	{
