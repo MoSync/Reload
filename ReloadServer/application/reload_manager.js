@@ -751,7 +751,7 @@ var rpcFunctions = {
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
 
-                var command = "open " + this.fixPathUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
+                var command = "open " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                         this.fixPathsUnix(projectFolder) + "/LocalFiles";
             }
             else if ((vars.globals.localPlatform.indexOf("linux") >=0)) {
