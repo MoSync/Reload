@@ -65,10 +65,13 @@ define([
         },
 
         changeWorkspace: function (e) {
+            var self = this;
+            
             e.preventDefault();
-
-            var dialog = new ChangeWorkspaceDialog( { projectList: this.projectList } );
-            dialog.render();
+            this.projectList.setpath(function () {
+                var dialog = new ChangeWorkspaceDialog( { projectList: self.projectList } );
+                dialog.render();
+            });
         },
 
         updateProjectList: function (e) {
