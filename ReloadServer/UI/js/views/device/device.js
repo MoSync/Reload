@@ -20,7 +20,8 @@ define([
             });
         },
 
-        disconnect: function () {
+        disconnect: function (e) {
+            e.preventDefault();
             this.model.disconnect();
         },
 

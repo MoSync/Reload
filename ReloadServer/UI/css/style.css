@@ -158,14 +158,14 @@ iframe {
     margin-bottom: 0;
 }
 .nav-tabs > li > a {
-    padding-top: 10px;
+    padding-top: 11px;
 }
 
 
 #main-content #content {
     position: absolute;
     background: #fff;
-    top: 51px;
+    top: 52px;
     bottom: 41px;
     overflow: auto;
 }
@@ -207,37 +207,75 @@ iframe {
     top: 10px;
     bottom: 0;
 }
+#log {
+    bottom: 22px;
+    height: 300px;
+    width: 100%;
+    background: #eee;
+    /*border-bottom: 1px solid rgb(184, 184, 184);*/
+}
 
-#content .dl-horizontal,
-.CodeMirror {
+.workbenchView {
     position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+#controls-workbench {
+    border-top: 1px solid #bdb;
+    border-bottom: 1px solid #bdb;
+    z-index: 999;
+}
+#controls-workbench div {
+    border-top: 1px solid #fff;
+}
+
+
+.logView {
+    width: 100%;
+    overflow: auto;
+    height: 200px;
+    position: absolute;
+    bottom: 0;
+}
+
+.logView dl#scroller {
+    margin: 0;
+    position: absolute;
+    overflow: auto;
     width: 100%;
     top: 0;
     bottom: 22px;
-    overflow: auto;
-    margin: 0;
-    border-bottom: 1px solid #bdbdbd;
+    border-bottom: 1px solid #bdb;
 }
 .CodeMirror {
-    height:auto;
+    height: 100%;
+    width: 100%;
+}
+
+#code {
+    position: absolute;
+    top: 0;
+    bottom: 223px;
+    width: 100%;
 }
 
 #content .dl-horizontal dt {
     width: 100px;
-
 }
+
 #content .dl-horizontal dd {
     margin-left: 120px;
 
 }
-#content #controls {
+
+#content div[id^="controls-"] {
     position: absolute;
-    bottom: 0;
+    bottom: 200px;
     height: 21px;
     width: 100%;
 
     background: rgb(238, 238, 238);
-    border-top: 1px solid #fff;
 
     background: #ededed; /* Old browsers */
     background: -moz-linear-gradient(top,  #ededed 0%, #dddddd 100%); /* FF3.6+ */
@@ -247,6 +285,10 @@ iframe {
     background: -ms-linear-gradient(top,  #ededed 0%,#dddddd 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #ededed 0%,#dddddd 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
+}
+#content #controls-log {
+    position: fixed;
+    bottom: 0;
 }
 
 #content #log-controls form {
