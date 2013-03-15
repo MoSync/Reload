@@ -33,7 +33,7 @@
 <property key="build.prefs:project.type" value=""/>
 <property key="com.mobilesorcery.sdk.html5.support" value="true"/>
 <property key="dependency.strategy" value="0"/>
-<property key="excludes/Debug" value=""/>
+<property key="excludes/Debug" value="Clients"/>
 <property key="excludes/Release" value=""/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.html5.hybrid"/>

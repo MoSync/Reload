@@ -38,10 +38,12 @@ MA 02110-1301, USA.
  * @param os The current os.
  * @param orientation The current device orientation.
  */
-WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation) :
+WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation,
+								 MAUtil::Vector <reloadProject> * projects) :
 	Screen(),
 	mMainLayout(NULL)
 {
+	mProjects = projects;
 	mOS = os;
 	setScreenValues();
 	createMainLayout();
@@ -84,13 +86,13 @@ void WorkspaceScreen::createMainLayout() {
 
 	// the list view doesn't automatically sort its elements - the
 	// developer has to handle the sorting
-	for (int i = 0; i <= 9; i++)
+	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); ++i)
 	{
 		ListViewItem* item = new ListViewItem();
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
 		Label* projectNameLabel = new Label();
-		projectNameLabel->setText("Project " + MAUtil::integerToString(i));
+		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
 
@@ -125,7 +127,6 @@ void WorkspaceScreen::createMainLayout() {
 	mMainLayout->addChild(mListView);
 	mMainLayout->addChild(mRefreshButton);
 }
-
 
 /**
 * This method is called if the touch-up event was inside the

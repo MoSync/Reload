@@ -42,6 +42,7 @@ MA 02110-1301, USA.
 #include "SocketHandler.h"
 #include "DownloadHandler.h"
 #include "MAHeaders.h"
+#include "dataTypes.h"
 
 // Forward declarations.
 class ReloadScreenController;
@@ -206,6 +207,10 @@ public:
 	void clearAppsFolder();
 
 	// ========== Send info to server  ==========
+	/**
+	 * Send a message requesting project list
+	 */
+	void ReloadClient::getProjectListFromServer();
 
     /**
      * Sends information about the device to the server.
@@ -232,6 +237,12 @@ public:
      * @param errorCode The error code that was returned.
      */
     void showConnectionErrorMessage(int errorCode);
+
+    /**
+     * Getter returns the vector of projects on server
+     * @return MAUtil::Vector <reloadProject>
+     */
+    MAUtil::Vector <reloadProject> * getListOfProjects();
 
 private:
 	/**
@@ -298,6 +309,8 @@ private:
 	 * Clients Protocol Version
 	 */
 	char* mProtocolVersion;
+
+	MAUtil::Vector <struct reloadProject> mProjects;
 };
 
 #endif

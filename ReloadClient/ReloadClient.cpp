@@ -282,7 +282,7 @@ void ReloadClient::initializeFiles()
 			if(prv != NULL)
 			{
 				stringsRead++;
-				LOG("@@@RELOAD: %s", prv);
+				//LOG("@@@RELOAD: %s", prv);
 			}
 			if(stringsRead == 3)
 			{
@@ -476,6 +476,8 @@ void ReloadClient::socketHandlerConnected(int result)
 	{
 		LOG("@@@ RELOAD connected to: %s", mServerAddress.c_str());
 
+		getProjectListFromServer();
+
 		// Tell UI we are connected.
 		mReloadScreenController->connectedTo(mServerAddress.c_str());
 
@@ -526,8 +528,6 @@ void ReloadClient::socketHandlerMessageReceived(const char* message)
 {
 	if (NULL != message)
 	{
-		LOG("@@@ RELOAD: socketHandlerMessageReceived JSON data: %s", message);
-
 		handleJSONMessage(message);
 	}
 	else
@@ -707,6 +707,27 @@ void ReloadClient::handleJSONMessage(const String& json)
 			this->showDisconnectionMessage(disconnectData);
 		}
 	}
+	else if (message == "projectList")
+	{
+		mProjects.clear();
+		YAJLDom::Value *data = jsonRoot->getValueForKey("data");
+
+		int totalProjects = (int)data->getValueForKey("projectsCount")->toDouble();
+
+		struct reloadProject tmp;
+
+		YAJLDom::Value *projectArray = data->getValueForKey("projects");
+
+		for(int i = 0; i < totalProjects; i++)
+		{
+			YAJLDom::Value *row = projectArray->getValueByIndex(i);
+			tmp.name = row->getValueForKey("name")->toString();
+			tmp.path = row->getValueForKey("path")->toString();
+			tmp.url = row->getValueForKey("url")->toString();
+			mProjects.add(tmp);
+		}
+		this->mReloadScreenController->pushWorkspaceScreen();
+	}
 	else
 	{
 		maPanic(0,"RELOAD: Unknown server message");
@@ -875,6 +896,15 @@ void ReloadClient::clearAppsFolder()
 }
 
 // ========== Send info to server  ==========
+/**
+ * Send a message requesting project list
+ */
+void ReloadClient::getProjectListFromServer()
+{
+	MAUtil::String tmpMsg = "{\"message\":\"getProjectList\",\"params\": {}}";
+
+	sendTCPMessage(tmpMsg);
+}
 
 /**
  * Sends information about the device to the server.
@@ -985,4 +1015,9 @@ void ReloadClient::showConnectionErrorMessage(int errorCode)
 	LOG("@@@ RELOAD: showConnectionErrorMessage: %s", errorMessage.c_str());
 
 	maAlert("Network Status", errorMessage.c_str(), "OK", NULL, NULL);
+}
+
+MAUtil::Vector <reloadProject> * ReloadClient::getListOfProjects()
+{
+	return &mProjects;
 }

@@ -16,17 +16,25 @@ var zip = require('unzip');
 var vars = require('./globals');
 
 /**
- * Send a given message to all connected clients.
+ * Send a given message to an optional client list.
  * @param jsonMessage Message in JSON format.
+ * @param clientsToSend optional if not provided send message to all
+ *        connected clients
  * The message must contain a field named 'message'
  * with the message name.
  */
-var sendToAllClients = function(jsonMessage) {
+var sendToClients = function(jsonMessage, clientsToSend) {
 
     // TODO: What about a client list object that has a send
     // method in it and other methods for managing the client list.
     // And a client object instaed of using bare socket objects.
-    vars.globals.clientList.forEach(function (client) {
+    if (clientsToSend == undefined) {
+        var cList = vars.globals.clientList;
+    } else {
+        var cList = clientsToSend;
+    }
+    
+    cList.forEach(function (client) {
 
         try {
             // Protocol consists of header "RELOADMSG" followed
@@ -47,7 +55,7 @@ var sendToAllClients = function(jsonMessage) {
             var result = client.write(fullMessage, "ascii");
         }
         catch (err) {
-            console.log("@@@ reload_manager.js: sendToAllClients error: " + err, 0)
+            console.log("@@@ reload_manager.js: sendToClients error: " + err, 0)
 
             // Remove this client from the list since we have problems with it.
             var index = vars.globals.clientList.indexOf(client);
@@ -233,7 +241,7 @@ var rpcFunctions = {
                             console.log("actualPath: " + actualPath);
                             console.log("url: " + url);
 
-                            sendToAllClients({
+                            sendToClients({
                                 message: 'ReloadBundle',
                                 url: url,
                                 fileSize: stat.size
@@ -425,13 +433,14 @@ var rpcFunctions = {
     },
 
     /**
-     * (RPC): Returns the Project list with attributes: url, name, path
+     * (RPC): Returns the Project list with 
+     * attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
         var sep = vars.globals.fileSeparator;
 
         //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
+        if (typeof sendResponse !== 'function') return false;
 
         this.findProjects( function (projects) {
 
@@ -449,6 +458,8 @@ var rpcFunctions = {
                 projectListJSON.push(projectInfo);
 
             });
+
+            vars.globals.projectListJSON = projectListJSON;
 
             sendResponse({hasError: false, data: projectListJSON});
         },sendResponse);
@@ -837,7 +848,7 @@ var rpcFunctions = {
             console.log("url: " + url);
 
             // Send the new bundle URL to the device clients.
-            sendToAllClients({
+            sendToClients({
                 message: 'ReloadBundle',
                 url: escape(url),
                 fileSize: data.length
@@ -880,7 +891,7 @@ var rpcFunctions = {
         //console.log("@@@ Callstack:");
         //console.log(new Error("CallStack").stack);
         sendResponse({hasError: false, data: "ok"});
-        sendToAllClients({
+        sendToClients({
             message: 'EvalJS',
             script: script
         });
@@ -1641,3 +1652,5 @@ vars.methods.loadConfig(function () {
 });
 
 rpc.exposeModule('manager', rpcFunctions);
+
+exports.send = sendToClients;

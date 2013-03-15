@@ -87,8 +87,6 @@ void ReloadScreenController::connectedTo(const char *serverAddress)
 	//Success, show the disconnect controls
 	String conTo = "Connected to: ";
 	conTo += serverAddress;
-
-	pushWorkspaceScreen();
 }
 
 /**
@@ -134,7 +132,7 @@ void ReloadScreenController::pushWorkspaceScreen()
 	if (mWorkspaceScreen == NULL)
 	{
 		int orientation = maScreenGetCurrentOrientation();
-		mWorkspaceScreen = new WorkspaceScreen(mOS, orientation);
+		mWorkspaceScreen = new WorkspaceScreen(mOS, orientation, mReloadClient->getListOfProjects());
 		mWorkspaceScreen->setTitle("Workspace");
 		mWorkspaceScreen->addReloadUIListener(this);
 	}

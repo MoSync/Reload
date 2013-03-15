@@ -32,6 +32,7 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 #include "ReloadUIListener.h"
+#include "../dataTypes.h"
 
 using namespace NativeUI;
 using namespace MAUtil;
@@ -48,7 +49,8 @@ public:
 	 * @param os The current os.
 	 * @param orientation The current device orientation.
 	 */
-	WorkspaceScreen(MAUtil::String os, int orientation);
+	WorkspaceScreen(MAUtil::String os, int orientation,
+					MAUtil::Vector <reloadProject> * project);
 
 	/**
 	 * Destructor.
@@ -162,6 +164,8 @@ private:
 	 * The reload button screen width ratio.
 	 */
 	float mReloadButtonWidthRatio;
+
+	MAUtil::Vector <struct reloadProject> *mProjects;
 };
 
 #endif /* WORKSPACESCREEN_H_ */

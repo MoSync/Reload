@@ -1,5 +1,6 @@
 var vars = require('../application/globals'),
-	fs = require('fs');
+	fs = require('fs'),
+    sendToClients = require('../application/reload_manager');
 
 /**
  * Object that accumulates data sent over a streaming
@@ -226,6 +227,19 @@ var create = function (port) {
                     msg: unescape(unescape(message.params)).replace("\n","</br>")
                 });
             }
+            else if (message.message === "getProjectList") {
+                console.log("Generate and send Project List to the Client");
+                console.log("Total Projects sent: " + vars.globals.projectListJSON.length);
+
+                // send client the project list (internal use)
+                sendToClients.send({ 
+                                message: "projectList",
+                                data: {
+                                    projectsCount: vars.globals.projectListJSON.length,
+                                    projects: vars.globals.projectListJSON
+                                }
+                            }, [socket]);
+                }
         }
     }
 

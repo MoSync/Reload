@@ -120,7 +120,6 @@ public:
 	 */
 	bool shouldExit();
 
-private:
 	/**
 	 * Pushes the workspace screen into the main stack.
 	 */
