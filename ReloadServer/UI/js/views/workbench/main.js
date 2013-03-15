@@ -18,11 +18,9 @@ define([
         className: 'workbenchView',
 
         events: {
-            'click #do-selection': 'doit',
-            'click a#clear': 'clear'
+            'click #do-selection': 'doit'
         },
 
-        clear: function(){console.log('clear');},
         initialize: function() {
 
             _.bindAll(this,
@@ -48,10 +46,9 @@ define([
             compiledTemplate = _.template(controlsTemplate, {});
             self.$el.append(compiledTemplate);
 
-
-            var logView = new LogView();
-            logView.render();
-            self.$el.append(logView.el);
+            this.logView = new LogView();
+            this.logView.render();
+            self.$el.append(this.logView.el);
 
             var editorHolder = codeContainer.find("textarea");
             self.editor = CodeMirror.fromTextArea(
@@ -99,6 +96,9 @@ define([
         render: function() {
             this.delegateEvents();
 
+            this.logView.render();
+            this.$el.append(this.logView.el);
+
             var self = this;
 
             var handleBar = self.$el.find('#controls-workbench');
@@ -140,6 +140,8 @@ define([
         },
 
         close: function () {
+            this.logView.close();
+
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();

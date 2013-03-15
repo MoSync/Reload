@@ -39,11 +39,6 @@ define([
 
             socket.on('log', function (data) {
                 self.updateLog(data);
-                self.updateLog(data);
-                self.updateLog(data);
-                self.updateLog(data);
-                self.updateLog(data);
-                self.updateLog(data);
             });
 
             this.model = new LogModel();
@@ -52,11 +47,12 @@ define([
         render: function () {
             this.$el.append( this.messages );
             this.$el.append( $(_.template( controlsTemplate, {} )) );
-            // Rebind all events in case close() was called.
-            this.delegateEvents();
 
             // Restore scroll position.
             this.restoreScroll();
+
+            // Rebind all events in case close() was called.
+            this.delegateEvents();
         },
 
         restoreScroll: function () {
