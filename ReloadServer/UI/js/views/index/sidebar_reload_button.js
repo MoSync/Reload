@@ -13,7 +13,7 @@ define([
         debugFlag: false,
 
         events: {
-            'click #reload-button': 'reload',
+            'click #reload-button': 'nodebug',
             'click #debug-button':  'debug'
         },
 
@@ -23,7 +23,7 @@ define([
 
             _.bindAll(this,
                       'render',
-                      'reload',
+                      'nodebug',
                       'debug');
 
             this.model = new SidebarReloadButtonModel();
@@ -41,7 +41,13 @@ define([
             this.reload();
         },
 
+        nodebug: function() {
+            this.debugFlag = false;
+            this.reload();
+        },
+
         reload: function () {
+
             var self = this;
 
             // Check if a project is selected.
