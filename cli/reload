@@ -1,0 +1,123 @@
+#!/usr/bin/env node
+
+var cli =      require('commander'),
+    request =  require('request'),
+    fs =       require('fs');
+
+var Options = function() {
+    this.host    = 'http://localhost',
+    this.port    = 8283,
+    this.url     = this.host + ':'+ this.port,
+    this.headers = {'content-type' : 'application/json'}
+
+    return this;
+};
+var opts = new Options();
+
+function getConnectedClients(cb) {
+    request.post({
+        headers  : opts.headers,
+        url      : opts.url,
+        body     : JSON.stringify({
+            "method" : "manager.getClientInfo",
+            "params" : [],
+            "id"     : null
+        })
+    }, function(error, response, body) {
+        var result = JSON.parse(JSON.parse(body).result);
+        cb(result);
+    });
+}
+
+function createProject(name, dir, type, cb) {
+    var p;
+
+    console.log('dir: ' + dir);
+    if (!fs.existsSync(dir)) {
+       // Assume current workspace path if given directory does not
+       // exist.
+
+        request.post({
+            headers  : opts.headers,
+            url      : opts.url,
+            body     : JSON.stringify({
+                "method" : "manager.getWorkspacePath",
+                "params" : [],
+                "id"     : null
+            })
+        }, function(error, response, body) {
+            var result = JSON.parse(body).result;
+            cb(result);
+        });
+        console.log('resolved path: ' + p);
+    }
+
+    /*
+     *request.post({
+     *    headers  : opts.headers,
+     *    url      : opts.url,
+     *    body     : JSON.stringify({
+     *        "method" : "manager.createNewProject",
+     *        "params" : [name],
+     *        "id"     : null
+     *    })
+     *}, function(error, response, body) {
+     *    var result = JSON.parse(JSON.parse(body).result);
+     *    cb(result);
+     *});
+     */
+}
+
+cli
+.version('0.0.1');
+
+cli
+.command('reload <path>')
+.description('\t\treload a project from a specified path.')
+.option('-i, --inspect', 'inspect mode for Weinre inspection.')
+.action(function(path, options){
+    console.log('path: ' + path);
+    console.log('inspect: ' + options.inspect);
+});
+
+cli
+.command('create <name>')
+.description('\tcreate a project with a specified name. Current directory is assumed as default.')
+.option('-p, --path [path]', 'project directory.')
+.option('-t, --type [native|web]', 'project type. Web based by default.', 'web')
+.action(function(name, options){
+
+    var dir, type;
+    dir = options.path;
+    type = options.type;
+    createProject(name, dir, type, function(result){
+        console.log(result);
+    });
+
+    console.log('name: ' + name);
+    console.log('path: ' + options.path);
+    console.log('type: ' + options.type);
+});
+
+cli
+.command('list')
+.description('\t\tlist connected clients.')
+.action(function(){
+    getConnectedClients(function(clients){
+        if (clients.length === 0) {
+            console.log('No clients connected.');
+            return;
+        }
+
+        clients.forEach(function(client){
+            console.log(client.name);
+            console.log('\tAddress:\t' + client.address);
+            console.log('\tPlatform:\t' + client.platform);
+            console.log('\tVersion:\t' + client.version);
+
+        });
+    });
+});
+
+//if (!cli.args) cli.help();
+cli.parse(process.argv);
