@@ -57,7 +57,6 @@ define([
         });
         views.editorView    = new EditorView();
         views.debugView     = new DebugView();
-        //views.logView       = new LogView();
         views.workbenchView = new WorkbenchView();
         views.docsView      = new DocsView();
         views.feedbackView  = new FeedbackView();

@@ -84,9 +84,7 @@ define([
         },
 
         clear: function (e) {
-            //if (typeof(e) === 'obejct') {
-                e.preventDefault();
-            //}
+            e.preventDefault();
 
             this.messages.empty();
         },
@@ -101,7 +99,6 @@ define([
             label = 'info'; // CSS style.
             header = 'Log'; // Log line prefix.
 
-            //console.log(data.msg.indexOf('Error:'));
             if (0 === data.msg.indexOf('javascript:')) {
                 header = 'Workbench';
                 data.msg = data.msg.substr(11);
