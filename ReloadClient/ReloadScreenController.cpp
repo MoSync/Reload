@@ -136,8 +136,24 @@ void ReloadScreenController::pushWorkspaceScreen()
 		mWorkspaceScreen->setTitle("Workspace");
 		mWorkspaceScreen->addReloadUIListener(this);
 	}
+	else
+	{
+		mWorkspaceScreen->updateProjectList();
+	}
 
-	MainStackSingleton::getInstance()->push(mWorkspaceScreen);
+	if(MainStackSingleton::getInstance()->getStackSize() < 2)
+	{
+		MainStackSingleton::getInstance()->push(mWorkspaceScreen);
+	}
+}
+
+/**
+ * Updates the workspace screen with new data
+ */
+
+void ReloadScreenController::updateWorkspaceScreen()
+{
+	mWorkspaceScreen->updateProjectList();
 }
 
 /**
@@ -202,7 +218,7 @@ void ReloadScreenController::infoButtonClicked()
  */
 void ReloadScreenController::refreshWorkspaceProjectsButtonClicked()
 {
-	// TODO: refresh workspace projects logic
+	mReloadClient->getProjectListFromServer();
 }
 
 /**

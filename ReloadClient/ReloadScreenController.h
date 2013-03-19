@@ -130,6 +130,11 @@ public:
 	 */
 	void popWorkspaceScreen();
 
+	/**
+	 * Updates the workspace screen with new data
+	 */
+	void updateWorkspaceScreen();
+
 private:
 	/**
 	 * The ReloadClient the handles the business logic of tha application.

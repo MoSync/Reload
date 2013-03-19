@@ -69,6 +69,13 @@ public:
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
 
+	/**
+	 * If there is no list populates the List View Widget with the project data
+	 * from mProjects vector. Else destroys and deallocates previous list items
+	 * and creates new ones.
+	 */
+	void updateProjectList();
+
 private:
 	/**
 	 * Creates and adds main layout to the screen.

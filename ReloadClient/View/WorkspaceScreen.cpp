@@ -77,16 +77,54 @@ void WorkspaceScreen::createMainLayout() {
 	mRefreshButton = new Button();
 	mRefreshButton->setText(REFRESH_LIST_BUTTON_TEXT);
 	mRefreshButton->fillSpaceHorizontally();
+	mRefreshButton->setBackgroundColor(72,191,72);
 
 	mDisconnectButton = new Button();
 	mDisconnectButton->setText(DISCONNECT_BUTTON_TEXT);
 	mDisconnectButton->fillSpaceHorizontally();
+	mDisconnectButton->setBackgroundColor(239,44,44);
 
 	mListView = new ListView();
 
-	// the list view doesn't automatically sort its elements - the
-	// developer has to handle the sorting
-	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); ++i)
+	updateProjectList();
+
+	mMainLayout->addChild(mDisconnectButton);
+	mMainLayout->addChild(mListView);
+	mMainLayout->addChild(mRefreshButton);
+}
+
+/**
+ * If there is no list populates the List View Widget with the project data
+ * from mProjects vector. Else destroys and deallocates previous list items
+ * and creates new ones.
+ */
+void WorkspaceScreen::updateProjectList()
+{
+	int prProjects = mListView->countChildWidgets();
+	if(prProjects != 0)
+	{
+		for(int i = 0; i < prProjects; i++)
+		{
+			Widget *listItemWidget = mListView->getChild(0); // list Item Widget
+
+			Widget *hLayout = listItemWidget->getChild(0); // horizontal layout widget
+			for( int j = 0; j < hLayout->countChildWidgets(); j++)
+			{
+				Widget * w = hLayout->getChild(0);
+				hLayout->removeChild(w);
+				delete w;
+			}
+
+			listItemWidget->removeChild(hLayout);
+
+			delete hLayout;
+
+			mListView->removeChild(listItemWidget);
+			delete listItemWidget;
+		}
+	}
+
+	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
 	{
 		ListViewItem* item = new ListViewItem();
 
@@ -122,10 +160,6 @@ void WorkspaceScreen::createMainLayout() {
 
 		mListView->addChild(item);
 	}
-
-	mMainLayout->addChild(mDisconnectButton);
-	mMainLayout->addChild(mListView);
-	mMainLayout->addChild(mRefreshButton);
 }
 
 /**

@@ -710,6 +710,7 @@ void ReloadClient::handleJSONMessage(const String& json)
 	else if (message == "projectList")
 	{
 		mProjects.clear();
+
 		YAJLDom::Value *data = jsonRoot->getValueForKey("data");
 
 		int totalProjects = (int)data->getValueForKey("projectsCount")->toDouble();
@@ -726,7 +727,7 @@ void ReloadClient::handleJSONMessage(const String& json)
 			tmp.url = row->getValueForKey("url")->toString();
 			mProjects.add(tmp);
 		}
-		this->mReloadScreenController->pushWorkspaceScreen();
+		mReloadScreenController->pushWorkspaceScreen();
 	}
 	else
 	{
