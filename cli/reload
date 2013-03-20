@@ -2,6 +2,7 @@
 
 var cli     = require('commander'),
     request = require('request'),
+    table   = require('cli-table'),
     fs      = require('fs');
 
 var Options = function() {
@@ -75,12 +76,14 @@ function createProject(name, path, type, cb) {
         type = 'web';
     }
 
-    // If path is given, set that directory as current workspace.
     if (path && !fs.existsSync(path)) {
         console.log("Path %s doesn't exist.", path);
         return;
     }
 
+    // If path is given, set that directory as current workspace.
+    // TODO: Project creation should be nested as a callback to
+    // changeworkspace
     if (path && fs.existsSync(path)) {
         request.post({
             headers  : opts.headers,
@@ -94,6 +97,7 @@ function createProject(name, path, type, cb) {
             console.log('Changed workspace path to %s', path);
         });
     }
+
 
     // Create project.
     request.post({
@@ -111,16 +115,34 @@ function createProject(name, path, type, cb) {
             return;
         }
 
-        result = 'Project created!';
-        result += '\n';
-        result += 'Name: ' + name;
-        result += '\n';
-        result += 'Path: ' + path;
-        result += '\n';
-        result += 'Type: ' + type;
-        cb(result);
-    });
+        var t = new table({
+            style: {compact: true, 'padding-left' :  2, 'padding-right' :  2, head: ['blue']},
+            chars: {
+                'top':             ''
+                , 'top-mid':       ''
+                , 'top-left':      ''
+                , 'top-right':     ''
+                , 'bottom':        ''
+                , 'bottom-mid':    ''
+                , 'bottom-left':   ''
+                , 'bottom-right':  ''
+                , 'left':          ''
+                , 'left-mid':      ''
+                , 'mid':           '-'
+                , 'mid-mid':       ''
+                , 'right':         ''
+                , 'right-mid':     ''
+            }
+        });
 
+        t.push({'Name': name}, {'Type':type});
+
+        if (path) {
+            t.push({'Path':path});
+        }
+
+        cb(t.toString());
+    });
 }
 
 cli
@@ -130,6 +152,47 @@ cli
 .option('-t, --type [native|web]', 'project type. Web based by default.', 'web')
 .action(function(name, options){
     createProject(name, options.path, options.type, function(result){
+        console.log(result);
+    });
+});
+
+function changeWorkspacePath(path, cb) {
+    // Return current workspace path info by default.
+    if (path === undefined) {
+        request.post({
+            headers  : opts.headers,
+            url      : opts.url,
+            body     : JSON.stringify({
+                "method" : "manager.getWorkspacePath",
+                "params" : [],
+                "id"     : null
+            })
+        }, function(error, response, body) {
+            var result = JSON.parse(body).result.path;
+            cb(result);
+        });
+    } else {
+        request.post({
+            headers  : opts.headers,
+            url      : opts.url,
+            body     : JSON.stringify({
+                "method" : "manager.changeWorkspacePath",
+                "params" : [path],
+                "id"     : null
+            })
+        }, function(error, response, body) {
+            var result = JSON.parse(body).result.path;
+            cb(result);
+        });
+    }
+}
+
+cli
+.command('workspace')
+.description('\tchange workspace directory. Shows current workspace path if no option is given.')
+.option('-p, --path <path>', "set workspace directory. Directory is created if it doesn't exist.")
+.action(function(options){
+    changeWorkspacePath(options.path, function(result){
         console.log(result);
     });
 });
@@ -145,7 +208,36 @@ function getConnectedClients(cb) {
         })
     }, function(error, response, body) {
         var result = JSON.parse(JSON.parse(body).result);
-        cb(result);
+        if (result.length === 0) {
+            console.log('No clients connected.');
+            return;
+        }
+
+        var t = new table({
+            head: ['Name', 'Address', 'Platform', 'Version'],
+            style: {compact: true, 'padding-left' :  2, 'padding-right' :  2, head: ['blue']},
+            chars: {
+                'top':             ''
+                , 'top-mid':       ''
+                , 'top-left':      ''
+                , 'top-right':     ''
+                , 'bottom':        ''
+                , 'bottom-mid':    ''
+                , 'bottom-left':   ''
+                , 'bottom-right':  ''
+                , 'left':          ''
+                , 'left-mid':      ''
+                , 'mid':           '-'
+                , 'mid-mid':       ''
+                , 'right':         ''
+                , 'right-mid':     ''
+            }
+        });
+
+        result.forEach(function(client){
+            t.push([client.name, client.address, client.platform, client.version]);
+        });
+        cb(t.toString());
     });
 }
 
@@ -153,18 +245,8 @@ cli
 .command('clients')
 .description('\tlist connected clients.')
 .action(function(){
-    getConnectedClients(function(clients){
-        if (clients.length === 0) {
-            console.log('No clients connected.');
-            return;
-        }
-
-        clients.forEach(function(client){
-            console.log(client.name);
-            console.log('\tAddress:\t' + client.address);
-            console.log('\tPlatform:\t' + client.platform);
-            console.log('\tVersion:\t' + client.version);
-        });
+    getConnectedClients(function(result){
+        console.log(result);
     });
 });
 
@@ -178,13 +260,34 @@ function getProjectList(cb) {
             "id"     : null
         })
     }, function(error, response, body) {
-        var result = JSON.parse(body).result,
-            out;
-        out = 'Name\t\tPath\n';
-        result.forEach(function(p){
-            out += p.name + '\t' + p.path + '\n';
+        var result = JSON.parse(body).result;
+
+        var t = new table({
+            head: ['Name', 'Path'],
+            style: {compact: true, 'padding-left' :  2, 'padding-right' :  2, head: ['blue']},
+            chars: {
+                'top':             ''
+                , 'top-mid':       ''
+                , 'top-left':      ''
+                , 'top-right':     ''
+                , 'bottom':        ''
+                , 'bottom-mid':    ''
+                , 'bottom-left':   ''
+                , 'bottom-right':  ''
+                , 'left':          ''
+                , 'left-mid':      ''
+                , 'mid':           '-'
+                , 'mid-mid':       ''
+                , 'right':         ''
+                , 'right-mid':     ''
+            }
         });
-        cb(out);
+
+        result.forEach(function(p){
+            t.push([p.name, p.path]);
+        });
+
+        cb(t.toString());
     });
 }
 cli
@@ -195,4 +298,9 @@ cli
         console.log(result);
     });
 });
-cli.parse(process.argv);
+
+if (process.argv.length > 2) {
+    cli.parse(process.argv);
+} else {
+    cli.help();
+}
