@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 
 #include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/Encoder.h>
+#include <maapi.h>
 
 #include "ReloadClient.h"
 #include "ReloadNativeUIMessageHandler.h"
@@ -170,7 +171,7 @@ ReloadClient::ReloadClient()
 	createNetworkHandlers();
 
 	// Show first screen.
-	mLoginScreen->showNotConnectedScreen();
+	mReloadScreenController->showNotConnectedScreen();
 }
 
 ReloadClient::~ReloadClient()
@@ -229,6 +230,7 @@ void ReloadClient::initializeVariables()
 	mHasPage = false;
 	mAppsFolder = "apps/";
 	mRunningApp = false;
+	mProtocolVersion = 0;
 
 	// Get the OS we are on.
 	char buffer[64];
@@ -265,11 +267,31 @@ void ReloadClient::initializeFiles()
 	int size = maGetDataSize(INFO_TEXT);
 	if (size > 0)
 	{
-		char *info = new char[size + 1];
-		maReadData(INFO_TEXT, (void*)info, 0, size);
-		info[size] = '\0';
-		mInfo = info;
-		delete info;
+		// Read the whole information resource file
+		mInfo.resize(size);
+		maReadData(INFO_TEXT, mInfo.pointer(), 0, size);
+
+		// Get the Protocol Version from the data read.
+		const char* prv;
+		char * infoTemp = new char[size + 1];
+		memcpy(infoTemp, mInfo.c_str(), size + 1);
+
+		int stringsRead = 0;
+		prv = strtok(infoTemp, "\r\n");
+		while(true)
+		{
+			if(prv != NULL)
+			{
+				stringsRead++;
+				LOG("@@@RELOAD: %s", prv);
+			}
+			if(stringsRead == 3)
+			{
+				break;
+			}
+			prv = strtok(NULL, "\r\n");
+		}
+		mProtocolVersion = (char*)prv;
 	}
 	else
 	{
@@ -289,14 +311,14 @@ void ReloadClient::initializeFiles()
 void ReloadClient::createScreens()
 {
 	// Create login screen and loading screen.
-	mLoginScreen = new LoginScreen(this);
+	mReloadScreenController = new ReloadScreenController(this);
 	int orientation = maScreenGetCurrentOrientation();
-	mLoginScreen->initializeScreen(mOS, orientation);
+	mReloadScreenController->initializeScreen(mOS, orientation);
 	mLoadingScreen = new LoadingScreen(this);
 	mLoadingScreen->initializeScreen(mOS);
 
 	// Set the most recently used server IP address.
-	mLoginScreen->defaultAddress(mServerAddress.c_str());
+	mReloadScreenController->defaultAddress(mServerAddress.c_str());
 }
 
 void ReloadClient::createMessageHandlers()
@@ -344,7 +366,19 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	{
 		if (MAK_BACK == keyCode)
 		{
-			exit();
+			if (mReloadScreenController->shouldExit())
+			{
+				// on wp7, we cannot exit the application programmatically - the
+				// system closes the application on back button press
+				if (mOS.find("Windows", 0) < 0)
+				{
+					exit();
+				}
+			}
+			else
+			{
+				disconnectFromServer();
+			}
 		}
 	}
 }
@@ -360,7 +394,7 @@ void ReloadClient::exit()
 	{
 		// Close the running app and show the start screen.
 		mRunningApp = false;
-		mLoginScreen->showConnectedScreen();
+		mReloadScreenController->showConnectedScreen();
 	}
 	else
 	{
@@ -444,7 +478,7 @@ void ReloadClient::socketHandlerConnected(int result)
 		LOG("@@@ RELOAD connected to: %s", mServerAddress.c_str());
 
 		// Tell UI we are connected.
-		mLoginScreen->connectedTo(mServerAddress.c_str());
+		mReloadScreenController->connectedTo(mServerAddress.c_str());
 
 		// Send info about this device to the server.
 		sendClientDeviceInfo();
@@ -480,10 +514,10 @@ void ReloadClient::socketHandlerDisconnected(int result)
 	if (0 != result)
 	{
 		showConnectionErrorMessage(result);
-	}
 
-	// Go back to the login screen.
-	mLoginScreen->showNotConnectedScreen();
+		// Go back to the login screen.
+		mReloadScreenController->showNotConnectedScreen();
+	}
 }
 
 /**
@@ -505,7 +539,7 @@ void ReloadClient::socketHandlerMessageReceived(const char* message)
 		//showConErrorMessage(result);
 
 		// Go back to the login screen.
-		mLoginScreen->showNotConnectedScreen();
+		mReloadScreenController->showNotConnectedScreen();
 	}
 }
 
@@ -572,7 +606,7 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 void ReloadClient::cancelDownload()
 {
 	mDownloadHandler.cancelDownload();
-	mLoginScreen->showConnectedScreen();
+	mReloadScreenController->showConnectedScreen();
 }
 
 void ReloadClient::connectToServer(const char* serverAddress)
@@ -599,7 +633,28 @@ void ReloadClient::disconnectFromServer()
 {
 	// Close the socket, and show the connect controls again.
 	mSocketHandler.closeConnection();
-	mLoginScreen->disconnected();
+	mReloadScreenController->disconnected();
+}
+
+void ReloadClient::showDisconnectionMessage (MAUtil::String disconnectData)
+{
+
+	MAUtil::String finalString = "";
+
+	int disconnectDataSize = disconnectData.length();
+	int startPos = 0;
+
+	while (startPos < disconnectDataSize)
+	{
+		finalString += disconnectData.substr(startPos,40) + "\n";
+		startPos += 40;
+	}
+
+	// Add \n every 40 characters so alert will be shown
+	// correctly on all devices
+	maAlert("Disconnection",
+			finalString.c_str(),
+			NULL,"OK",NULL);
 }
 
 // ========== Server message handling  ==========
@@ -647,6 +702,17 @@ void ReloadClient::handleJSONMessage(const String& json)
 		// Get message parameters.
 		String script = (jsonRoot->getValueForKey("script"))->toString();
 		evaluateScript(script);
+	}
+	else if (message == "Disconnect")
+	{
+		this->disconnectFromServer();
+
+		YAJLDom::Value* tempstr = jsonRoot->getValueForKey("data");
+		if(!tempstr->isNull())
+		{
+			MAUtil::String disconnectData = (tempstr->toString()) + "\n";
+			this->showDisconnectionMessage(disconnectData);
+		}
 	}
 	else
 	{
@@ -865,13 +931,15 @@ void ReloadClient::sendClientDeviceInfo()
 				"\"name\":\"%s\","
 				"\"uuid\":\"%s\","
 				"\"version\":\"%s\","
-				"\"phonegap\":\"1.2.0\""
+				"\"phonegap\":\"1.2.0\","
+				"\"protocolVersion\":\"%s\""
 			"}"
 		"}",
 		deviceOS,
 		deviceName,
 		deviceUUID,
-		deviceOSVersion
+		deviceOSVersion,
+		mProtocolVersion
 		);
 
 	sendTCPMessage(buffer);

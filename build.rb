@@ -26,13 +26,15 @@ end
 
 
 #Defince version and timestamp 
-version = "1.0"
+version = "1.0.1"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
+protocolVersion = "1.0"
 
 #Write the version information to the file for use in the server  and client
 File.open("ReloadServer/build.dat", "w") do |file|
   file.puts("#{version}")
-  file.puts(time_stamp);
+  file.puts(time_stamp)
+  file.puts(protocolVersion);
 end
 
 puts "Updating the templates"

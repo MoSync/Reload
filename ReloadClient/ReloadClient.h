@@ -37,14 +37,14 @@ MA 02110-1301, USA.
 #include <MAFS/File.h> // Library for file system bundles
 #include <yajl/YAJLDom.h>
 
-#include "LoginScreen.h"
-#include "LoadingScreen.h"
+#include "ReloadScreenController.h"
+#include "View/LoadingScreen.h"
 #include "SocketHandler.h"
 #include "DownloadHandler.h"
 #include "MAHeaders.h"
 
 // Forward declarations.
-class LoginScreen;
+class ReloadScreenController;
 class LoadingScreen;
 
 /**
@@ -152,6 +152,13 @@ public:
      */
     void disconnectFromServer();
 
+    /**
+     * Shows an alert with the disconnection message from server
+     * @param disconnectData The message that the server sent
+     * 						 when disconnecting the client
+     */
+    void ReloadClient::showDisconnectionMessage (MAUtil::String disconnectData);
+
     // ========== Server message handling  ==========
 
 	/**
@@ -230,7 +237,7 @@ private:
 	/**
 	 * Class that handles the Login Screen UI.
 	 */
-	LoginScreen* mLoginScreen;
+    ReloadScreenController* mReloadScreenController;
 
 	/**
 	 * Class that handles the Loading screen UI.
@@ -286,6 +293,11 @@ private:
 	 * Object that handles downloads.
 	 */
 	DownloadHandler mDownloadHandler;
+
+	/**
+	 * Clients Protocol Version
+	 */
+	char* mProtocolVersion;
 };
 
 #endif
