@@ -12,7 +12,8 @@ define([
 
         name: 'log',
 
-        timer: null,
+        tagName: 'div',
+        className: 'logView',
 
         messages: $('<dl id="scroller" class="dl-horizontal">'),
 
@@ -41,16 +42,17 @@ define([
             });
 
             this.model = new LogModel();
-            this.$el.append( $(_.template( controlsTemplate, {} )) );
         },
 
         render: function () {
             this.$el.append( this.messages );
-            // Rebind all events in case close() was called.
-            this.delegateEvents();
+            this.$el.append( $(_.template( controlsTemplate, {} )) );
 
             // Restore scroll position.
             this.restoreScroll();
+
+            // Rebind all events in case close() was called.
+            this.delegateEvents();
         },
 
         restoreScroll: function () {
@@ -79,29 +81,24 @@ define([
             //Remove view from DOM
             this.remove();
             Backbone.View.prototype.remove.call(this);
-
-            // Clear timer.
-            clearInterval(this.timer);
-            this.timer = null;
         },
 
         clear: function (e) {
-            if (typeof(e) === 'obejct') {
-                e.preventDefault();
-            }
+            e.preventDefault();
 
             this.messages.empty();
         },
 
         updateLog: function(data) {
+            console.log(data);
 
+            console.log('updatelog');
             console.log(this.scrollPosition);
 
             var header, label;
             label = 'info'; // CSS style.
             header = 'Log'; // Log line prefix.
 
-            console.log(data.msg.indexOf('Error:'));
             if (0 === data.msg.indexOf('javascript:')) {
                 header = 'Workbench';
                 data.msg = data.msg.substr(11);
