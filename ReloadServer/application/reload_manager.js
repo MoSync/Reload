@@ -810,7 +810,7 @@ var rpcFunctions = {
      *        - Bundles the project folder
      *        - Request the mobile device to "Reload" the project.
      */
-    reloadProject: function (projectName, debug, sendResponse) {
+    reloadProject: function (projectName, debug, sendResponse, clientList) {
 
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') return false;
@@ -852,7 +852,7 @@ var rpcFunctions = {
                 message: 'ReloadBundle',
                 url: escape(url),
                 fileSize: data.length
-            });
+            }, clientList);
 
             // Collect Stats Statistics
             if(vars.globals.statistics === true) {
@@ -1654,3 +1654,4 @@ vars.methods.loadConfig(function () {
 rpc.exposeModule('manager', rpcFunctions);
 
 exports.send = sendToClients;
+exports.rpc = rpcFunctions;

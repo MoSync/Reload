@@ -54,6 +54,11 @@ public:
 	virtual void loadStoredProjectsButtonClicked() = 0;
 
 	/**
+	 * Called when reload project button is clicked for some particular project
+	 */
+	virtual void reloadProjectClicked(MAUtil::String projectName) = 0;
+
+	/**
 	 * Called when the info button is clicked.
 	 */
 	virtual void infoButtonClicked() = 0;

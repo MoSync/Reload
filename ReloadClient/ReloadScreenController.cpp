@@ -214,7 +214,15 @@ void ReloadScreenController::infoButtonClicked()
 }
 
 /**
- * Called when the refresh workspace projects is cliecked.
+ * Called when reload project button is clicked for some particular project
+ */
+void ReloadScreenController::reloadProjectClicked(MAUtil::String projectName)
+{
+	mReloadClient->reloadProjectFromServer( projectName);
+}
+
+/**
+ * Called when the refresh workspace projects is clicked.
  */
 void ReloadScreenController::refreshWorkspaceProjectsButtonClicked()
 {

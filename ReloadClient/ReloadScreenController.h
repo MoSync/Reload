@@ -110,6 +110,11 @@ public:
 	virtual void infoButtonClicked();
 
 	/**
+	 * Called when reload project button is clicked for some particular project
+	 */
+	virtual void reloadProjectClicked(MAUtil::String projectName);
+
+	/**
 	 * Called when the refresh workspace projects is cliecked.
 	 */
 	virtual void refreshWorkspaceProjectsButtonClicked();

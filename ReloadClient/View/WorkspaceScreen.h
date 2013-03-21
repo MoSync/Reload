@@ -172,7 +172,30 @@ private:
 	 */
 	float mReloadButtonWidthRatio;
 
+	/**
+	 * Pointer to the vector that holds all the projects data
+	 */
 	MAUtil::Vector <struct reloadProject> *mProjects;
+
+	/**
+	 * Holds the List View index of the currently selected project
+	 */
+	int mSelectedProject;
+
+	/**
+	 * The save button widget
+	 */
+	Button* mSaveButton;
+
+	/**
+	 * The reload Button widget
+	 */
+	Button* mReloadButton;
+
+	/**
+	 * Holds the project name of the currently selected project
+	 */
+	MAUtil::String mSelectedProjectName;
 };
 
 #endif /* WORKSPACESCREEN_H_ */

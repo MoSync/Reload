@@ -158,7 +158,7 @@ public:
      * @param disconnectData The message that the server sent
      * 						 when disconnecting the client
      */
-    void ReloadClient::showDisconnectionMessage (MAUtil::String disconnectData);
+    void showDisconnectionMessage (MAUtil::String disconnectData);
 
     // ========== Server message handling  ==========
 
@@ -210,7 +210,12 @@ public:
 	/**
 	 * Send a message requesting project list
 	 */
-	void ReloadClient::getProjectListFromServer();
+	void getProjectListFromServer();
+
+	/**
+	 * Send a message requesting a project to be reloaded
+	 */
+	void reloadProjectFromServer(MAUtil::String projectName);
 
     /**
      * Sends information about the device to the server.

@@ -43,6 +43,8 @@ WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation,
 	Screen(),
 	mMainLayout(NULL)
 {
+	mSelectedProject = -1;
+	mSelectedProjectName = "";
 	mProjects = projects;
 	mOS = os;
 	setScreenValues();
@@ -51,6 +53,7 @@ WorkspaceScreen::WorkspaceScreen(MAUtil::String os, int orientation,
 	//Set the moblet to receive events from the buttons and listview
 	mRefreshButton->addButtonListener(this);
 	mDisconnectButton->addButtonListener(this);
+	mListView->allowSelection(true);
 	mListView->addListViewListener(this);
 }
 
@@ -100,9 +103,14 @@ void WorkspaceScreen::createMainLayout() {
  */
 void WorkspaceScreen::updateProjectList()
 {
+	// ReInitialize selected project
+	mSelectedProject = -1;
+	mSelectedProjectName = "";
+
 	int prProjects = mListView->countChildWidgets();
 	if(prProjects != 0)
 	{
+		mListView->setVisible(false);
 		for(int i = 0; i < prProjects; i++)
 		{
 			Widget *listItemWidget = mListView->getChild(0); // list Item Widget
@@ -126,27 +134,15 @@ void WorkspaceScreen::updateProjectList()
 
 	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
 	{
+		// TODO Change hardcoded 80 height of item horizontal layout and list item height
 		ListViewItem* item = new ListViewItem();
-
+		item->setHeight(80);
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
+		itemHorizontalLayout->setHeight(80);
 		Label* projectNameLabel = new Label();
 		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
-
-		Button* saveButton = new Button();
-		saveButton->setText(SAVE_BUTTON_TEXT);
-		saveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
-		saveButton->addButtonListener(this);
-		saveButton->wrapContentHorizontally();
-		mSaveButtons.add(saveButton);
-
-		Button* reloadButton = new Button();
-		reloadButton->setText(RELOAD_BUTTON_TEXT);
-		reloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
-		reloadButton->addButtonListener(this);
-		reloadButton->wrapContentHorizontally();
-		mReloadButtons.add(reloadButton);
 
 		if (mOS.find("iPhone") >= 0)
 		{
@@ -154,12 +150,12 @@ void WorkspaceScreen::updateProjectList()
 		}
 
 		itemHorizontalLayout->addChild(projectNameLabel);
-		itemHorizontalLayout->addChild(saveButton);
-		itemHorizontalLayout->addChild(reloadButton);
+
 		item->addChild(itemHorizontalLayout);
 
 		mListView->addChild(item);
 	}
+	mListView->setVisible(true);
 }
 
 /**
@@ -183,26 +179,16 @@ void WorkspaceScreen::buttonClicked(Widget* button)
 			mReloadUIListeners[i]->disconnectButtonClicked();
 		}
 	}
-	else
+	else if (button == mSaveButton)
 	{
-		// check if a save button was clicked
-		for (int i = 0; i < mSaveButtons.size(); i++)
+		maAlert("Save",("Saving project " + integerToString(mSelectedProject)).c_str(), NULL, "OK", NULL);
+		// TODO Save project Logic
+	}
+	else if (button == mReloadButton)
+	{
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
 		{
-			if (button == mSaveButtons[i])
-			{
-				// TODO SA: add logic
-				return;
-			}
-		}
-
-		// check if a reload button was clicked
-		for (int i = 0; i < mReloadButtons.size(); i++)
-		{
-			if (button == mReloadButtons[i])
-			{
-				// TODO SA: add logic
-				return;
-			}
+			mReloadUIListeners[i]->reloadProjectClicked(mSelectedProjectName);
 		}
 	}
 }
@@ -216,7 +202,45 @@ void WorkspaceScreen::listViewItemClicked(
 	ListView* listView,
 	ListViewItem* listViewItem)
 {
+	Widget * hLayout = listViewItem->getChild(0);
+	Label * lb = (Label*)hLayout->getChild(0);
 
+	// Diselect previous item
+	if (mSelectedProject != -1)
+	{
+		Widget *delHLayout = listView->getChild(mSelectedProject)->getChild(0);
+		delHLayout->removeChild(mSaveButton);
+		delHLayout->removeChild(mReloadButton);
+		delete mSaveButton;
+		delete mReloadButton;
+	}
+
+	int selection = 0;
+	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
+	{
+		if(i->name == lb->getText())
+		{
+			mSelectedProject = selection;
+			mSelectedProjectName = i->name;
+			break;
+		}
+		selection++;
+	}
+
+	mSaveButton = new Button();
+	mSaveButton->setText(SAVE_BUTTON_TEXT);
+	mSaveButton->setWidth((int)(mScreenWidth * mSaveButtonWidthRatio));
+	mSaveButton->addButtonListener(this);
+	mSaveButton->wrapContentHorizontally();
+
+	mReloadButton = new Button();
+	mReloadButton->setText(RELOAD_BUTTON_TEXT);
+	mReloadButton->setWidth((int)(mScreenWidth * mReloadButtonWidthRatio));
+	mReloadButton->addButtonListener(this);
+	mReloadButton->wrapContentHorizontally();
+
+	hLayout->addChild(mSaveButton);
+	hLayout->addChild(mReloadButton);
 }
 
 /**

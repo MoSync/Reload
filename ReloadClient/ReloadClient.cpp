@@ -363,6 +363,7 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	}
 	else
 	{
+
 		if (MAK_BACK == keyCode)
 		{
 			if (mReloadScreenController->shouldExit())
@@ -904,6 +905,19 @@ void ReloadClient::getProjectListFromServer()
 {
 	MAUtil::String tmpMsg = "{\"message\":\"getProjectList\",\"params\": {}}";
 
+	sendTCPMessage(tmpMsg);
+}
+
+/**
+ * Send a message requesting a project to be reloaded
+ */
+void ReloadClient::reloadProjectFromServer(MAUtil::String projectName)
+{
+	MAUtil::String tmpMsg = "{ \"message\": \"reloadProject\","
+							  "\"params\" : {"
+							  	  "\"projectName\": \"" + projectName + "\""
+							    "}"
+							"}";
 	sendTCPMessage(tmpMsg);
 }
 

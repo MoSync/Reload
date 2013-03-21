@@ -238,8 +238,13 @@ var create = function (port) {
                                     projectsCount: vars.globals.projectListJSON.length,
                                     projects: vars.globals.projectListJSON
                                 }
-                            }, [socket]);
-                }
+                }, [socket]);
+            }
+            else if (message.message === "reloadProject") {
+                console.log("Reloading project Request")
+                var project = message.params.projectName;
+                sendToClients.rpc.reloadProject(project, false, function (){}, [socket]);
+            }
         }
     }
 
