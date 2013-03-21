@@ -128,6 +128,9 @@ FileUtils.cp_r "ReloadClient/Clients/Android", "Build/#{time_stamp}/MoSync_Reloa
 FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Linux/iOS Client"
 FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Linux/WindowsPhone Client"
 
+puts "Copying command line tool"
+FileUtils.cp_r "cli", "/Volumes/MoSyncReload/cli"
+
 puts "Copying Readme"
 FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSyncReload/"
 FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_Windows"
