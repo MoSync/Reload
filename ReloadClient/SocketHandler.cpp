@@ -177,8 +177,6 @@ void SocketHandler::connReadFinished(Connection* conn, int result)
 			readMessageHeader();
 
 			mListener->socketHandlerMessageReceived(mReadBuffer);
-
-
 		}
 		else
 		{

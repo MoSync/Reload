@@ -4,7 +4,7 @@ define([
     'backbone',
     'views/index/serverip',
     'views/index/serverinfo',
-    'views/devices/main',
+    'views/device/main',
     'text!../../../templates/index/sidebar_left_foot.html'
 ], function($, _, Backbone, ServerIpView, ServerInfoView, DevicesView, template){
 

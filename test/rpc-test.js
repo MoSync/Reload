@@ -9,6 +9,7 @@ var net = require('net');
  *
  * == Install Buster ==
  * $ npm install -g buster
+ * $ npm install -g request
  *
  * == Run tests ==
  * $ buster test

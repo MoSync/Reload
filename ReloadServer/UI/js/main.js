@@ -5,7 +5,10 @@ require.config({
         'backbone':    'vendor/backbone-0.9.2.min',
         'bootstrap':   'vendor/bootstrap.min',
         'stacktrace':  'vendor/stacktrace',
-        'socket.io':   '/socket.io/socket.io.js'
+        'socket.io':   '/socket.io/socket.io.js',
+        'codemirror':  'vendor/codemirror/lib/codemirror',
+        'codemirror.mode.javascript':  'vendor/codemirror/mode/javascript/javascript',
+        'jquery.draggable':      'vendor/jquery-ui-1.10.1.custom.min',
     },
     // Define non AMD modules
     shim: {
@@ -22,6 +25,12 @@ require.config({
         'bootstrap': {
             deps: ["jquery"],
             exports: "$.fn.popover"
+        },
+        'codemirror': {
+            exports: 'CodeMirror'
+        },
+        'codemirror.mode.javascript': {
+            deps: ['codemirror']
         }
     }
 });

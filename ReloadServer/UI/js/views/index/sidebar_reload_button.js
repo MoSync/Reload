@@ -13,8 +13,8 @@ define([
         debugFlag: false,
 
         events: {
-            'click #reload-button': 'nodebug',
-            'click #debug-button':  'debug'
+            'click #reload-button': 'doReload',
+            'click #debug-button':  'doDebug'
         },
 
         initialize: function (options) {
@@ -23,8 +23,9 @@ define([
 
             _.bindAll(this,
                       'render',
-                      'nodebug',
-                      'debug');
+                      'reload',
+                      'doReload',
+                      'doDebug');
 
             this.model = new SidebarReloadButtonModel();
 
@@ -36,18 +37,21 @@ define([
             return this.$el;
         },
 
-        debug: function() {
+        doDebug: function() {
+            $('#reload-button').removeClass('btn-primary');
+            $('#debug-button').addClass('btn-primary');
             this.debugFlag = true;
             this.reload();
         },
 
-        nodebug: function() {
+        doReload: function () {
+            $('#reload-button').addClass('btn-primary');
+            $('#debug-button').removeClass('btn-primary');
             this.debugFlag = false;
             this.reload();
         },
 
         reload: function () {
-
             var self = this;
 
             // Check if a project is selected.
@@ -66,6 +70,8 @@ define([
                 self.parent.views.logView.clear();
             });
             this.parent.selectedProject.reload(this.debugFlag);
+
+            this.debugFlag = false;
         }
 
     });
