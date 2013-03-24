@@ -110,7 +110,14 @@ public:
 	virtual void infoButtonClicked();
 
 	/**
+	 * Called when save project button is clicked for a particular project
+	 * @param projectName The name of the project to be saved
+	 */
+	virtual void saveProjectClicked(MAUtil::String projectName);
+
+	/**
 	 * Called when reload project button is clicked for some particular project
+	 * @param projectName The name of the project to be reloaded
 	 */
 	virtual void reloadProjectClicked(MAUtil::String projectName);
 

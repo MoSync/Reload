@@ -37,6 +37,7 @@ MA 02110-1301, USA.
 #include <MAFS/File.h> // Library for file system bundles
 #include <yajl/YAJLDom.h>
 
+
 #include "ReloadScreenController.h"
 #include "View/LoadingScreen.h"
 #include "SocketHandler.h"
@@ -204,13 +205,19 @@ public:
     /**
      * Empty the folder where apps are stored.
      */
-	void clearAppsFolder();
+	void clearAppsFolder(MAUtil::String appFolder);
 
 	// ========== Send info to server  ==========
 	/**
 	 * Send a message requesting project list
 	 */
 	void getProjectListFromServer();
+
+	/**
+	 * Send a message requesting a project so it can be saved
+	 * @param projectName The name of the project to be saved
+	 */
+	void saveProjectFromServer(MAUtil::String projectName);
 
 	/**
 	 * Send a message requesting a project to be reloaded
@@ -291,6 +298,11 @@ private:
 	MAUtil::String mAppsFolder;
 
 	/**
+	 * The general folder where saved apps reside.
+	 */
+	MAUtil::String mSavedAppsFolder;
+
+	/**
 	 * The relative path to the downloaded app folder.
 	 */
 	MAUtil::String mAppPath;
@@ -315,7 +327,22 @@ private:
 	 */
 	char* mProtocolVersion;
 
+	/**
+	 * Vector of type reloadProject that stores data about the projects
+	 * that are on the server
+	 */
 	MAUtil::Vector <struct reloadProject> mProjects;
+
+	/**
+	 * Vector that stores the saved projects that are located on the
+	 * device for offline use
+	 */
+	MAUtil::Vector <struct reloadProject> mSavedProjects;
+
+	/**
+	 * If it set then the app will be saved. I not normal reload functionality.
+	 */
+	MAUtil::String mProjectToSave;
 };
 
 #endif

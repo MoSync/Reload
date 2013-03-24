@@ -54,7 +54,14 @@ public:
 	virtual void loadStoredProjectsButtonClicked() = 0;
 
 	/**
+	 * Called when save project button is clicked for some particular project
+	 * @param projectName
+	 */
+	virtual void saveProjectClicked(MAUtil::String projectName) = 0;
+
+	/**
 	 * Called when reload project button is clicked for some particular project
+	 * @param projectName
 	 */
 	virtual void reloadProjectClicked(MAUtil::String projectName) = 0;
 

@@ -1,6 +1,3 @@
-var server  = require("./lib/jsonrpc_server"),
-    tcp     = require("./lib/tcp_server");
-
 var vars    = require("./application/globals"),
     logModule = require("./application/log");
 
@@ -60,6 +57,9 @@ process.on('exit', function(){
 /**
  * Include and execute the modules of the rpc
  */
+var server  = require("./lib/jsonrpc_server"),
+    tcp     = require("./lib/tcp_server");
+    
 var manager = require("./application/reload_manager"),
     client  = require("./application/client_manager");
 /**

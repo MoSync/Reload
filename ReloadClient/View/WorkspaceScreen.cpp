@@ -181,8 +181,10 @@ void WorkspaceScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mSaveButton)
 	{
-		maAlert("Save",("Saving project " + integerToString(mSelectedProject)).c_str(), NULL, "OK", NULL);
-		// TODO Save project Logic
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mReloadUIListeners[i]->saveProjectClicked(mSelectedProjectName);
+		}
 	}
 	else if (button == mReloadButton)
 	{

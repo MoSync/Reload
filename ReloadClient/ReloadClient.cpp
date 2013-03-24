@@ -32,6 +32,8 @@ MA 02110-1301, USA.
 #include "ReloadClient.h"
 #include "ReloadNativeUIMessageHandler.h"
 #include "Log.h"
+#include "View/MainStackSingleton.h"
+#include "View/MainStackScreen.h"
 
 #define SERVER_TCP_PORT "7000"
 #define SERVER_HTTP_PORT "8283"
@@ -44,6 +46,7 @@ using namespace Wormhole;
 // ========== Error messages ==========
 
 #define RELOAD_ERROR_COULD_NOT_CONNECT_TO_SERVER 0
+
 
 static String sErrorMessages[] =
 {
@@ -228,8 +231,10 @@ void ReloadClient::initializeVariables()
 {
 	mHasPage = false;
 	mAppsFolder = "apps/";
+	mSavedAppsFolder = "saved/";
 	mRunningApp = false;
 	mProtocolVersion = 0;
+	mProjectToSave = "";
 
 	// Get the OS we are on.
 	char buffer[64];
@@ -252,15 +257,45 @@ void ReloadClient::initializeFiles()
 	}
 	maFileClose(appDirHandle);
 
-	// Get the path of the last downloaded app.
-	bool success = mFileUtil->readTextFromFile(
-		mFileUtil->getLocalPath() + "LastAppDir.txt",
-		mAppPath);
-	if (!success)
+	// Create folder where saved apps are stored
+	appDirHandle = maFileOpen(
+		(mFileUtil->getLocalPath() + mSavedAppsFolder).c_str(),
+		MA_ACCESS_READ_WRITE);
+	if (!maFileExists(appDirHandle))
 	{
-		mAppPath = "";
+		maFileCreate(appDirHandle);
+	}
+	maFileClose(appDirHandle);
+
+	// load stored project data
+	MAUtil::String storedProjectData;
+	bool success = mFileUtil->readTextFromFile(
+			mFileUtil->getLocalPath() + "SavedAppsData.txt",
+			storedProjectData);
+
+	// parse the data read and populate the mSavedProjects Vector
+	if (success && storedProjectData.length() > 0)
+	{
+		struct reloadProject node;
+		char *prPtr = NULL;
+
+		char * spa = new char[storedProjectData.length()+1];
+		memcpy(spa, storedProjectData.c_str(),storedProjectData.length()+1);
+
+		prPtr = strtok( spa, "\n");
+
+		while( prPtr != NULL)
+		{
+			node.name = prPtr;
+			node.path = strtok(NULL, "\n");
+			this->mSavedProjects.add(node);
+
+			prPtr = strtok(NULL, "\n");
+		}
 	}
 
+	// Reading information resource file and populate mInfo
+	// and mProtocolVersion
 	// TODO: What is this? Some resource string?
 	// TODO: Use SysLoadStringResource(MAHandle data)
 	int size = maGetDataSize(INFO_TEXT);
@@ -567,31 +602,81 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 		return;
 	}
 
-	// Delete old files.
-	clearAppsFolder();
+	// Check if the project exists
+	bool projectExists = false;
+	if(mProjectToSave != "")
+	{
+		for(MAUtil::Vector <reloadProject>::iterator i = mSavedProjects.begin(); i != mSavedProjects.end(); i++)
+		{
+			if(i->name == mProjectToSave)
+			{
+				projectExists = true;
+				lprintfln("@@@ RELOAD: The project %s already exists", mProjectToSave.c_str());
+				break;
+			}
+		}
+	}
 
-	// Set the new app path.
-	char buf[1024];
-	sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
-	mAppPath = buf;
+	// Delete old files if necessary.
+	if(mProjectToSave == "" || projectExists )
+	{
+		clearAppsFolder(mProjectToSave);
+	}
+
+	// Set the project Path depending on weather the
+	// we are reloading or saving
+	if (mProjectToSave == "")
+	{
+		char buf[1024];
+		sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
+		mAppPath = buf;
+	}
+	else
+	{
+		mAppPath = mSavedAppsFolder + "RLDPRJ" + mProjectToSave +"/";
+	}
+
+	String fullPath = mFileUtil->getLocalPath() + mAppPath;
 
 	// Extract files.
-	String fullPath = mFileUtil->getLocalPath() + mAppPath;
 	setCurrentFileSystem(data, 0);
 	int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
 	freeCurrentFileSystem();
 	maDestroyPlaceholder(data);
 
-	// Load the app.
+	// Load the app if reloading or return to workspace screen if saving.
 	if (result > 0)
 	{
-		// Save location of last loaded app.
-		mFileUtil->writeTextToFile(
-			mFileUtil->getLocalPath() + "LastAppDir.txt",
-			mAppPath);
+		// Save the new project to the vecture and write the data on file
+		if(mProjectToSave != "")
+		{
+			if( !projectExists)
+			{
+				struct reloadProject projectItem;
+				projectItem.name = mProjectToSave;
+				projectItem.path = mFileUtil->getLocalPath() + mSavedAppsFolder + "RLDPRJ" + mProjectToSave +"/";
+				mSavedProjects.add(projectItem);
 
-		// Bundle was extracted, launch the new app files.
-		launchSavedApp();
+				MAUtil::String stringToWrite = "";
+				for(MAUtil::Vector <reloadProject>::iterator i = mSavedProjects.begin(); i != mSavedProjects.end(); i++)
+				{
+					stringToWrite += i->name + "\n" + i->path + "\n";
+				}
+				mFileUtil->writeTextToFile(
+								mFileUtil->getLocalPath() + "SavedAppsData.txt",
+								stringToWrite);
+			}
+			maAlert("Saving Project", ("Project " + mProjectToSave + " was succesfully\nsaved on disc.").c_str(),
+					NULL, "OK", NULL);
+			mProjectToSave = "";
+
+			MainStackSingleton::getInstance()->show();
+		}
+		else
+		{
+			// We are in reload mode. Just start the saved app.
+			launchSavedApp();
+		}
 	}
 	else
 	{
@@ -892,9 +977,18 @@ void ReloadClient::freeHardware()
 	}
 }
 
-void ReloadClient::clearAppsFolder()
+void ReloadClient::clearAppsFolder(MAUtil::String appFolder)
 {
-	DeleteFolderRecursively((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+	if (appFolder == "") // Normal Reload mode
+	{
+		DeleteFolderRecursively((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+	}
+	else // Save app mode
+	{
+		DeleteFolderRecursively((mFileUtil->getLocalPath() +
+								 mSavedAppsFolder +
+								 "RLDPRJ" + appFolder + "/").c_str());
+	}
 }
 
 // ========== Send info to server  ==========
@@ -909,7 +1003,23 @@ void ReloadClient::getProjectListFromServer()
 }
 
 /**
+ * Send a message requesting a project so it can be saved
+ * @param projectName The name of the project to be saved
+ */
+void ReloadClient::saveProjectFromServer(MAUtil::String projectName)
+{
+	mProjectToSave = projectName;
+	MAUtil::String tmpMsg = "{ \"message\": \"reloadProject\","
+							  "\"params\" : {"
+								  "\"projectName\": \"" + projectName + "\""
+								"}"
+							"}";
+	sendTCPMessage(tmpMsg);
+}
+
+/**
  * Send a message requesting a project to be reloaded
+ * @param projectName The name of the project to be reloaded
  */
 void ReloadClient::reloadProjectFromServer(MAUtil::String projectName)
 {

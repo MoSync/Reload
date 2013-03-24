@@ -214,11 +214,21 @@ void ReloadScreenController::infoButtonClicked()
 }
 
 /**
+ * Called when save project button is clicked for a particular project
+ * @param projectName The name of the project to be saved
+ */
+void ReloadScreenController::saveProjectClicked(MAUtil::String projectName)
+{
+	mReloadClient->saveProjectFromServer(projectName);
+}
+
+/**
  * Called when reload project button is clicked for some particular project
+ * @param projectName The name of the project to be reloaded
  */
 void ReloadScreenController::reloadProjectClicked(MAUtil::String projectName)
 {
-	mReloadClient->reloadProjectFromServer( projectName);
+	mReloadClient->reloadProjectFromServer(projectName);
 }
 
 /**
