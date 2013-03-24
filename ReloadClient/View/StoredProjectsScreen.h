@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 
 #include <NativeUI/Widgets.h>
 #include "ReloadUIListener.h"
+#include "../dataTypes.h"
 
 using namespace NativeUI;
 using namespace MAUtil;
@@ -44,7 +45,8 @@ public:
 	 * @param os The current os.
 	 * @param orientation The current device orientation.
 	 */
-	StoredProjectsScreen(MAUtil::String os, int orientation);
+	StoredProjectsScreen(MAUtil::String os, int orientation,
+						 MAUtil::Vector <reloadProject> * projects);
 
 	/**
 	 * Destructor.
@@ -137,6 +139,16 @@ private:
 	 * The reload button screen width ratio.
 	 */
 	float mLoadButtonWidthRatio;
+
+	/**
+	 *
+	 */
+	MAUtil::Vector <reloadProject> *mProjects;
+
+	/**
+	 * Holds the project name of the currently selected project
+	 */
+	MAUtil::String mSelectedProjectName;
 };
 
 #endif /* STOREDPROJECTSSCREEN_H_ */

@@ -139,6 +139,7 @@ void ReloadScreenController::pushWorkspaceScreen()
 	else
 	{
 		mWorkspaceScreen->updateProjectList();
+		MainStackSingleton::getInstance()->show();
 	}
 
 	if(MainStackSingleton::getInstance()->getStackSize() < 2)
@@ -196,7 +197,7 @@ void ReloadScreenController::loadStoredProjectsButtonClicked()
 	if (mStoredProjectScreen == NULL)
 	{
 		int orientation = maScreenGetCurrentOrientation();
-		mStoredProjectScreen = new StoredProjectsScreen(mOS, orientation);
+		mStoredProjectScreen = new StoredProjectsScreen(mOS, orientation, mReloadClient->getListOfSavedProjects());
 		mStoredProjectScreen->setTitle("Stored Projects");
 		mStoredProjectScreen->addReloadUIListener(this);
 	}
@@ -237,6 +238,15 @@ void ReloadScreenController::reloadProjectClicked(MAUtil::String projectName)
 void ReloadScreenController::refreshWorkspaceProjectsButtonClicked()
 {
 	mReloadClient->getProjectListFromServer();
+}
+
+/**
+ * Called when on offline mode an reloading a saved project
+ * @param projectName The name of the stored project to be reloaded
+ */
+void ReloadScreenController::launchSavedApp(MAUtil::String projectName)
+{
+	mReloadClient->launchSavedApp(projectName);
 }
 
 /**

@@ -674,8 +674,9 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 		}
 		else
 		{
-			// We are in reload mode. Just start the saved app.
-			launchSavedApp();
+			// We are in reload mode. Just start the saved app
+			// without providing project Name
+			launchSavedApp("");
 		}
 	}
 	else
@@ -920,16 +921,32 @@ void ReloadClient::evaluateScript(const String& script)
 /**
  * Loads the HTML files that were extracted last time.
  */
-void ReloadClient::launchSavedApp()
+void ReloadClient::launchSavedApp(MAUtil::String projectName)
 {
-	// Get path to app.
-	String fullAppPath = mFileUtil->getLocalPath() + mAppPath;
+	MAUtil::String fullAppPath;
+
+	if (projectName == "")
+	{
+		// Get path to app.
+		fullAppPath = mFileUtil->getLocalPath() + mAppPath;
+	}
+	else
+	{
+		for(MAUtil::Vector <reloadProject>::iterator i = mSavedProjects.begin(); i != mSavedProjects.end(); i++)
+		{
+			if(i->name == projectName)
+			{
+				fullAppPath = i->path;
+				break;
+			}
+		}
+	}
 
 	// Check that index.html exists.
 	MAHandle file = mFileUtil->openFileForReading(fullAppPath + "index.html");
 	if (file < 0)
 	{
-		maAlert("Reload: No App", "No app has been loaded yet", "Back", NULL, NULL);
+		maAlert("Reload: No App", "No app has been saved yet", "Back", NULL, NULL);
 		return;
 	}
 	maFileClose(file);
@@ -1142,7 +1159,20 @@ void ReloadClient::showConnectionErrorMessage(int errorCode)
 	maAlert("Network Status", errorMessage.c_str(), "OK", NULL, NULL);
 }
 
+/**
+ * Getter returns the vector of projects on server
+ * @return MAUtil::Vector <reloadProject>
+ */
 MAUtil::Vector <reloadProject> * ReloadClient::getListOfProjects()
 {
 	return &mProjects;
+}
+
+/**
+ * Getter returns the vector of projects stored on the device
+ * @return MAUtil::Vector <reloadProject>
+ */
+MAUtil::Vector <reloadProject> * ReloadClient::getListOfSavedProjects()
+{
+	return &mSavedProjects;
 }

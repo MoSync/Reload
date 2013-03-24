@@ -127,6 +127,12 @@ public:
 	virtual void refreshWorkspaceProjectsButtonClicked();
 
 	/**
+	 * Called when on offline mode an reloading a saved project
+	 * @param projectName The name of the stored project to be reloaded
+	 */
+	virtual void launchSavedApp(MAUtil::String projectName);
+
+	/**
 	 * If the stack screen has only one screen, the application should exit.
 	 * @return true if the application should exit, false otherwise.
 	 */

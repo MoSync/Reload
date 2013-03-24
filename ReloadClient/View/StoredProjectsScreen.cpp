@@ -40,10 +40,13 @@ MA 02110-1301, USA.
  * @param os The current os.
  * @param orientation The current device orientation.
  */
-StoredProjectsScreen::StoredProjectsScreen(MAUtil::String os, int orientation) :
+StoredProjectsScreen::StoredProjectsScreen(MAUtil::String os, int orientation,
+										   MAUtil::Vector <reloadProject> * projects) :
 	Screen(),
 	mMainLayout(NULL)
 {
+	mProjects = projects;
+
 	mOS = os;
 	setScreenValues();
 	createMainLayout();
@@ -71,28 +74,30 @@ void StoredProjectsScreen::createMainLayout() {
 	Screen::setMainWidget(mMainLayout);
 
 	mListView = new ListView();
+	mListView->allowSelection(true);
 	mListView->fillSpaceHorizontally();
 
-	// the list view doesn't automatically sort its elements - the
-	// developer has to handle the sorting
-	for (int i = 0; i <= 5; i++)
+	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
 	{
 		ListViewItem* item = new ListViewItem();
 		item->fillSpaceHorizontally();
+		item->setHeight(80);
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
 		itemHorizontalLayout->fillSpaceHorizontally();
 		Label* projectNameLabel = new Label();
-		projectNameLabel->setText("Project " + MAUtil::integerToString(i));
+		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
 
-		Button* loadButton = new Button();
-		loadButton->setText(LOAD_BUTTON_TEXT);
-		loadButton->setWidth((int)(mScreenWidth * mLoadButtonWidthRatio));
-		loadButton->addButtonListener(this);
-		loadButton->wrapContentHorizontally();
-		mLoadButtons.add(loadButton);
+		// TODO: Keep this for the posibility of adding remove button
+		// will affect StoredProjectsScreen::buttonClicked
+		//Button* loadButton = new Button();
+		//loadButton->setText(LOAD_BUTTON_TEXT);
+		//loadButton->setWidth((int)(mScreenWidth * mLoadButtonWidthRatio));
+		//loadButton->addButtonListener(this);
+		//loadButton->wrapContentHorizontally();
+		//mLoadButtons.add(loadButton);
 
 		if (mOS.find("iPhone") >= 0)
 		{
@@ -100,7 +105,7 @@ void StoredProjectsScreen::createMainLayout() {
 		}
 
 		itemHorizontalLayout->addChild(projectNameLabel);
-		itemHorizontalLayout->addChild(loadButton);
+		//itemHorizontalLayout->addChild(loadButton);
 		item->addChild(itemHorizontalLayout);
 
 		mListView->addChild(item);
@@ -115,6 +120,7 @@ void StoredProjectsScreen::createMainLayout() {
 * bounds of the button.
 * @param button The button object that generated the event.
 */
+//TODO: use it for deleting app functionality
 void StoredProjectsScreen::buttonClicked(Widget* button)
 {
 	// check if a load button was clicked
@@ -137,7 +143,26 @@ void StoredProjectsScreen::listViewItemClicked(
 	ListView* listView,
 	ListViewItem* listViewItem)
 {
+	Widget * hLayout = listViewItem->getChild(0);
+	Label * lb = (Label*)hLayout->getChild(0);
+	int selection = 0;
 
+	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
+	{
+
+		if(i->name == lb->getText())
+		{
+			mSelectedProjectName = i->name;
+			lprintfln("@@@ RELOAD: project %s was selected",lb->getText().c_str());
+			break;
+		}
+		selection++;
+	}
+
+	for (int j = 0; j < mReloadUIListeners.size(); j++)
+	{
+		mReloadUIListeners[j]->launchSavedApp(mSelectedProjectName);
+	}
 }
 
 /**

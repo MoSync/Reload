@@ -66,6 +66,12 @@ public:
 	virtual void reloadProjectClicked(MAUtil::String projectName) = 0;
 
 	/**
+	 * Called when on offline mode and selecting a project to load
+	 * @param projectName
+	 */
+	virtual void launchSavedApp(MAUtil::String  projectName) = 0;
+
+	/**
 	 * Called when the info button is clicked.
 	 */
 	virtual void infoButtonClicked() = 0;

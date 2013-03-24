@@ -194,7 +194,7 @@ public:
     /**
      * Loads the HTML files that were extracted last time.
      */
-    void launchSavedApp();
+    void launchSavedApp(MAUtil::String projectName);
 
     /**
      * Resets the client (destroys widgets and stops sensors)
@@ -255,6 +255,12 @@ public:
      * @return MAUtil::Vector <reloadProject>
      */
     MAUtil::Vector <reloadProject> * getListOfProjects();
+
+    /**
+	 * Getter returns the vector of projects stored on the device
+	 * @return MAUtil::Vector <reloadProject>
+	 */
+    MAUtil::Vector <reloadProject> * getListOfSavedProjects();
 
 private:
 	/**
