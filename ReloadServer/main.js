@@ -59,6 +59,7 @@ process.on('exit', function(){
  */
 var server  = require("./lib/jsonrpc_server"),
     tcp     = require("./lib/tcp_server");
+    udp     = require("./lib/udp_server");
     
 var manager = require("./application/reload_manager"),
     client  = require("./application/client_manager");
@@ -67,3 +68,4 @@ var manager = require("./application/reload_manager"),
  */
 WebUI       = server.create(8283);
 tcpSocket   = tcp.create(7000);
+udp         = udp.create(41234);
