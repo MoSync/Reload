@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include "View/MainStackScreen.h"
 #include "View/WorkspaceScreen.h"
 #include "View/StoredProjectsScreen.h"
+#include "View/ServersDialog.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -40,7 +41,8 @@ using namespace NativeUI; // WebView widget.
 ReloadScreenController::ReloadScreenController(ReloadClient *client) :
 		mLoginScreen(NULL),
 		mWorkspaceScreen(NULL),
-		mStoredProjectScreen(NULL)
+		mStoredProjectScreen(NULL),
+		mServersDialog(NULL)
 {
 	mReloadClient = client;
 }
@@ -178,6 +180,34 @@ void ReloadScreenController::popWorkspaceScreen()
 void ReloadScreenController::connectButtonClicked(String address)
 {
 	mReloadClient->connectToServer(address.c_str());
+}
+
+/**
+ * Called when find servers button is clicked
+ */
+void ReloadScreenController::findServersButtonClicked()
+{
+	if(mServersDialog == NULL)
+	{
+		int orientation = maScreenGetCurrentOrientation();
+		mServersDialog = new ServersDialog(mOS, orientation);
+		mServersDialog->setTitle("Servers");
+		mServersDialog->addReloadUIListener(this);
+	}
+
+	mServersDialog->show();
+	// TODO: make broadcast for server discovery
+}
+
+/**
+ * Called when selecting a specific server from available server list
+ * @param ipAddress
+ */
+void ReloadScreenController::connectToSelectedServer(MAUtil::String ipAddress)
+{
+	mServersDialog->hide();
+	defaultAddress(ipAddress.c_str());
+	mReloadClient->connectToServer(ipAddress.c_str());
 }
 
 /**

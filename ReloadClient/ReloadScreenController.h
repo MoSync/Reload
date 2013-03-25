@@ -34,6 +34,7 @@ class ReloadTabScreen;
 class ConnectionScreen;
 class WorkspaceScreen;
 class StoredProjectsScreen;
+class ServersDialog;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -93,6 +94,17 @@ public:
 	 * @param address The address contained by the connect EditBox.
 	 */
 	virtual void connectButtonClicked(String address);
+
+	/**
+	 * Called when find servers button is clicked
+	 */
+	virtual void findServersButtonClicked();
+
+	/**
+	 * Called when selecting a specific server from available server list
+	 * @param ipAddress
+	 */
+	virtual void connectToSelectedServer(MAUtil::String ipAddress);
 
 	/**
 	 * Called when the disconnect button is clicked.
@@ -178,6 +190,11 @@ private:
 	 * The screen containing projects saved on the device.
 	 */
 	StoredProjectsScreen *mStoredProjectScreen;
+
+	/**
+	 * The modal dialog containing available servers
+	 */
+	ServersDialog *mServersDialog;
 };
 
 

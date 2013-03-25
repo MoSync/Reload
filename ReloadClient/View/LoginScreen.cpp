@@ -558,7 +558,11 @@ void LoginScreen::buttonClicked(Widget *button)
 	}
 	else if (button == mFindServersButton)
 	{
-
+		// announce that finding servers button was clicked
+		for (int i = 0; i < mReloadUIListeners.size(); i++)
+		{
+			mReloadUIListeners[i]->findServersButtonClicked();
+		}
 	}
 	else if(button == mLoadStoredProjectsButton)
 	{
