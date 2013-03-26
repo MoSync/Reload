@@ -142,8 +142,9 @@ files_to_copy.each { |item|
   FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_Linux/server"
 }
 
-FileUtils.cp "ReloadServer/cli", "/Volumes/MoSyncReload/"
+puts "Copying command line tool"
 FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Linux/server"
+FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Windows/server"
 
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Windows/* Build/#{time_stamp}/MoSync_Reload_Windows"
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"
