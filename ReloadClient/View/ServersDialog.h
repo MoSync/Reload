@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 using namespace MAUtil;
 using namespace NativeUI;
 
-class ServersDialog : public Dialog, ListViewListener
+class ServersDialog : public Dialog, ListViewListener, DialogListener
 {
 public:
 	/**
@@ -60,6 +60,11 @@ public:
 	void addServerToList(MAUtil::String serverIP);
 
 	/**
+	 * Empties the server list
+	 */
+	void emptyServerList();
+
+	/**
 	 * Add a reload UI event listener.
 	 * @param listener The listener that will receive reload UI events.
 	 */
@@ -70,6 +75,8 @@ public:
 	 * @param listener The listener that receives reload UI events.
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
+
+	void dialogDismissed(Dialog* dialog);
 
 private:
 	/**

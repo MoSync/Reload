@@ -48,8 +48,6 @@ ServersDialog::ServersDialog(String os, int orientation)
 	mListView->addListViewListener(this);
 
 	this->addChild(mListView);
-	this->addServerToList("192.168.0.120");
-	this->addServerToList("192.168.0.121");
 }
 
 /**
@@ -79,12 +77,42 @@ void ServersDialog::listViewItemClicked(ListView *listView, ListViewItem *listVi
  */
 void ServersDialog::addServerToList(MAUtil::String serverIP)
 {
-	ListViewItem * item = new ListViewItem();
-	item->fillSpaceHorizontally();
-	item->setHeight(80);
-	item->setText(serverIP);
+	// check if already exists
+	bool exists = false;
+	int totalItems = mListView->countChildWidgets();
 
-	mListView->addChild(item);
+	for (int i = 0; i < totalItems; i++)
+	{
+		if (mListView->getChild(i)->getPropertyString("text") == serverIP)
+		{
+			exists = true;
+		}
+	}
+
+	if(!exists)
+	{
+		ListViewItem * item = new ListViewItem();
+		item->fillSpaceHorizontally();
+		item->setHeight(80);
+		item->setText(serverIP);
+
+		mListView->addChild(item);
+	}
+}
+
+/**
+ * Empties the server list
+ */
+void ServersDialog::emptyServerList()
+{
+	int items = mListView->countChildWidgets();
+	lprintfln("@@@ RELOAD: list length=%d", items);
+	for(int i = 0; i < items; i++)
+	{
+		Widget * listItem = mListView->getChild(0);
+		mListView->removeChild(listItem);
+		delete listItem;
+	}
 }
 
 /**
@@ -120,3 +148,10 @@ void ServersDialog::removeReloadUIListener(ReloadUIListener* listener)
 	}
 }
 
+void ServersDialog::dialogDismissed(Dialog* dialog)
+{
+	for (int j = 0; j < mReloadUIListeners.size(); j++)
+	{
+		mReloadUIListeners[j]->connectToSelectedServer("");
+	}
+}

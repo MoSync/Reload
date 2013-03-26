@@ -29,6 +29,8 @@ MA 02110-1301, USA.
 #include "View/LoginScreen.h"
 #include "View/ReloadUIListener.h"
 
+#include "BroadcastHandler.h"
+
 class ReloadClient;
 class ReloadTabScreen;
 class ConnectionScreen;
@@ -195,6 +197,8 @@ private:
 	 * The modal dialog containing available servers
 	 */
 	ServersDialog *mServersDialog;
+
+	BroadcastHandler *mBroadcastHandler;
 };
 
 

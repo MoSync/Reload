@@ -197,6 +197,8 @@ void ReloadScreenController::findServersButtonClicked()
 
 	mServersDialog->show();
 	// TODO: make broadcast for server discovery
+	mBroadcastHandler = new BroadcastHandler(mServersDialog);
+	mBroadcastHandler->findServer();
 }
 
 /**
@@ -206,8 +208,13 @@ void ReloadScreenController::findServersButtonClicked()
 void ReloadScreenController::connectToSelectedServer(MAUtil::String ipAddress)
 {
 	mServersDialog->hide();
-	defaultAddress(ipAddress.c_str());
-	mReloadClient->connectToServer(ipAddress.c_str());
+	mServersDialog->emptyServerList();
+	if (ipAddress != "")
+	{
+		defaultAddress(ipAddress.c_str());
+		mReloadClient->connectToServer(ipAddress.c_str());
+	}
+	delete mBroadcastHandler;
 }
 
 /**

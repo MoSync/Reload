@@ -1,5 +1,5 @@
-var dgram = require("dgram")
-vars = require("../application/globals");
+var dgram = require("dgram"),
+	vars  = require("../application/globals");
 
 
 
@@ -34,7 +34,7 @@ var create = function (port) {
 
 	server.bind(port);
 
-	return server;
+	//return server;
 }
 
 exports.create = create;
