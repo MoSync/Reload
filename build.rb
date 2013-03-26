@@ -91,8 +91,8 @@ files_to_copy = [
   "ReloadServer/lib",  
   "ReloadServer/build.dat",
   "ReloadServer/MoSyncVersion.dat",
-  "ReloadServer/node_modules"
-  
+  "ReloadServer/node_modules",
+  "ReloadServer/cli"
   ]
 
 
@@ -136,8 +136,6 @@ FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_Linux"
 FileUtils.cp_r "Licenses", "/Volumes/MoSyncReload/"
 FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_Windows"
 FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_Linux"
-
-
 
 files_to_copy.each { |item|
   FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_Windows/server"
