@@ -91,8 +91,7 @@ files_to_copy = [
   "ReloadServer/lib",  
   "ReloadServer/build.dat",
   "ReloadServer/MoSyncVersion.dat",
-  "ReloadServer/node_modules",
-  "ReloadServer/cli"
+  "ReloadServer/node_modules"
   ]
 
 
@@ -129,7 +128,7 @@ FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Li
 FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Linux/WindowsPhone Client"
 
 puts "Copying command line tool"
-FileUtils.cp_r "cli", "/Volumes/MoSyncReload/cli"
+FileUtils.cp "cli", "/Volumes/MoSyncReload/cli"
 
 puts "Copying Readme"
 FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSyncReload/"
