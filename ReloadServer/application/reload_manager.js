@@ -501,13 +501,25 @@ var rpcFunctions = {
      */
     findProjects: function (callback, sendResponse) {
         try {
+            var self = this;
 
             fs.exists( vars.globals.rootWorkspacePath, function(exist) {
 
                 if(!exist) {
                     console.log("Creating the workspace directory " +
                                 vars.globals.rootWorkspacePath);
-                    fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);
+                    try {
+
+                        fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);    
+                    } catch (e) {
+                        console.log("ERROR in findProjects: " + e, 0);
+                        console.log("Reverting to Default Workspace Path", 0);
+                        
+                        self.getLatestPath(); // Reverting to Default workspace path
+                        self.findProjects(callback,sendResponse);
+                        return true;
+                    }
+                    
                 }
 
                 // Now, check for projects in it
@@ -858,53 +870,60 @@ var rpcFunctions = {
 
         console.log("Weinre Enabled:" + weinreDebug);
 
-        sendResponse({hasError: false, data: ""});
-
         // Bundle the app.
         var projectPath = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectName;
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
+            try {
 
-            // We will send the file size information together with
-            // the command as an extra level of integrity checking.
-            var data = fs.readFileSync(actualPath);
-            var url = vars.globals.rootWorkspacePath +
-                vars.globals.fileSeparator +
-                projectName;
+                // Collect Stats Statistics
+                if(vars.globals.statistics === true) {
+                    var indexPath = vars.globals.fileSeparator + projectPath +
+                                    vars.globals.fileSeparator + "LocalFiles" +
+                                    vars.globals.fileSeparator + "index.html";
 
-            console.log("---------- S e n d i n g   B u n d l e --------");
-            console.log("actualPath: " + actualPath);
-            console.log("url: " + url);
+                    var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
 
-            // Send the new bundle URL to the device clients.
-            sendToAllClients({
-                message: 'ReloadBundle',
-                url: url,
-                fileSize: data.length
-            });
+                    $ = cheerio.load(indexFileData,{
+                        lowerCaseTags: false
+                    });
+                    var nativeUIProject = $("#NativeUI");
+                    vars.methods.loadStats(function (statistics) {
 
-            // Collect Stats Statistics
-            if(vars.globals.statistics === true) {
-                var indexPath = projectPath +
-                                vars.globals.fileSeparator + "LocalFiles" +
-                                vars.globals.fileSeparator + "index.html";
+                        if(nativeUIProject.length) {
+                            statistics.totalReloadsNative += 1;
+                        } else {
+                            statistics.totalReloadsHTML += 1;
+                        }
 
-                var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
-                
-                $ = cheerio.load(indexFileData,{
-                    lowerCaseTags: false
+                        statistics.lastActivityTS = new Date().getTime();
+                        vars.methods.saveStats(statistics);
+                    });
+                }
+
+
+                // We will send the file size information together with
+                // the command as an extra level of integrity checking.
+                var data = fs.readFileSync(actualPath);
+                var url = vars.globals.rootWorkspacePath +
+                    vars.globals.fileSeparator +
+                    projectName;
+
+                console.log("---------- S e n d i n g   B u n d l e --------");
+                console.log("actualPath: " + actualPath);
+                console.log("url: " + url + "?filesize=" + data.length);
+
+                // Send the new bundle URL to the device clients.
+                sendToAllClients({
+                    message: 'ReloadBundle',
+                    url: url,
+                    fileSize: data.length
                 });
-                var nativeUIProject = $("#NativeUI");
-                vars.methods.loadStats(function (statistics) {
 
-                    if(nativeUIProject.length) {
-                        statistics.totalReloadsNative += 1;
-                    } else {
-                        statistics.totalReloadsHTML += 1;
-                    }
-                    
-                    statistics.lastActivityTS = new Date().getTime();
-                    vars.methods.saveStats(statistics);
-                });
+
+                sendResponse({hasError: false, data: ""});
+            } catch (e) {
+
+                sendResponse({hasError: true, data: "Error in reloadProject: " + e});
             }
         });
     },
@@ -1071,7 +1090,7 @@ var rpcFunctions = {
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
 
-                var command = "open " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                var command = "open " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                         this.fixPathsUnix(projectFolder) + "/LocalFiles";
             }
             else if ((vars.globals.localPlatform.indexOf("linux") >=0)) {
@@ -1079,12 +1098,12 @@ var rpcFunctions = {
                 var commandStat = fs.statSync("/usr/bin/nautilus");
                 if(commandStat.isFile()) {
 
-                  var command = "nautilus " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                  var command = "nautilus " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                               this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
                 else {
 
-                  var command = "dolphin " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                  var command = "dolphin " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                              this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
             }
@@ -1356,7 +1375,7 @@ var rpcFunctions = {
 
         console.log("Changing workspace to " + newWorkspacePath);
 
-        path.exists(newWorkspacePath, function(exists) {
+        fs.exists(newWorkspacePath, function(exists) {
 
             if(exists) {
 
@@ -1491,9 +1510,19 @@ var rpcFunctions = {
                 if (exists) {
 
                     var data = String(fs.readFileSync('lastWorkspace.dat', "utf8"));
+
                     if(data != "") {
 
-                        self.setRootWorkspacePath(data);
+                        fs.exists(data, function (exists) {
+                            if(exists) {
+                                self.setRootWorkspacePath(data);
+                            } else {
+                                self.setRootWorkspacePath(defaultPath);
+                                self.changeWorkspacePath(defaultPath);
+                            }
+                        });
+
+                        
                     }
                     else {
 
