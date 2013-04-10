@@ -16,6 +16,20 @@ var zip = require('unzip');
 var vars = require('./globals');
 
 /**
+ * (internal function) Converts a decimal value to 8byte length Hex
+ */
+var toHex8Byte = function (decimal) {
+
+    var finalHex  = decimal.toString(16);
+
+    while (finalHex.length < 8) {
+        finalHex = "0"+finalHex;
+    }
+
+    return finalHex;
+};
+
+/**
  * Send a given message to all connected clients.
  * @param jsonMessage Message in JSON format.
  * The message must contain a field named 'message'
@@ -29,22 +43,8 @@ var sendToAllClients = function(jsonMessage) {
     vars.globals.clientList.forEach(function (client) {
 
         try {
-            // Protocol consists of header "RELOADMSG" followed
-            // by data length encoded as 8 hex didgits, e.g.: "000000F0"
-            // Then string data follows with actual JSON message.
-            // Advantage with hex is that we can read fixed numer of bytes
-            // in the read operation.
-            // Convert to hex:
-            // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
-            // Construct message with proper header.
-            var message = JSON.stringify(jsonMessage);
-            var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
-
-            // Send the message.
-            // TODO: Perhaps make client object that wraps the base socket and
-            // put a send/write method in there.
-            var result = client.write(fullMessage, "ascii");
+            sendToClient(client, jsonMessage);
         }
         catch (err) {
             console.log("@@@ reload_manager.js: sendToAllClients error: " + err, 0)
@@ -59,9 +59,57 @@ var sendToAllClients = function(jsonMessage) {
     });
 };
 
+var sendToClient = function(client, jsonMessage) {
+    try {
+        // Protocol consists of header "RELOADMSG" followed
+        // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+        // Then string data follows with actual JSON message.
+        // Advantage with hex is that we can read fixed numer of bytes
+        // in the read operation.
+        // Convert to hex:
+        // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+
+        // Construct message with proper header.
+        var message = JSON.stringify(jsonMessage);
+        var fullMessage = "RELOADMSG" + toHex8Byte(message.length) + message;
+
+        // Send the message.
+        // TODO: Perhaps make client object that wraps the base socket and
+        // put a send/write method in there.
+        var result = client.write(fullMessage, "ascii");
+    } catch (err) {
+        console.log("@@@ reload_manager.js: sendToClient error: " + err)
+    }
+};
 // TODO: Move non-RPC functions out of this object to make the code
 // mode clean and make rpcFunctions contain only the RPC functions.
 var rpcFunctions = {
+
+    disconnectDevice: function (address, sendResponse) {
+        var response = null;
+        var i, len;
+        len = vars.globals.clientList.length;
+
+        for (i = 0; i < len; i++) {
+            var client = vars.globals.clientList[i];
+            if (client !== undefined && address === client.deviceInfo.address) {
+                response = address + ' closed';
+
+                console.log('!!! sent Disconnect msg to client');
+                sendToClient(client, { message: 'Disconnect' });
+                //client.end();
+                break;
+
+            } else {
+                response = address + ' was not in the list';
+            }
+        }
+
+        sendResponse({
+            success: true,
+            data: response
+        });
+    },
 
     /**
      * (internal function) Used to acquire the server ip address
@@ -176,12 +224,12 @@ var rpcFunctions = {
             return false;
         }
 
-        var self, opts, options, file_name, home_dir, download_dir, file, sep, request;
+        var self, opts, options, file_name, home_dir, download_dir, file, DS, request;
 
         self = this;
-        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        sep = vars.globals.fileSeparator;
-        download_dir = home_dir + '/.reload/examples';
+        home_dir = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+        DS = vars.globals.fileSeparator;
+        download_dir = home_dir + DS + '.reload' + DS + 'examples';
         opts = JSON.parse(opts);
         file_name = url.parse(opts.url).pathname.split('/').pop();
 
@@ -190,11 +238,11 @@ var rpcFunctions = {
             if (!exists){
                 console.log("Download dir does not exist. Create it!");
                 console.log(download_dir);
-                fs.mkdir(home_dir+'/.reload', 0755, function(e) {
+                fs.mkdir(home_dir + DS + '.reload', 0755, function(e) {
                     if (!e) {
-                        fs.mkdir(home_dir+'/.reload/examples', 0755, function(e) {
+                        fs.mkdir(home_dir + DS + '.reload' + DS + 'examples', 0755, function(e) {
                             if (!e) {
-                                console.log('Done creating ~/.reload/examples/');
+                                console.log('Done creating ' + home_dir + DS + '.reload' + DS + 'examples' + DS);
                             }
                         });
                     }
@@ -203,7 +251,7 @@ var rpcFunctions = {
         });
 
         // Stream to file.
-        file = fs.createWriteStream(download_dir + sep + file_name);
+        file = fs.createWriteStream(download_dir + DS + file_name);
         options = {
             host:    url.parse(opts.url).hostname,
             port:    url.parse(opts.url).port,
@@ -221,7 +269,7 @@ var rpcFunctions = {
                 file.end();
 
                 // Unpack
-                self.unzip(download_dir + sep + file_name, download_dir + sep, function(){
+                self.unzip(download_dir + DS + file_name, download_dir + DS, function(){
                     console.log('Finished extraction. Now Reload!');
                     self.bundleApp(download_dir + vars.globals.fileSeparator + opts.name, false, function(actualPath) {
                         fs.stat(actualPath, function(err, stat){
@@ -271,16 +319,16 @@ var rpcFunctions = {
             return false;
         }
 
-        var self, opts, home_dir, sep, download_dir;
+        var self, opts, home_dir, DS, download_dir;
 
         self = this;
         home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        sep = vars.globals.fileSeparator;
-        download_dir = home_dir + '/.reload/examples';
+        DS = vars.globals.fileSeparator;
+        download_dir = home_dir + DS + '.reload' + DS + 'examples';
         opts = JSON.parse(opts);
 
         // Download file if not already done so.
-        var filePath = download_dir + sep + opts.name + '.zip';
+        var filePath = download_dir + DS + opts.name + '.zip';
         console.log(filePath);
         fs.exists(filePath, function(exists){
             if (!exists) {
@@ -388,14 +436,14 @@ var rpcFunctions = {
       * @callback   Callback is returned with a {file: 'filepath' } object passed.
       */
     download: function (location, dest, callback) {
-        var request, options, file, fileName, sep, res;
+        var request, options, file, fileName, DS, res;
 
         fileName = location.split('/').pop();
         res = {};
-        sep = vars.globals.fileSeparator;
+        DS = vars.globals.fileSeparator;
 
         // Stream to file.
-        file = fs.createWriteStream(dest + sep + fileName);
+        file = fs.createWriteStream(dest + DS + fileName);
         options = {
             host:    url.parse(location).hostname,
             port:    url.parse(location).port,
@@ -410,7 +458,7 @@ var rpcFunctions = {
 
             res.on('end', function(){
                 file.end();
-                res.file = dest + sep + fileName;
+                res.file = dest + DS + fileName;
                 callback(res);
             });
         });
@@ -428,7 +476,7 @@ var rpcFunctions = {
      * (RPC): Returns the Project list with attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
-        var sep = vars.globals.fileSeparator;
+        var DS = vars.globals.fileSeparator;
 
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
@@ -444,7 +492,7 @@ var rpcFunctions = {
                     url: "http://localhost:8282/" + p + "/LocalFiles.html",
                     name: p,
                     path: vars.globals.rootWorkspacePath +
-                          sep + p
+                          DS + p
                 }
                 projectListJSON.push(projectInfo);
 
@@ -460,6 +508,7 @@ var rpcFunctions = {
      */
     findProjects: function (callback, sendResponse) {
         try {
+            var self = this;
 
             fs.exists( vars.globals.rootWorkspacePath, function(exist) {
 
@@ -467,6 +516,19 @@ var rpcFunctions = {
                     console.log("Creating the workspace directory " +
                                 vars.globals.rootWorkspacePath, 0);
                     fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);
+                                vars.globals.rootWorkspacePath);
+                    try {
+
+                        fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);    
+                    } catch (e) {
+                        console.log("ERROR in findProjects: " + e, 0);
+                        console.log("Reverting to Default Workspace Path", 0);
+                        
+                        self.getLatestPath(); // Reverting to Default workspace path
+                        self.findProjects(callback,sendResponse);
+                        return true;
+                    }
+
                 }
 
                 // Now, check for projects in it
@@ -819,11 +881,10 @@ var rpcFunctions = {
 
         console.log("Weinre Enabled:" + weinreDebug);
 
-        sendResponse({hasError: false, data: ""});
-
         // Bundle the app.
         var projectPath = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectName;
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
+            try {
 
             // We will send the file size information together with
             // the command as an extra level of integrity checking.
@@ -849,23 +910,55 @@ var rpcFunctions = {
                                 vars.globals.fileSeparator + "LocalFiles" +
                                 vars.globals.fileSeparator + "index.html";
 
-                var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                var data = fs.readFileSync(actualPath);
                 
-                $ = cheerio.load(indexFileData,{
-                    lowerCaseTags: false
-                });
-                var nativeUIProject = $("#NativeUI");
-                vars.methods.loadStats(function (statistics) {
+                var url = projectPath.replace(
+                    "LocalFiles.html",
+                    "LocalFiles.bin").replace(
+                        ' ',
+                        '%20');
 
-                    if(nativeUIProject.length) {
-                        statistics.totalReloadsNative += 1;
-                    } else {
-                        statistics.totalReloadsHTML += 1;
-                    }
-                    
-                    statistics.lastActivityTS = new Date().getTime();
-                    vars.methods.saveStats(statistics);
+                console.log("---------- S e n d i n g   B u n d l e --------");
+                console.log("actualPath: " + actualPath);
+                console.log("url: " + url + "?filesize=" + data.length);
+
+                // Send the new bundle URL to the device clients.
+                sendToAllClients({
+                    message: 'ReloadBundle',
+                    url: url,
+                    fileSize: data.length
                 });
+
+                // Collect Stats Statistics
+                if(vars.globals.statistics === true) {
+                    var indexPath = vars.globals.rootWorkspacePath +
+                                    vars.globals.fileSeparator + projectPath +
+                                    vars.globals.fileSeparator + "LocalFiles" +
+                                    vars.globals.fileSeparator + "index.html";
+
+                    var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
+                    
+                    $ = cheerio.load(indexFileData,{
+                        lowerCaseTags: false
+                    });
+                    var nativeUIProject = $("#NativeUI");
+                    vars.methods.loadStats(function (statistics) {
+
+                        if(nativeUIProject.length) {
+                            statistics.totalReloadsNative += 1;
+                        } else {
+                            statistics.totalReloadsHTML += 1;
+                        }
+                        
+                        statistics.lastActivityTS = new Date().getTime();
+                        vars.methods.saveStats(statistics);
+                    });
+                }
+
+                sendResponse({hasError: false, data: ""});
+            } catch (e) {
+
+                sendResponse({hasError: true, data: "Error in reloadProject: " + e});
             }
         });
     },
@@ -1041,7 +1134,7 @@ var rpcFunctions = {
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
 
-                var command = "open " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                var command = "open " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                         this.fixPathsUnix(projectFolder) + "/LocalFiles";
             }
             else if ((vars.globals.localPlatform.indexOf("linux") >=0)) {
@@ -1049,12 +1142,12 @@ var rpcFunctions = {
                 var commandStat = fs.statSync("/usr/bin/nautilus");
                 if(commandStat.isFile()) {
 
-                  var command = "nautilus " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                  var command = "nautilus " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                               this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
                 else {
 
-                  var command = "dolphin " + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
+                  var command = "dolphin " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
                                              this.fixPathsUnix(projectFolder) + "/LocalFiles &";
                 }
             }
@@ -1326,7 +1419,7 @@ var rpcFunctions = {
 
         console.log("Changing workspace to " + newWorkspacePath, 0);
 
-        path.exists(newWorkspacePath, function(exists) {
+        fs.exists(newWorkspacePath, function(exists) {
 
             if(exists) {
 
@@ -1461,9 +1554,19 @@ var rpcFunctions = {
                 if (exists) {
 
                     var data = String(fs.readFileSync('lastWorkspace.dat', "utf8"));
+
                     if(data != "") {
 
-                        self.setRootWorkspacePath(data);
+                        fs.exists(data, function (exists) {
+                            if(exists) {
+                                self.setRootWorkspacePath(data);
+                            } else {
+                                self.setRootWorkspacePath(defaultPath);
+                                self.changeWorkspacePath(defaultPath);
+                            }
+                        });
+
+                        
                     }
                     else {
 
@@ -1525,18 +1628,6 @@ var rpcFunctions = {
         return pathTemp;
     },
 
-    /**
-     * (internal function) Converts a decimal value to 8byte length Hex
-     */
-    toHex8Byte: function (decimal) {
-
-        var finalHex  = decimal.toString(16);
-
-        while (finalHex.length < 8)
-            finalHex = "0"+finalHex;
-
-        return finalHex;
-    },
 
     /**
      * (internal function) injects evaluation code for error capturing

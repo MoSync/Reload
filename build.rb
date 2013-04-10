@@ -26,7 +26,7 @@ end
 
 
 #Defince version and timestamp 
-version = "1.0"
+version = "1.0.1"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 protocolVersion = "1.0"
 
