@@ -54,6 +54,11 @@ public:
 	~StoredProjectsScreen();
 
 	/**
+	 * Updates the list view that contains the stored projects
+	 */
+	void updateProjectList();
+
+	/**
 	 * Add a reload UI event listener.
 	 * @param listener The listener that will receive reload UI events.
 	 */
@@ -108,6 +113,11 @@ private:
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
+
+	/**
+	 * Screen Label
+	 */
+	Label *mScreenLabel;
 
 	/**
 	 * The alphabetical list view.

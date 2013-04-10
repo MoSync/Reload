@@ -60,9 +60,9 @@ StoredProjectsScreen::StoredProjectsScreen(MAUtil::String os, int orientation,
  */
 StoredProjectsScreen::~StoredProjectsScreen()
 {
-	mListView->removeListViewListener(this);
+	//mListView->removeListViewListener(this);
 
-	mReloadUIListeners.clear();
+	//mReloadUIListeners.clear();
 }
 
 /**
@@ -73,9 +73,19 @@ void StoredProjectsScreen::createMainLayout() {
 	mMainLayout = new VerticalLayout();
 	Screen::setMainWidget(mMainLayout);
 
+	mScreenLabel = new Label();
+	mScreenLabel->setBackgroundColor(66,133,244);
+	mScreenLabel->setFontColor(0xFFFFFF);
+	mScreenLabel->setHeight(80);
+	mScreenLabel->setText("Saved Projects: " + integerToString(mProjects->size()));
+	mScreenLabel->fillSpaceHorizontally();
+
+	mMainLayout->addChild(mScreenLabel);
+
 	mListView = new ListView();
 	mListView->allowSelection(true);
 	mListView->fillSpaceHorizontally();
+	mListView->fillSpaceVertically();
 
 	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
 	{
@@ -85,6 +95,8 @@ void StoredProjectsScreen::createMainLayout() {
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
 		itemHorizontalLayout->fillSpaceHorizontally();
+		itemHorizontalLayout->setHeight(80);
+
 		Label* projectNameLabel = new Label();
 		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
@@ -114,6 +126,73 @@ void StoredProjectsScreen::createMainLayout() {
 	mMainLayout->addChild(mListView);
 }
 
+/**
+ * Updates the list view that contains the stored projects
+ */
+void StoredProjectsScreen::updateProjectList()
+{
+	// clear the list of projects
+	int oldProjects = mListView->countChildWidgets();
+
+	for(int i = 0; i < oldProjects; i++)
+	{
+		Widget *listItemWidget = mListView->getChild(0); // list Item Widget
+
+		Widget *hLayout = listItemWidget->getChild(0); // horizontal layout widget
+		for( int j = 0; j < hLayout->countChildWidgets(); j++)
+		{
+			Widget * w = hLayout->getChild(0);
+			hLayout->removeChild(w);
+			delete w;
+		}
+
+		listItemWidget->removeChild(hLayout);
+
+		delete hLayout;
+
+		mListView->removeChild(listItemWidget);
+		delete listItemWidget;
+	}
+
+	// populate the list view
+	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
+	{
+		lprintfln("@@@ RELOAD Project Name: %s", i->name.c_str());
+		ListViewItem* item = new ListViewItem();
+		item->fillSpaceHorizontally();
+		item->setHeight(80);
+
+		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
+		itemHorizontalLayout->fillSpaceHorizontally();
+		itemHorizontalLayout->setHeight(80);
+		Label* projectNameLabel = new Label();
+		projectNameLabel->setText(i->name);
+		projectNameLabel->fillSpaceHorizontally();
+		projectNameLabel->fillSpaceVertically();
+
+		// TODO: Keep this for the posibility of adding remove button
+		// will affect StoredProjectsScreen::buttonClicked
+		//Button* loadButton = new Button();
+		//loadButton->setText(LOAD_BUTTON_TEXT);
+		//loadButton->setWidth((int)(mScreenWidth * mLoadButtonWidthRatio));
+		//loadButton->addButtonListener(this);
+		//loadButton->wrapContentHorizontally();
+		//mLoadButtons.add(loadButton);
+
+		if (mOS.find("iPhone") >= 0)
+		{
+			itemHorizontalLayout->setWidth(item->getWidth());
+		}
+
+		itemHorizontalLayout->addChild(projectNameLabel);
+		//itemHorizontalLayout->addChild(loadButton);
+		item->addChild(itemHorizontalLayout);
+
+		mListView->addChild(item);
+	}
+	mScreenLabel->setText("Saved Projects: " + integerToString(mProjects->size()));
+	mListView->fillSpaceVertically();
+}
 
 /**
 * This method is called if the touch-up event was inside the

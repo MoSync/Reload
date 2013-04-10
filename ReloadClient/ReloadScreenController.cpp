@@ -169,7 +169,7 @@ void ReloadScreenController::popWorkspaceScreen()
 	if (screenCount >= 2)
 	{
 		MainStackSingleton::getInstance()->pop();
-		mLoginScreen->setTitle("Login screen");
+		//mLoginScreen->setTitle("Login screen");
 	}
 }
 
@@ -238,7 +238,10 @@ void ReloadScreenController::loadStoredProjectsButtonClicked()
 		mStoredProjectScreen->setTitle("Stored Projects");
 		mStoredProjectScreen->addReloadUIListener(this);
 	}
-
+	else
+	{
+		mStoredProjectScreen->updateProjectList();
+	}
 	MainStackSingleton::getInstance()->push(mStoredProjectScreen);
 }
 

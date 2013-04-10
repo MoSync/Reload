@@ -80,12 +80,16 @@ void WorkspaceScreen::createMainLayout() {
 	mRefreshButton = new Button();
 	mRefreshButton->setText(REFRESH_LIST_BUTTON_TEXT);
 	mRefreshButton->fillSpaceHorizontally();
-	mRefreshButton->setBackgroundColor(72,191,72);
+	mRefreshButton->setBackgroundColor(66, 133, 244);
+	mRefreshButton->setFontColor(0xFFFFFF);
+	mRefreshButton->setHeight(80);
 
 	mDisconnectButton = new Button();
 	mDisconnectButton->setText(DISCONNECT_BUTTON_TEXT);
 	mDisconnectButton->fillSpaceHorizontally();
-	mDisconnectButton->setBackgroundColor(239,44,44);
+	mDisconnectButton->setBackgroundColor(239, 89, 59);
+	mDisconnectButton->setFontColor(0xFFFFFF);
+	mDisconnectButton->setHeight(80);
 
 	mListView = new ListView();
 

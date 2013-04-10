@@ -647,7 +647,7 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 	// Load the app if reloading or return to workspace screen if saving.
 	if (result > 0)
 	{
-		// Save the new project to the vecture and write the data on file
+		// Save the new project to the vector and write the data on file
 		if(mProjectToSave != "")
 		{
 			if( !projectExists)
@@ -670,7 +670,7 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 					NULL, "OK", NULL);
 			mProjectToSave = "";
 
-			MainStackSingleton::getInstance()->show();
+			mReloadScreenController->showConnectedScreen();
 		}
 		else
 		{

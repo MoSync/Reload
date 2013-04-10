@@ -273,6 +273,11 @@ void LoginScreen::createMenuLayout()
 	//Button that loads the last loaded app
 	if(mOS == "iPhone OS")
 	{
+		mFindServersButton = new ImageButton();
+		((ImageButton*)mFindServersButton)->addButtonListener(this);
+		((ImageButton*)mFindServersButton)->setBackgroundImage(RELOAD_BG);
+		mFindServersButton->setFontColor(0x000000);
+
 		mLoadStoredProjectsButton = new ImageButton();
 		((ImageButton*)mLoadStoredProjectsButton)->addButtonListener(this);
 		((ImageButton*)mLoadStoredProjectsButton)->setBackgroundImage(RELOAD_BG);
@@ -280,12 +285,13 @@ void LoginScreen::createMenuLayout()
 	}
 	else
 	{
+		mFindServersButton = new Button();
+		((Button*)mFindServersButton)->addButtonListener(this);
+
 		mLoadStoredProjectsButton = new Button();
 		((Button*)mLoadStoredProjectsButton)->addButtonListener(this);
 	}
 
-	mFindServersButton = new Button();
-	((Button*)mFindServersButton)->addButtonListener(this);
 	mFindServersButton->setText(FIND_SERVERS_BUTTON_TEXT);
 
 	mLoadStoredProjectsButton->setText(LOAD_STORED_PROJECTS_TEXT);
