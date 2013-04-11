@@ -305,7 +305,7 @@ var rpcFunctions = {
 
                             sendToClients({
                                 message: 'ReloadBundle',
-                                url: url,
+                                url: escape(url),
                                 fileSize: stat.size
                             });
 
@@ -906,28 +906,8 @@ var rpcFunctions = {
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
 
-<<<<<<< HEAD
                 // We will send the file size information together with
                 // the command as an extra level of integrity checking.
-=======
-            // We will send the file size information together with
-            // the command as an extra level of integrity checking.
-            var data = fs.readFileSync(actualPath);
-            var url = vars.globals.rootWorkspacePath +
-                vars.globals.fileSeparator +
-                projectName;
-
-            console.log("---------- S e n d i n g   B u n d l e --------");
-            console.log("actualPath: " + actualPath);
-            console.log("url: " + url);
-
-            // Send the new bundle URL to the device clients.
-            sendToClients({
-                message: 'ReloadBundle',
-                url: escape(url),
-                fileSize: data.length
-            }, clientList);
->>>>>>> new-client
 
                 var data = fs.readFileSync(actualPath);
 
@@ -942,9 +922,9 @@ var rpcFunctions = {
                 console.log("url: " + url + "?filesize=" + data.length);
 
                 // Send the new bundle URL to the device clients.
-                sendToAllClients({
+                sendToClients({
                     message: 'ReloadBundle',
-                    url: url,
+                    url: escape(url),
                     fileSize: data.length
                 });
 
