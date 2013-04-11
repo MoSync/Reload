@@ -1123,10 +1123,11 @@ var rpcFunctions = {
         try {
             var exec = require('child_process').exec;
 
-            console.log("stdout: " + stdout);
+
             function puts(error, stdout, stderr) {
-                console.log("ERROR stderr: " + stderr, 0);
-                console.log("ERROR error: " + error, 0);
+                console.log("stdout: " + stdout);
+                console.log("ERROR stderr: " + stderr);
+                console.log("ERROR error: " + error);
             }
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
