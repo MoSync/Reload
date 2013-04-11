@@ -6,7 +6,6 @@ var ncp   = require('../node_modules/ncp');
 var cheerio = require('cheerio');
 var http = require('http');
 var url = require('url');
-
 var zip = require('unzip');
 
 /**
@@ -14,20 +13,6 @@ var zip = require('unzip');
  */
 
 var vars = require('./globals');
-
-/**
- * (internal function) Converts a decimal value to 8byte length Hex
- */
-var toHex8Byte = function (decimal) {
-
-    var finalHex  = decimal.toString(16);
-
-    while (finalHex.length < 8) {
-        finalHex = "0"+finalHex;
-    }
-
-    return finalHex;
-};
 
 /**
  * Send a given message to all connected clients.
@@ -43,8 +28,22 @@ var sendToAllClients = function(jsonMessage) {
     vars.globals.clientList.forEach(function (client) {
 
         try {
+            // Protocol consists of header "RELOADMSG" followed
+            // by data length encoded as 8 hex didgits, e.g.: "000000F0"
+            // Then string data follows with actual JSON message.
+            // Advantage with hex is that we can read fixed numer of bytes
+            // in the read operation.
+            // Convert to hex:
+            // http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
 
-            sendToClient(client, jsonMessage);
+            // Construct message with proper header.
+            var message = JSON.stringify(jsonMessage);
+            var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+
+            // Send the message.
+            // TODO: Perhaps make client object that wraps the base socket and
+            // put a send/write method in there.
+            var result = client.write(fullMessage, "ascii");
         }
         catch (err) {
             console.log("@@@ reload_manager.js: sendToAllClients error: " + err, 0)
@@ -84,7 +83,6 @@ var sendToClient = function(client, jsonMessage) {
 // TODO: Move non-RPC functions out of this object to make the code
 // mode clean and make rpcFunctions contain only the RPC functions.
 var rpcFunctions = {
-
     disconnectDevice: function (address, sendResponse) {
         var response = null;
         var i, len;
@@ -116,7 +114,7 @@ var rpcFunctions = {
      */
     getIpFromSocket: function (sendResponse) {
 
-        var socket = net.createConnection(80, "www.google.com");
+        var socket = net.createConnection(80, "www.example.com");
 
         socket.on('connect', function () {
 
@@ -164,14 +162,18 @@ var rpcFunctions = {
 
         vars.globals.versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
 
-        var versionInfoJSON = JSON.stringify({"version":vars.globals.versionInfo[0],
-                                              "timestamp": vars.globals.versionInfo[1],
-                                              "protocolVersion": vars.globals.versionInfo[2]});
+        var versionInfoJSON = JSON.stringify({
+            "version":          vars.globals.versionInfo[0],
+            "timestamp":        vars.globals.versionInfo[1],
+            "protocolVersion":  vars.globals.versionInfo[2]
+        });
         vars.globals.protocolVersion = vars.globals.versionInfo[2].replace(/^\s+|\s+$/g,'');
 
-        console.log(vars.globals.versionInfo[0].replace(/^\s+|\s+$/g,'') + "  " + 
-                    vars.globals.versionInfo[1].replace(/^\s+|\s+$/g,'') + "  " +
-                    vars.globals.protocolVersion, 0);
+        console.log(
+            vars.globals.versionInfo[0].replace(/^\s+|\s+$/g,'') + "  " + 
+            vars.globals.versionInfo[1].replace(/^\s+|\s+$/g,'') + "  " +
+            vars.globals.protocolVersion, 0
+        );
 
         sendResponse({hasError: false, data: versionInfoJSON});
     },
@@ -223,39 +225,52 @@ var rpcFunctions = {
         if(typeof sendResponse !== 'function') {
             return false;
         }
+        var self = this;
+        var home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'],
+            DS           = vars.globals.fileSeparator,
+            download_dir = home_dir + DS + '.reload' + DS + 'examples',
+            opts         = JSON.parse(opts),
+            file_name    = url.parse(opts.url).pathname.split('/').pop();
 
-        var self, opts, options, file_name, home_dir, download_dir, file, DS, request;
-
-        self = this;
-        home_dir = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
-        DS = vars.globals.fileSeparator;
-        download_dir = home_dir + DS + '.reload' + DS + 'examples';
-        opts = JSON.parse(opts);
-        file_name = url.parse(opts.url).pathname.split('/').pop();
+        // Options object to encapsulate parameters passed between
+        // functions.
+        var o = {
+            home_dir     : home_dir,
+            DS           : DS,
+            download_dir : download_dir,
+            opts         : opts,
+            file_name    : file_name
+        };
 
         // Create download directory if it does not exist.
-        path.exists(download_dir, function(exists) {
-            if (!exists){
+        fs.exists(o.download_dir, function(exists) {
+            if (!exists) {
                 console.log("Download dir does not exist. Create it!");
-                console.log(download_dir);
-                fs.mkdir(home_dir + DS + '.reload', 0755, function(e) {
+                fs.mkdir(o.home_dir + o.DS + '.reload', 0755, function(e) {
                     if (!e) {
-                        fs.mkdir(home_dir + DS + '.reload' + DS + 'examples', 0755, function(e) {
+                        fs.mkdir(o.home_dir + o.DS + '.reload' + o.DS + 'examples', 0755, function(e) {
                             if (!e) {
-                                console.log('Done creating ' + home_dir + DS + '.reload' + DS + 'examples' + DS);
+                                console.log('Done creating ' + o.home_dir + o.DS + '.reload' + o.DS + 'examples' + o.DS);
+                                self.sendExample(o, sendResponse);
                             }
                         });
                     }
                 });
+            } else {
+                self.sendExample(o, sendResponse);
             }
         });
+    },
 
+    // Helper function for reloadExample()
+    sendExample: function (o, sendResponse)  {
         // Stream to file.
-        file = fs.createWriteStream(download_dir + DS + file_name);
-        options = {
-            host:    url.parse(opts.url).hostname,
-            port:    url.parse(opts.url).port,
-            path:    url.parse(opts.url).pathname,
+        var file = fs.createWriteStream(o.download_dir + o.DS + o.file_name);
+        var self = this;
+        var options = {
+            host:    url.parse(o.opts.url).hostname,
+            port:    url.parse(o.opts.url).port,
+            path:    url.parse(o.opts.url).pathname,
             method:  'GET'
         };
 
@@ -269,13 +284,12 @@ var rpcFunctions = {
                 file.end();
 
                 // Unpack
-                self.unzip(download_dir + DS + file_name, download_dir + DS, function(){
+                self.unzip(o.download_dir + o.DS + o.file_name, o.download_dir + o.DS, function(){
                     console.log('Finished extraction. Now Reload!');
-                    self.bundleApp(download_dir + vars.globals.fileSeparator + opts.name, false, function(actualPath) {
+                    self.bundleApp(o.download_dir + o.DS + o.opts.name, false, function(actualPath) {
                         fs.stat(actualPath, function(err, stat){
-                            console.log('datasize');
-                            console.log(stat.size);
-                            var url = download_dir + vars.globals.fileSeparator + opts.name;
+                            console.log('Datasize: ' + stat.size);
+                            var url = o.download_dir + o.DS + o.opts.name;
 
                             console.log("---------- S e n d i n g   B u n d l e --------");
                             console.log("actualPath: " + actualPath);
@@ -299,14 +313,13 @@ var rpcFunctions = {
 
         request.on('error', function(e) {
             console.log('Could not establish connection with '
-                        + opts.url
+                        + o.opts.url
                         + ' : '
                         + e.message);
         });
         request.end();
 
-        console.log('reload_manager::reloadExample()');
-        console.log(opts);
+        console.log(o);
     },
 
     /*
@@ -514,8 +527,6 @@ var rpcFunctions = {
 
                 if(!exist) {
                     console.log("Creating the workspace directory " +
-                                vars.globals.rootWorkspacePath, 0);
-                    fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);
                                 vars.globals.rootWorkspacePath);
                     try {
 
@@ -523,12 +534,10 @@ var rpcFunctions = {
                     } catch (e) {
                         console.log("ERROR in findProjects: " + e, 0);
                         console.log("Reverting to Default Workspace Path", 0);
-                        
                         self.getLatestPath(); // Reverting to Default workspace path
                         self.findProjects(callback,sendResponse);
                         return true;
                     }
-
                 }
 
                 // Now, check for projects in it
@@ -842,9 +851,9 @@ var rpcFunctions = {
             else
             {
                 var command = "rename \"" + vars.globals.rootWorkspacePath +
-                                          vars.globals.fileSeparator +
-                                          oldName +
-                              "\" \"" + newName + "\"";
+                    vars.globals.fileSeparator +
+                    oldName +
+                    "\" \"" + newName + "\"";
             }
             console.log("Command: " + command, 2);
             exec(command, resultCommand);
@@ -886,32 +895,11 @@ var rpcFunctions = {
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
 
-            // We will send the file size information together with
-            // the command as an extra level of integrity checking.
-            var data = fs.readFileSync(actualPath);
-            var url = vars.globals.rootWorkspacePath +
-                vars.globals.fileSeparator +
-                projectName;
-
-            console.log("---------- S e n d i n g   B u n d l e --------");
-            console.log("actualPath: " + actualPath);
-            console.log("url: " + url);
-
-            // Send the new bundle URL to the device clients.
-            sendToAllClients({
-                message: 'ReloadBundle',
-                url: escape(url),
-                fileSize: data.length
-            });
-
-            // Collect Stats Statistics
-            if(vars.globals.statistics === true) {
-                var indexPath = projectPath +
-                                vars.globals.fileSeparator + "LocalFiles" +
-                                vars.globals.fileSeparator + "index.html";
+                // We will send the file size information together with
+                // the command as an extra level of integrity checking.
 
                 var data = fs.readFileSync(actualPath);
-                
+
                 var url = projectPath.replace(
                     "LocalFiles.html",
                     "LocalFiles.bin").replace(
@@ -932,12 +920,12 @@ var rpcFunctions = {
                 // Collect Stats Statistics
                 if(vars.globals.statistics === true) {
                     var indexPath = vars.globals.rootWorkspacePath +
-                                    vars.globals.fileSeparator + projectPath +
-                                    vars.globals.fileSeparator + "LocalFiles" +
-                                    vars.globals.fileSeparator + "index.html";
+                        vars.globals.fileSeparator + projectPath +
+                        vars.globals.fileSeparator + "LocalFiles" +
+                        vars.globals.fileSeparator + "index.html";
 
                     var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
-                    
+
                     $ = cheerio.load(indexFileData,{
                         lowerCaseTags: false
                     });
@@ -949,15 +937,15 @@ var rpcFunctions = {
                         } else {
                             statistics.totalReloadsHTML += 1;
                         }
-                        
+
                         statistics.lastActivityTS = new Date().getTime();
                         vars.methods.saveStats(statistics);
                     });
                 }
 
                 sendResponse({hasError: false, data: ""});
-            } catch (e) {
 
+            } catch (e) {
                 sendResponse({hasError: true, data: "Error in reloadProject: " + e});
             }
         });
@@ -988,11 +976,9 @@ var rpcFunctions = {
         // copy project files to naother directory which will
         // be bundled
         var self = this,
-            pathToLocalFiles =  projectDir +
-                                vars.globals.fileSeparator + "LocalFiles",
-            pathToTempBundle =  projectDir +
-                                vars.globals.fileSeparator + "TempBundle";
-        ncp.limit = 16;
+            pathToLocalFiles = projectDir + vars.globals.fileSeparator + "LocalFiles",
+            pathToTempBundle = projectDir + vars.globals.fileSeparator + "TempBundle";
+            ncp.limit = 16;
 
         console.log("Path to Project  : " + pathToLocalFiles);
         console.log("Path to TempFiles: " + pathToTempBundle);
@@ -1009,7 +995,7 @@ var rpcFunctions = {
 
                     self.debugInjection(projectDir, function (){
 
-                        
+
                             //INJECT WEINRE SCRIPT
                             //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
                             //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
@@ -1040,7 +1026,7 @@ var rpcFunctions = {
                                     console.log("ERROR stderr: " + stderr, 0);
                                     console.log("ERROR error : " + error, 0);
                                 }
-                                
+
                                 callback(projectDir + "/LocalFiles.bin");
 
                                 // Delete TempBundle directory
@@ -1083,12 +1069,12 @@ var rpcFunctions = {
                 function puts(error, stdout, stderr)
                 {
                     console.log("stdout: " + stdout);
-                    
+
                     if (error){
                         console.log("stderr: " + stderr, 0);
                         console.log("error : " + error, 0);
                     }
-                    
+
                     callback(projectDir + "/LocalFiles.bin");
                 }
 
@@ -1566,7 +1552,7 @@ var rpcFunctions = {
                             }
                         });
 
-                        
+
                     }
                     else {
 
@@ -1628,6 +1614,18 @@ var rpcFunctions = {
         return pathTemp;
     },
 
+    /**
+     * (internal function) Converts a decimal value to 8byte length Hex
+     */
+    toHex8Byte: function (decimal) {
+
+        var finalHex  = decimal.toString(16);
+
+        while (finalHex.length < 8)
+            finalHex = "0"+finalHex;
+
+        return finalHex;
+    },
 
     /**
      * (internal function) injects evaluation code for error capturing
