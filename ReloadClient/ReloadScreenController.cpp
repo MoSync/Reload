@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include "View/MainStackScreen.h"
 #include "View/WorkspaceScreen.h"
 #include "View/StoredProjectsScreen.h"
+#include "View/ServersDialog.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -40,7 +41,8 @@ using namespace NativeUI; // WebView widget.
 ReloadScreenController::ReloadScreenController(ReloadClient *client) :
 		mLoginScreen(NULL),
 		mWorkspaceScreen(NULL),
-		mStoredProjectScreen(NULL)
+		mStoredProjectScreen(NULL),
+		mServersDialog(NULL)
 {
 	mReloadClient = client;
 }
@@ -87,8 +89,6 @@ void ReloadScreenController::connectedTo(const char *serverAddress)
 	//Success, show the disconnect controls
 	String conTo = "Connected to: ";
 	conTo += serverAddress;
-
-	pushWorkspaceScreen();
 }
 
 /**
@@ -134,12 +134,29 @@ void ReloadScreenController::pushWorkspaceScreen()
 	if (mWorkspaceScreen == NULL)
 	{
 		int orientation = maScreenGetCurrentOrientation();
-		mWorkspaceScreen = new WorkspaceScreen(mOS, orientation);
+		mWorkspaceScreen = new WorkspaceScreen(mOS, orientation, mReloadClient->getListOfProjects());
 		mWorkspaceScreen->setTitle("Workspace");
 		mWorkspaceScreen->addReloadUIListener(this);
 	}
+	else
+	{
+		mWorkspaceScreen->updateProjectList();
+		MainStackSingleton::getInstance()->show();
+	}
 
-	MainStackSingleton::getInstance()->push(mWorkspaceScreen);
+	if(MainStackSingleton::getInstance()->getStackSize() < 2)
+	{
+		MainStackSingleton::getInstance()->push(mWorkspaceScreen);
+	}
+}
+
+/**
+ * Updates the workspace screen with new data
+ */
+
+void ReloadScreenController::updateWorkspaceScreen()
+{
+	mWorkspaceScreen->updateProjectList();
 }
 
 /**
@@ -152,7 +169,7 @@ void ReloadScreenController::popWorkspaceScreen()
 	if (screenCount >= 2)
 	{
 		MainStackSingleton::getInstance()->pop();
-		mLoginScreen->setTitle("Login screen");
+		//mLoginScreen->setTitle("Login screen");
 	}
 }
 
@@ -163,6 +180,41 @@ void ReloadScreenController::popWorkspaceScreen()
 void ReloadScreenController::connectButtonClicked(String address)
 {
 	mReloadClient->connectToServer(address.c_str());
+}
+
+/**
+ * Called when find servers button is clicked
+ */
+void ReloadScreenController::findServersButtonClicked()
+{
+	if(mServersDialog == NULL)
+	{
+		int orientation = maScreenGetCurrentOrientation();
+		mServersDialog = new ServersDialog(mOS, orientation);
+		mServersDialog->setTitle("Servers");
+		mServersDialog->addReloadUIListener(this);
+	}
+
+	mServersDialog->show();
+	// TODO: make broadcast for server discovery
+	mBroadcastHandler = new BroadcastHandler(mServersDialog);
+	mBroadcastHandler->findServer();
+}
+
+/**
+ * Called when selecting a specific server from available server list
+ * @param ipAddress
+ */
+void ReloadScreenController::connectToSelectedServer(MAUtil::String ipAddress)
+{
+	mServersDialog->hide();
+	mServersDialog->emptyServerList();
+	if (ipAddress != "")
+	{
+		defaultAddress(ipAddress.c_str());
+		mReloadClient->connectToServer(ipAddress.c_str());
+	}
+	delete mBroadcastHandler;
 }
 
 /**
@@ -182,11 +234,14 @@ void ReloadScreenController::loadStoredProjectsButtonClicked()
 	if (mStoredProjectScreen == NULL)
 	{
 		int orientation = maScreenGetCurrentOrientation();
-		mStoredProjectScreen = new StoredProjectsScreen(mOS, orientation);
+		mStoredProjectScreen = new StoredProjectsScreen(mOS, orientation, mReloadClient->getListOfSavedProjects());
 		mStoredProjectScreen->setTitle("Stored Projects");
 		mStoredProjectScreen->addReloadUIListener(this);
 	}
-
+	else
+	{
+		mStoredProjectScreen->updateProjectList();
+	}
 	MainStackSingleton::getInstance()->push(mStoredProjectScreen);
 }
 
@@ -200,11 +255,38 @@ void ReloadScreenController::infoButtonClicked()
 }
 
 /**
- * Called when the refresh workspace projects is cliecked.
+ * Called when save project button is clicked for a particular project
+ * @param projectName The name of the project to be saved
+ */
+void ReloadScreenController::saveProjectClicked(MAUtil::String projectName)
+{
+	mReloadClient->saveProjectFromServer(projectName);
+}
+
+/**
+ * Called when reload project button is clicked for some particular project
+ * @param projectName The name of the project to be reloaded
+ */
+void ReloadScreenController::reloadProjectClicked(MAUtil::String projectName)
+{
+	mReloadClient->reloadProjectFromServer(projectName);
+}
+
+/**
+ * Called when the refresh workspace projects is clicked.
  */
 void ReloadScreenController::refreshWorkspaceProjectsButtonClicked()
 {
-	// TODO: refresh workspace projects logic
+	mReloadClient->getProjectListFromServer();
+}
+
+/**
+ * Called when on offline mode an reloading a saved project
+ * @param projectName The name of the stored project to be reloaded
+ */
+void ReloadScreenController::launchSavedApp(MAUtil::String projectName)
+{
+	mReloadClient->launchSavedApp(projectName);
 }
 
 /**
