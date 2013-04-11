@@ -1,51 +1,51 @@
 var fs = require('fs');
 
 var globals = {
-	versionInfo : [],
+    versionInfo : [],
 
-	rootWorkspacePath : "",
+    rootWorkspacePath : "",
 
-	gRemoteLogData : [],
+    gRemoteLogData : [],
 
-	ip : null,
+    ip : null,
 
-	localPlatform: "",
+    localPlatform: "",
 
-	currentWorkingPath: "",
+    currentWorkingPath: "",
 
-	fileSeparator: "",
+    fileSeparator: "",
 
-	// List of node.js sockets for connected clients.
-	clientList: [],
+    // List of node.js sockets for connected clients.
+    clientList: [],
 
-	deviceInfoListJSON: "[]",
+    deviceInfoListJSON: "[]",
 
-	//Debuging globals
-	adb: {},
+    //Debuging globals
+    adb: {},
 
-	clearData : false,
+    clearData : false,
 
-	logCatData : [],
+    logCatData : [],
 
-	logCatData2: [],
+    logCatData2: [],
 
-	useSecondaryBuffer: false,
+    useSecondaryBuffer: false,
 
-	isDebuggingStarted: false,
+    isDebuggingStarted: false,
 
-	commandMap: {
-		ConnectRequest 	: 1,
-		JSONMessage		: 2
-	},
+    commandMap: {
+        ConnectRequest  : 1,
+        JSONMessage     : 2
+    },
 
-	homeDir: "",
+    homeDir: "",
 
-	statistics: "undefined",
+    statistics: "undefined",
 
-	statsFile : "stats.dat",
+    statsFile : "stats.dat",
 
-	// Server configs for Collection of statistics
-	statsRequestOptions: {
+    // Server configs for Collection of statistics
+    statsRequestOptions: {
         host: 'www.mosync.com',
         port: '80',
         path: '/reload_stats',
@@ -64,67 +64,69 @@ var globals = {
 
     logLevel: 0,
 
-    protocolVersion: ""
+    protocolVersion: "",
+
+    sampleProjectsFeedUrl: "https://api.github.com/orgs/MoSyncSamples/repos"
 };
 
 var methods = {
 
-	loadStats: function (callback) {
-		var self = this;
+    loadStats: function (callback) {
+        var self = this;
 
-		function createNewStatsFile() {
-			var startTS = new Date().getTime();
-				statistics = JSON.parse('{ "serverPlatform" : "' + globals.localPlatform + '",' +
-										'"reloadVersion" : "'+ globals.versionInfo[0].trim() + '",'+
-										'"buildID": "' + globals.versionInfo[1].trim()+'",' +
-										'"serverStartTS": ' + startTS + ',' +
-										'"lastActivityTS": ' + startTS + ',' +
-										'"totalReloadsNative" : 0,' +
-										'"totalReloadsHTML" : 0,' +
-										'"clients" : []}');
-				self.saveStats(statistics);
+        function createNewStatsFile() {
+            var startTS = new Date().getTime();
+                statistics = JSON.parse('{ "serverPlatform" : "' + globals.localPlatform + '",' +
+                                        '"reloadVersion" : "'+ globals.versionInfo[0].trim() + '",'+
+                                        '"buildID": "' + globals.versionInfo[1].trim()+'",' +
+                                        '"serverStartTS": ' + startTS + ',' +
+                                        '"lastActivityTS": ' + startTS + ',' +
+                                        '"totalReloadsNative" : 0,' +
+                                        '"totalReloadsHTML" : 0,' +
+                                        '"clients" : []}');
+                self.saveStats(statistics);
 
-				return statistics;
-		}
+                return statistics;
+        }
 
-		fs.exists( process.cwd() + globals.fileSeparator + globals.statsFile, function (exists){
-			if(exists) {
-				try {
-					statistics = JSON.parse(fs.readFileSync( process.cwd() + 
-											 globals.fileSeparator + globals.statsFile,
-											 "utf8"));
-				} catch (e) {
-					statistics = createNewStatsFile();
-				}
-				
-			} else {
-				statistics = createNewStatsFile();
-			}
-			callback(statistics);
-		});
-	},
+        fs.exists( process.cwd() + globals.fileSeparator + globals.statsFile, function (exists){
+            if(exists) {
+                try {
+                    statistics = JSON.parse(fs.readFileSync( process.cwd() + 
+                                             globals.fileSeparator + globals.statsFile,
+                                             "utf8"));
+                } catch (e) {
+                    statistics = createNewStatsFile();
+                }
+                
+            } else {
+                statistics = createNewStatsFile();
+            }
+            callback(statistics);
+        });
+    },
 
-	saveStats: function (statistics) {
-		var data = JSON.stringify(statistics);
+    saveStats: function (statistics) {
+        var data = JSON.stringify(statistics);
 
-		fs.exists( process.cwd() + globals.fileSeparator + globals.statsFile, function (exists){
+        fs.exists( process.cwd() + globals.fileSeparator + globals.statsFile, function (exists){
 
-			fs.writeFile(process.cwd() + globals.fileSeparator + globals.statsFile,
-						 data, function (err) {} );
-		});
-	},
-	/**
-	 * Loads Configuration settings from the config file if it exists
-	 * into globals variable. If the file does not exists it uses the 
-	 * defaultConfig to set the globals var and create new config file
-	 */
-	loadConfig: function (callback) {
-		fs.exists(process.cwd() + globals.fileSeparator + "config.dat", function (exists){
-			if(exists){
-				fs.readFile(process.cwd() + globals.fileSeparator + "config.dat", 
+            fs.writeFile(process.cwd() + globals.fileSeparator + globals.statsFile,
+                         data, function (err) {} );
+        });
+    },
+    /**
+     * Loads Configuration settings from the config file if it exists
+     * into globals variable. If the file does not exists it uses the 
+     * defaultConfig to set the globals var and create new config file
+     */
+    loadConfig: function (callback) {
+        fs.exists(process.cwd() + globals.fileSeparator + "config.dat", function (exists){
+            if(exists){
+                fs.readFile(process.cwd() + globals.fileSeparator + "config.dat", 
                     "utf8", 
                     function(err, data){
-						console.log(data);
+                        console.log(data);
                         if (err) throw err;
 
                         var config = JSON.parse(data);
@@ -136,29 +138,29 @@ var methods = {
                         //console.log("STATISTICS: " + globals.statistics);
 
                         if(typeof callback === "function") {
-                        	callback();
+                            callback();
                         }
                     });
-			} else {
-				var defaultConfig = {
-					statistics: "undefined"
-				}
+            } else {
+                var defaultConfig = {
+                    statistics: "undefined"
+                }
 
-				fs.writeFile(process.cwd() + globals.fileSeparator + "config.dat", 
-						     JSON.stringify(defaultConfig), function (err) {
+                fs.writeFile(process.cwd() + globals.fileSeparator + "config.dat", 
+                             JSON.stringify(defaultConfig), function (err) {
 
-					if(err) throw err;
+                    if(err) throw err;
     
-					for(var i in defaultConfig) {
-						globals[i] = defaultConfig[i];
-					}
-					//console.log("STATISTICS: " + globals.statistics);
-					if(typeof callback === "function") {
-						callback();
-					}
-			    });
-			}
-		});
+                    for(var i in defaultConfig) {
+                        globals[i] = defaultConfig[i];
+                    }
+                    //console.log("STATISTICS: " + globals.statistics);
+                    if(typeof callback === "function") {
+                        callback();
+                    }
+                });
+            }
+        });
         
     },
 
@@ -167,11 +169,11 @@ var methods = {
             command = "";
         function puts(error, stdout, stderr) {
 
-        	if (error) {
-        		console.log("stdout: " + stdout, 0);
-	            console.log("stderr: " + stderr, 0);
-	            console.log("error: " + error, 0);
-        	}
+            if (error) {
+                console.log("stdout: " + stdout, 0);
+                console.log("stderr: " + stderr, 0);
+                console.log("error: " + error, 0);
+            }
         }
 
         if((globals.localPlatform.indexOf("darwin") >= 0)) {

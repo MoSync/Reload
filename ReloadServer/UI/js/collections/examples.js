@@ -25,7 +25,7 @@ define([
             };
 
             options.success = function (resp) {
-                _.map(resp.result.feed, function (p) {
+                _.map(resp.result, function (p) {
                     self.push(new ExampleModel(p));
                 });
             };

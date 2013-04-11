@@ -7,6 +7,8 @@ var cheerio = require('cheerio');
 var http = require('http');
 var url = require('url');
 var zip = require('unzip');
+var request = require('request');
+
 
 /**
  * The functions that are available for remote calling
@@ -182,49 +184,39 @@ var rpcFunctions = {
      * (RPC): Read a remote list of example projects.
      */
     getExampleList: function (sendResponse) {
-        //check if parameter passing was correct
         if(typeof sendResponse !== 'function') {
             return false;
         }
 
-        var options = {
-            host: 'localhost',
-            port: '8283',
-            path: '/feed/feed.json',
-            method: 'GET'
-        }
+        var feed = [];
 
-        options.headers = {
-            'Content-Type': 'text/pain'
-        };
+        request(vars.globals.sampleProjectsFeedUrl, function(error, response, body){
+            if (!error && response.statusCode == 200) {
+                var res = JSON.parse(body);
+                res.forEach(function(p){
+                    console.log(p);
+                    var archive_url = p.html_url+'/archive/master.zip';
+                    feed.push({
+                        "url": archive_url,
+                        "name": p.name,
+                        "description": p.description,
+                        "screenshot": "screenshot"
+                    });
+                });
 
-        // Set up the request
-        var request = http.request(options, function(res) {
-            var output = '';
-            res.setEncoding('utf8');
-
-            res.on('data', function (chunk) {
-                output += chunk;
-            });
-
-            res.on('end', function() {
-                var obj = JSON.parse(output);
-                console.log(obj);
-                sendResponse({hasError: false, data: obj});
-            });
+                sendResponse({
+                    hasError: false,
+                    data: feed
+                });
+            }
         });
-
-        request.on('error', function(e) {
-            console.log('Could not establish connection with Localhost: ' + e.message);
-        });
-        request.end();
-        sendResponse({hasError: false, data: obj});
     },
 
     reloadExample: function (opts, sendResponse) {
         if(typeof sendResponse !== 'function') {
             return false;
         }
+
         var self = this;
         var home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'],
             DS           = vars.globals.fileSeparator,
@@ -264,62 +256,39 @@ var rpcFunctions = {
 
     // Helper function for reloadExample()
     sendExample: function (o, sendResponse)  {
+        var self = this;
         // Stream to file.
         var file = fs.createWriteStream(o.download_dir + o.DS + o.file_name);
-        var self = this;
-        var options = {
-            host:    url.parse(o.opts.url).hostname,
-            port:    url.parse(o.opts.url).port,
-            path:    url.parse(o.opts.url).pathname,
-            method:  'GET'
-        };
+        file.on('close', function(){
+            // Unpack
+            self.unzip(o.download_dir + o.DS + o.file_name, o.download_dir + o.DS, function(){
+                var url = o.download_dir + o.DS + o.opts.name + '-master'; // Github adds prefix to the folder
+                self.bundleApp(url, false, function(actualPath) {
+                    fs.stat(actualPath, function(err, stat){
+                        console.log('Datasize: ' + stat.size);
 
-        request = http.request(options, function (res) {
-            res.on('data', function(chunk){
-                file.write(chunk);
-            });
+                        console.log("---------- S e n d i n g   B u n d l e --------");
+                        console.log("actualPath: " + actualPath);
+                        console.log("url: " + url);
 
-            res.on('end', function(){
-                console.log(file);
-                file.end();
+                        sendToAllClients({
+                            message: 'ReloadBundle',
+                            url: url,
+                            fileSize: stat.size
+                        });
 
-                // Unpack
-                self.unzip(o.download_dir + o.DS + o.file_name, o.download_dir + o.DS, function(){
-                    console.log('Finished extraction. Now Reload!');
-                    self.bundleApp(o.download_dir + o.DS + o.opts.name, false, function(actualPath) {
-                        fs.stat(actualPath, function(err, stat){
-                            console.log('Datasize: ' + stat.size);
-                            var url = o.download_dir + o.DS + o.opts.name;
-
-                            console.log("---------- S e n d i n g   B u n d l e --------");
-                            console.log("actualPath: " + actualPath);
-                            console.log("url: " + url);
-
-                            sendToAllClients({
-                                message: 'ReloadBundle',
-                                url: url,
-                                fileSize: stat.size
-                            });
-
-                            sendResponse({
-                                success: true,
-                                error: null
-                            });
+                        sendResponse({
+                            success: true,
+                            error: null
                         });
                     });
                 });
             });
         });
-
-        request.on('error', function(e) {
-            console.log('Could not establish connection with '
-                        + o.opts.url
-                        + ' : '
-                        + e.message);
+        file.on('error', function(e){
+            console.log('Error: ' + e);
         });
-        request.end();
-
-        console.log(o);
+        request(o.opts.url).pipe(file);
     },
 
     /*
@@ -339,56 +308,31 @@ var rpcFunctions = {
         DS = vars.globals.fileSeparator;
         download_dir = home_dir + DS + '.reload' + DS + 'examples';
         opts = JSON.parse(opts);
+        file_name    = url.parse(opts.url).pathname.split('/').pop();
 
-        // Download file if not already done so.
-        var filePath = download_dir + DS + opts.name + '.zip';
-        console.log(filePath);
-        fs.exists(filePath, function(exists){
-            if (!exists) {
-                self.download(opts.url, vars.globals.rootWorkspacePath, function(res) {
-                    console.log(res.file);
+        var file = fs.createWriteStream(download_dir + DS + file_name);
+        file.on('close', function(){
+            self.unzip(download_dir + DS + file_name, vars.globals.rootWorkspacePath, function(resp){
+                console.log('Unzip successful');
 
-                    // Unpack.
-                    self.unzip(res.file, vars.globals.rootWorkspacePath, function(resp){
-                        console.log('unzip successful');
-                        console.log(resp);
-
-                        // Remove downloaded zip.
-                        fs.unlink(res.file, function(){
-                            console.log(res.file + ' removed');
-                            // Notify callee.
-                            sendResponse({
-                                success: true,
-                                error: null
-                            });
-                        });
+                // Remove downloaded zip.
+                fs.unlink(download_dir + DS + file_name, function(){
+                    console.log(download_dir + DS + file_name + ' removed');
+                    // Notify callee.
+                    sendResponse({
+                        success: true,
+                        error: null
                     });
                 });
-            } else {
-                // If already downloaded, copy to currect workspace and
-                // unzip there. Remove zip file when done.
-                self.copy(filePath, vars.globals.rootWorkspacePath+opts.name+'.zip', function(err){
-
-                    var src = vars.globals.rootWorkspacePath + opts.name + '.zip';
-                    self.unzip(src, vars.globals.rootWorkspacePath, function(err){
-
-                        // Remove copied file.
-                        fs.unlink(src, function(){
-                            console.log(src + ' removed');
-                            // Notify callee.
-                            sendResponse({
-                                success: true,
-                                error: null
-                            });
-                        });
-                    });
-                });
-            }
+            });
         });
+        file.on('error', function(e){
+            console.log('Error: ' + e);
+        });
+        request(opts.url).pipe(file);
 
         console.log('reload_manager.js::copyExample():260 ' + vars.globals.rootWorkspacePath);
         console.log(opts);
-
     },
     /*
      * Copies a file.
