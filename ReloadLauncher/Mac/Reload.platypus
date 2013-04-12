@@ -22,6 +22,7 @@
 		<string>../../ReloadServer/express</string>
 		<string>../../ReloadServer/lib</string>
 		<string>../../ReloadServer/node_modules</string>
+		<string>../../ReloadServer/cli</string>
 		<string>../../Licenses</string>
 	</array>
 	<key>Creator</key>

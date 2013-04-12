@@ -25,7 +25,8 @@ define([
                       'render',
                       'reload',
                       'doReload',
-                      'doDebug');
+                      'doDebug'
+                     );
 
             this.model = new SidebarReloadButtonModel();
 

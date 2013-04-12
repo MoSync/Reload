@@ -838,35 +838,11 @@ var rpcFunctions = {
         var projectPath = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectName;
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
-
-                // We will send the file size information together with
-                // the command as an extra level of integrity checking.
-
-                var data = fs.readFileSync(actualPath);
-
-                var url = projectPath.replace(
-                    "LocalFiles.html",
-                    "LocalFiles.bin").replace(
-                        ' ',
-                        '%20');
-
-                console.log("---------- S e n d i n g   B u n d l e --------");
-                console.log("actualPath: " + actualPath);
-                console.log("url: " + url + "?filesize=" + data.length);
-
-                // Send the new bundle URL to the device clients.
-                sendToAllClients({
-                    message: 'ReloadBundle',
-                    url: url,
-                    fileSize: data.length
-                });
-
                 // Collect Stats Statistics
                 if(vars.globals.statistics === true) {
-                    var indexPath = vars.globals.rootWorkspacePath +
-                        vars.globals.fileSeparator + projectPath +
-                        vars.globals.fileSeparator + "LocalFiles" +
-                        vars.globals.fileSeparator + "index.html";
+                    var indexPath = vars.globals.fileSeparator + projectPath +
+                                    vars.globals.fileSeparator + "LocalFiles" +
+                                    vars.globals.fileSeparator + "index.html";
 
                     var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
 
@@ -886,6 +862,26 @@ var rpcFunctions = {
                         vars.methods.saveStats(statistics);
                     });
                 }
+
+
+                // We will send the file size information together with
+                // the command as an extra level of integrity checking.
+                var data = fs.readFileSync(actualPath);
+                var url = vars.globals.rootWorkspacePath +
+                    vars.globals.fileSeparator +
+                    projectName;
+
+                console.log("---------- S e n d i n g   B u n d l e --------");
+                console.log("actualPath: " + actualPath);
+                console.log("url: " + url + "?filesize=" + data.length);
+
+                // Send the new bundle URL to the device clients.
+                sendToAllClients({
+                    message: 'ReloadBundle',
+                    url: url,
+                    fileSize: data.length
+                });
+
 
                 sendResponse({hasError: false, data: ""});
 
