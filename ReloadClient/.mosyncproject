@@ -8,7 +8,7 @@
 </filter>
 </criteria>
 <properties>
-<property key="android:version.number" value="4"/>
+<property key="android:version.number" value="7"/>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib"/>
@@ -17,7 +17,7 @@
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="Accelerometer Bluetooth Calendar Camera Compass Contacts File\ Storage Gyroscope Internet\ Access Location Location/Coarse Location/Fine Orientation Power\ Management Proximity Push\ Notifications SMS Vibration"/>
 <property key="build.prefs:app.vendor/Release" value="MoSync SDK"/>
-<property key="build.prefs:app.version/Release" value="1.0.4"/>
+<property key="build.prefs:app.version/Release" value="1.0.1"/>
 <property key="build.prefs:extra.link.sw/Debug" value="-master-dump"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -25,11 +25,11 @@
 <property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:memory.data/Debug" value="16384"/>
-<property key="build.prefs:memory.data/Release" value="8192"/>
-<property key="build.prefs:memory.heap/Debug" value="14000"/>
-<property key="build.prefs:memory.heap/Release" value="7000"/>
-<property key="build.prefs:memory.stack/Debug" value="1024"/>
-<property key="build.prefs:memory.stack/Release" value="512"/>
+<property key="build.prefs:memory.data/Release" value="16384"/>
+<property key="build.prefs:memory.heap/Debug" value="200"/>
+<property key="build.prefs:memory.heap/Release" value="14000"/>
+<property key="build.prefs:memory.stack/Debug" value="14000"/>
+<property key="build.prefs:memory.stack/Release" value="200"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="com.mobilesorcery.sdk.html5.support" value="true"/>
 <property key="dependency.strategy" value="0"/>
