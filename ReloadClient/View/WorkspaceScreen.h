@@ -32,6 +32,7 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 #include "ReloadUIListener.h"
+#include "../dataTypes.h"
 
 using namespace NativeUI;
 using namespace MAUtil;
@@ -48,7 +49,8 @@ public:
 	 * @param os The current os.
 	 * @param orientation The current device orientation.
 	 */
-	WorkspaceScreen(MAUtil::String os, int orientation);
+	WorkspaceScreen(MAUtil::String os, int orientation,
+					MAUtil::Vector <reloadProject> * project);
 
 	/**
 	 * Destructor.
@@ -66,6 +68,13 @@ public:
 	 * @param listener The listener that receives reload UI events.
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
+
+	/**
+	 * If there is no list populates the List View Widget with the project data
+	 * from mProjects vector. Else destroys and deallocates previous list items
+	 * and creates new ones.
+	 */
+	void updateProjectList();
 
 private:
 	/**
@@ -162,6 +171,31 @@ private:
 	 * The reload button screen width ratio.
 	 */
 	float mReloadButtonWidthRatio;
+
+	/**
+	 * Pointer to the vector that holds all the projects data
+	 */
+	MAUtil::Vector <struct reloadProject> *mProjects;
+
+	/**
+	 * Holds the List View index of the currently selected project
+	 */
+	int mSelectedProject;
+
+	/**
+	 * The save button widget
+	 */
+	Button* mSaveButton;
+
+	/**
+	 * The reload Button widget
+	 */
+	Button* mReloadButton;
+
+	/**
+	 * Holds the project name of the currently selected project
+	 */
+	MAUtil::String mSelectedProjectName;
 };
 
 #endif /* WORKSPACESCREEN_H_ */

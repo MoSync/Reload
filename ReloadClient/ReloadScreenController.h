@@ -29,11 +29,14 @@ MA 02110-1301, USA.
 #include "View/LoginScreen.h"
 #include "View/ReloadUIListener.h"
 
+#include "BroadcastHandler.h"
+
 class ReloadClient;
 class ReloadTabScreen;
 class ConnectionScreen;
 class WorkspaceScreen;
 class StoredProjectsScreen;
+class ServersDialog;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -95,6 +98,17 @@ public:
 	virtual void connectButtonClicked(String address);
 
 	/**
+	 * Called when find servers button is clicked
+	 */
+	virtual void findServersButtonClicked();
+
+	/**
+	 * Called when selecting a specific server from available server list
+	 * @param ipAddress
+	 */
+	virtual void connectToSelectedServer(MAUtil::String ipAddress);
+
+	/**
 	 * Called when the disconnect button is clicked.
 	 */
 	virtual void disconnectButtonClicked();
@@ -110,9 +124,27 @@ public:
 	virtual void infoButtonClicked();
 
 	/**
+	 * Called when save project button is clicked for a particular project
+	 * @param projectName The name of the project to be saved
+	 */
+	virtual void saveProjectClicked(MAUtil::String projectName);
+
+	/**
+	 * Called when reload project button is clicked for some particular project
+	 * @param projectName The name of the project to be reloaded
+	 */
+	virtual void reloadProjectClicked(MAUtil::String projectName);
+
+	/**
 	 * Called when the refresh workspace projects is cliecked.
 	 */
 	virtual void refreshWorkspaceProjectsButtonClicked();
+
+	/**
+	 * Called when on offline mode an reloading a saved project
+	 * @param projectName The name of the stored project to be reloaded
+	 */
+	virtual void launchSavedApp(MAUtil::String projectName);
 
 	/**
 	 * If the stack screen has only one screen, the application should exit.
@@ -120,7 +152,6 @@ public:
 	 */
 	bool shouldExit();
 
-private:
 	/**
 	 * Pushes the workspace screen into the main stack.
 	 */
@@ -130,6 +161,11 @@ private:
 	 * Pops the workspace screen from the stack.
 	 */
 	void popWorkspaceScreen();
+
+	/**
+	 * Updates the workspace screen with new data
+	 */
+	void updateWorkspaceScreen();
 
 private:
 	/**
@@ -156,6 +192,13 @@ private:
 	 * The screen containing projects saved on the device.
 	 */
 	StoredProjectsScreen *mStoredProjectScreen;
+
+	/**
+	 * The modal dialog containing available servers
+	 */
+	ServersDialog *mServersDialog;
+
+	BroadcastHandler *mBroadcastHandler;
 };
 
 
