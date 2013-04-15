@@ -39,6 +39,17 @@ public:
 	virtual void connectButtonClicked(MAUtil::String address) = 0;
 
 	/**
+	 * Called when the find servers button is clicked.
+	 */
+	virtual void findServersButtonClicked() = 0;
+
+	/**
+	 * Called when selecting a specific server from available server list
+	 * @param ipAddress
+	 */
+	virtual void connectToSelectedServer(MAUtil::String ipAddress) = 0;
+
+	/**
 	 * Called when the disconnect button is clicked.
 	 */
 	virtual void disconnectButtonClicked() = 0;
@@ -52,6 +63,24 @@ public:
 	 * Called when the reload last app button is clicked.
 	 */
 	virtual void loadStoredProjectsButtonClicked() = 0;
+
+	/**
+	 * Called when save project button is clicked for some particular project
+	 * @param projectName
+	 */
+	virtual void saveProjectClicked(MAUtil::String projectName) = 0;
+
+	/**
+	 * Called when reload project button is clicked for some particular project
+	 * @param projectName
+	 */
+	virtual void reloadProjectClicked(MAUtil::String projectName) = 0;
+
+	/**
+	 * Called when on offline mode and selecting a project to load
+	 * @param projectName
+	 */
+	virtual void launchSavedApp(MAUtil::String  projectName) = 0;
 
 	/**
 	 * Called when the info button is clicked.

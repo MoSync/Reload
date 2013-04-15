@@ -37,11 +37,13 @@ MA 02110-1301, USA.
 #include <MAFS/File.h> // Library for file system bundles
 #include <yajl/YAJLDom.h>
 
+
 #include "ReloadScreenController.h"
 #include "View/LoadingScreen.h"
 #include "SocketHandler.h"
 #include "DownloadHandler.h"
 #include "MAHeaders.h"
+#include "dataTypes.h"
 
 // Forward declarations.
 class ReloadScreenController;
@@ -157,7 +159,7 @@ public:
      * @param disconnectData The message that the server sent
      * 						 when disconnecting the client
      */
-    void ReloadClient::showDisconnectionMessage (MAUtil::String disconnectData);
+    void showDisconnectionMessage (MAUtil::String disconnectData);
 
     // ========== Server message handling  ==========
 
@@ -192,7 +194,7 @@ public:
     /**
      * Loads the HTML files that were extracted last time.
      */
-    void launchSavedApp();
+    void launchSavedApp(MAUtil::String projectName);
 
     /**
      * Resets the client (destroys widgets and stops sensors)
@@ -203,9 +205,24 @@ public:
     /**
      * Empty the folder where apps are stored.
      */
-	void clearAppsFolder();
+	void clearAppsFolder(MAUtil::String appFolder);
 
 	// ========== Send info to server  ==========
+	/**
+	 * Send a message requesting project list
+	 */
+	void getProjectListFromServer();
+
+	/**
+	 * Send a message requesting a project so it can be saved
+	 * @param projectName The name of the project to be saved
+	 */
+	void saveProjectFromServer(MAUtil::String projectName);
+
+	/**
+	 * Send a message requesting a project to be reloaded
+	 */
+	void reloadProjectFromServer(MAUtil::String projectName);
 
     /**
      * Sends information about the device to the server.
@@ -232,6 +249,18 @@ public:
      * @param errorCode The error code that was returned.
      */
     void showConnectionErrorMessage(int errorCode);
+
+    /**
+     * Getter returns the vector of projects on server
+     * @return MAUtil::Vector <reloadProject>
+     */
+    MAUtil::Vector <reloadProject> * getListOfProjects();
+
+    /**
+	 * Getter returns the vector of projects stored on the device
+	 * @return MAUtil::Vector <reloadProject>
+	 */
+    MAUtil::Vector <reloadProject> * getListOfSavedProjects();
 
 private:
 	/**
@@ -275,6 +304,11 @@ private:
 	MAUtil::String mAppsFolder;
 
 	/**
+	 * The general folder where saved apps reside.
+	 */
+	MAUtil::String mSavedAppsFolder;
+
+	/**
 	 * The relative path to the downloaded app folder.
 	 */
 	MAUtil::String mAppPath;
@@ -298,6 +332,23 @@ private:
 	 * Clients Protocol Version
 	 */
 	char* mProtocolVersion;
+
+	/**
+	 * Vector of type reloadProject that stores data about the projects
+	 * that are on the server
+	 */
+	MAUtil::Vector <struct reloadProject> mProjects;
+
+	/**
+	 * Vector that stores the saved projects that are located on the
+	 * device for offline use
+	 */
+	MAUtil::Vector <struct reloadProject> mSavedProjects;
+
+	/**
+	 * If it set then the app will be saved. I not normal reload functionality.
+	 */
+	MAUtil::String mProjectToSave;
 };
 
 #endif
