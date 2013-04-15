@@ -56,6 +56,8 @@ ReloadScreenController::~ReloadScreenController()
 	delete mLoginScreen;
 	delete mWorkspaceScreen;
 	delete mStoredProjectScreen;
+	delete mServersDialog;
+	delete mBroadcastHandler;
 
 	delete MainStackSingleton::getInstance();
 }
@@ -169,7 +171,6 @@ void ReloadScreenController::popWorkspaceScreen()
 	if (screenCount >= 2)
 	{
 		MainStackSingleton::getInstance()->pop();
-		//mLoginScreen->setTitle("Login screen");
 	}
 }
 

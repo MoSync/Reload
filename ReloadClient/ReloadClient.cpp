@@ -667,7 +667,7 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 								mFileUtil->getLocalPath() + "SavedAppsData.txt",
 								stringToWrite);
 			}
-			maAlert("Saving Project", ("Project " + mProjectToSave + " was succesfully\nsaved on disc.").c_str(),
+			maAlert("Saving Project", ("Project " + mProjectToSave + " was succesfully saved").c_str(),
 					NULL, "OK", NULL);
 			mProjectToSave = "";
 
