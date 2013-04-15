@@ -279,7 +279,7 @@ var rpcFunctions = {
                         console.log("actualPath: " + actualPath);
                         console.log("url: " + url);
 
-                        sendToAllClients({
+                        sendToClients({
                             message: 'ReloadBundle',
                             url: url,
                             fileSize: stat.size
@@ -886,7 +886,7 @@ var rpcFunctions = {
                 console.log("url: " + url + "?filesize=" + data.length);
 
                 // Send the new bundle URL to the device clients.
-                sendToAllClients({
+                sendToClients({
                     message: 'ReloadBundle',
                     url: url,
                     fileSize: data.length
