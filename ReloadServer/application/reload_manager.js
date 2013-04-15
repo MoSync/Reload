@@ -17,17 +17,25 @@ var request = require('request');
 var vars = require('./globals');
 
 /**
- * Send a given message to all connected clients.
+ * Send a given message to an optional client list.
  * @param jsonMessage Message in JSON format.
+ * @param clientsToSend optional if not provided send message to all
+ *        connected clients
  * The message must contain a field named 'message'
  * with the message name.
  */
-var sendToAllClients = function(jsonMessage) {
+var sendToClients = function(jsonMessage, clientsToSend) {
 
     // TODO: What about a client list object that has a send
     // method in it and other methods for managing the client list.
     // And a client object instaed of using bare socket objects.
-    vars.globals.clientList.forEach(function (client) {
+    if (clientsToSend == undefined) {
+        var cList = vars.globals.clientList;
+    } else {
+        var cList = clientsToSend;
+    }
+    
+    cList.forEach(function (client) {
 
         try {
             // Protocol consists of header "RELOADMSG" followed
@@ -48,7 +56,7 @@ var sendToAllClients = function(jsonMessage) {
             var result = client.write(fullMessage, "ascii");
         }
         catch (err) {
-            console.log("@@@ reload_manager.js: sendToAllClients error: " + err, 0)
+            console.log("@@@ reload_manager.js: sendToClients error: " + err, 0)
 
             // Remove this client from the list since we have problems with it.
             var index = vars.globals.clientList.indexOf(client);
@@ -331,8 +339,7 @@ var rpcFunctions = {
         });
         request(opts.url).pipe(file);
 
-        console.log('reload_manager.js::copyExample():260 ' + vars.globals.rootWorkspacePath);
-        console.log(opts);
+        console.log('reload_manager.js::copyExample() ' + vars.globals.rootWorkspacePath);
     },
     /*
      * Copies a file.
@@ -430,13 +437,14 @@ var rpcFunctions = {
     },
 
     /**
-     * (RPC): Returns the Project list with attributes: url, name, path
+     * (RPC): Returns the Project list with 
+     * attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
         var DS = vars.globals.fileSeparator;
 
         //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
+        if (typeof sendResponse !== 'function') return false;
 
         this.findProjects( function (projects) {
 
@@ -454,6 +462,8 @@ var rpcFunctions = {
                 projectListJSON.push(projectInfo);
 
             });
+
+            vars.globals.projectListJSON = projectListJSON;
 
             sendResponse({hasError: false, data: projectListJSON});
         },sendResponse);
@@ -814,7 +824,7 @@ var rpcFunctions = {
      *        - Bundles the project folder
      *        - Request the mobile device to "Reload" the project.
      */
-    reloadProject: function (projectName, debug, sendResponse) {
+    reloadProject: function (projectName, debug, sendResponse, clientList) {
 
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') return false;
@@ -901,7 +911,7 @@ var rpcFunctions = {
         //console.log("@@@ Callstack:");
         //console.log(new Error("CallStack").stack);
         sendResponse({hasError: false, data: "ok"});
-        sendToAllClients({
+        sendToClients({
             message: 'EvalJS',
             script: script
         });
@@ -1052,10 +1062,11 @@ var rpcFunctions = {
         try {
             var exec = require('child_process').exec;
 
-            console.log("stdout: " + stdout);
+
             function puts(error, stdout, stderr) {
-                console.log("ERROR stderr: " + stderr, 0);
-                console.log("ERROR error: " + error, 0);
+                console.log("stdout: " + stdout);
+                console.log("ERROR stderr: " + stderr);
+                console.log("ERROR error: " + error);
             }
 
             if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
@@ -1670,3 +1681,6 @@ vars.methods.loadConfig(function () {
 });
 
 rpc.exposeModule('manager', rpcFunctions);
+
+exports.send = sendToClients;
+exports.rpc = rpcFunctions;

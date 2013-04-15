@@ -32,6 +32,8 @@ MA 02110-1301, USA.
 #include "ReloadClient.h"
 #include "ReloadNativeUIMessageHandler.h"
 #include "Log.h"
+#include "View/MainStackSingleton.h"
+#include "View/MainStackScreen.h"
 
 #define SERVER_TCP_PORT "7000"
 #define SERVER_HTTP_PORT "8283"
@@ -44,6 +46,7 @@ using namespace Wormhole;
 // ========== Error messages ==========
 
 #define RELOAD_ERROR_COULD_NOT_CONNECT_TO_SERVER 0
+
 
 static String sErrorMessages[] =
 {
@@ -229,8 +232,10 @@ void ReloadClient::initializeVariables()
 {
 	mHasPage = false;
 	mAppsFolder = "apps/";
+	mSavedAppsFolder = "saved/";
 	mRunningApp = false;
 	mProtocolVersion = 0;
+	mProjectToSave = "";
 
 	// Get the OS we are on.
 	char buffer[64];
@@ -253,15 +258,45 @@ void ReloadClient::initializeFiles()
 	}
 	maFileClose(appDirHandle);
 
-	// Get the path of the last downloaded app.
-	bool success = mFileUtil->readTextFromFile(
-		mFileUtil->getLocalPath() + "LastAppDir.txt",
-		mAppPath);
-	if (!success)
+	// Create folder where saved apps are stored
+	appDirHandle = maFileOpen(
+		(mFileUtil->getLocalPath() + mSavedAppsFolder).c_str(),
+		MA_ACCESS_READ_WRITE);
+	if (!maFileExists(appDirHandle))
 	{
-		mAppPath = "";
+		maFileCreate(appDirHandle);
+	}
+	maFileClose(appDirHandle);
+
+	// load stored project data
+	MAUtil::String storedProjectData;
+	bool success = mFileUtil->readTextFromFile(
+			mFileUtil->getLocalPath() + "SavedAppsData.txt",
+			storedProjectData);
+
+	// parse the data read and populate the mSavedProjects Vector
+	if (success && storedProjectData.length() > 0)
+	{
+		struct reloadProject node;
+		char *prPtr = NULL;
+
+		char * spa = new char[storedProjectData.length()+1];
+		memcpy(spa, storedProjectData.c_str(),storedProjectData.length()+1);
+
+		prPtr = strtok( spa, "\n");
+
+		while( prPtr != NULL)
+		{
+			node.name = prPtr;
+			node.path = strtok(NULL, "\n");
+			this->mSavedProjects.add(node);
+
+			prPtr = strtok(NULL, "\n");
+		}
 	}
 
+	// Reading information resource file and populate mInfo
+	// and mProtocolVersion
 	// TODO: What is this? Some resource string?
 	// TODO: Use SysLoadStringResource(MAHandle data)
 	int size = maGetDataSize(INFO_TEXT);
@@ -283,7 +318,7 @@ void ReloadClient::initializeFiles()
 			if(prv != NULL)
 			{
 				stringsRead++;
-				LOG("@@@RELOAD: %s", prv);
+				//LOG("@@@RELOAD: %s", prv);
 			}
 			if(stringsRead == 3)
 			{
@@ -364,6 +399,7 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 	}
 	else
 	{
+
 		if (MAK_BACK == keyCode)
 		{
 			if (mReloadScreenController->shouldExit())
@@ -477,6 +513,8 @@ void ReloadClient::socketHandlerConnected(int result)
 	{
 		LOG("@@@ RELOAD connected to: %s", mServerAddress.c_str());
 
+		getProjectListFromServer();
+
 		// Tell UI we are connected.
 		mReloadScreenController->connectedTo(mServerAddress.c_str());
 
@@ -527,8 +565,6 @@ void ReloadClient::socketHandlerMessageReceived(const char* message)
 {
 	if (NULL != message)
 	{
-		LOG("@@@ RELOAD: socketHandlerMessageReceived JSON data: %s", message);
-
 		handleJSONMessage(message);
 	}
 	else
@@ -567,31 +603,82 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 		return;
 	}
 
-	// Delete old files.
-	clearAppsFolder();
+	// Check if the project exists
+	bool projectExists = false;
+	if(mProjectToSave != "")
+	{
+		for(MAUtil::Vector <reloadProject>::iterator i = mSavedProjects.begin(); i != mSavedProjects.end(); i++)
+		{
+			if(i->name == mProjectToSave)
+			{
+				projectExists = true;
+				lprintfln("@@@ RELOAD: The project %s already exists", mProjectToSave.c_str());
+				break;
+			}
+		}
+	}
 
-	// Set the new app path.
-	char buf[1024];
-	sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
-	mAppPath = buf;
+	// Delete old files if necessary.
+	if(mProjectToSave == "" || projectExists )
+	{
+		clearAppsFolder(mProjectToSave);
+	}
+
+	// Set the project Path depending on weather the
+	// we are reloading or saving
+	if (mProjectToSave == "")
+	{
+		char buf[1024];
+		sprintf(buf, (mAppsFolder + "%d/").c_str(), maGetMilliSecondCount());
+		mAppPath = buf;
+	}
+	else
+	{
+		mAppPath = mSavedAppsFolder + "RLDPRJ" + mProjectToSave +"/";
+	}
+
+	String fullPath = mFileUtil->getLocalPath() + mAppPath;
 
 	// Extract files.
-	String fullPath = mFileUtil->getLocalPath() + mAppPath;
 	setCurrentFileSystem(data, 0);
 	int result = MAFS_extractCurrentFileSystem(fullPath.c_str());
 	freeCurrentFileSystem();
 	maDestroyPlaceholder(data);
 
-	// Load the app.
+	// Load the app if reloading or return to workspace screen if saving.
 	if (result > 0)
 	{
-		// Save location of last loaded app.
-		mFileUtil->writeTextToFile(
-			mFileUtil->getLocalPath() + "LastAppDir.txt",
-			mAppPath);
+		// Save the new project to the vector and write the data on file
+		if(mProjectToSave != "")
+		{
+			if( !projectExists)
+			{
+				struct reloadProject projectItem;
+				projectItem.name = mProjectToSave;
+				projectItem.path = mFileUtil->getLocalPath() + mSavedAppsFolder + "RLDPRJ" + mProjectToSave +"/";
+				mSavedProjects.add(projectItem);
 
-		// Bundle was extracted, launch the new app files.
-		launchSavedApp();
+				MAUtil::String stringToWrite = "";
+				for(MAUtil::Vector <reloadProject>::iterator i = mSavedProjects.begin(); i != mSavedProjects.end(); i++)
+				{
+					stringToWrite += i->name + "\n" + i->path + "\n";
+				}
+				mFileUtil->writeTextToFile(
+								mFileUtil->getLocalPath() + "SavedAppsData.txt",
+								stringToWrite);
+			}
+			maAlert("Saving Project", ("Project " + mProjectToSave + " was succesfully saved").c_str(),
+					NULL, "OK", NULL);
+			mProjectToSave = "";
+
+			mReloadScreenController->showConnectedScreen();
+		}
+		else
+		{
+			// We are in reload mode. Just start the saved app
+			// without providing project Name
+			launchSavedApp("");
+		}
 	}
 	else
 	{
@@ -714,6 +801,28 @@ void ReloadClient::handleJSONMessage(const String& json)
 			this->showDisconnectionMessage(disconnectData);
 		}
 	}
+	else if (message == "projectList")
+	{
+		mProjects.clear();
+
+		YAJLDom::Value *data = jsonRoot->getValueForKey("data");
+
+		int totalProjects = (int)data->getValueForKey("projectsCount")->toDouble();
+
+		struct reloadProject tmp;
+
+		YAJLDom::Value *projectArray = data->getValueForKey("projects");
+
+		for(int i = 0; i < totalProjects; i++)
+		{
+			YAJLDom::Value *row = projectArray->getValueByIndex(i);
+			tmp.name = row->getValueForKey("name")->toString();
+			tmp.path = row->getValueForKey("path")->toString();
+			tmp.url = row->getValueForKey("url")->toString();
+			mProjects.add(tmp);
+		}
+		mReloadScreenController->pushWorkspaceScreen();
+	}
 	else
 	{
 		maPanic(0,"RELOAD: Unknown server message");
@@ -819,16 +928,32 @@ void ReloadClient::evaluateScript(const String& script)
 /**
  * Loads the HTML files that were extracted last time.
  */
-void ReloadClient::launchSavedApp()
+void ReloadClient::launchSavedApp(MAUtil::String projectName)
 {
-	// Get path to app.
-	String fullAppPath = mFileUtil->getLocalPath() + mAppPath;
+	MAUtil::String fullAppPath;
+
+	if (projectName == "")
+	{
+		// Get path to app.
+		fullAppPath = mFileUtil->getLocalPath() + mAppPath;
+	}
+	else
+	{
+		for(MAUtil::Vector <reloadProject>::iterator i = mSavedProjects.begin(); i != mSavedProjects.end(); i++)
+		{
+			if(i->name == projectName)
+			{
+				fullAppPath = i->path;
+				break;
+			}
+		}
+	}
 
 	// Check that index.html exists.
 	MAHandle file = mFileUtil->openFileForReading(fullAppPath + "index.html");
 	if (file < 0)
 	{
-		maAlert("Reload: No App", "No app has been loaded yet", "Back", NULL, NULL);
+		maAlert("Reload: No App", "No app has been saved yet", "Back", NULL, NULL);
 		return;
 	}
 	maFileClose(file);
@@ -876,12 +1001,59 @@ void ReloadClient::freeHardware()
 	}
 }
 
-void ReloadClient::clearAppsFolder()
+void ReloadClient::clearAppsFolder(MAUtil::String appFolder)
 {
-	DeleteFolderRecursively((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+	if (appFolder == "") // Normal Reload mode
+	{
+		DeleteFolderRecursively((mFileUtil->getLocalPath() + mAppsFolder).c_str());
+	}
+	else // Save app mode
+	{
+		DeleteFolderRecursively((mFileUtil->getLocalPath() +
+								 mSavedAppsFolder +
+								 "RLDPRJ" + appFolder + "/").c_str());
+	}
 }
 
 // ========== Send info to server  ==========
+/**
+ * Send a message requesting project list
+ */
+void ReloadClient::getProjectListFromServer()
+{
+	MAUtil::String tmpMsg = "{\"message\":\"getProjectList\",\"params\": {}}";
+
+	sendTCPMessage(tmpMsg);
+}
+
+/**
+ * Send a message requesting a project so it can be saved
+ * @param projectName The name of the project to be saved
+ */
+void ReloadClient::saveProjectFromServer(MAUtil::String projectName)
+{
+	mProjectToSave = projectName;
+	MAUtil::String tmpMsg = "{ \"message\": \"reloadProject\","
+							  "\"params\" : {"
+								  "\"projectName\": \"" + projectName + "\""
+								"}"
+							"}";
+	sendTCPMessage(tmpMsg);
+}
+
+/**
+ * Send a message requesting a project to be reloaded
+ * @param projectName The name of the project to be reloaded
+ */
+void ReloadClient::reloadProjectFromServer(MAUtil::String projectName)
+{
+	MAUtil::String tmpMsg = "{ \"message\": \"reloadProject\","
+							  "\"params\" : {"
+							  	  "\"projectName\": \"" + projectName + "\""
+							    "}"
+							"}";
+	sendTCPMessage(tmpMsg);
+}
 
 /**
  * Sends information about the device to the server.
@@ -992,4 +1164,22 @@ void ReloadClient::showConnectionErrorMessage(int errorCode)
 	LOG("@@@ RELOAD: showConnectionErrorMessage: %s", errorMessage.c_str());
 
 	maAlert("Network Status", errorMessage.c_str(), "OK", NULL, NULL);
+}
+
+/**
+ * Getter returns the vector of projects on server
+ * @return MAUtil::Vector <reloadProject>
+ */
+MAUtil::Vector <reloadProject> * ReloadClient::getListOfProjects()
+{
+	return &mProjects;
+}
+
+/**
+ * Getter returns the vector of projects stored on the device
+ * @return MAUtil::Vector <reloadProject>
+ */
+MAUtil::Vector <reloadProject> * ReloadClient::getListOfSavedProjects()
+{
+	return &mSavedProjects;
 }
