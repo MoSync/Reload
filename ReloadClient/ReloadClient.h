@@ -37,14 +37,14 @@ MA 02110-1301, USA.
 #include <MAFS/File.h> // Library for file system bundles
 #include <yajl/YAJLDom.h>
 
-#include "LoginScreen.h"
-#include "LoadingScreen.h"
+#include "ReloadScreenController.h"
+#include "View/LoadingScreen.h"
 #include "SocketHandler.h"
 #include "DownloadHandler.h"
 #include "MAHeaders.h"
 
 // Forward declarations.
-class LoginScreen;
+class ReloadScreenController;
 class LoadingScreen;
 
 /**
@@ -230,7 +230,7 @@ private:
 	/**
 	 * Class that handles the Login Screen UI.
 	 */
-	LoginScreen* mLoginScreen;
+    ReloadScreenController* mReloadScreenController;
 
 	/**
 	 * Class that handles the Loading screen UI.
