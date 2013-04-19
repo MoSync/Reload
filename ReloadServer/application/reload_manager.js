@@ -17,6 +17,18 @@ var request = require('request');
 var vars = require('./globals');
 
 /**
+ * (internal function) Converts a decimal value to 8byte length Hex
+ */
+var toHex8Byte = function(decimal) {
+    var finalHex  = decimal.toString(16);
+    while (finalHex.length < 8)
+        finalHex = "0"+finalHex;
+
+    return finalHex;
+}
+
+
+/**
  * Send a given message to an optional client list.
  * @param jsonMessage Message in JSON format.
  * @param clientsToSend optional if not provided send message to all
@@ -48,7 +60,7 @@ var sendToClients = function(jsonMessage, clientsToSend) {
 
             // Construct message with proper header.
             var message = JSON.stringify(jsonMessage);
-            var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+            var fullMessage = "RELOADMSG" + toHex8Byte(message.length) + message;
 
             // Send the message.
             // TODO: Perhaps make client object that wraps the base socket and
@@ -441,91 +453,58 @@ var rpcFunctions = {
      * attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
-        var DS = vars.globals.fileSeparator;
-
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') return false;
 
-        this.findProjects( function (projects) {
-
-            var projectListJSON = [];
-
-            projects.forEach(function(p) {
-
-                var projectInfo = {
-
-                    url: "http://localhost:8282/" + p + "/LocalFiles.html",
-                    name: p,
-                    path: vars.globals.rootWorkspacePath +
-                          DS + p
-                }
-                projectListJSON.push(projectInfo);
-
-            });
-
-            vars.globals.projectListJSON = projectListJSON;
-
-            sendResponse({hasError: false, data: projectListJSON});
-        },sendResponse);
+        // Send the list of projects
+        sendResponse({
+            hasError: false,
+            data: vars.globals.projectListJSON
+        });
     },
 
     /**
      * (internal function) Searches the current workspace path, finds
      * and creates a list of projects exist in tha directory
      */
-    findProjects: function (callback, sendResponse) {
+    findProjects: function () {
+        var WP = vars.globals.rootWorkspacePath,
+            DS = vars.globals.fileSeparator,
+            HOST = 'http://localhost:8282/';
+
         try {
-            var self = this;
+            var files = fs.readdirSync( WP ),
+                projects = [];
 
-            fs.exists( vars.globals.rootWorkspacePath, function(exist) {
+            for (var key in files) {
+                var file = files[ key ],
+                    stat = fs.statSync( WP + DS + file );
 
-                if(!exist) {
-                    console.log("Creating the workspace directory " +
-                                vars.globals.rootWorkspacePath);
+                if ( stat && stat.isDirectory() ) {
                     try {
-
-                        fs.mkdirSync(vars.globals.rootWorkspacePath, 0755);    
-                    } catch (e) {
-                        console.log("ERROR in findProjects: " + e, 0);
-                        console.log("Reverting to Default Workspace Path", 0);
-                        self.getLatestPath(); // Reverting to Default workspace path
-                        self.findProjects(callback,sendResponse);
-                        return true;
+                        // If we see a folder called LocalFiles we
+                        // assume it's a project.
+                        var LocalfileStat = fs.lstatSync( WP + DS + file + DS + 'LocalFiles' );
+                        if (LocalfileStat && LocalfileStat.isDirectory()) {
+                            // Add to the list of projcts
+                            projects.push({
+                                url: HOST + file + '/LocalFiles.html',
+                                name: file,
+                                path: WP + DS + file
+                            });
+                        }
+                    } catch(e) {
+                        //do nothing
                     }
                 }
+            }
 
-                // Now, check for projects in it
-                files = fs.readdirSync(vars.globals.rootWorkspacePath);
+            // Make project list available globally
+            vars.globals.projectListJSON = projects;
+            console.log(vars.globals.projectListJSON);
 
-                var projects = [];
-
-                for (var key in files) {
-
-                    var file = files[key];
-                    var stat = fs.statSync(vars.globals.rootWorkspacePath +
-                                           vars.globals.fileSeparator +
-                                           file);
-
-                    if(stat && stat.isDirectory()) {
-                        try {
-
-                            var LocalfileStat = fs.lstatSync(vars.globals.rootWorkspacePath +
-                                                vars.globals.fileSeparator +  file + "/LocalFiles");
-
-                            if(LocalfileStat && LocalfileStat.isDirectory()) {
-                                projects.push(file);
-                            }
-                        }
-                        catch(e) {
-                            //do nothing
-                        }
-                    }
-                }
-                callback(projects, sendResponse);
-            });
-        }
-        catch (err) {
-            console.log("ERROR in findProjects: " + err, 0);
+        } catch (err) {
+            console.log('ERROR in findProjects: ' + err, 0);
         }
     },
 
@@ -1222,7 +1201,10 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-        sendResponse({hasError: false, data: {"path":vars.globals.rootWorkspacePath}});
+        sendResponse({
+            hasError: false,
+            data: { "path" : vars.globals.rootWorkspacePath }
+        });
     },
 
     sendFeedback : function (text, sendResponse) {
@@ -1286,7 +1268,7 @@ var rpcFunctions = {
             respond(true, "Sending Statistics is not enabled.");
             return;
         }
-        
+
         vars.methods.loadStats( function(statistics){
 
             if( statistics.clients.length === 0 ) {
@@ -1295,7 +1277,7 @@ var rpcFunctions = {
             }
 
             var postData = "data=" + escape(JSON.stringify(statistics));
-        
+
             var requestOptions = vars.globals.statsRequestOptions;
             requestOptions.headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1320,7 +1302,7 @@ var rpcFunctions = {
 
                     //if it is an RPC call
                     respond(false, "Statistics Sent");
-                    
+
                 } else {
                     respond(true, "Status Code: " + res.statusCode);
                 }
@@ -1336,7 +1318,7 @@ var rpcFunctions = {
             });
 
             postRequest.on('error', function(e) {
-                respond(true, 'Could not establish connection with MoSync: ' + e.message);                
+                respond(true, 'Could not establish connection with MoSync: ' + e.message);
             });
             // post the data
             postRequest.write(postData);
@@ -1345,37 +1327,23 @@ var rpcFunctions = {
     },
 
     /**
-     * (RPC): Changes the workspace directory to "newWorkspacePath"
+     * (RPC): Changes workspace directory. Creates it if it doesn't
+     * exist.
      */
-    changeWorkspacePath: function (newWorkspacePath, sendResponse) {
-
+    changeWorkspacePath: function (path, sendResponse) {
+        console.log('changeWorkspace');
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
         var self = this;
-
-        console.log("Changing workspace to " + newWorkspacePath, 0);
-
-        fs.exists(newWorkspacePath, function(exists) {
-
-            if(exists) {
-
-                self.setRootWorkspacePath(newWorkspacePath);
-                self.findProjects(function(){}, sendResponse);
-            }
-            else {
-
-                console.log("workspace does not exist", 0);
-                fs.mkdirSync(newWorkspacePath);
-                self.setRootWorkspacePath(newWorkspacePath);
-                self.findProjects(function(){},sendResponse);
+        vars.methods.setRootWorkspacePath(path, function(err, result){
+            if (err) {
+                console.log('Oh noes! ' + err, 0);
+            } else {
+                self.findProjects();
+                sendResponse({hasError: false, data: path});
             }
         });
-
-        if(sendResponse !== undefined) {
-
-            sendResponse({hasError: false, data: newWorkspacePath});
-        }
     },
 
     /**
@@ -1478,68 +1446,16 @@ var rpcFunctions = {
     },
 
     /**
-     * (internal function) At server startup initializes the global var for path
-     */
-    getLatestPath : function () {
-
-        self = this;
-        var defaultPath = vars.globals.homeDir + vars.globals.fileSeparator + "MoSync_Reload_Projects"
-        try {
-
-            fs.exists('lastWorkspace.dat', function(exists) {
-
-                if (exists) {
-
-                    var data = String(fs.readFileSync('lastWorkspace.dat', "utf8"));
-
-                    if(data != "") {
-
-                        fs.exists(data, function (exists) {
-                            if(exists) {
-                                self.setRootWorkspacePath(data);
-                            } else {
-                                self.setRootWorkspacePath(defaultPath);
-                                self.changeWorkspacePath(defaultPath);
-                            }
-                        });
-
-
-                    }
-                    else {
-
-                        console.log("ERROR reading last workspace path, reverting to default", 0);
-                        self.setRootWorkspacePath(defaultPath);
-                        self.changeWorkspacePath(defaultPath);
-                    }
-                }
-                else {
-
-                    self.setRootWorkspacePath(defaultPath);
-                    self.changeWorkspacePath(defaultPath);
-                }
-            });
-        }
-        catch(err) {
-
-            console.log("ERROR in getLatestPath: " + err, 0);
-        }
-    },
-
-    /**
      * (internal function) Setter function that sets the path global variable
      * and write the value to lastworkspace.dat
      */
     setRootWorkspacePath : function (path){
-
         vars.globals.rootWorkspacePath = path;
         console.log("Using workspace at: " + path, 0);
 
         try {
-
-            fs.writeFile('lastWorkspace.dat', path, function (err) { });
-        }
-        catch(err) {
-
+            fs.writeFileSync(vars.globals.lastWorkspaceFile, path);
+        } catch(err) {
             console.log("ERROR in setRootWorkspacePath: " + err, 0);
         }
     },
@@ -1563,19 +1479,6 @@ var rpcFunctions = {
         }
 
         return pathTemp;
-    },
-
-    /**
-     * (internal function) Converts a decimal value to 8byte length Hex
-     */
-    toHex8Byte: function (decimal) {
-
-        var finalHex  = decimal.toString(16);
-
-        while (finalHex.length < 8)
-            finalHex = "0"+finalHex;
-
-        return finalHex;
     },
 
     /**
@@ -1671,9 +1574,6 @@ var rpcFunctions = {
 };
 
 // These functions are called for initialization
-rpcFunctions.getVersionInfo(function (a){});
-rpcFunctions.getLatestPath();
-rpcFunctions.getNetworkIP();
 vars.methods.loadConfig(function () {
     if(vars.globals.statistics === true) {
         rpcFunctions.sendStats();
@@ -1681,6 +1581,5 @@ vars.methods.loadConfig(function () {
 });
 
 rpc.exposeModule('manager', rpcFunctions);
-
 exports.send = sendToClients;
 exports.rpc = rpcFunctions;

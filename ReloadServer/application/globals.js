@@ -66,10 +66,44 @@ var globals = {
 
     protocolVersion: "",
 
-    sampleProjectsFeedUrl: "https://api.github.com/orgs/MoSyncSamples/repos"
+    sampleProjectsFeedUrl: "https://api.github.com/orgs/MoSyncSamples/repos",
+
+    lastWorkspaceFile: 'lastWorkspace.dat'
 };
 
 var methods = {
+
+    /**
+     * Setter function that sets the path global variable
+     * and write the value to lastWorkspace.dat
+     *
+     * @param {string}
+     * @param {function(..., string)}
+     * @return void
+     */
+    setRootWorkspacePath : function (path, callback) {
+        var configFile = globals.lastWorkspaceFile;
+
+        fs.exists(path, function(exists){
+            if (!exists) {
+                try {
+                    fs.mkdirSync(path, 0755); // Create it
+                    globals.rootWorkspacePath = path; // Make it available to the rest of the script
+                    fs.writeFileSync(configFile, path); // Remember it after server shuts down
+                    console.log("Using workspace at: " + path, 0);
+                    callback(null, path); // Response with success
+                } catch (err) {
+                    console.log('ERROR in setRootWorkspacePath: ' + e , 0);
+                    callback(e, null); // Response with error
+                }
+            } else {
+                globals.rootWorkspacePath = path;
+                fs.writeFileSync(configFile, path);
+                console.log("Using workspace at: " + globals.rootWorkspacePath, 0);
+                callback(null, path);
+            }
+        });
+    },
 
     loadStats: function (callback) {
         var self = this;
