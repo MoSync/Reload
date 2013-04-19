@@ -347,11 +347,9 @@ var rpcFunctions = {
             });
         });
         file.on('error', function(e){
-            console.log('Error: ' + e);
+            console.log('Error: ' + e, 0);
         });
         request(opts.url).pipe(file);
-
-        console.log('reload_manager.js::copyExample() ' + vars.globals.rootWorkspacePath);
     },
     /*
      * Copies a file.
