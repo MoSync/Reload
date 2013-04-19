@@ -34,7 +34,9 @@ androidPackagePath = packagePath + "Android/"
 iOSPackagePath = packagePath + "iOS/"
 wp7PackagePath = packagePath + "WindowsPhone/"
 
-projectFiles = Dir.entries(".")
+projectViews = Dir.entries("./View")
+projectMainFiles = Dir.entries(".")
+projectFiles = projectMainFiles + projectViews
 cppFiles = []
 cFiles = []
 hFiles = []
@@ -76,7 +78,7 @@ puts sFileListString;
 
 #Android
 puts "Compiling for Android";
-system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=31457280 -stacksize=524288 -datasize=41943040 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B " + Dir.getwd + "/" + commonPath + "program " + sFileListString + libs)
+system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=14336000 -stacksize=204800 -datasize=16777216 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B " + Dir.getwd + "/" + commonPath + "program " + sFileListString + libs)
 system(packagerPath + " -t platform -p " + Dir.getwd + "/" + commonPath + "program -r " + Dir.getwd + "/" + commonPath + "resources -i " + iconFile + " -d " + Dir.getwd + "/" + androidPath + "package -m Android/Android --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0.1 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --android-package com.mosync.app_" + programName + " --android-version-code 7")
 FileUtils.cp_r androidPath + "package/" + programName + ".apk", androidPackagePath, :verbose => true
 
@@ -84,7 +86,7 @@ oldWD = Dir.getwd;
 #WP7
 puts "Compiling for WP7";
 Dir.chdir(wp7Path);
-system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=31457280 -stacksize=524288 -datasize=41943040 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cs " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
+system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=14336000 -stacksize=204800 -datasize=16777216 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cs " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
 Dir.chdir(oldWD);
 system(packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + wp7Path + "package -m \"Windows Phone/7\" --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0.1 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --cs-output " + wp7Path + " --wp-project-only --wp-target device --wp-config rebuild_release --wp-guid 3e0fa7b0-3ec6-102f-8003-a9d7f020192f")
 FileUtils.cp_r Dir.glob(wp7Path + "package/project/*"), wp7PackagePath, :verbose => true
@@ -92,7 +94,7 @@ FileUtils.cp_r Dir.glob(wp7Path + "package/project/*"), wp7PackagePath, :verbose
 #iOS
 puts "Compiling for iOS";
 Dir.chdir(iOSPath);
-system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=31457280 -stacksize=524288 -datasize=41943040 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cpp " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
+system(pipeToolPath + " -appcode=DSFN -stabs=stabs.tab -heapsize=14336000 -stacksize=204800 -datasize=16777216 -sld=sld.tab -s" + ENV['MOSYNCDIR'] + "/lib/pipe -B -cpp " + oldWD + "/" + commonPath + "program " + sFileListString + libs)
 Dir.chdir(oldWD);
 system(packagerPath + " -t platform -p " + commonPath + "program -r " + commonPath + "resources -i " + iconFile + " -d " + iOSPath + "package -m iOS/iPhone --vendor \"Built with MoSync SDK\" -n " + programName + " --version 1.0.1 --permissions \"Accelerometer,Bluetooth,Calendar,Camera,Compass,Contacts,File Storage,File Storage/Read,File Storage/Write,Gyroscope,Internet Access,Internet Access/HTTPS,Location,Location/Coarse,Location/Fine,Location/Coarse,Location/Fine,Orientation,Power Management,Proximity,Push Notifications,SMS,Vibration\" --ios-project-only --ios-cert \"iPhone Developer\" --ios-sdk iphoneos5.0 --ios-xcode-target Release --cpp-output " + iOSPath)
 FileUtils.cp_r Dir.glob(iOSPath + "package/xcode-proj/*"), iOSPackagePath, :verbose => true
