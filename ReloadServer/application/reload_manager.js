@@ -166,8 +166,7 @@ var rpcFunctions = {
 
         if (vars.globals.ip === null) {
             this.getIpFromSocket(sendResponse);
-        }
-        else {
+        } else {
             if(sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             }
@@ -451,10 +450,13 @@ var rpcFunctions = {
      * attributes: url, name, path
      */
     getProjectList: function (sendResponse) {
-        //check if parameter passing was correct
+        // Check if parameter passing was correct.
         if (typeof sendResponse !== 'function') return false;
 
-        // Send the list of projects
+        // Refresh list of projects.
+        this.findProjects();
+
+        // Send the list of projects.
         sendResponse({
             hasError: false,
             data: vars.globals.projectListJSON
@@ -617,7 +619,7 @@ var rpcFunctions = {
                           projectName;
 
         // Delete directory
-        this.removeRecursive(projectPath, function (error, status){
+        this.removeRecursive(projectPath, function (error, status) {
             if(!error) {
                 console.log("Succesfull deletion of directory " + projectPath, 0);
                 if (!responseSent) {
@@ -814,8 +816,7 @@ var rpcFunctions = {
         console.log("-----------------------------------------------");
         if (typeof debug !== "boolean" || typeof debug === "undefined") {
             weinreDebug = false;
-        }
-        else {
+        } else {
             weinreDebug = debug;
         }
 
@@ -825,11 +826,12 @@ var rpcFunctions = {
         var projectPath = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectName;
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
-                // Collect Stats Statistics
-                if(vars.globals.statistics === true) {
-                    var indexPath = vars.globals.fileSeparator + projectPath +
-                                    vars.globals.fileSeparator + "LocalFiles" +
-                                    vars.globals.fileSeparator + "index.html";
+                // Collect Stats
+                if (vars.globals.statistics === true) {
+                    var indexPath =
+                        vars.globals.fileSeparator + projectPath
+                        + vars.globals.fileSeparator + "LocalFiles"
+                        + vars.globals.fileSeparator + "index.html";
 
                     var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
 
@@ -850,13 +852,12 @@ var rpcFunctions = {
                     });
                 }
 
-
                 // We will send the file size information together with
                 // the command as an extra level of integrity checking.
-                var data = fs.readFileSync(actualPath);
-                var url = vars.globals.rootWorkspacePath +
-                    vars.globals.fileSeparator +
-                    projectName;
+                var data = fs.readFileSync(actualPath),
+                    url  = vars.globals.rootWorkspacePath
+                           + vars.globals.fileSeparator
+                           + projectName;
 
                 console.log("---------- S e n d i n g   B u n d l e --------");
                 console.log("actualPath: " + actualPath);
@@ -869,8 +870,7 @@ var rpcFunctions = {
                     fileSize: data.length
                 });
 
-
-                sendResponse({hasError: false, data: ""});
+                sendResponse({hasError: false, data: "Bundle sent to clients."});
 
             } catch (e) {
                 sendResponse({hasError: true, data: "Error in reloadProject: " + e});
@@ -1070,7 +1070,7 @@ var rpcFunctions = {
                                               projectFolder + "\\LocalFiles\"";
             }
             exec(command, puts);
-            sendResponse({hasError: false, data: ""});
+            sendResponse({hasError: false, data: "Project folder opened."});
         }
         catch(err) {
             console.log("ERROR in openProjectFolder: " + err, 0);
@@ -1097,35 +1097,38 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
+        var data, error;
+
         if(!vars.globals.isDebuggingStarted) {
             //Initialize debugging
             this.startDebugging();
-            sendResponse({hasError: false, data: ""});
-        }
-        else {
-
-            if(vars.globals.clearData == false) {
-
-                if(vars.globals.useSecondaryBuffer) {
-
+            sendResponse({hasError: false, data: "Debugging started."});
+            error = false;
+            data = "Debugging started.";
+        } else {
+            if (vars.globals.clearData == false) {
+                if (vars.globals.useSecondaryBuffer) {
                     vars.globals.useSecondaryBuffer = false;
                     var dataString  = JSON.stringify(vars.globals.logCatData);
                     vars.globals.logCatData = [];
-                    sendResponse({hasError: false, data: dataString});
-                }
-                else {
 
+                    error = false;
+                    data = dataString;
+                } else {
                     vars.globals.useSecondaryBuffer = true;
                     var dataString  = JSON.stringify(vars.globals.logCatData2);
                     vars.globals.logCatData2 = [];
-                    sendResponse({hasError: false, data: dataString});
-                }
-            }
-            else {
 
-                sendResponse({hasError: false, data: ""});
+                    error = false;
+                    data = dataString;
+                }
+            } else {
+                    error = false;
+                    data = '';
             }
         }
+
+        sendResponse({hasError: error, data: data});
     },
 
     /**
@@ -1348,11 +1351,16 @@ var rpcFunctions = {
      * (RPC): Removes a workspace directory.
      */
     removeWorkspace: function (workspacePath, sendResponse) {
-        var self, responseSent, response;
+        var self
+            , responseSent
+            , error
+            , data
+            ;
 
-        self = this;
+        self         = this;
         responseSent = false;
-        response = { hasError: false, data: workspacePath };
+        error        = false;
+        data         = workspacePath;
 
         // check if parameter passing was correct
         if (typeof sendResponse !== 'function') {
@@ -1366,21 +1374,24 @@ var rpcFunctions = {
                 self.removeRecursive(workspacePath, function (error, status){
                     if(!error) {
                         console.log("Succesfull deletion of directory " + workspacePath, 0);
-                        response = {hasError: false, data: "Succesfull deletion of " + workspacePath};
+                        error = false;
+                        data = "Succesfull deletion of " + workspacePath;
                     } else {
                         console.log("ERROR in deletion of " + workspacePath, 0);
-                        response = {hasError: true, data: "ERROR deleting project: " + error};
+                        error = true;
+                        data = "ERROR deleting project: " + error;
                     }
                 });
             } else {
                 console.log('ERROR ' + workspacePath + ' does not exist', 0);
             }
+
+            if(sendResponse !== undefined && !responseSent) {
+                sendResponse({hasError: error, data: data});
+                responseSent = true;
+            }
         });
 
-        if(sendResponse !== undefined && !responseSent) {
-            sendResponse(response);
-            responseSent = true;
-        }
     },
 
     /**
@@ -1427,7 +1438,7 @@ var rpcFunctions = {
                                         vars.globals[option] = value;
 
                                         sendResponse({hasError: false, data: true});
-                                    });   
+                                    });
             }
         });
     },

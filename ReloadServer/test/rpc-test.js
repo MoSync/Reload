@@ -389,7 +389,7 @@ buster.testCase("RPC", {
         var projectName, projectType, expected, result, self;
         projectName = 'OpenFolder_My_Project';
         projectType = 'web';
-        expected = '';
+        expected = 'Project folder opened.';
         self = this;
 
         request.post({
@@ -471,7 +471,7 @@ buster.testCase("RPC", {
 
     "getExampleList": function (done) {
         var result, expected;
-        expected = {feed: [{}]};
+        expected = [{}];
 
         request.post({
             headers:  this.headers,
