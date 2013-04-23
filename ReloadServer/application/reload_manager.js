@@ -181,22 +181,12 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
-        vars.globals.versionInfo = fs.readFileSync("build.dat", "ascii").split("\n");
+        var file = fs.readFileSync("build.dat", "ascii");
+        vars.globals.versionInfo = JSON.parse(file);
 
-        var versionInfoJSON = JSON.stringify({
-            "version":          vars.globals.versionInfo[0],
-            "timestamp":        vars.globals.versionInfo[1],
-            "protocolVersion":  vars.globals.versionInfo[2]
-        });
-        vars.globals.protocolVersion = vars.globals.versionInfo[2].replace(/^\s+|\s+$/g,'');
+        console.log(vars.globals.versionInfo);
 
-        console.log(
-            vars.globals.versionInfo[0].replace(/^\s+|\s+$/g,'') + "  " + 
-            vars.globals.versionInfo[1].replace(/^\s+|\s+$/g,'') + "  " +
-            vars.globals.protocolVersion, 0
-        );
-
-        sendResponse({hasError: false, data: versionInfoJSON});
+        sendResponse({hasError: false, data: JSON.stringify(vars.globals.versionInfo)});
     },
 
     /**
