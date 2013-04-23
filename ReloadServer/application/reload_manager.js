@@ -514,88 +514,90 @@ var rpcFunctions = {
      */
     createNewProject: function (projectName, projectType, sendResponse) {
 
-        //check if parameter passing was correct
+        // Check if parameter passing was correct.
         if(typeof sendResponse !== 'function') return false;
 
         var self = this;
 
-        // check if directory exists
-        fs.exists( vars.globals.rootWorkspacePath +
-                   vars.globals.fileSeparator +
-                   projectName, function (exists) {
-            if(exists) {
+        // Check if directory exists.
+        var dir = vars.globals.rootWorkspacePath
+                + vars.globals.fileSeparator
+                + projectName;
+
+        fs.exists( dir, function (exists) {
+            if (exists) {
                 sendResponse({hasError: true, data: "Error in createNewProject: Project already exists."});
-            }
-            else {
+            } else {
                 try {
-                    console.log(
-                        "Creating new project: " + projectName +
-                        ", of type " + projectType, 0);
+                    console.log( "Creating new project: " + projectName + ", of type " + projectType , 0);
 
                     var templateName = "ReloadTemplate";
-                    if (projectType)
-                    {
-                        if (projectType == "native")
-                        {
-                            templateName = "NativeUITemplate";
-                        }
-                        else
-                        {
-                            templateName = "ReloadTemplate";
-                        }
+                    if (projectType && projectType == "native") {
+                        templateName = "NativeUITemplate";
                     }
 
                     var exec = require('child_process').exec;
 
                     function resultCommand(error, stdout, stderr) {
-                        
                         console.log("stdout: " + stdout, 2);
-                        if (error)
-                        {
+                        if (error) {
                             console.log("ERROR stderr: " + stderr, 0);
-                            console.log("ERROR error: " + error, 0);
+                            console.log("ERROR error: "  + error, 0);
                         }
 
-                        var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
-                                                          vars.globals.fileSeparator +
-                                                          projectName +
-                                                          vars.globals.fileSeparator +
-                                                          ".project", 'utf8');
+                        var projectData =
+                            fs.readFileSync(
+                                vars.globals.rootWorkspacePath
+                                + vars.globals.fileSeparator
+                                + projectName
+                                + vars.globals.fileSeparator
+                                + ".project"
+                                , 'utf8'
+                        );
 
-                        //TODO: Very bad way to change the project name in file
-                        var newData = projectData.replace(templateName, projectName);
-
-                        fs.writeFileSync(vars.globals.rootWorkspacePath +
-                                         vars.globals.fileSeparator +
-                                         projectName +
-                                         vars.globals.fileSeparator +
-                                         ".project", newData    , 'utf8');
+                        var re = /<name>(.+?)<\/name>/;
+                        var substitute = '<name>' + projectName + '<\/name>';
+                        var newData = projectData.replace(re, substitute);
+                        var projectFile =
+                            vars.globals.rootWorkspacePath
+                            + vars.globals.fileSeparator
+                            + projectName
+                            + vars.globals.fileSeparator
+                            + ".project"
+                            ;
+                        fs.writeFileSync(projectFile, newData , 'utf8');
 
                         sendResponse({hasError: false, data: projectName});
                     }
 
-                    if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
-                    {
-                        var command = "cp -r " + self.fixPathsUnix(vars.globals.currentWorkingPath) +
-                                                 "/templates/" +
-                                                 self.fixPathsUnix(templateName) +
-                                           " " + self.fixPathsUnix(vars.globals.rootWorkspacePath) +
-                                                 self.fixPathsUnix(vars.globals.fileSeparator) +
-                                                 self.fixPathsUnix(projectName);
+                    var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+                    var linux = vars.globals.localPlatform.indexOf("linux") >=0;
+                    if ( darwin || linux ) {
+                        var command = "cp -r "
+                        + self.fixPathsUnix(vars.globals.currentWorkingPath)
+                        + "/templates/"
+                        + self.fixPathsUnix(templateName)
+                        + " "
+                        + self.fixPathsUnix(vars.globals.rootWorkspacePath)
+                        + self.fixPathsUnix(vars.globals.fileSeparator)
+                        + self.fixPathsUnix(projectName)
+                        ;
+                    } else {
+                        var command = "xcopy /e /I \""
+                        + vars.globals.currentWorkingPath
+                        + "\\templates\\"
+                        + templateName
+                        + "\" \""
+                        + vars.globals.rootWorkspacePath
+                        + vars.globals.fileSeparator
+                        + projectName
+                        + "\""
+                        ;
                     }
-                    else
-                    {
-                        var command = "xcopy /e /I \"" + vars.globals.currentWorkingPath +
-                                                         "\\templates\\" + templateName +
-                                               "\" \"" + vars.globals.rootWorkspacePath +
-                                                         vars.globals.fileSeparator +
-                                                         projectName + "\"";
-                    }
+
                     console.log("Command: " + command, 2);
                     exec(command, resultCommand);
-                }
-                catch(err)
-                {
+                } catch(err) {
                     console.log("ERROR in createNewProject: " + err, 0);
                     sendResponse({hasError: true, data: "Error in createNewProject: " + err});
                 }
@@ -614,9 +616,11 @@ var rpcFunctions = {
             return false;
         }
 
-        var projectPath = vars.globals.rootWorkspacePath +
-                          vars.globals.fileSeparator +
-                          projectName;
+        var projectPath =
+            vars.globals.rootWorkspacePath
+            + vars.globals.fileSeparator
+            + projectName
+            ;
 
         // Delete directory
         this.removeRecursive(projectPath, function (error, status) {
@@ -626,8 +630,7 @@ var rpcFunctions = {
                     sendResponse({hasError: false, data: "Succesfull deletion of project " + projectName});
                     responseSent = true;
                 }
-            }
-            else {
+            } else {
                 console.log("ERROR in deletion of directory " + projectPath, 0);
                 console.log("ERROR deleting project: " + error, 0);
                 if (!responseSent) {
@@ -657,22 +660,20 @@ var rpcFunctions = {
                 fs.unlink(path, function (err) {
                     if(err) {
                         cb(err,null);
-                    }
-                    else {
+                    } else {
                         cb(null,true);
                     }
                     return;
                 });
-            }
-            else if (stats.isDirectory()) {
+
+            } else if (stats.isDirectory()) {
+
                 // A folder may contain files
                 // We need to delete the files first
                 // When all are deleted we could delete the
                 // dir itself
                 fs.readdir(path, function (err, files) {
-
                     if (err) {
-
                         cb(err,null);
                         return;
                     }
@@ -692,8 +693,7 @@ var rpcFunctions = {
                             fs.rmdir(path, function(err) {
                                 if (err) {
                                     cb(err,null);
-                                }
-                                else {
+                                } else {
                                     cb(null,true);
                                 }
                             });
@@ -718,14 +718,11 @@ var rpcFunctions = {
 
                                         f_delete_index ++;
                                         checkStatus();
-                                    }
-                                    else {
-
+                                    } else {
                                         cb(err,null);
                                         return;
                                     }
                                 });
-
                             })()
                         }
                     }
@@ -749,7 +746,7 @@ var rpcFunctions = {
             var respond = sendResponse;
 
             function resultCommand(error, stdout, stderr) {
-                
+
                 console.log("stdout: " + stdout, 2);
                 if (error)
                 {
@@ -757,41 +754,60 @@ var rpcFunctions = {
                     console.log("ERROR error: " + error, 0);
                 }
 
-                var projectData = fs.readFileSync(vars.globals.rootWorkspacePath +
-                                                  vars.globals.fileSeparator +
-                                                  newName +
-                                                  vars.globals.fileSeparator +
-                                                  ".project", 'utf8');
+                var projectFile =
+                    vars.globals.rootWorkspacePath
+                    + vars.globals.fileSeparator
+                    + newName
+                    + vars.globals.fileSeparator
+                    + ".project"
+                    ;
+                var projectData = fs.readFileSync(projectFile, 'utf8');
 
-                var newData = projectData.replace(oldName, newName);
-                fs.writeFileSync(vars.globals.rootWorkspacePath +
-                                 vars.globals.fileSeparator +
-                                 newName +
-                                 vars.globals.fileSeparator +
-                                 ".project", newData, 'utf8');
+                var re = /<name>(.+?)<\/name>/;
+                var substitute = '<name>' + newName + '<\/name>';
+                var newData = projectData.replace(re, substitute);
+
+                    projectFile =
+                    vars.globals.rootWorkspacePath
+                    + vars.globals.fileSeparator
+                    + newName
+                    + vars.globals.fileSeparator
+                    + ".project"
+                    ;
+
+                fs.writeFileSync(projectFile, newData , 'utf8');
                 respond({hasError: false, data: newName});
             }
 
-            if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||(vars.globals.localPlatform.indexOf("linux") >=0))
-            {
-                var command = "mv " + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
-                                      this.fixPathsUnix(vars.globals.fileSeparator) +
-                                      this.fixPathsUnix(oldName) +
-                              " "   + this.fixPathsUnix(vars.globals.rootWorkspacePath) +
-                                      this.fixPathsUnix(vars.globals.fileSeparator) +
-                                      this.fixPathsUnix(newName);
+            var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+            var linux = vars.globals.localPlatform.indexOf("linux") >=0;
+            if( darwin || linux ) {
+                var command =
+                    "mv "
+                    + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                    + this.fixPathsUnix(vars.globals.fileSeparator)
+                    + this.fixPathsUnix(oldName)
+                    + " "
+                    + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                    + this.fixPathsUnix(vars.globals.fileSeparator)
+                    + this.fixPathsUnix(newName)
+                    ;
+            } else {
+                var command =
+                    "rename \""
+                    + vars.globals.rootWorkspacePath
+                    + vars.globals.fileSeparator
+                    + oldName
+                    + "\" \""
+                    + newName
+                    + "\""
+                    ;
             }
-            else
-            {
-                var command = "rename \"" + vars.globals.rootWorkspacePath +
-                    vars.globals.fileSeparator +
-                    oldName +
-                    "\" \"" + newName + "\"";
-            }
+
             console.log("Command: " + command, 2);
             exec(command, resultCommand);
-        }
-        catch(err) {
+
+        } catch(err) {
             console.log("ERROR in renameProject(" + oldname + ", " + newName + "): " + err, 0);
             sendResponse({hasError: true, data: "Error in renameProject(" + oldname + ", " + newName + "): " + err});
         }
@@ -809,38 +825,42 @@ var rpcFunctions = {
         if (typeof sendResponse !== 'function') return false;
 
         var self = this;
+        var weinreDebug = (typeof debug === "boolean")? debug : false;
 
-        var weinreDebug;
         console.log("-----------------------------------------------");
         console.log("-                 R e l o a d                 -");
         console.log("-----------------------------------------------");
-        if (typeof debug !== "boolean" || typeof debug === "undefined") {
-            weinreDebug = false;
-        } else {
-            weinreDebug = debug;
-        }
 
         console.log("Weinre Enabled:" + weinreDebug);
 
         // Bundle the app.
-        var projectPath = vars.globals.rootWorkspacePath + vars.globals.fileSeparator + projectName;
+        var projectPath =
+            vars.globals.rootWorkspacePath
+            + vars.globals.fileSeparator
+            + projectName
+            ;
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
                 // Collect Stats
                 if (vars.globals.statistics === true) {
                     var indexPath =
-                        vars.globals.fileSeparator + projectPath
-                        + vars.globals.fileSeparator + "LocalFiles"
-                        + vars.globals.fileSeparator + "index.html";
+                        vars.globals.fileSeparator
+                        + projectPath
+                        + vars.globals.fileSeparator
+                        + "LocalFiles"
+                        + vars.globals.fileSeparator
+                        + "index.html"
+                        ;
 
                     var indexFileData = String(fs.readFileSync(indexPath, "utf8"));
 
                     $ = cheerio.load(indexFileData,{
                         lowerCaseTags: false
                     });
-                    var nativeUIProject = $("#NativeUI");
-                    vars.methods.loadStats(function (statistics) {
 
+                    var nativeUIProject = $("#NativeUI");
+
+                    vars.methods.loadStats(function (statistics) {
                         if(nativeUIProject.length) {
                             statistics.totalReloadsNative += 1;
                         } else {
@@ -1046,28 +1066,42 @@ var rpcFunctions = {
                 console.log("ERROR error: " + error);
             }
 
-            if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
-
-                var command = "open " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
-                                        this.fixPathsUnix(projectFolder) + "/LocalFiles";
-            }
-            else if ((vars.globals.localPlatform.indexOf("linux") >=0)) {
-
+            var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+            var linux = vars.globals.localPlatform.indexOf("linux") >=0;
+            if (darwin) {
+                var command =
+                    "open "
+                    + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                    + vars.globals.fileSeparator
+                    + this.fixPathsUnix(projectFolder)
+                    + "/LocalFiles"
+                    ;
+            } else if (linux) {
                 var commandStat = fs.statSync("/usr/bin/nautilus");
                 if(commandStat.isFile()) {
-
-                  var command = "nautilus " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
-                                              this.fixPathsUnix(projectFolder) + "/LocalFiles &";
+                  var command =
+                      "nautilus "
+                      + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                      + vars.globals.fileSeparator
+                      + this.fixPathsUnix(projectFolder)
+                      + "/LocalFiles &"
+                      ;
+                } else {
+                  var command =
+                      "dolphin "
+                      + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                      + vars.globals.fileSeparator
+                      + this.fixPathsUnix(projectFolder)
+                      + "/LocalFiles &"
+                      ;
                 }
-                else {
-
-                  var command = "dolphin " + this.fixPathsUnix(vars.globals.rootWorkspacePath) + vars.globals.fileSeparator +
-                                             this.fixPathsUnix(projectFolder) + "/LocalFiles &";
-                }
-            }
-            else {
-                var command = "explorer \"" + vars.globals.rootWorkspacePath + vars.globals.fileSeparator +
-                                              projectFolder + "\\LocalFiles\"";
+            } else {
+                var command =
+                    "explorer \""
+                    + vars.globals.rootWorkspacePath
+                    + vars.globals.fileSeparator
+                    + projectFolder
+                    + "\\LocalFiles\"";
             }
             exec(command, puts);
             sendResponse({hasError: false, data: "Project folder opened."});
@@ -1082,7 +1116,6 @@ var rpcFunctions = {
      * (RPC): Returns a list with the devices connected to the Server and info
      */
     getClientInfo: function (sendResponse) {
-
         //check if parameter passing was correct
         if(typeof sendResponse !== 'function') return false;
 
@@ -1109,7 +1142,7 @@ var rpcFunctions = {
             if (vars.globals.clearData == false) {
                 if (vars.globals.useSecondaryBuffer) {
                     vars.globals.useSecondaryBuffer = false;
-                    var dataString  = JSON.stringify(vars.globals.logCatData);
+                    var dataString = JSON.stringify(vars.globals.logCatData);
                     vars.globals.logCatData = [];
 
                     error = false;
@@ -1142,34 +1175,26 @@ var rpcFunctions = {
             var util = require('util');
             var spawn = require('child_process').spawn;
 
-            if((vars.globals.localPlatform.indexOf("darwin") >= 0)) {
+            var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+            var linux = vars.globals.localPlatform.indexOf("linux") >=0;
 
+            if(darwin) {
                 adb = spawn('bin/mac/android/adb', ['logcat']);
-            }
-            else if((vars.globals.localPlatform.indexOf("linux") >=0)) {
-
+            } else if (linux) {
                 adb = spawn('bin/linux/android/adb', ['logcat']);
-            }
-            else {
-
+            } else {
                 adb = spawn('bin\\win\\android\\adb.exe', ['logcat']);
             }
 
             adb.stdout.setEncoding("utf8");
             adb.stdout.on('data', function (data) {
-
                 if(vars.globals.useSecondaryBuffer) {
-
                     vars.globals.logCatData.push(data);
-                }
-                else {
-
+                } else {
                     vars.globals.logCatData2.push(data);
                 }
             });
-        }
-        catch(err) {
-
+        } catch(err) {
             console.log("ERROR in startDebugging: " + err, 0);
         }
     },
@@ -1188,7 +1213,7 @@ var rpcFunctions = {
         });
 
         var dataString  = JSON.stringify(unescapedLogArray);
-        
+
         vars.globals.gRemoteLogData = [];
 
         sendResponse({hasError: false, data: dataString});
@@ -1402,47 +1427,44 @@ var rpcFunctions = {
         var config = {};
         if(typeof sendResponse !== 'function') return false;
 
-        fs.exists(process.cwd() + vars.globals.fileSeparator + "config.dat", function (exists) {
+        var configFile =
+            process.cwd()
+            + vars.globals.fileSeparator
+            + "config.dat"
+            ;
+
+        fs.exists(configFile, function (exists) {
             if(exists) {
-                fs.readFile(process.cwd() + vars.globals.fileSeparator + "config.dat", 
-                    "utf8", 
-                    function(err, data){
-                        //console.log(data);
+                fs.readFile(configFile, "utf8", function(err, data){
+                    if (err) throw err;
+
+                    config = JSON.parse(data);
+                    config[option] = value;
+
+                    fs.writeFile(configFile, JSON.stringify(config), "utf8", function(err, data) {
                         if (err) throw err;
 
-                        config = JSON.parse(data);
-                        config[option] = value;
+                        //set the configuration var
+                        vars.globals[option] = value;
 
-                        fs.writeFile( process.cwd() + vars.globals.fileSeparator + "config.dat",
-                                      JSON.stringify(config),
-                                      "utf8", 
-                                      function(err, data){
-                                        if (err) throw err;
-
-                                        //set the configuration var
-                                        vars.globals[option] = value;
-
-                                        sendResponse({hasError: false, data: true});
-                                    });
+                        sendResponse({hasError: false, data: true});
                     });
+                });
             } else {
                 config[option] = value;
 
-                fs.writeFile( process.cwd() + vars.globals.fileSeparator + "config.dat",
-                                      JSON.stringify(config),
-                                      "utf8", 
-                                      function(err, data){
-                                        if (err) throw err;
+                fs.writeFile( configFile, JSON.stringify(config), "utf8", function(err, data) {
+                    if (err) throw err;
 
-                                        //set the configuration var
-                                        vars.globals[option] = value;
+                    //set the configuration var
+                    vars.globals[option] = value;
 
-                                        sendResponse({hasError: false, data: true});
-                                    });
+                    sendResponse({hasError: false, data: true});
+                });
             }
         });
     },
-    
+
     /**
      * (RPC): Gets a configuration option's value
      */
@@ -1497,14 +1519,22 @@ var rpcFunctions = {
     debugInjection: function (projectName, callback) {
 
         var self = this,
-            indexHtmlPath = projectName +
-                            vars.globals.fileSeparator + 'TempBundle' +
-                            vars.globals.fileSeparator + 'index.html',
-            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
-            debugNotice =   "/**\n" + 
-                            " * NOTICE: The try catch statement is automaticaly added\n" + 
-                            " * when the project is reloaded in debug mode.\n" +
-                            " */\n";
+
+            indexHtmlPath =
+                projectName
+                + vars.globals.fileSeparator + 'TempBundle'
+                + vars.globals.fileSeparator + 'index.html'
+                ,
+
+            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"))
+                ,
+
+            debugNotice =
+                "/**\n"
+                + " * NOTICE: The try catch statement is automaticaly added\n"
+                + " * when the project is reloaded in debug mode.\n"
+                + " */\n"
+                ;
 
         /**
          * Load the index.html file and parse it to a new window object
@@ -1529,15 +1559,17 @@ var rpcFunctions = {
         var externalScriptFiles = $("script[src]:not([class='jsdom'])").each(function (index, element){
 
             if( element.attribs.src !== "js/wormhole.js") {
-                var scriptPath = vars.globals.fileSeparator + 'TempBundle' +
-                                 vars.globals.fileSeparator + self.fixPathsUnix(element.attribs.src);
+                var scriptPath =
+                    vars.globals.fileSeparator
+                    + 'TempBundle'
+                    + vars.globals.fileSeparator
+                    + self.fixPathsUnix(element.attribs.src)
+                    ;
+
                 try {
-
                     var s = fs.statSync(scriptPath);
-
                     if( s.isFile() ) {
                         var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
-
                         jsFileData = debugNotice + "try {" + jsFileData + "} catch (e) { mosync.rlog(e.stack); };";
                         fs.writeFileSync(scriptPath, jsFileData, "utf8");
                     }
@@ -1559,13 +1591,9 @@ var rpcFunctions = {
         var inlineJsCode = $("div,body").each(function (index, element){
 
             for( var i in element.attribs ) {
-
                 for( var j = 0; j < attrs.length; j++) {
-
                     if( i.toLowerCase() == attrs[j] ) {
-
                         var inlineCode = $(this).attr(i);
-
                         $(element).attr(i, debugNotice + "try {" + inlineCode + "} catch (e) { mosync.rlog(e.stack); };");
                     }
                 }
