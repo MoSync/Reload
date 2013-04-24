@@ -218,6 +218,9 @@ var rpcFunctions = {
                     data: feed
                 });
             }
+            /*console.log(error);
+            console.log(vars.globals.sampleProjectsFeedUrl);
+            console.log(response.statusCode);*/
         });
     },
 

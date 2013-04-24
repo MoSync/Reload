@@ -19,6 +19,7 @@ define([
                 this.currentView = view;
                 this.currentView.render();
 
+
                 $('#content').html( this.currentView.el );
 
                 if (this.sidebarView) {

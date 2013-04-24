@@ -94,7 +94,10 @@
                     <span class="capital">1.</span>
                 </div>
                 <div class="span10">
-                    Click the <button class="btn btn-mini">New
+                    Click the <button
+                        data-target="#add-project"
+                        data-message="Click here to create a new project."
+                        class="btn btn-mini">New
                         Project</button> button.<br />
                 </div>
             </div>
@@ -135,8 +138,11 @@
                     <span class="capital">4.</span>
                 </div>
                 <div class="span10">
-                    Click the <button class="btn btn-mini
-                        btn-primary">Create Project</button> button.
+                    Click the <button
+                        class="btn btn-mini btn-primary"
+                        data-target="#add-project"
+                        data-message="Click 'New project' to access 'Create Project' button.">
+                        Create Project</button> button.
                     (Your project will be created with the needed HTML,
                     CSS and JavaScript files.)
                 </div>
@@ -201,8 +207,11 @@
                     <span class="capital">2.</span>
                 </div>
                 <div class="span10">
-                    Click the <button class="btn btn-primary
-                        btn-mini">Reload</button> button.<br />
+                    Click the <button class="btn btn-primary btn-mini"
+                        data-target="#reload-button"
+                        data-message="Click here to reload a selected
+                        project.">
+                        Reload</button> button.<br />
                     Your project will be loaded/reloaded on the device/emulator and executed.
                 </div>
             </div>
@@ -230,7 +239,10 @@
                 </div>
                 <div class="span10">
                     Click the <button class="btn
-                        btn-mini">Inspect</button> button.<br />
+                        btn-mini"
+                        data-target="#debug-button"
+                        data-message="Click here to reload a project in
+                        'inspect' mode.">Inspect</button> button.<br />
                     Your project will be loaded/reloaded on the
                     device/emulator and executed in inspect mode.
                 </div>
@@ -330,7 +342,10 @@
                 </div>
                 <div class="span10">
                     Reaload your app by clicking the <button class="btn btn-primary
-                        btn-mini">Reload</button> button.<br />
+                        btn-mini"
+                        data-target="#reload-button"
+                        data-message="Click here to reload a project.">
+                        Reload</button> button.<br />
                 </div>
             </div>
         </div>
