@@ -217,10 +217,11 @@ var rpcFunctions = {
                     hasError: false,
                     data: feed
                 });
+            } else {
+                console.log(error);
+                console.log(vars.globals.sampleProjectsFeedUrl);
+                console.log(response.statusCode);
             }
-            /*console.log(error);
-            console.log(vars.globals.sampleProjectsFeedUrl);
-            console.log(response.statusCode);*/
         });
     },
 
