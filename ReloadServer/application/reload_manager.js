@@ -199,7 +199,13 @@ var rpcFunctions = {
 
         var feed = [];
 
-        request(vars.globals.sampleProjectsFeedUrl, function(error, response, body){
+        var params = {
+            url: vars.globals.sampleProjectsFeedUrl,
+            headers: {
+                'User-Agent': 'MoSync Reload ' + JSON.stringify(vars.globals.versionInfo)
+            }
+        };
+        request(params, function(error, response, body){
             if (!error && response.statusCode == 200) {
                 var res = JSON.parse(body);
                 res.forEach(function(p){
