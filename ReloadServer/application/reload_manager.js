@@ -1,12 +1,12 @@
-var rpc   = require('../lib/jsonrpc');
-var net   = require('net');
-var fs    = require('fs');
-var path  = require('path');
-var ncp   = require('../node_modules/ncp');
+var rpc     = require('../lib/jsonrpc');
+var net     = require('net');
+var fs      = require('fs');
+var path    = require('path');
+var ncp     = require('../node_modules/ncp');
 var cheerio = require('cheerio');
-var http = require('http');
-var url = require('url');
-var zip = require('unzip');
+var http    = require('http');
+var url     = require('url');
+var zip     = require('unzip');
 var request = require('request');
 
 
@@ -1358,7 +1358,7 @@ var rpcFunctions = {
         var self = this;
         vars.methods.setRootWorkspacePath(path, function(err, result){
             if (err) {
-                console.log('Oh noes! ' + err, 0);
+                console.log('ERROR: ' + err, 0);
             } else {
                 self.findProjects();
                 sendResponse({hasError: false, data: path});
