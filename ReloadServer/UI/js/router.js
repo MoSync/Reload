@@ -29,6 +29,28 @@ define([
         initialize: function () {
         },
 
+        startAt: function(callback) {
+            // Get initial path
+            var options     = {};
+            options.url     = 'http://localhost:8283';
+            options.rpcMsg  = {
+                method: 'manager.getConfig',
+                params: ['state'],
+                id:     null
+            };
+
+            var self = this;
+            options.success = function (resp) {
+                callback(false, resp.result);
+            };
+
+            options.error   = function (resp) {
+                callback('could not get config '+resp , false);
+            };
+
+            this.rpc(options);
+        },
+
         routes: {
             // Define URL routes
             '':           'index',
@@ -66,6 +88,15 @@ define([
             projectCollection: projectCollection
         });
         var router = new ReloadRouter();
+        router.startAt(function(err, state){
+            if (err) {
+                console.log('Error in router.startAt()');
+            } else {
+                if (state !== 'index') {
+                    router.navigate('#/' + state);
+                }
+            }
+        });
 
         // Listen to router events.
         router.on('route:index', function () {

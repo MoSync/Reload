@@ -11,7 +11,6 @@ define([
 
         return {
             show: function(view) {
-
                 if (this.currentView) {
                     this.currentView.close();
                 }
@@ -33,10 +32,8 @@ define([
                 }
 
                 if (this.contentNavView) {
-                    //console.log('nav is set!');
                     this.contentNavView.setActive(view.name);
                 } else {
-                    //console.log('viewhandler: ' + view.name);
                     this.contentNavView = new ContentNavView();
                     $('#content-nav').html( this.contentNavView.render() );
                     this.contentNavView.setActive(view.name);

@@ -46,7 +46,7 @@ var sendToClients = function(jsonMessage, clientsToSend) {
     } else {
         var cList = clientsToSend;
     }
-    
+
     cList.forEach(function (client) {
 
         try {

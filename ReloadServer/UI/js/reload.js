@@ -22,6 +22,7 @@ define([
 
         _.extend(Backbone.Collection.prototype, rpc);
         _.extend(Backbone.Model.prototype, rpc);
+        _.extend(Backbone.Router.prototype, rpc);
 
         Backbone.sync = function (method, model, options) {
 
