@@ -58,8 +58,7 @@ define([
             // Check if a project is selected.
             if (this.parent.selectedProject === null) {
                 var btn = $('ul#projects');
-                $('ul#projects').children().css('background', 'rgb(216, 221, 228)');
-
+                btn.children().css('background', 'rgb(216, 221, 228)');
                 btn.attr('data-intro', 'Please select a project.');
                 btn.attr('data-position', 'right');
                 $('body').on('chardinJs:stop', function() {
@@ -73,7 +72,16 @@ define([
 
             // Check if any device is connected.
             if (this.parent.deviceCount === 0) {
-                alert ('Please connect a device.');
+                var btn = $('#devices');
+                btn.children().css('background', 'rgb(216, 221, 228)');
+                btn.attr('data-intro', 'Please connect a device.');
+                btn.attr('data-position', 'right');
+                $('body').on('chardinJs:stop', function() {
+                    btn.removeAttr('data-intro');
+                    btn.removeAttr('data-position');
+                });
+                $('body').chardinJs('start');
+
                 return;
             }
 

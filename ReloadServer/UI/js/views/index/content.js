@@ -33,9 +33,19 @@ define([
             var btn = $(target);
             btn.attr('data-intro', message);
             btn.attr('data-position', 'right');
+
+            // Handle click event on target element
+            var callback = function(){
+                $('body').chardinJs('stop');
+            };
+            // Bind handler to target
+            btn.on('click', callback);
+
             $('body').on('chardinJs:stop', function(){
                 btn.removeAttr('data-intro');
                 btn.removeAttr('data-position');
+                // Unbing handler from target
+                btn.off('click', callback);
             });
             $('body').chardinJs('start');
         },
