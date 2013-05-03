@@ -66,14 +66,13 @@ define([
                 // Save scroll position on manual scroll.
                 $(scroll).bind('scroll', function () {
                     self.scrollPosition = scroll.scrollTop;
-                    console.log(scroll.scrollTop);
+                    //console.log(scroll.scrollTop);
                 });
 
             }, 100);
         },
 
         close: function () {
-            console.log('close log');
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();
@@ -90,10 +89,10 @@ define([
         },
 
         updateLog: function(data) {
-            console.log(data);
+            //console.log(data);
 
-            console.log('updatelog');
-            console.log(this.scrollPosition);
+            //console.log('updatelog');
+            //console.log(this.scrollPosition);
 
             var header, label;
             label = 'info'; // CSS style.

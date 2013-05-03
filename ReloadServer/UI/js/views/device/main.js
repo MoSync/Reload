@@ -18,6 +18,8 @@ define([
                 'click a.open-dialog': 'openDialog'
             },
 
+            id: 'devices',
+
             initialize: function (options) {
                 var self = this;
                 this.parent = options.parent;

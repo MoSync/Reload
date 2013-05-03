@@ -17,10 +17,9 @@ define([
         populate: function () {
             // Populate with records.
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.getProjectList',
-                params: [],
+                params: [''],
                 id:     null
             };
 
@@ -48,15 +47,16 @@ define([
         setpath: function (callback) {
             // Set current workspace path.
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.getWorkspacePath',
-                params: [],
+                params: [''],
                 id:     null
             };
 
             var self = this;
             options.success = function (resp) {
+                console.log('!!!!! setpath');
+                console.log(resp);
                 self.path = resp.result.path;
                 if(typeof callback !== 'undefined') {
                     callback();
