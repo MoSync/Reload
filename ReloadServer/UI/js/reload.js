@@ -29,15 +29,28 @@ define([
             var resp,
             params = {};
 
-            params.url          = options.url;
-            params.data         = JSON.stringify(options.rpcMsg);
-            params.contentType  = 'application/json';
-            params.type         = 'POST';
-            params.dataType     = 'json';
+            // POST
+            /*
+             *params.url          = 'http://localhost:' + location.port;
+             *params.data         = JSON.stringify(options.rpcMsg);
+             *params.contentType  = 'application/json';
+             *params.type         = 'POST';
+             *params.dataType     = 'json';
+             */
 
+            // GET
+            params.url           = 'http://' + location.host + '/proccess';
+            params.data          = options.rpcMsg;
+            params.type          = 'GET';
+            params.dataType      = 'jsonp';
+
+            console.log(params.url);
             // Only rpc calls are supported for now.
             if (method === 'rpc') {
-                resp = $.ajax(_.extend(params, options));
+                //resp = $.ajax(_.extend(params, options));
+                resp = $.getJSON(params.url, options.rpcMsg, function(data) {
+                    options.success(data);
+                });
             } else {
                 console.log(method + ' is not supported.');
             }
@@ -47,9 +60,9 @@ define([
             }
         };
 
-        // Pass in our Router module and call it's initialize function
         Router.initialize();
     };
+
 
     return {
         initialize: initialize

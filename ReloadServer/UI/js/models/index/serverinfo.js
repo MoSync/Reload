@@ -11,10 +11,9 @@ define([
         getServerInfo: function () {
 
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.getVersionInfo',
-                params: [],
+                params: [''],
                 id:     null
             };
 

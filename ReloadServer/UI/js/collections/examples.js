@@ -17,10 +17,9 @@ define([
             var self = this;
             // Populate with records.
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.getExampleList',
-                params: [],
+                params: [''],
                 id:     null
             };
 

@@ -135,12 +135,10 @@ var rpcFunctions = {
      * (internal function) Used to acquire the server ip address
      */
     getIpFromSocket: function (sendResponse) {
-
         var socket = net.createConnection(80, "www.example.com");
-
         socket.on('connect', function () {
-
             vars.globals.ip = socket.address().address;
+            console.log('got ip from socket ' +vars.globals.ip );
             if (sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             } else {
@@ -161,13 +159,13 @@ var rpcFunctions = {
      */
     getNetworkIP: function (sendResponse) {
         //check if parameter passing was correct
-        if( (typeof sendResponse !== 'function') &&
+        if ( (typeof sendResponse !== 'function') &&
             (sendResponse !== undefined) ) return false;
 
-        if (vars.globals.ip === null) {
+        if ( vars.globals.ip === null ) {
             this.getIpFromSocket(sendResponse);
         } else {
-            if(sendResponse !== undefined) {
+            if ( sendResponse !== undefined ) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             }
         }
@@ -183,7 +181,9 @@ var rpcFunctions = {
 
         var file = fs.readFileSync("build.dat", "ascii");
         vars.globals.versionInfo = JSON.parse(file);
+        vars.globals.protocolVersion = JSON.parse(file).protocolVersion;
 
+        console.log('version info');
         console.log(vars.globals.versionInfo);
 
         sendResponse({hasError: false, data: JSON.stringify(vars.globals.versionInfo)});
@@ -468,12 +468,12 @@ var rpcFunctions = {
      * and creates a list of projects exist in tha directory
      */
     findProjects: function () {
-        var WP = vars.globals.rootWorkspacePath,
-            DS = vars.globals.fileSeparator,
-            HOST = 'http://localhost:8282/';
+        var WP   = vars.globals.rootWorkspacePath,
+            DS   = vars.globals.fileSeparator,
+            HOST = vars.globals.host + ':' + vars.globals.port;
 
         try {
-            var files = fs.readdirSync( WP ),
+            var files    = fs.readdirSync( WP ),
                 projects = [];
 
             for (var key in files) {
@@ -488,9 +488,9 @@ var rpcFunctions = {
                         if (LocalfileStat && LocalfileStat.isDirectory()) {
                             // Add to the list of projcts
                             projects.push({
-                                url: HOST + file + '/LocalFiles.html',
-                                name: file,
-                                path: WP + DS + file
+                                url:   HOST + file + '/LocalFiles.html',
+                                name:  file,
+                                path:  WP + DS + file
                             });
                         }
                     } catch(e) {

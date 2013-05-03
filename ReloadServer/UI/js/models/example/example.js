@@ -9,7 +9,6 @@ define([
             self = this;
 
             options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.reloadExample',
                 params: [JSON.stringify(opts)],

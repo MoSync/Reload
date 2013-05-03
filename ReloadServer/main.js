@@ -34,21 +34,22 @@ process.argv.forEach(function (value, index, array) {
     }
 });
 
-//Platform specific considerations for getting the home directory
-if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||
-   (vars.globals.localPlatform.indexOf("linux") >=0)) {
+// Platform specific considerations for getting the home directory
+var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+var linux = vars.globals.localPlatform.indexOf("linux") >=0;
 
+if ( darwin || linux ) {
     vars.globals.homeDir = process.env.HOME;
 } else {
     vars.globals.homeDir = process.env.USERPROFILE;
 }
 
-//Platform specific considerations for getting the directory separator
-vars.globals.fileSeparator = ((vars.globals.localPlatform.indexOf("darwin") >=0) ||
-                         (vars.globals.localPlatform.indexOf("linux") >=0))?"/" : "\\";
+// Platform specific considerations for getting the directory separator
+vars.globals.fileSeparator = ( darwin || linux )? "/" : "\\";
 
+// Kill adb when the server dies
 process.on('exit', function(){
-    vars.globals.adb.kill("-9"); //Kill adb when the server dies
+    vars.globals.adb.kill("-9");
 });
 
 /**
@@ -71,7 +72,7 @@ var manager = require("./application/reload_manager"),
  */
 function getLatestPath(done) {
     var self = this;
-    var configFile = 'lastWorkspace.dat';
+    var configFile = vars.globals.lastWorkspaceFile;
     var defaultPath =
         vars.globals.homeDir
         + vars.globals.fileSeparator
@@ -114,8 +115,10 @@ function getLatestPath(done) {
 getLatestPath(function(){
     manager.rpc.findProjects(); // Generate project list.
     manager.rpc.getVersionInfo(function (a){});
-    manager.rpc.getNetworkIP();
+    manager.rpc.getNetworkIP(function(){
+        WebUI       = server.create(8283);
+        tcpSocket   = tcp.create(7000);
+        udp         = udp.create(41234);
+    });
+
 });
-WebUI       = server.create(8283);
-tcpSocket   = tcp.create(7000);
-udp         = udp.create(41234);

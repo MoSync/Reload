@@ -29,7 +29,6 @@ define([
         rpcCall: function(methodName, paramArray) {
 
             var options = {};
-            options.url = 'http://localhost:8283';
             options.rpcMsg = {
                 method: methodName,
                 params: paramArray,

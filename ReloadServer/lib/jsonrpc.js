@@ -40,12 +40,12 @@ var JSONRPC = {
         this.handleMessage(message, function(processingResult) {
 
             var responseObject = {
-                'id': 0,
-                'result': null,
-                'error': null
+                'id':      0,
+                'result':  null,
+                'error':   null
             };
 
-            if( processingResult.hasError ) {
+            if ( processingResult.hasError ) {
                 responseObject.error = processingResult.data;
             } else {
                 responseObject.result = processingResult.data;
@@ -54,26 +54,30 @@ var JSONRPC = {
             // Using id=1 attribute for sending response in binary format.
             // Used only for calling from Reload device client.
             if ((message.id == 1) && (!processingResult.hasError)) {
-                response.writeHead(200, {
-                          'Content-Length': processingResult.data.length,
-                          'Content-Type': 'binary',
-                          'Pragma': 'no-cache',
-                          'Cache-Control': 'no-cache',
-                          'Expires': '-1'
-                        });
-                response.write( processingResult.data );
-                response.end("");
+                var resp = {
+                    'Content-Length':   processingResult.data.length
+                    , 'Content-Type':   'binary'
+                    , 'Pragma':         'no-cache'
+                    , 'Cache-Control':  'no-cache'
+                    , 'Expires':        '-1'
+                };
+                response.writeHead(200, response);
+                response.end( processingResult.data );
+                //response.write( processingResult.data );
+                //response.end("");
             } else {
                 console.log("SENDING RESPONSE: " + JSON.stringify(responseObject),1);
-                response.writeHead(200, {
-                              'Content-Length': JSON.stringify(responseObject).length,
-                              'Content-Type': 'application/json',
-                              'Pragma': 'no-cache',
-                              'Cache-Control': 'no-cache',
-                              'Expires': '-1'
-                            });
-                response.write( JSON.stringify(responseObject) );
-                response.end("");
+                var resp = {
+                    'Content-Length':   JSON.stringify(responseObject).length
+                    , 'Content-Type':   'application/json'
+                    , 'Pragma':         'no-cache'
+                    , 'Cache-Control':  'no-cache'
+                    , 'Expires':        '-1'
+                };
+                response.writeHead(200, resp);
+                response.end( JSON.stringify(responseObject) );
+                //response.write( JSON.stringify(responseObject) );
+                //response.end("");
             }
         });
     },
@@ -141,20 +145,22 @@ var JSONRPC = {
         // dispatch to the handleInvalidRequest function.
         if(!(message.method && message.params)) {
             var responseObject = {
-                'id': message.id,
-                'result': null,
-                'error': 'Invalid Request'
+                'id':      message.id,
+                'result':  null,
+                'error':   'Invalid Request'
             };
 
-            resObj.writeHead(200, {
-                          'Content-Length': JSON.stringify(responseObject).length,
-                          'Content-Type': 'application/json',
-                          'Pragma': 'no-cache',
-                          'Cache-Control': 'no-cache',
-                          'Expires': '-1'
-                        });
-            resObj.write( JSON.stringify(responseObject) );
-            resObj.end("");
+            var resp = {
+                'Content-Length':   JSON.stringify(responseObject).length
+                , 'Content-Type':   'application/json'
+                , 'Pragma':         'no-cache'
+                , 'Cache-Control':  'no-cache'
+                , 'Expires':        '-1'
+            };
+            resObj.writeHead(200, resp);
+            resObj.end( JSON.stringify(responseObject) );
+            //resObj.write( JSON.stringify(responseObject) );
+            //resObj.end("");
 
             return this;
         }
@@ -163,20 +169,22 @@ var JSONRPC = {
         if (!this.functions.hasOwnProperty(message.method)) {
 
             var responseObject = {
-                'id': message.id,
-                'result': null,
-                'error': 'Function not found'
+                'id':      message.id,
+                'result':  null,
+                'error':   'Function not found'
             };
 
-            resObj.writeHead(200, {
-                          'Content-Length': JSON.stringify(responseObject).length,
-                          'Content-Type': 'application/json',
-                          'Pragma': 'no-cache',
-                          'Cache-Control': 'no-cache',
-                          'Expires': '-1'
-                        });
-            resObj.write( JSON.stringify(responseObject) );
-            resObj.end("");
+            var resp = {
+                'Content-Length':   JSON.stringify(responseObject).length
+                , 'Content-Type':   'application/json'
+                , 'Pragma':         'no-cache'
+                , 'Cache-Control':  'no-cache'
+                , 'Expires':        '-1'
+            };
+            resObj.writeHead(200, resp);
+            resObj.end( JSON.stringify(responseObject) );
+            //resObj.write( JSON.stringify(responseObject) );
+            //resObj.end("");
 
             return this;
         }
@@ -186,9 +194,9 @@ var JSONRPC = {
             //JSONRPC.trace('SUCCESS-->', 'response (id ' + message.id + '): ' + funcResp);
 
             return {
-                'id': message.id,
-                'result': funcResp,
-                'error': null
+                'id':      message.id,
+                'result':  funcResp,
+                'error':   null
             };
         };
 
@@ -197,9 +205,9 @@ var JSONRPC = {
             JSONRPC.trace('-->', 'failure: ' + failure);
 
             return {
-                'id': message.id,
-                'result': null,
-                'error': failure || 'Unspecified Failure'
+                'id':      message.id,
+                'result':  null,
+                'error':   failure || 'Unspecified Failure'
             };
         };
 
@@ -222,20 +230,22 @@ var JSONRPC = {
 
             if( executionResult === false) {
                 var responseObject = {
-                    'id': message.id,
-                    'result': null,
-                    'error': 'Invalid Parameters passed to function'
+                    'id':      message.id,
+                    'result':  null,
+                    'error':   'Invalid Parameters passed to function'
                 };
 
-                resObj.writeHead(200, {
-                              'Content-Length': JSON.stringify(responseObject).length,
-                              'Content-Type': 'application/json',
-                              'Pragma': 'no-cache',
-                              'Cache-Control': 'no-cache',
-                              'Expires': '-1'
-                            });
-                resObj.write( JSON.stringify(responseObject) );
-                resObj.end("");
+                var resp = {
+                    'Content-Length':   JSON.stringify(responseObject).length
+                    , 'Content-Type':   'application/json'
+                    , 'Pragma':         'no-cache'
+                    , 'Cache-Control':  'no-cache'
+                    , 'Expires':        '-1'
+                };
+                resObj.writeHead(200, resp);
+                resObj.end( JSON.stringify(responseObject) );
+                //resObj.write( JSON.stringify(responseObject) );
+                //resObj.end("");
             }
         }
         catch(err) {

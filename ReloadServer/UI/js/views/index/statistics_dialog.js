@@ -33,7 +33,6 @@ define([
                 statsValue = false;
             }
 
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.setConfig',
                 params: ["statistics", statsValue],
@@ -70,7 +69,6 @@ define([
             // Check if statistics gathering is already confirmed by
             // the user.
             var options = {};
-            options.url     = "http://localhost:8283";
             options.rpcMsg  = {
                 method: "manager.getConfig",
                 params: ["statistics"],
