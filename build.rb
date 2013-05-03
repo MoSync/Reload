@@ -26,15 +26,17 @@ end
 
 
 #Defince version and timestamp 
-version = "1.0.1"
+version = "1.1"
 time_stamp = Time.now.strftime("%Y%m%d-%H%M")[2..-1]
 protocolVersion = "1.0"
 
 #Write the version information to the file for use in the server  and client
 File.open("ReloadServer/build.dat", "w") do |file|
-  file.puts("#{version}")
-  file.puts(time_stamp)
-  file.puts(protocolVersion);
+  file.puts("{")
+  file.puts("\"version\":\"#{version}\",")
+  file.puts("\"timestamp\":\"" + time_stamp + "\",")
+  file.puts("\"protocolVersion\":\"" + protocolVersion + "\"");
+  file.puts("}")
 end
 
 puts "Updating the templates"
@@ -90,12 +92,11 @@ files_to_copy = [
   "ReloadServer/templates",
   "ReloadServer/application",
   "ReloadServer/express",
-  "ReloadServer/lib",  
+  "ReloadServer/lib",
   "ReloadServer/build.dat",
   "ReloadServer/MoSyncVersion.dat",
-  "ReloadServer/node_modules",
+  "ReloadServer/node_modules"
   ]
-
 
 main_dir = FileUtils.pwd
 
@@ -141,12 +142,15 @@ FileUtils.cp_r "Licenses", "/Volumes/MoSyncReload/"
 FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_Windows"
 FileUtils.cp_r "Licenses", "Build/#{time_stamp}/MoSync_Reload_Linux"
 
-
-
 files_to_copy.each { |item|
   FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_Windows/server"
   FileUtils.cp_r item, "Build/#{time_stamp}/MoSync_Reload_Linux/server"
 }
+
+puts "Copying command line tool"
+FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Linux/server"
+FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Windows/server"
+
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Windows/* Build/#{time_stamp}/MoSync_Reload_Windows"
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"
 sh "cp -rf ReloadLauncher/Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"

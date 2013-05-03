@@ -12,8 +12,6 @@ define([
         className: 'docs',
 
         render: function () {
-
-            console.log('render Docs VIEW');
             // Using Underscore we can compile our template with data
             var data = {};
             var compiledTemplate = _.template( docsTemplate, data );
@@ -22,7 +20,6 @@ define([
         },
 
         close: function () {
-
             //COMPLETELY UNBIND THE VIEW
             this.undelegateEvents();
             this.$el.removeData().unbind();

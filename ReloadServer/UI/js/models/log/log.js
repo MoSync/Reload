@@ -7,17 +7,16 @@ define([
 
         initialize: function () {
             _.bindAll(this, 'getLogMsg');
-            this.messages = [];
+            this.messages = [''];
             this.getLogMsg();
         },
 
         getLogMsg: function (callback) {
 
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.getRemoteLogData',
-                params: [],
+                params: [''],
                 id:     null
             };
 
