@@ -33,9 +33,9 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/Vector.h>
 #include <MAUtil/Connection.h>
-#include "View/ServersDialog.h"
+#include "LoginScreen.h"
 
-//class LoginScreen;
+class LoginScreen;
 
 /**
  * Class that broadcasts message for server discovery
@@ -47,7 +47,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	BroadcastHandler(ServersDialog *serversDialog);
+	BroadcastHandler(LoginScreen *loginScreen);
 
 	/**
 	 * Destructor.
@@ -124,7 +124,7 @@ private:
 	/**
 	 * The dialog of available server
 	 */
-	ServersDialog *mServersDialog;
+	LoginScreen *mLoginScreen;
 };
 
 #endif

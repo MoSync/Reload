@@ -145,7 +145,7 @@ void WorkspaceScreen::updateProjectList()
 		itemHorizontalLayout->setHeight(80);
 		Label* projectNameLabel = new Label();
 		projectNameLabel->setText(i->name);
-		projectNameLabel->fillSpaceHorizontally();
+		//projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
 
 		if (mOS.find("iPhone") >= 0)

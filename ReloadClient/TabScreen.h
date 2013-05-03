@@ -17,27 +17,16 @@ MA 02110-1301, USA.
 */
 
 /*
- * MainStackSingleton.cpp
+ * TabScreen.h
  *
- *  Created on: Feb 28, 2013
- *      Author: Spiridon Alexandru
+ *  Created on: Apr 23, 2013
+ *      Author: Kostas Tsolakis
  */
 
-#include "MainStackSingleton.h"
-#include "MainStackScreen.h"
+#ifndef TABSCREEN_H_
+#define TABSCREEN_H_
 
-MainStackScreen* MainStackSingleton::pSingleton = NULL;
+class TabScreen;
 
-MainStackSingleton::MainStackSingleton()
-{
-   // do init stuff
-}
 
-MainStackScreen* MainStackSingleton::getInstance()
-{
-	if (pSingleton== NULL) {
-		pSingleton = new MainStackScreen();
-	}
-	return pSingleton;
-}
-
+#endif /* TABSCREEN_H_ */

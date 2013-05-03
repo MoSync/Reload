@@ -86,6 +86,11 @@ public:
 	 * Called when the info button is clicked.
 	 */
 	virtual void infoButtonClicked() = 0;
+
+	/**
+	 * Called when the manual setting of server ip is clicked
+	 */
+	virtual void defaultAddress() = 0;
 };
 
 #endif /* RELOADUILISTENER_H_ */

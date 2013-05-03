@@ -17,30 +17,35 @@ MA 02110-1301, USA.
 */
 
 /*
- * MainStackScreen.h
+ * MainScreen.cpp
  *
  *  Created on: Feb 1, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef MAINSTACKSCREEN_H_
-#define MAINSTACKSCREEN_H_
+#include "MainScreen.h"
+#include "LoginScreen.h"
 
-#include <NativeUI/Widgets.h>
-using namespace NativeUI;
-
-class MainStackScreen :
-	public StackScreen
+MainScreen::MainScreen():
+	TabScreen()
 {
-public:
-	MainStackScreen();
+   // do init stuff
+}
 
-	~MainStackScreen();
+MainScreen::~MainScreen()
+{
 
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	virtual void orientationWillChange();
-};
+}
 
-#endif /* MAINSTACKSCREEN_H_ */
+/**
+ * Called just before the screen begins rotating.
+ */
+void MainScreen::orientationWillChange()
+{
+	// go through the children and announce the orientation will change event
+	//for (int i = 0; i < this->getStackSize(); i++)
+	//{
+	//	Screen *loginScreen = (Screen*)this->getChild(i);
+	//	loginScreen->orientationWillChange();
+	//}
+}

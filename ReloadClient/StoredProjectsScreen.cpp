@@ -30,8 +30,8 @@ MA 02110-1301, USA.
 #include <mawstring.h>
 #include <mastdlib.h>
 
-#include "MainStackSingleton.h"
-#include "MainStackScreen.h"
+#include "MainScreenSingleton.h"
+#include "MainScreen.h"
 #include "StoredProjectsScreen.h"
 #include "StoredProjectsScreenUtils.h"
 
@@ -131,6 +131,7 @@ void StoredProjectsScreen::createMainLayout() {
  */
 void StoredProjectsScreen::updateProjectList()
 {
+	lprintfln("@@@ RELOAD: Updating stored projects");
 	// clear the list of projects
 	int oldProjects = mListView->countChildWidgets();
 
