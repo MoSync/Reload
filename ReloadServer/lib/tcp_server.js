@@ -1,6 +1,6 @@
 var vars = require('../application/globals'),
 	fs = require('fs'),
-    sendToClients = require('../application/reload_manager');
+    ReloadManager = require('../application/reload_manager');
 
 /**
  * Object that accumulates data sent over a streaming
@@ -227,23 +227,23 @@ var create = function (port) {
                     msg: unescape(unescape(message.params)).replace("\n","</br>")
                 });
             }
-            else if (message.message === "getProjectList") {
+            else if (message.message === "getProjectList")
+            {
                 console.log("Generate and send Project List to the Client");
-                console.log("Total Projects sent: " + vars.globals.projectListJSON.length);
-
                 // send client the project list (internal use)
-                sendToClients.send({ 
+                ReloadManager.send({
                                 message: "projectList",
                                 data: {
                                     projectsCount: vars.globals.projectListJSON.length,
                                     projects: vars.globals.projectListJSON
                                 }
                 }, [socket]);
+                console.log("Total Projects sent: " + vars.globals.projectListJSON.length);
             }
             else if (message.message === "reloadProject") {
                 console.log("Reloading project Request")
                 var project = message.params.projectName;
-                sendToClients.rpc.reloadProject(project, false, function (){}, [socket]);
+                ReloadManager.rpc.reloadProject(project, false, function (){}, [socket]);
             }
         }
     }

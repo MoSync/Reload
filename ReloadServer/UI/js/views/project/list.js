@@ -65,6 +65,9 @@ define([
         selectProject: function (e) {
             e.preventDefault();
 
+            // Hide overlay
+            $('body').chardinJs('stop');
+
             var t, id;
             t = $(e.target);
             id = t.data('id');

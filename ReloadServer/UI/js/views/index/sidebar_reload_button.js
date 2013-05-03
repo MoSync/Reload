@@ -25,7 +25,8 @@ define([
                       'render',
                       'reload',
                       'doReload',
-                      'doDebug');
+                      'doDebug'
+                     );
 
             this.model = new SidebarReloadButtonModel();
 
@@ -56,13 +57,31 @@ define([
 
             // Check if a project is selected.
             if (this.parent.selectedProject === null) {
-                alert ('Please select a project.');
+                var btn = $('ul#projects');
+                btn.children().css('background', 'rgb(216, 221, 228)');
+                btn.attr('data-intro', 'Please select a project.');
+                btn.attr('data-position', 'right');
+                $('body').on('chardinJs:stop', function() {
+                    btn.removeAttr('data-intro');
+                    btn.removeAttr('data-position');
+                });
+                $('body').chardinJs('start');
+
                 return;
             }
 
             // Check if any device is connected.
             if (this.parent.deviceCount === 0) {
-                alert ('Please connect a device.');
+                var btn = $('#devices');
+                btn.children().css('background', 'rgb(216, 221, 228)');
+                btn.attr('data-intro', 'Please connect a device.');
+                btn.attr('data-position', 'right');
+                $('body').on('chardinJs:stop', function() {
+                    btn.removeAttr('data-intro');
+                    btn.removeAttr('data-position');
+                });
+                $('body').chardinJs('start');
+
                 return;
             }
 

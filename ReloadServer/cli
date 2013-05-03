@@ -1,0 +1,377 @@
+#!/usr/bin/env node
+
+var cli     = require('commander'),
+    request = require('request'),
+    table   = require('cli-table'),
+    fs      = require('fs');
+
+var parseError = function(code) {
+    switch(code) {
+        case 'ECONNREFUSED':
+            console.log('Unable to connect to server.');
+            break;
+
+        default:
+            console.log(code);
+    }
+}
+/*
+ * Common stuff used in the rest of this script.
+ */
+var Options = function() {
+    this.host    = 'http://localhost',
+    this.port    = 8283,
+    this.url     = this.host + ':'+ this.port,
+    this.headers = {'content-type' : 'application/json'}
+
+    return this;
+};
+var opts = new Options();
+
+/*
+ * Cli version.
+ */
+cli
+.version('0.0.1');
+
+
+/*
+ * Callback used by 'reload' command.
+ */
+function reloadProject(name, inspect, cb) {
+    if(inspect === undefined) {
+        inspect = false;
+    }
+
+    request.post({
+        headers  : opts.headers,
+        url      : opts.url,
+        body     : JSON.stringify({
+            "method" : "manager.reloadProject",
+            "params" : [name, inspect],
+            "id"     : null
+        })
+    }, function(error, response, body) {
+        if (error) {
+            parseError(error.code);
+            return;
+        }
+
+        var result = JSON.parse(body).result;
+        cb(result);
+    });
+}
+
+/*
+ * 'reload' command definition.
+ */
+cli
+.command('reload <name>')
+.description('\treload a project with a specified name.')
+.option('-i, --inspect', 'inspect mode for Weinre inspection.')
+.action(function(name, options){
+    reloadProject(name, options.inspect, function(result){
+        console.log(result);
+    });
+});
+
+/*
+ * Callback for 'create' command.
+ */
+function createProject(name, path, type, cb) {
+   if (!name.match(/^[a-zA-Z]/)) {
+        console.log("Project name can start only with characters a-z and A-Z");
+        return;
+    }
+
+    if (!name.match(/^[a-zA-Z0-9_\- ]+$/)) {
+        console.log("Project name should be at least 1 character of a-z, A-Z, 0-9, '_', '-' or ' '.");
+        return;
+    }
+
+    if (!type.match(/^(native|web|n|w)$/)) {
+        console.log("Project type can only be 'native' (n) or 'web' (w)");
+        return;
+    }
+
+    if (type.toLowerCase() === 'n') {
+        type = 'native';
+    }
+
+    if (type.toLowerCase() === 'w') {
+        type = 'web';
+    }
+
+    if (path && !fs.existsSync(path)) {
+        console.log("Path %s doesn't exist.", path);
+        return;
+    }
+
+    // If path is given, set that directory as current workspace.
+    // TODO: Project creation should be nested as a callback to
+    // changeworkspace
+    if (path && fs.existsSync(path)) {
+        request.post({
+            headers  : opts.headers,
+            url      : opts.url,
+            body     : JSON.stringify({
+                "method" : "manager.changeWorkspacePath",
+                "params" : [path],
+                "id"     : null
+            })
+        }, function(error, response, body) {
+            if (error) {
+                parseError(error.code);
+                return;
+            }
+            console.log('Changed workspace path to %s', path);
+        });
+    }
+
+    // Create project.
+    request.post({
+        headers  : opts.headers,
+        url      : opts.url,
+        body     : JSON.stringify({
+            "method" : "manager.createNewProject",
+            "params" : [name, type],
+            "id"     : null
+        })
+    }, function(error, response, body) {
+        if (error) {
+            parseError(error.code);
+            return;
+        }
+
+        var result = JSON.parse(body).result;
+        if (result === null) {
+            console.log('Project with this name already exist.');
+            return;
+        }
+
+        var t = new table({
+            style: {compact: true, 'padding-left' :  2, 'padding-right' :  2, head: ['blue']},
+            chars: {
+                'top':             ''
+                , 'top-mid':       ''
+                , 'top-left':      ''
+                , 'top-right':     ''
+                , 'bottom':        ''
+                , 'bottom-mid':    ''
+                , 'bottom-left':   ''
+                , 'bottom-right':  ''
+                , 'left':          ''
+                , 'left-mid':      ''
+                , 'mid':           '-'
+                , 'mid-mid':       ''
+                , 'right':         ''
+                , 'right-mid':     ''
+            }
+        });
+
+        t.push({'Name': name}, {'Type':type});
+
+        if (path) {
+            t.push({'Path':path});
+        }
+
+        cb(t.toString());
+    });
+}
+
+/*
+ * 'create' command definition.
+ */
+cli
+.command('create <name>')
+.description('\tcreate a project with a specified name. Current workspace is assumed as default.')
+.option('-p, --path [path]', 'project directory.')
+.option('-t, --type [native|web]', 'project type. Web based by default.', 'web')
+.action(function(name, options){
+    createProject(name, options.path, options.type, function(result){
+        console.log(result);
+    });
+});
+
+/*
+ * Callback for 'workspace' command.
+ */
+function changeWorkspacePath(path, cb) {
+    // Return current workspace path info by default.
+    if (path === undefined) {
+        request.post({
+            headers  : opts.headers,
+            url      : opts.url,
+            body     : JSON.stringify({
+                "method" : "manager.getWorkspacePath",
+                "params" : [],
+                "id"     : null
+            })
+        }, function(error, response, body) {
+            if (error) {
+                parseError(error.code);
+                return;
+            }
+
+            var result = JSON.parse(body).result.path;
+            cb(result);
+        });
+    } else {
+        request.post({
+            headers  : opts.headers,
+            url      : opts.url,
+            body     : JSON.stringify({
+                "method" : "manager.changeWorkspacePath",
+                "params" : [path],
+                "id"     : null
+            })
+        }, function(error, response, body) {
+            if (error) {
+                parseError(error.code);
+                return;
+            }
+
+            var result = JSON.parse(body).result.path;
+            cb(result);
+        });
+    }
+}
+
+/*
+ * 'workspace' command definition.
+ */
+cli
+.command('workspace')
+.description('\tchange workspace directory. Shows current workspace path if no option is given.')
+.option('-p, --path <path>', "set workspace directory. Directory is created if it doesn't exist.")
+.action(function(options){
+    changeWorkspacePath(options.path, function(result){
+        console.log(result);
+    });
+});
+
+/*
+ * Callback for 'clients' command.
+ */
+function getConnectedClients(cb) {
+    request.post({
+        headers  : opts.headers,
+        url      : opts.url,
+        body     : JSON.stringify({
+            "method" : "manager.getClientInfo",
+            "params" : [],
+            "id"     : null
+        })
+    }, function(error, response, body) {
+        if (error) {
+            parseError(error.code);
+            return;
+        }
+
+        var result = JSON.parse(JSON.parse(body).result);
+        if (result.length === 0) {
+            console.log('No clients connected.');
+            return;
+        }
+
+        var t = new table({
+            head: ['Name', 'Address', 'Platform', 'Version'],
+            style: {compact: true, 'padding-left' :  2, 'padding-right' :  2, head: ['blue']},
+            chars: {
+                'top':             ''
+                , 'top-mid':       ''
+                , 'top-left':      ''
+                , 'top-right':     ''
+                , 'bottom':        ''
+                , 'bottom-mid':    ''
+                , 'bottom-left':   ''
+                , 'bottom-right':  ''
+                , 'left':          ''
+                , 'left-mid':      ''
+                , 'mid':           '-'
+                , 'mid-mid':       ''
+                , 'right':         ''
+                , 'right-mid':     ''
+            }
+        });
+
+        result.forEach(function(client){
+            t.push([client.name, client.address, client.platform, client.version]);
+        });
+        cb(t.toString());
+    });
+}
+
+/*
+ * 'clients' command definition.
+ */
+cli
+.command('clients')
+.description('\tlist connected clients.')
+.action(function(){
+    getConnectedClients(function(result){
+        console.log(result);
+    });
+});
+
+/*
+ * Callback for 'projects' command.
+ */
+function getProjectList(cb) {
+    request.post({
+        headers  : opts.headers,
+        url      : opts.url,
+        body     : JSON.stringify({
+            "method" : "manager.getProjectList",
+            "params" : [],
+            "id"     : null
+        })
+    }, function(error, response, body) {
+        var result = JSON.parse(body).result;
+
+        var t = new table({
+            head: ['Name', 'Path'],
+            style: {compact: true, 'padding-left' :  2, 'padding-right' :  2, head: ['blue']},
+            chars: {
+                'top':             ''
+                , 'top-mid':       ''
+                , 'top-left':      ''
+                , 'top-right':     ''
+                , 'bottom':        ''
+                , 'bottom-mid':    ''
+                , 'bottom-left':   ''
+                , 'bottom-right':  ''
+                , 'left':          ''
+                , 'left-mid':      ''
+                , 'mid':           '-'
+                , 'mid-mid':       ''
+                , 'right':         ''
+                , 'right-mid':     ''
+            }
+        });
+
+        result.forEach(function(p){
+            t.push([p.name, p.path]);
+        });
+
+        cb(t.toString());
+    });
+}
+
+/*
+ * 'projects' command definition.
+ */
+cli
+.command('projects')
+.description('\tlist project names in current workspace.')
+.action(function(){
+    getProjectList(function(result){
+        console.log(result);
+    });
+});
+
+if (process.argv.length > 2) {
+    cli.parse(process.argv);
+} else {
+    cli.help();
+}

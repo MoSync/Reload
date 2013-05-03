@@ -24,26 +24,38 @@ create = function(port) {
     if(vars.globals.logLevel == 2){
         app.use(express.logger('dev'));
     }
-    
+
     app.use(express.cookieParser('foobar'));
     app.use(express.session());
     app.use(express.bodyParser());
     app.use('/', express.static(path.resolve(__dirname, '../UI')));
 
+    app.get('/ip', function(request, response){
+        response.send(vars.globals.ip);
+    });
+
     app.get('/proccess', function(request, response){
         console.log("-------------------------------");
-        console.log(request.query.jsonRPC);
-        console.log(JSON.parse(request.query.jsonRPC));
+        delete request.query.callback;
+        delete request.query._;
+        console.log(request.query);
+        //console.log(request.query.jsonRPC);
+        //console.log(JSON.parse(request.query.jsonRPC));
         console.log("-------------------------------");
-        rpc.listen(JSON.parse(request.query.jsonRPC), response);
+        rpc.listen(request.query, response);
+        //rpc.listen(JSON.parse(request.query.jsonRPC), response);
     });
 
 
 
-    app.post('/', function( request, response ){
-
-        rpc.listen(request.body, response);
-    });
+    /*
+     *app.post('/', function( request, response ){
+     *    console.log('--');
+     *    console.log(request.body);
+     *    console.log('--');
+     *    rpc.listen(request.body, response);
+     *});
+     */
 
     // Init WebSockets.
     var io      = require('../node_modules/socket.io');
@@ -83,9 +95,9 @@ create = function(port) {
     });
 
     if(vars.globals.openBrowser) {
-        vars.methods.startWebUI();    
+        vars.methods.startWebUI();
     }
-    
+
     console.log('Server started listening on port: ' + port, 0);
 };
 
