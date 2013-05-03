@@ -9,7 +9,6 @@ define([
             console.log('!!! Reloading ' + this.get('name') + ' with debug flag: ' + d);
 
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.reloadProject',
                 params: [this.get('name'), d],

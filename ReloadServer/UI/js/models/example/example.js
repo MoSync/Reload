@@ -9,21 +9,25 @@ define([
             self = this;
 
             options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.reloadExample',
                 params: [JSON.stringify(opts)],
                 id: null
             };
 
+            options.timeout = 5000;
             options.success = function (resp) {
+                console.log('succsess');
                 self.trigger('reloaded');
                 console.log(resp);
             };
 
-            options.error = function (resp) {
-                console.log('could not reload');
-                console.log(resp);
+            options.error = function (jqXHR, status, error) {
+                console.log('Could not reload.');
+                self.trigger('error');
+                console.log(jqXHR);
+                console.log(status);
+                console.log(error);
             };
 
             this.rpc(options);
@@ -41,13 +45,13 @@ define([
             };
 
             options.success = function (resp) {
-                console.log('Copy successful');
+                console.log('Copy successful.');
                 console.log(resp);
                 self.trigger('copied');
             };
 
             options.error   = function (resp) {
-                console.log('Could not copy example');
+                console.log('Could not copy example.');
                 console.log(resp);
             };
 

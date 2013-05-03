@@ -16,9 +16,18 @@ define([
 
         initialize: function () {
             _.bindAll(this, 'render', 'setActive');
+
+            this.model = new ContentNavModel();
         },
 
-        setActive: function (tab) {
+        setActive: function (state) {
+            // Read previous tab state
+            var previous = this.model.getState();
+
+            // Persist if current tab state =/= previous
+            if (state !== previous && typeof state !== 'object') {
+                this.model.setState(state);
+            }
 
             // Clear old active tab before setting new tab as active.
             this.$el.children().each(function() {
@@ -26,13 +35,13 @@ define([
                     $(this).removeClass('active');
                 }
 
-                if ($(this).data('name') === tab) {
+                if ($(this).data('name') === state) {
                     $(this).addClass('active');
                 }
 
             });
-            if (typeof(tab) === 'object') {
-                $(tab.target).parent().addClass('active');
+            if (typeof(state) === 'object') {
+                $(state.target).parent().addClass('active');
             }
             // Set new tab as active.
             //$(e.target).parent().addClass('active');

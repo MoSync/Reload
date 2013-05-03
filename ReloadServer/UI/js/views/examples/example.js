@@ -60,6 +60,17 @@ define([
             // Disable buttons.
             $('.controls').css({display: 'none'});
 
+            this.model.on('error', function(){
+                // Remove loading message.
+                load_sign.remove();
+
+                // Reenable buttons.
+                $('.controls').css({display: ''});
+
+                // Show error message to the user.
+                alert('An error occured.');
+            });
+
             this.model.on('reloaded', function(){
                 // Remove loading message.
                 load_sign.remove();

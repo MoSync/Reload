@@ -1,8 +1,9 @@
-var vars    = require("./application/globals"),
+var vars      = require("./application/globals"),
     logModule = require("./application/log");
 
 var os  = require('os'),
-    net = require('net');
+    net = require('net'),
+    fs  = require('fs');
 
 /**
  * Overriding console.log() for different levels of logging output
@@ -20,7 +21,6 @@ vars.globals.localPlatform = os.platform();
 vars.globals.currentWorkingPath = process.cwd();
 
 process.argv.forEach(function (value, index, array) {
-
     switch (value) {
         case "-nobrowser" : 
             vars.globals.openBrowser = false;
@@ -34,25 +34,23 @@ process.argv.forEach(function (value, index, array) {
     }
 });
 
-//Platform specific considerations for getting the home directory
-if((vars.globals.localPlatform.indexOf("darwin") >= 0) ||
-   (vars.globals.localPlatform.indexOf("linux") >=0)) {
+// Platform specific considerations for getting the home directory
+var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+var linux = vars.globals.localPlatform.indexOf("linux") >=0;
 
+if ( darwin || linux ) {
     vars.globals.homeDir = process.env.HOME;
-}
-else {
-
+} else {
     vars.globals.homeDir = process.env.USERPROFILE;
 }
 
-//Platform specific considerations for getting the directory separator
-vars.globals.fileSeparator = ((vars.globals.localPlatform.indexOf("darwin") >=0) ||
-                         (vars.globals.localPlatform.indexOf("linux") >=0))?"/" : "\\";
+// Platform specific considerations for getting the directory separator
+vars.globals.fileSeparator = ( darwin || linux )? "/" : "\\";
 
+// Kill adb when the server dies
 process.on('exit', function(){
-    vars.globals.adb.kill("-9"); //Kill adb when the server dies
+    vars.globals.adb.kill("-9");
 });
-
 
 /**
  * Include and execute the modules of the rpc
@@ -60,12 +58,67 @@ process.on('exit', function(){
 var server  = require("./lib/jsonrpc_server"),
     tcp     = require("./lib/tcp_server");
     udp     = require("./lib/udp_server");
-    
+
 var manager = require("./application/reload_manager"),
     client  = require("./application/client_manager");
+
+/**
+ * Figure out a project directory. Accepts a callback to be processed
+ * efter path is set.
+ *
+ * @param {function()}   A callback to be executed.
+ *
+ * @return void
+ */
+function getLatestPath(done) {
+    var self = this;
+    var configFile = vars.globals.lastWorkspaceFile;
+    var defaultPath =
+        vars.globals.homeDir
+        + vars.globals.fileSeparator
+        + "MoSync_Reload_Projects";
+
+    try {
+        fs.exists(configFile, function(exists) {
+            // If config file exists
+            if (exists) {
+                // Read it's contents
+                var data = String(fs.readFileSync(configFile, "utf8"));
+                if (data != "") {
+                    // If "data" is a file system path
+                    fs.exists(data, function (exists) {
+                        if (exists) {
+                            // Set it as current workspace
+                            vars.methods.setRootWorkspacePath(data, done);
+                        } else {
+                            // Otherwise use default workspace instead
+                            vars.methods.setRootWorkspacePath(defaultPath, done);
+                        }
+                    });
+                } else {
+                    console.log("ERROR reading " + configFile + ", reverting to " + defaultPath, 0);
+                    vars.methods.setRootWorkspacePath(defaultPath, done);
+                }
+            } else {
+                console.log(configFile + "doesn't exist. Workspace path set to " + defaultPath, 0);
+                vars.methods.setRootWorkspacePath(defaultPath, done);
+            }
+        });
+    } catch(err) {
+        console.log("ERROR in getLatestPath: " + err, 0);
+    }
+}
+
 /**
  * Starting the http and TCP Services
  */
-WebUI       = server.create(8283);
-tcpSocket   = tcp.create(7000);
-udp         = udp.create(41234);
+getLatestPath(function(){
+    manager.rpc.findProjects(); // Generate project list.
+    manager.rpc.getVersionInfo(function (a){});
+    manager.rpc.getNetworkIP(function(){
+        WebUI       = server.create(8283);
+        tcpSocket   = tcp.create(7000);
+        udp         = udp.create(41234);
+    });
+
+});
