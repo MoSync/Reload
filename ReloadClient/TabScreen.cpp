@@ -17,29 +17,12 @@ MA 02110-1301, USA.
 */
 
 /*
- * MainStackSingleton.h
+ * TabScreen.cpp
  *
- *  Created on: Feb 28, 2013
- *      Author: Spiridon Alexandru
+ *  Created on: Apr 23, 2013
+ *      Author: Kostas Tsolakis
  */
 
 
-#ifndef MAINSTACKSINGLETON_H_
-#define MAINSTACKSINGLETON_H_
 
-#include <NativeUI/Widgets.h>
-using namespace NativeUI;
 
-class MainStackScreen;
-
-class MainStackSingleton
-{
-public:
-   static MainStackScreen* getInstance();
-
-private:
-   MainStackSingleton();
-   static MainStackScreen* pSingleton;
-};
-
-#endif /* MAINSTACKSINGLETON_H_ */

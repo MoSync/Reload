@@ -43,7 +43,7 @@ using namespace NativeUI;
 LoginScreen::LoginScreen(MAUtil::String os, int orientation):
 	Screen()
 {
-	this->setTitle("Login screen");
+	this->setTitle("Server");
 	this->mOS = os;
 	this->mCurrentOrientation = orientation;
 
@@ -74,24 +74,26 @@ void LoginScreen::initializeScreen()
 {
 	maScreenSetFullscreen(1);
 	MAExtent ex = maGetScrSize();
-	int screenWidth = EXTENT_X(ex);
-	int screenHeight = EXTENT_Y(ex);
+	mScreenWidth = EXTENT_X(ex);
+	mScreenHeight = EXTENT_Y(ex);
 
 	mMainLayout = new RelativeLayout();
 
-	createBackgroundImage(screenWidth, screenHeight);
-	createLogoLayout();
-	createMenuLayout();
-	createBottomLayout();
+	createBackgroundImage(mScreenWidth, mScreenHeight);
+	createNewLayout();
+	//findServers();
+	//createLogoLayout();
+	//createMenuLayout();
+	//createBottomLayout();
 
 	if (mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ||
 		mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
-		mMainLayout->setSize(screenHeight, screenWidth);
-		mBackground->setSize(screenHeight, screenWidth);
+		mMainLayout->setSize(mScreenHeight, mScreenWidth);
+		mBackground->setSize(mScreenHeight, mScreenWidth);
 
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
+		/*int logoBottomY = positionLogoLayout(screenHeight, screenWidth,
 				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				LOGO_TOP_LANDSCAPE_RATIO,
 				LOGO_WIDTH_LANDSCAPE_RATIO,
@@ -113,15 +115,15 @@ void LoginScreen::initializeScreen()
 				BOTTOM_LOGO_TOP_LANDSCAPE_RATIO,
 				BOTTOM_INFO_WIDTH_LANDSCAPE_RATIO,
 				BOTTOM_INFO_LEFT_LANDSCAPE_RATIO,
-				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);
+				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);*/
 	}
 	else
 	{
-		mMainLayout->setSize(screenWidth, screenHeight);
-		mBackground->setSize(screenWidth, screenHeight);
+		mMainLayout->setSize(mScreenWidth, mScreenHeight);
+		mBackground->setSize(mScreenWidth, mScreenHeight);
 
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+		/*int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
 				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				LOGO_TOP_PORTRAIT_RATIO,
 				LOGO_HEIGHT_PORTRAIT_RATIO,
@@ -143,13 +145,13 @@ void LoginScreen::initializeScreen()
 				BOTTOM_LOGO_TOP_PORTRAIT_RATIO,
 				BOTTOM_INFO_WIDTH_PORTRAIT_RATIO,
 				BOTTOM_INFO_LEFT_PORTRAIT_RATIO,
-				BOTTOM_INFO_TOP_PORTRAIT_RATIO);
+				BOTTOM_INFO_TOP_PORTRAIT_RATIO);*/
 	}
 
-	mMainLayout->addChild(mFindServersButton);
-	mMainLayout->addChild(mLoadStoredProjectsButton);
-	mMainLayout->addChild(mMosynclogo);
-	mMainLayout->addChild(mInfoIcon);
+	//mMainLayout->addChild(mFindServersButton);
+	//mMainLayout->addChild(mLoadStoredProjectsButton);
+	//mMainLayout->addChild(mMosynclogo);
+	//mMainLayout->addChild(mInfoIcon);
 
 	this->setMainWidget(mMainLayout);
 }
@@ -173,7 +175,7 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 			mCurrentOrientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
 		// the reload logo layout will represent 30% of the screen
-		int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
+		/*int logoBottomY = positionLogoLayout(screenWidth, screenHeight,
 				LOGO_SCREEN_HEIGHT_LANDSCAPE_RATIO,
 				LOGO_TOP_LANDSCAPE_RATIO,
 				LOGO_WIDTH_LANDSCAPE_RATIO,
@@ -195,14 +197,14 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 				BOTTOM_LOGO_TOP_LANDSCAPE_RATIO,
 				BOTTOM_INFO_WIDTH_LANDSCAPE_RATIO,
 				BOTTOM_INFO_LEFT_LANDSCAPE_RATIO,
-				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);
+				BOTTOM_INFO_TOP_LANDSCAPE_RATIO);*/
 	}
 	else
 	{
 		int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
 		int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
 
-		positionBottomLayout(screenWidth, screenHeight,
+		/*positionBottomLayout(screenWidth, screenHeight,
 				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				BOTTOM_LOGO_WIDTH_PORTRAIT_RATIO,
 				BOTTOM_LOGO_HEIGHT_PORTRAIT_RATIO,
@@ -224,7 +226,7 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 				LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO,
 				LOGO_TOP_PORTRAIT_RATIO,
 				LOGO_WIDTH_PORTRAIT_RATIO,
-				LOGO_HEIGHT_PORTRAIT_RATIO);
+				LOGO_HEIGHT_PORTRAIT_RATIO);*/
 	}
 }
 
@@ -244,6 +246,45 @@ void LoginScreen::createBackgroundImage(int screenWidth, int screenHeight)
 	{
 		mMainLayout->addChild(mBackground);
 	}
+}
+
+void LoginScreen::createNewLayout()
+{
+	if(mOS == "iPhone OS")
+	{
+		mServersTitle = new ImageButton();
+		((ImageButton*)mServersTitle)->addButtonListener(this);
+		((ImageButton*)mServersTitle)->setBackgroundImage(RELOAD_BG);
+		mServersTitle->setFontColor(0x000000);
+		mServersTitle->setEnabled(false);
+	}
+	else
+	{
+		mServersTitle = new Button();
+		((Button*)mServersTitle)->addButtonListener(this);
+		mServersTitle->setEnabled(false);
+	}
+
+	mServersTitle->fillSpaceHorizontally();
+	mServersTitle->setText("Searching for Servers ...");
+	mServersTitle->setHeight(80);
+	mServersTitle->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mServersTitle->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mMainLayout->addChild(mServersTitle);
+
+
+	// Available servers LIST VIEW
+	mServersListView = new ListView();
+	mServersListView->fillSpaceHorizontally();
+	mServersListView->addListViewListener(this);
+	mServersListView->setTopPosition(80);
+	mMainLayout->addChild(mServersListView);
+
+	// Create the list item for manual server ip entry
+	ListViewItem * serverItem = new ListViewItem();
+	serverItem->setText("Enter ip manually");
+	serverItem->setHeight(80);
+	mServersListView->addChild(serverItem);
 }
 
 /**
@@ -531,6 +572,75 @@ int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, float s
 }
 
 /**
+ * Creates new Broadcast Handler that initiates server discovery
+ */
+void LoginScreen::findServers()
+{
+	if(mOS.find("Windows") < 0)
+	{
+		mBroadcastHandler = new BroadcastHandler(this);
+		mBroadcastHandler->findServer();
+	}
+	else
+	{
+		mServersTitle->fillSpaceHorizontally();
+		mServersTitle->setText("Server Discovery is not Supported");
+	}
+}
+
+/**
+ * Empties the server list
+ */
+void LoginScreen::emptyServerList()
+{
+	int items = mServersListView->countChildWidgets();
+	lprintfln("@@@ RELOAD: list length=%d", items);
+	for(int i = 0; i < items-1; i++)
+	{
+		Widget * listItem = mServersListView->getChild(0);
+		mServersListView->removeChild(listItem);
+		delete listItem;
+	}
+}
+
+/**
+ * Adds the server ip into the list view
+ */
+void LoginScreen::addServerToList(MAUtil::String serverIP)
+{
+	// check if already exists
+	bool exists = false;
+	int totalItems = mServersListView->countChildWidgets();
+
+	// There was a server found replace Searching for servers label
+	// with refresh button
+	if (totalItems == 1)
+	{
+		mServersTitle->setEnabled(true);
+		mServersTitle->setText("Refresh List");
+	}
+
+	for (int i = 0; i < totalItems; i++)
+	{
+		if (mServersListView->getChild(i)->getPropertyString("text") == serverIP)
+		{
+			exists = true;
+		}
+	}
+
+	if(!exists)
+	{
+		ListViewItem * serverItem = new ListViewItem();
+		serverItem->setText(serverIP);
+		serverItem->setHeight(80);
+		Widget *manualIp = mServersListView->getChild(totalItems-1);
+		mServersListView->removeChild(manualIp);
+		mServersListView->addChild(serverItem);
+		mServersListView->addChild(manualIp);
+	}
+}
+
+/**
  * On iOS, it's called when the return button is clicked on
  * a virtual keyboard
  * @param editBox The editbox using the virtual keyboard
@@ -546,14 +656,16 @@ void LoginScreen::editBoxReturn(EditBox* editBox)
  */
 void LoginScreen::buttonClicked(Widget *button)
 {
-	//Trim the beggining and end of the string of any spaces.
-	int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
-	int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
-	lastCharPos = (lastCharPos != String::npos)?lastCharPos - 1:mServerIPBox->getText().length() - 1;
-	String address = mServerIPBox->getText().substr(firstCharPos, lastCharPos - firstCharPos + 1);
+
 
 	if(button == mServerConnectButton)
 	{
+		//Trim the beggining and end of the string of any spaces.
+		int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
+		int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
+		lastCharPos = (lastCharPos != String::npos)?lastCharPos - 1:mServerIPBox->getText().length() - 1;
+		String address = mServerIPBox->getText().substr(firstCharPos, lastCharPos - firstCharPos + 1);
+
 		// announce the screen listeners that the connect button was clicked
 		for (int i = 0; i < mReloadUIListeners.size(); i++)
 		{
@@ -585,6 +697,63 @@ void LoginScreen::buttonClicked(Widget *button)
 		{
 			mReloadUIListeners[i]->infoButtonClicked();
 		}
+	}
+	else if(button == mServersTitle)
+	{
+		delete mBroadcastHandler;
+		this->emptyServerList();
+		this->findServers();
+	}
+}
+
+void LoginScreen::listViewItemClicked(ListView *listView, ListViewItem *listViewItem)
+{
+	lprintfln("@@@ RELOAD: item clicked with text=%s",listViewItem->getPropertyString("text").c_str());
+	if(listViewItem->getPropertyString("text") == "Enter ip manually")
+	{
+		//The edit box that receives the server IP
+		mServerIPBox = new EditBox();
+		mServerIPBox->addEditBoxListener(this);
+		for (int j = 0; j < mReloadUIListeners.size(); j++)
+		{
+			mReloadUIListeners[j]->defaultAddress();
+		}
+		mServerIPBox->setWidth((int)(mScreenWidth * 0.45));
+
+		//The connect to server button
+		if(mOS == "iPhone OS") //Android image buttons do not support text
+		{
+			mServerConnectButton = new ImageButton();
+			((ImageButton*)mServerConnectButton)->addButtonListener(this);
+			((ImageButton*)mServerConnectButton)->setBackgroundImage(CONNECT_BG);
+			mServerConnectButton->setFontColor(0x000000);
+		}
+		else
+		{
+			mServerConnectButton = new Button();
+			((Button*)mServerConnectButton)->addButtonListener(this);
+		}
+		mServerConnectButton->setText(CONNECT_BUTTON_TEXT);
+		mServerConnectButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		mServerConnectButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+		mServerConnectButton->setWidth((int)(mScreenWidth * 0.30));
+
+		HorizontalLayout *hLayout = new HorizontalLayout();
+
+		hLayout->addChild(mServerIPBox);
+		hLayout->addChild(mServerConnectButton);
+
+		listViewItem->setText("");
+		listViewItem->addChild(hLayout);
+	}
+	else if (listViewItem->getPropertyString("text") != "")
+	{
+		lprintfln("@@@ RELOAD: Connect to server %s", listViewItem->getPropertyString("text").c_str());
+		for (int j = 0; j < mReloadUIListeners.size(); j++)
+		{
+			mReloadUIListeners[j]->connectToSelectedServer(listViewItem->getPropertyString("text"));
+		}
+		delete mBroadcastHandler;
 	}
 }
 

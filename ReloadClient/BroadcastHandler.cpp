@@ -36,10 +36,10 @@ using namespace MAUtil;
 /**
  * Constructor.
  */
-BroadcastHandler::BroadcastHandler(ServersDialog *serversDialog) :
+BroadcastHandler::BroadcastHandler(LoginScreen *loginScreen) :
 	mDatagramSocket(this)
 {
-	mServersDialog = serversDialog;
+	mLoginScreen = loginScreen;
 
 	// Initialize broadcastAddress
 	mBroadcastAddress.family = CONN_FAMILY_INET4;
@@ -97,7 +97,7 @@ void BroadcastHandler::closeConnection()
  */
 void BroadcastHandler::broadcast()
 {
-
+	lprintfln("@@@ RELOAD: mBroadcastAddres.family = %d", mBroadcastAddress.family);
 	mDatagramSocket.writeTo(mBroadcastedData, 6, mBroadcastAddress);
 }
 
@@ -128,7 +128,7 @@ void BroadcastHandler::connRecvFinished(Connection* conn, int result)
 		lprintfln("@@@ RELOAD: SERVER RESPONSE:%s",mBuffer);
 
 		initializeBuffer();
-		mServersDialog->addServerToList(mServerAddress);
+		mLoginScreen->addServerToList(mServerAddress);
 	}
 	mDatagramSocket.recvFrom(mBuffer, sizeof(mBuffer), &mAddress);
 }

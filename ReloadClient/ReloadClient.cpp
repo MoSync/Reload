@@ -32,8 +32,9 @@ MA 02110-1301, USA.
 #include "ReloadClient.h"
 #include "ReloadNativeUIMessageHandler.h"
 #include "Log.h"
-#include "View/MainStackSingleton.h"
-#include "View/MainStackScreen.h"
+#include "MainScreenSingleton.h"
+#include "MainScreen.h"
+#include "SplashScreen.h"
 
 #define SERVER_TCP_PORT "7000"
 #define SERVER_HTTP_PORT "8283"
@@ -164,6 +165,12 @@ ReloadClient::ReloadClient()
 	// Initialize application.
 	// Order of calls are important as data needed by
 	// later calls are created in earlier calls.
+	Screen *splashScreen = new SplashScreen();
+	splashScreen->show();
+	int startTime = maGetMilliSecondCount();
+	while( maGetMilliSecondCount() < startTime + 2000){
+		//sleep
+	}
 
 	setScreenOrientation();
 	initializeWebView();
@@ -353,7 +360,7 @@ void ReloadClient::createScreens()
 	mLoadingScreen->initializeScreen(mOS);
 
 	// Set the most recently used server IP address.
-	mReloadScreenController->defaultAddress(mServerAddress.c_str());
+	//mReloadScreenController->defaultAddress(mServerAddress.c_str());
 }
 
 void ReloadClient::createMessageHandlers()
@@ -671,7 +678,10 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 					NULL, "OK", NULL);
 			mProjectToSave = "";
 
-			mReloadScreenController->showConnectedScreen();
+			//mReloadScreenController->showConnectedScreen();
+			// Update the local list of projects
+			mReloadScreenController->loadStoredProjectsButtonClicked();
+			MainScreenSingleton::getInstance()->show();
 		}
 		else
 		{
@@ -693,7 +703,8 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 void ReloadClient::cancelDownload()
 {
 	mDownloadHandler.cancelDownload();
-	mReloadScreenController->showConnectedScreen();
+	MainScreenSingleton::getInstance()->show();
+	//mReloadScreenController->showConnectedScreen();
 }
 
 void ReloadClient::connectToServer(const char* serverAddress)
@@ -1182,4 +1193,13 @@ MAUtil::Vector <reloadProject> * ReloadClient::getListOfProjects()
 MAUtil::Vector <reloadProject> * ReloadClient::getListOfSavedProjects()
 {
 	return &mSavedProjects;
+}
+
+/**
+ * Getter: Returns the servers last used ip address
+ * @return A string with the ip address
+ */
+MAUtil::String ReloadClient::getServerIpAddress()
+{
+	return this->mServerAddress;
 }

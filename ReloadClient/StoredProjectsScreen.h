@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 
 #include <NativeUI/Widgets.h>
 #include "ReloadUIListener.h"
-#include "../dataTypes.h"
+#include "dataTypes.h"
 
 using namespace NativeUI;
 using namespace MAUtil;

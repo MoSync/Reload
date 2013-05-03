@@ -24,7 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include "LoadingScreen.h"
-#include "../Log.h"
+#include "Log.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.

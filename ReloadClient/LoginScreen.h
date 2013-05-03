@@ -29,12 +29,15 @@ MA 02110-1301, USA.
 #include <NativeUI/Widgets.h>
 
 #include "ReloadUIListener.h"
+#include "BroadcastHandler.h"
 
 using namespace MAUtil;
 using namespace NativeUI;
 
+class BroadcastHandler;
+
 class LoginScreen:
-	public Screen, ButtonListener, EditBoxListener
+	public Screen, ButtonListener, EditBoxListener, ListViewListener
 {
 public:
 	/**
@@ -53,7 +56,7 @@ public:
 	 * Sets the default IP address of the server.
 	 * @param ipAddress The server IP default address.
 	 */
-	void setDefaultIPAddress(const char *ipAddress);
+	void setDefaultIPAddress(const char * ipAddress);
 
 	/**
 	 * Add a reload UI event listener.
@@ -78,6 +81,21 @@ public:
 	 */
 	virtual void orientationDidChange();
 
+	/**
+	 * Creates new Broadcast Handler that initiates server discovery
+	 */
+	void findServers();
+
+	/**
+	 * Empties the server list
+	 */
+	void LoginScreen::emptyServerList();
+
+	/**
+	 * Adds the server ip into the list view
+	 */
+	void addServerToList(MAUtil::String serverIP);
+
 private:
 	/**
 	 * Creates the screen, the layouts, the widgets and positions everything.
@@ -90,6 +108,8 @@ private:
 	 * @param screenHeight Used to set the background image height.
 	 */
 	void createBackgroundImage(int screenWidth, int screenHeight);
+
+	void createNewLayout();
 
 	/**
 	 * Creates the upper layout of the main screen (that contains the Reload logo)
@@ -181,6 +201,8 @@ private:
 	 */
 	void buttonClicked(Widget *button);
 
+	void listViewItemClicked(ListView *listView, ListViewItem *listViewItem);
+
 	/**
 	 * On iOS, it's called when the return button is clicked on
 	 * a virtual keyboard
@@ -189,6 +211,10 @@ private:
 	void editBoxReturn(EditBox* editBox);
 
 private:
+	int mScreenWidth;
+
+	int mScreenHeight;
+
 	/**
 	 * Array with login screen listeners.
 	 */
@@ -208,6 +234,10 @@ private:
 	 * The TextWidgets declared here are instantiated as either
 	 * Buttons or ImageButtons depending on the platform
 	 */
+	ListView *mServersListView;
+
+	TextWidget *mServersTitle;
+
 	TextWidget *mServerConnectButton;
 
 	TextWidget *mLoadStoredProjectsButton;
@@ -229,6 +259,8 @@ private:
 	Image *mBackground;
 
 	RelativeLayout* mMainLayout;
+
+	BroadcastHandler *mBroadcastHandler;
 };
 
 #endif /* LOGINSCREEN_H_ */

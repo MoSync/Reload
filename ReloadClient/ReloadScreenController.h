@@ -26,17 +26,17 @@ MA 02110-1301, USA.
 #ifndef RELOADSCREENCONTROLLER_H_
 #define RELOADSCREENCONTROLLER_H_
 
-#include "View/LoginScreen.h"
-#include "View/ReloadUIListener.h"
+#include "LoginScreen.h"
+#include "ReloadUIListener.h"
 
-#include "BroadcastHandler.h"
+//#include "BroadcastHandler.h"
 
 class ReloadClient;
 class ReloadTabScreen;
 class ConnectionScreen;
 class WorkspaceScreen;
 class StoredProjectsScreen;
-class ServersDialog;
+//class ServersDialog;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -89,7 +89,7 @@ public:
 	 * Sets the default address (will appear inside the connect EditBox).
 	 * @param serverAddress The default server address.
 	 */
-	void defaultAddress(const char *serverAddress);
+	virtual void defaultAddress();
 
 	/**
 	 * Called when the connect button is clicked.
@@ -168,6 +168,9 @@ public:
 	void updateWorkspaceScreen();
 
 private:
+	int mAppLevel;
+
+	Screen * mServerScreen;
 	/**
 	 * The ReloadClient the handles the business logic of tha application.
 	 */
@@ -196,9 +199,9 @@ private:
 	/**
 	 * The modal dialog containing available servers
 	 */
-	ServersDialog *mServersDialog;
+	//ServersDialog *mServersDialog;
 
-	BroadcastHandler *mBroadcastHandler;
+	//BroadcastHandler *mBroadcastHandler;
 };
 
 
