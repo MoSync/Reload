@@ -143,7 +143,7 @@ var JSONRPC = {
 
         // Check for the required fields, and if they aren't there, then
         // dispatch to the handleInvalidRequest function.
-        if(!(message.method && message.params)) {
+        if (!(message.method && message.params)) {
             var responseObject = {
                 'id':      message.id,
                 'result':  null,

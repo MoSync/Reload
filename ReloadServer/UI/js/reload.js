@@ -29,16 +29,14 @@ define([
             var resp,
             params = {};
 
-            // POST
-            /*
-             *params.url          = 'http://localhost:' + location.port;
-             *params.data         = JSON.stringify(options.rpcMsg);
-             *params.contentType  = 'application/json';
-             *params.type         = 'POST';
-             *params.dataType     = 'json';
-             */
+            // Send data with POST
+            params.url          = 'http://localhost:' + location.port;
+            params.data         = JSON.stringify(options.rpcMsg);
+            params.contentType  = 'application/json';
+            params.type         = 'POST';
+            params.dataType     = 'json';
 
-            // GET
+            // Send data with GET
             params.url           = 'http://' + location.host + '/proccess';
             params.data          = options.rpcMsg;
             params.type          = 'GET';
