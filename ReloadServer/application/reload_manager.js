@@ -138,7 +138,7 @@ var rpcFunctions = {
         var socket = net.createConnection(80, "www.example.com");
         socket.on('connect', function () {
             vars.globals.ip = socket.address().address;
-            console.log('got ip from socket ' +vars.globals.ip );
+            console.log('got ip from socket ' + vars.globals.ip );
             if (sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             } else {
@@ -162,7 +162,7 @@ var rpcFunctions = {
         if ( (typeof sendResponse !== 'function') &&
             (sendResponse !== undefined) ) return false;
 
-        if ( vars.globals.ip === null ) {
+        if ( !vars.globals.ip ) {
             this.getIpFromSocket(sendResponse);
         } else {
             if ( sendResponse !== undefined ) {
@@ -175,10 +175,6 @@ var rpcFunctions = {
      * (RPC): Returns the version information of Reload
      */
     getVersionInfo: function (sendResponse) {
-
-        //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
-
         var file = fs.readFileSync("build.dat", "ascii");
         vars.globals.versionInfo = JSON.parse(file);
         vars.globals.protocolVersion = JSON.parse(file).protocolVersion;
@@ -186,7 +182,9 @@ var rpcFunctions = {
         console.log('version info');
         console.log(vars.globals.versionInfo);
 
-        sendResponse({hasError: false, data: JSON.stringify(vars.globals.versionInfo)});
+        if (typeof sendResponse === 'function') {
+            sendResponse({hasError: false, data: JSON.stringify(vars.globals.versionInfo)});
+        }
     },
 
     /**
@@ -470,7 +468,7 @@ var rpcFunctions = {
     findProjects: function () {
         var WP   = vars.globals.rootWorkspacePath,
             DS   = vars.globals.fileSeparator,
-            HOST = vars.globals.host + ':' + vars.globals.port;
+            HOST = vars.globals.ip + ':' + vars.globals.port;
 
         try {
             var files    = fs.readdirSync( WP ),
@@ -488,7 +486,7 @@ var rpcFunctions = {
                         if (LocalfileStat && LocalfileStat.isDirectory()) {
                             // Add to the list of projcts
                             projects.push({
-                                url:   HOST + file + '/LocalFiles.html',
+                                url:   'http://' + HOST + '/' + file + '/LocalFiles.html',
                                 name:  file,
                                 path:  WP + DS + file
                             });
@@ -844,8 +842,7 @@ var rpcFunctions = {
                 // Collect Stats
                 if (vars.globals.statistics === true) {
                     var indexPath =
-                        vars.globals.fileSeparator
-                        + projectPath
+                        projectPath
                         + vars.globals.fileSeparator
                         + "LocalFiles"
                         + vars.globals.fileSeparator

@@ -1,6 +1,5 @@
 require.config({
     paths: {
-        //'jquery':                      'vendor/jquery-1.7.2.min',
         'jquery':                      'vendor/jquery-1.8.3.min',
         'underscore':                  'vendor/underscore-1.4.3.min',
         'backbone':                    'vendor/backbone-0.9.2.min',
