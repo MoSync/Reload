@@ -146,59 +146,42 @@ var create = function (port) {
      * has the socket object. It can cause problems to add custom
      * properties to the socket object.
      */
-    function processMessage(jsonString, socket)
-    {
+    function processMessage(jsonString, socket) {
         // The data is always in JSON format.
-        console.log(jsonString);
         var message = JSON.parse(jsonString);
 
-        if (message != undefined);
-        {
+        if (message != undefined) {
             // The device sent info upon connecting.
-            if (message.message == "clientConnectRequest")
-            {
-                // Platform, name, uuid, os version, phonegap version.
-                //message.type == null;
-                
+            if (message.message == "clientConnectRequest") {
                 // Check for protocol compatibility
-                console.log("client version: " + message.params.protocolVersion);
-                console.log("server version: " + vars.globals.protocolVersion);
-                if( (typeof message.params.protocolVersion === 'undefined') ||
-                    (message.params.protocolVersion != vars.globals.protocolVersion) ) {
-
+                var protocolDevice = (typeof message.params.protocolVersion === 'undefined');
+                var protocolsMatch = (message.params.protocolVersion != vars.globals.protocolVersion)
+                if ( protocolDevice || protocolsMatch ) {
                     console.log("ERROR client version is not compatible with server version.", 0);
                     // Send client disconnection command
                     try {
                         // Construct message with proper header.
-                        var message = JSON.stringify( { message: "Disconnect",
-                                                        data: "Incompatible Client and Server versions"} );
+                        var message = JSON.stringify( { message: "Disconnect", data: "Incompatible Client and Server versions"} );
                         var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
-
                         var result = socket.write(fullMessage, "ascii");
-                    }
-                    catch (err) {
+                    } catch (err) {
                         console.log("ERROR tcp_server.js: processMessage: " + err, 0)
                     }
 
                 } else {
-                    
-                    if(vars.globals.statistics === true) {
 
+                    if (vars.globals.statistics === true) {
                         // Statistics Collection
                         vars.methods.loadStats(function (statistics) {
-
                             var actionTS = new Date().getTime();
-                            
                             var client = {
-                                localIP: socket.remoteAddress,
-                                platform: message.params.platform,
-                                version: message.params.version,
-                                action: "connect",
-                                actionTS : actionTS
+                                localIP:    socket.remoteAddress,
+                                platform:   message.params.platform,
+                                version:    message.params.version,
+                                action:     "connect",
+                                actionTS :  actionTS
                             };
-
                             statistics.clients.push(client);
-                            
                             vars.methods.saveStats(statistics);
                         });
                     }
@@ -208,13 +191,16 @@ var create = function (port) {
                     socket.deviceInfo = message.params;
                     socket.deviceInfo.address = socket.remoteAddress;
                     generateDeviceInfoListJSON();
-                    console.log("Client " + socket.remoteAddress +
-                        " (" + socket.deviceInfo.name + ") has connected.", 0 );
+                    var msg = "Client "
+                            + socket.remoteAddress
+                            + " ("
+                            + socket.deviceInfo.name
+                            + ") has connected.";
+                    console.log( msg , 0 );
                 }
-            }
-            // The device sent a log message.
-            else if (message.message == "remoteLogRequest")
-            {
+
+            } else if (message.message == "remoteLogRequest") { // The device sent a log message.
+
                 // Add log message to queue.
                 // TODO: Use a function for this rather than
                 // accessing global data directly.
@@ -226,21 +212,21 @@ var create = function (port) {
                     target: 'log',
                     msg: unescape(unescape(message.params)).replace("\n","</br>")
                 });
-            }
-            else if (message.message === "getProjectList")
-            {
+
+            } else if (message.message === "getProjectList") {
+
                 console.log("Generate and send Project List to the Client");
                 // send client the project list (internal use)
                 ReloadManager.send({
-                                message: "projectList",
-                                data: {
-                                    projectsCount: vars.globals.projectListJSON.length,
-                                    projects: vars.globals.projectListJSON
-                                }
+                    message: "projectList",
+                    data: {
+                        projectsCount: vars.globals.projectListJSON.length,
+                        projects: vars.globals.projectListJSON
+                    }
                 }, [socket]);
                 console.log("Total Projects sent: " + vars.globals.projectListJSON.length);
-            }
-            else if (message.message === "reloadProject") {
+
+            } else if (message.message === "reloadProject") {
                 console.log("Reloading project Request")
                 var project = message.params.projectName;
                 ReloadManager.rpc.reloadProject(project, false, function (){}, [socket]);

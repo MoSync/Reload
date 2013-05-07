@@ -30,32 +30,25 @@ create = function(port) {
     app.use(express.bodyParser());
     app.use('/', express.static(path.resolve(__dirname, '../UI')));
 
-    app.get('/ip', function(request, response){
-        response.send(vars.globals.ip);
-    });
-
+    // Dispatch JSONP GET requests.
     app.get('/proccess', function(request, response){
         console.log("-------------------------------");
-        delete request.query.callback;
-        delete request.query._;
         console.log(request.query);
-        //console.log(request.query.jsonRPC);
-        //console.log(JSON.parse(request.query.jsonRPC));
         console.log("-------------------------------");
-        rpc.listen(request.query, response);
-        //rpc.listen(JSON.parse(request.query.jsonRPC), response);
+        var query = (request.query.jsonRPC) ? request.query.jsonRPC : request.query;
+        query = (typeof query === 'string') ? JSON.parse(query) : query;
+        rpc.listen(query, response);
     });
 
 
 
-    /*
-     *app.post('/', function( request, response ){
-     *    console.log('--');
-     *    console.log(request.body);
-     *    console.log('--');
-     *    rpc.listen(request.body, response);
-     *});
-     */
+    // Dispatch POST requests.
+    app.post('/', function( request, response ){
+        console.log('-- POST');
+        console.log(request.body);
+        console.log('-- // POST');
+        rpc.listen(request.body, response);
+    });
 
     // Init WebSockets.
     var io      = require('../node_modules/socket.io');

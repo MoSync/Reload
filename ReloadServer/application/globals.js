@@ -1,7 +1,7 @@
 var fs = require('fs');
 
 var globals = {
-    versionInfo : [],
+    versionInfo : {},
     rootWorkspacePath : "",
     gRemoteLogData : [],
     ip : null,
@@ -89,8 +89,8 @@ var methods = {
             var startTS = new Date().getTime(),
                 statistics = {
                     serverPlatform :      globals.localPlatform,
-                    reloadVersion :       globals.versionInfo[0].trim(),
-                    buildID :             globals.versionInfo[1].trim(),
+                    reloadVersion :       globals.versionInfo.version,
+                    buildID :             globals.versionInfo.timestamp,
                     serverStartTS :       startTS,
                     lastActivityTS :      startTS,
                     totalReloadsNative :  0,
