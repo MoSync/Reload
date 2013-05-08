@@ -61,7 +61,7 @@ var JSONRPC = {
                     , 'Cache-Control':  'no-cache'
                     , 'Expires':        '-1'
                 };
-                response.writeHead(200, response);
+                response.writeHead(200, resp);
                 response.end( processingResult.data );
                 //response.write( processingResult.data );
                 //response.end("");
