@@ -108,6 +108,10 @@ void StoredProjectsScreen::createMainLayout() {
 		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
+		if(mOS.find("iPhone") >= 0)
+		{
+			projectNameLabel->setFontColor(0xffffff);
+		}
 
 		/**
 		 * TODO: Keep this for the posibility of adding load and
@@ -180,6 +184,10 @@ void StoredProjectsScreen::updateProjectList()
 		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
+		if(mOS.find("iPhone") >= 0)
+		{
+			projectNameLabel->setFontColor(0xffffff);
+		}
 
 		// TODO: Keep this for the posibility of adding remove button
 		// will affect StoredProjectsScreen::buttonClicked
