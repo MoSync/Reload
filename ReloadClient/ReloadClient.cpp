@@ -163,8 +163,6 @@ static void DeleteFolderRecursively(const char *path)
 ReloadClient::ReloadClient()
 {
 	// Initialize application.
-	// Order of calls are important as data needed by
-	// later calls are created in earlier calls.
 	lprintfln("@@@ ReloadClient");
 	setScreenOrientation();
 
@@ -180,6 +178,8 @@ ReloadClient::~ReloadClient()
 
 void ReloadClient::runTimerEvent()
 {
+	// Order of calls are important as data needed by
+	// later calls are created in earlier calls.
 	initializeWebView();
 	initializeVariables();
 	initializeFiles();

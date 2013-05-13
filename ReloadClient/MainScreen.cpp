@@ -29,24 +29,8 @@ MA 02110-1301, USA.
 MainScreen::MainScreen():
 	TabScreen()
 {
-   // do init stuff
-	this->addScreenListener(this);
 }
 
 MainScreen::~MainScreen()
 {
-
-}
-
-/**
- * Called just before the screen begins rotating.
- */
-void MainScreen::orientationChanged(Screen *screen, int screenOrientation)
-{
-	// go through the children and announce the orientation will change event
-	for (int i = 0; i < this->countChildWidgets(); i++)
-	{
-		Screen *screen = (Screen*)this->getChild(i);
-		screen->orientationWillChange();
-	}
 }

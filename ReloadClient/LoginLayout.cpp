@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * LoginLayout.cpp
  *
  *  Created on: Feb 4, 2013
- *      Author: Spiridon Alexandru
+ *      Author: Kostas Tsolakis
  */
 
 #include "LoginLayout.h"

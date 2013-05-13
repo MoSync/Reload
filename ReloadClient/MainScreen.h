@@ -30,17 +30,12 @@ MA 02110-1301, USA.
 using namespace NativeUI;
 
 class MainScreen :
-	public TabScreen, ScreenListener
+	public TabScreen
 {
 public:
 	MainScreen();
 
 	~MainScreen();
-
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	virtual void orientationChanged(Screen *screen, int screenOrientation);
 };
 
 #endif /* MAINSCREEN_H_ */
