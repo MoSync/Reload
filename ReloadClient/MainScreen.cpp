@@ -24,12 +24,13 @@ MA 02110-1301, USA.
  */
 
 #include "MainScreen.h"
-#include "LoginScreen.h"
+#include "LoginLayout.h"
 
 MainScreen::MainScreen():
 	TabScreen()
 {
    // do init stuff
+	this->addScreenListener(this);
 }
 
 MainScreen::~MainScreen()
@@ -40,12 +41,12 @@ MainScreen::~MainScreen()
 /**
  * Called just before the screen begins rotating.
  */
-void MainScreen::orientationWillChange()
+void MainScreen::orientationChanged(Screen *screen, int screenOrientation)
 {
 	// go through the children and announce the orientation will change event
-	//for (int i = 0; i < this->getStackSize(); i++)
-	//{
-	//	Screen *loginScreen = (Screen*)this->getChild(i);
-	//	loginScreen->orientationWillChange();
-	//}
+	for (int i = 0; i < this->countChildWidgets(); i++)
+	{
+		Screen *screen = (Screen*)this->getChild(i);
+		screen->orientationWillChange();
+	}
 }

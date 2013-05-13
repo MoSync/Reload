@@ -17,30 +17,32 @@ MA 02110-1301, USA.
 */
 
 /*
- * MainScreen.h
+ * WorkspaceLayoutUtils.h
  *
- *  Created on: Feb 1, 2013
+ *  Created on: Feb 26, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef MAINSCREEN_H_
-#define MAINSCREEN_H_
+#ifndef WORKSPACELAYOUTUTILS_H_
+#define WORKSPACELAYOUTUTILS_H_
 
-#include <NativeUI/Widgets.h>
-using namespace NativeUI;
+/**
+ * Text resources for UI elements
+ */
+#define DISCONNECT_BUTTON_TEXT "Disconnect"
+#define REFRESH_LIST_BUTTON_TEXT "Refresh projects"
+#define SAVE_BUTTON_TEXT "Save"
+#define RELOAD_BUTTON_TEXT "Reload"
 
-class MainScreen :
-	public TabScreen, ScreenListener
-{
-public:
-	MainScreen();
+/**
+ * UI elements ratios
+ */
+#define SAVE_BUTTON_PORTRAIT_WIDTH_RATIO 0.3
+#define RELOAD_BUTTON_PORTRAIT_WIDTH_RATIO 0.35
 
-	~MainScreen();
+#define SAVE_BUTTON_LANDSCAPE_WIDTH_RATIO 0.3
+#define RELOAD_BUTTON_LANDSCAPE_WIDTH_RATIO 0.35
 
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	virtual void orientationChanged(Screen *screen, int screenOrientation);
-};
+#define WIDGET_HEIGHT_RATIO 0.1
 
-#endif /* MAINSCREEN_H_ */
+#endif /* WORKSPACELAYOUTUTILS_H_ */
