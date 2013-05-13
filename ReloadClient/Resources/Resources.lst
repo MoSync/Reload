@@ -3,7 +3,7 @@
 .res LOGO_IMAGE
 .image "Reload_Menubar_Logo.png"
 .res MOSYNC_IMAGE
-.image "MoSync_Logo2.png"
+.image "MoSync_Logo.png"
 .res CONNECT_BG
 .image "connect_background.png"
 .res RELOAD_BG
