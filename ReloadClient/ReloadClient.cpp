@@ -1123,11 +1123,11 @@ void ReloadClient::sendClientDeviceInfo()
 				"\"protocolVersion\":\"%s\""
 			"}"
 		"}",
-		deviceOS,
-		deviceName,
-		deviceUUID,
-		deviceOSVersion,
-		mProtocolVersion
+		(Encoder::escape(deviceOS)).c_str(),
+		(Encoder::escape(deviceName)).c_str(),
+		(Encoder::escape(deviceUUID)).c_str(),
+		(Encoder::escape(deviceOSVersion)).c_str(),
+		(Encoder::escape(mProtocolVersion)).c_str()
 		);
 
 	sendTCPMessage(buffer);

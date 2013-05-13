@@ -148,6 +148,8 @@ var create = function (port) {
      */
     function processMessage(jsonString, socket) {
         // The data is always in JSON format.
+       console.log('@@@jsonstring');
+       console.log(jsonString);
         var message = JSON.parse(jsonString);
 
         if (message != undefined) {
@@ -155,7 +157,7 @@ var create = function (port) {
             if (message.message == "clientConnectRequest") {
                 // Check for protocol compatibility
                 var protocolDevice = (typeof message.params.protocolVersion === 'undefined');
-                var protocolsMatch = (message.params.protocolVersion != vars.globals.protocolVersion)
+                var protocolsMatch = (unescape(message.params.protocolVersion) != vars.globals.protocolVersion)
                 if ( protocolDevice || protocolsMatch ) {
                     console.log("ERROR client version is not compatible with server version.", 0);
                     // Send client disconnection command

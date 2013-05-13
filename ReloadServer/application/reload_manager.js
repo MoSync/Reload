@@ -290,7 +290,7 @@ var rpcFunctions = {
 
                         sendToClients({
                             message: 'ReloadBundle',
-                            url: url,
+                            url: escape(url),
                             fileSize: stat.size
                         });
 
