@@ -17,14 +17,14 @@ MA 02110-1301, USA.
 */
 
 /*
- * WorkspaceScreen.h
+ * WorkspaceLayout.h
  *
  *  Created on: Jan 31, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef WORKSPACESCREEN_H_
-#define WORKSPACESCREEN_H_
+#ifndef WORKSPACELAYOUT_H_
+#define WORKSPACELAYOUT_H_
 
 #include <maapi.h>
 #include <MAUtil/util.h>
@@ -37,8 +37,8 @@ MA 02110-1301, USA.
 using namespace NativeUI;
 using namespace MAUtil;
 
-class WorkspaceScreen:
-	public Screen,
+class WorkspaceLayout:
+	public VerticalLayout,
 	public ListViewListener,
 	public ButtonListener
 {
@@ -49,13 +49,12 @@ public:
 	 * @param os The current os.
 	 * @param orientation The current device orientation.
 	 */
-	WorkspaceScreen(MAUtil::String os, int orientation,
-					MAUtil::Vector <reloadProject> * project);
+	WorkspaceLayout(MAUtil::String os, int orientation);
 
 	/**
 	 * Destructor.
 	 */
-	~WorkspaceScreen();
+	~WorkspaceLayout();
 
 	/**
 	 * Add a reload UI event listener.
@@ -74,7 +73,7 @@ public:
 	 * from mProjects vector. Else destroys and deallocates previous list items
 	 * and creates new ones.
 	 */
-	void updateProjectList();
+	void updateProjectList(MAUtil::Vector <reloadProject> * projects);
 
 private:
 	/**
@@ -94,58 +93,46 @@ private:
 	 * @param listView The list view object that generated the event.
 	 * @param listViewItem The ListViewItem object that was clicked.
 	 */
-	virtual void listViewItemClicked(
-		ListView* listView,
-		ListViewItem* listViewItem);
-
-	/**
-	 * Called after the screen orientation has changed.
-	 * Available only on iOS and Windows Phone 7.1 platforms.
-	 */
-	virtual void orientationDidChange();
+	virtual void listViewItemClicked(ListView * listView, int index );
 
 	/**
 	 * Sets the screen height/width values and the screen width ratio
 	 * for the save and reload buttons.
 	 */
 	void setScreenValues();
+
 private:
+
+	/**
+	 * The current screen orientation.
+	 */
+	int mCurrentOrientation;
+
 	/**
 	 * Array with login screen listeners.
 	 */
 	MAUtil::Vector<ReloadUIListener*> mReloadUIListeners;
 
 	/**
-	 * Main layout.
-	 */
-	VerticalLayout* mMainLayout;
-
-	/**
 	 * The button that refreshes the workspace project list.
 	 */
-	Button* mRefreshButton;
+	TextWidget* mRefreshButton;
 
 	/**
 	 * The button that disconnects us from the server.
 	 */
-	Button *mDisconnectButton;
+	TextWidget *mDisconnectButton;
+
+	/**
+	 * Activity Indicato container that is shown when updating
+	 * project list
+	 */
+	RelativeLayout *mActivityIndicatorContainer;
 
 	/**
 	 * The alphabetical list view.
 	 */
 	ListView* mListView;
-
-	/**
-	 * An array containing the list view item save buttons.
-	 * Used to identify which list view item button has been clicked.
-	 */
-	MAUtil::Vector<Button*> mSaveButtons;
-
-	/**
-	 * An array containing the list view item reload buttons.
-	 * Used to identify which list view item button has been clicked.
-	 */
-	MAUtil::Vector<Button*> mReloadButtons;
 
 	/**
 	 * The platform the client is running on.
@@ -173,11 +160,6 @@ private:
 	float mReloadButtonWidthRatio;
 
 	/**
-	 * Pointer to the vector that holds all the projects data
-	 */
-	MAUtil::Vector <struct reloadProject> *mProjects;
-
-	/**
 	 * Holds the List View index of the currently selected project
 	 */
 	int mSelectedProject;
@@ -185,17 +167,22 @@ private:
 	/**
 	 * The save button widget
 	 */
-	Button* mSaveButton;
+	TextWidget * mSaveButton;
 
 	/**
 	 * The reload Button widget
 	 */
-	Button* mReloadButton;
+	TextWidget * mReloadButton;
 
 	/**
 	 * Holds the project name of the currently selected project
 	 */
 	MAUtil::String mSelectedProjectName;
+
+	/**
+	 * Stores the widget Height depending on the screen size
+	 */
+	int mWidgetHeight;
 };
 
-#endif /* WORKSPACESCREEN_H_ */
+#endif /* WORKSPACELAYOUT_H_ */

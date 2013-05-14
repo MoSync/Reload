@@ -46,13 +46,12 @@ StoredProjectsScreen::StoredProjectsScreen(MAUtil::String os, int orientation,
 	mMainLayout(NULL)
 {
 	mProjects = projects;
-
 	mOS = os;
-	setScreenValues();
-	createMainLayout();
+	mCurrentOrientation = orientation;
 
-	//Set the moblet to receive events from the buttons and listview
-	mListView->addListViewListener(this);
+	setScreenValues();
+
+	createMainLayout();
 }
 
 /**
@@ -60,9 +59,8 @@ StoredProjectsScreen::StoredProjectsScreen(MAUtil::String os, int orientation,
  */
 StoredProjectsScreen::~StoredProjectsScreen()
 {
-	//mListView->removeListViewListener(this);
-
-	//mReloadUIListeners.clear();
+	mListView->removeListViewListener(this);
+	mReloadUIListeners.clear();
 }
 
 /**
@@ -71,12 +69,15 @@ StoredProjectsScreen::~StoredProjectsScreen()
 void StoredProjectsScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
+	mMainLayout->setBackgroundColor(0x000000);
 	Screen::setMainWidget(mMainLayout);
 
 	mScreenLabel = new Label();
-	mScreenLabel->setBackgroundColor(66,133,244);
+	//mScreenLabel->setBackgroundColor(66,133,244);
+	mScreenLabel->setBackgroundColor(0xFF8B00);
+	mScreenLabel->setBackgroundGradient(0xFFA900, 0xFF7A00);
 	mScreenLabel->setFontColor(0xFFFFFF);
-	mScreenLabel->setHeight(80);
+	mScreenLabel->setHeight(mWidgetHeight);
 	mScreenLabel->setText("Saved Projects: " + integerToString(mProjects->size()));
 	mScreenLabel->fillSpaceHorizontally();
 
@@ -86,23 +87,36 @@ void StoredProjectsScreen::createMainLayout() {
 	mListView->allowSelection(true);
 	mListView->fillSpaceHorizontally();
 	mListView->fillSpaceVertically();
+	mListView->addListViewListener(this);
+
+	if(mOS.find("iPhone") >= 0)
+	{
+		mListView->setProperty(MAW_WIDGET_BACKGROUND_COLOR,"00000000");
+	}
 
 	for (MAUtil::Vector <reloadProject>::iterator i = mProjects->begin(); i != mProjects->end(); i++)
 	{
 		ListViewItem* item = new ListViewItem();
 		item->fillSpaceHorizontally();
-		item->setHeight(80);
+		item->setHeight(mWidgetHeight);
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
 		itemHorizontalLayout->fillSpaceHorizontally();
-		itemHorizontalLayout->setHeight(80);
+		itemHorizontalLayout->setHeight(mWidgetHeight);
 
 		Label* projectNameLabel = new Label();
 		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
+		if(mOS.find("iPhone") >= 0)
+		{
+			projectNameLabel->setFontColor(0xffffff);
+		}
 
-		// TODO: Keep this for the posibility of adding remove button
+		/**
+		 * TODO: Keep this for the posibility of adding load and
+		 * remove project button
+		 */
 		// will affect StoredProjectsScreen::buttonClicked
 		//Button* loadButton = new Button();
 		//loadButton->setText(LOAD_BUTTON_TEXT);
@@ -161,15 +175,19 @@ void StoredProjectsScreen::updateProjectList()
 		lprintfln("@@@ RELOAD Project Name: %s", i->name.c_str());
 		ListViewItem* item = new ListViewItem();
 		item->fillSpaceHorizontally();
-		item->setHeight(80);
+		item->setHeight(mWidgetHeight);
 
 		HorizontalLayout *itemHorizontalLayout = new HorizontalLayout();
 		itemHorizontalLayout->fillSpaceHorizontally();
-		itemHorizontalLayout->setHeight(80);
+		itemHorizontalLayout->setHeight(mWidgetHeight);
 		Label* projectNameLabel = new Label();
 		projectNameLabel->setText(i->name);
 		projectNameLabel->fillSpaceHorizontally();
 		projectNameLabel->fillSpaceVertically();
+		if(mOS.find("iPhone") >= 0)
+		{
+			projectNameLabel->setFontColor(0xffffff);
+		}
 
 		// TODO: Keep this for the posibility of adding remove button
 		// will affect StoredProjectsScreen::buttonClicked
@@ -309,9 +327,11 @@ void StoredProjectsScreen::setScreenValues()
 		orientation == MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
 	{
 		mLoadButtonWidthRatio = LOAD_BUTTON_LANDSCAPE_WIDTH_RATIO;
+		mWidgetHeight = (int)((float)mScreenWidth * WIDGET_HEIGHT_RATIO);
 	}
 	else
 	{
 		mLoadButtonWidthRatio = LOAD_BUTTON_PORTRAIT_WIDTH_RATIO;
+		mWidgetHeight = (int)((float)mScreenHeight * WIDGET_HEIGHT_RATIO);
 	}
 }

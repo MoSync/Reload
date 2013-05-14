@@ -17,30 +17,32 @@ MA 02110-1301, USA.
 */
 
 /*
- * WorkspaceScreenUtils.h
+ * ServerScreen.cpp
  *
- *  Created on: Feb 26, 2013
- *      Author: Spiridon Alexandru
+ *  Created on: May 13, 2013
+ *      Author: Kostas Tsolakis
  */
+#include "ServerScreen.h"
 
-#ifndef WORKSPACESCREENUTILS_H_
-#define WORKSPACESCREENUTILS_H_
+ServerScreen::ServerScreen(VerticalLayout *loginLayout,
+			 	 	 	   VerticalLayout *workspaceLayout)
+			: Screen()
+{
+	this->setEnabledLayout(1);
+	mLoginLayout = loginLayout;
+	mWorkspaceLayout = workspaceLayout;
+}
 
-/**
- * Text resources for UI elements
- */
-#define DISCONNECT_BUTTON_TEXT "Disconnect"
-#define REFRESH_LIST_BUTTON_TEXT "Refresh projects"
-#define SAVE_BUTTON_TEXT "Save"
-#define RELOAD_BUTTON_TEXT "Reload"
+ServerScreen::~ServerScreen()
+{
+}
 
-/**
- * UI elements ratios
- */
-#define SAVE_BUTTON_PORTRAIT_WIDTH_RATIO 0.3
-#define RELOAD_BUTTON_PORTRAIT_WIDTH_RATIO 0.35
+int ServerScreen::getEnabledLayout()
+{
+	return mEnabledLayout;
+}
 
-#define SAVE_BUTTON_LANDSCAPE_WIDTH_RATIO 0.3
-#define RELOAD_BUTTON_LANDSCAPE_WIDTH_RATIO 0.35
-
-#endif /* WORKSPACESCREENUTILS_H_ */
+void ServerScreen::setEnabledLayout(int layout)
+{
+	mEnabledLayout = layout;
+}

@@ -23,8 +23,8 @@ MA 02110-1301, USA.
  *      Author: Spiridon Alexandru
  */
 
-#ifndef LOGINSCREENUTILS_H_
-#define LOGINSCREENUTILS_H_
+#ifndef LOGINLAYOUTUTILS_H_
+#define LOGINLAYOUTUTILS_H_
 
 /**
  * Text resources for UI elements
@@ -98,4 +98,6 @@ MA 02110-1301, USA.
 #define BOTTOM_INFO_LEFT_PORTRAIT_RATIO 0.1
 #define BOTTOM_INFO_TOP_PORTRAIT_RATIO 0.1
 
-#endif /* LOGINSCREENUTILS_H_ */
+#define WIDGET_HEIGHT_RATIO 0.1
+
+#endif /* LOGINLAYOUTUTILS_H_ */
