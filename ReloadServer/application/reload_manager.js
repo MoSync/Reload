@@ -198,8 +198,8 @@ var rpcFunctions = {
         var feed = [];
 
         var params = {
-            url: vars.globals.sampleProjectsFeedUrl,
-            headers: {
+            url: vars.globals.sampleProjectsFeedUrl
+            , headers: {
                 'User-Agent': 'MoSync Reload ' + JSON.stringify(vars.globals.versionInfo)
             }
         };
@@ -210,10 +210,10 @@ var rpcFunctions = {
                     console.log(p);
                     var archive_url = p.html_url+'/archive/master.zip';
                     feed.push({
-                        "url": archive_url,
-                        "name": p.name,
-                        "description": p.description,
-                        "screenshot": "screenshot"
+                        "url": archive_url
+                        , "name": p.name
+                        , "description": p.description
+                        , "screenshot": "screenshot"
                     });
                 });
 
@@ -229,32 +229,33 @@ var rpcFunctions = {
         });
     },
 
-    reloadExample: function (opts, sendResponse) {
+    reloadExample: function (options, sendResponse) {
         if(typeof sendResponse !== 'function') {
             return false;
         }
 
-        var self = this;
-        var home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'],
-            DS           = vars.globals.fileSeparator,
-            download_dir = home_dir + DS + '.reload' + DS + 'examples',
-            opts         = JSON.parse(opts),
-            file_name    = url.parse(opts.url).pathname.split('/').pop();
+        var self           = this
+            , options      = JSON.parse(options) // Options string is expected to contain JSON.
+            , home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']
+            , DS           = vars.globals.fileSeparator
+            , download_dir = home_dir + DS + '.reload' + DS + 'examples'
+            , file_name    = url.parse(options.url).pathname.split('/').pop()
+            ;
 
         // Options object to encapsulate parameters passed between
         // functions.
         var o = {
-            home_dir     : home_dir,
-            DS           : DS,
-            download_dir : download_dir,
-            opts         : opts,
-            file_name    : file_name
+            home_dir       : home_dir
+            , DS           : DS
+            , download_dir : download_dir
+            , options      : options
+            , file_name    : file_name
         };
 
         // Create download directory if it does not exist.
         fs.exists(o.download_dir, function(exists) {
             if (!exists) {
-                console.log("Download dir does not exist. Create it!");
+                console.log('Download dir does not exist. Create it!');
                 fs.mkdir(o.home_dir + o.DS + '.reload', 0755, function(e) {
                     if (!e) {
                         fs.mkdir(o.home_dir + o.DS + '.reload' + o.DS + 'examples', 0755, function(e) {
@@ -272,16 +273,23 @@ var rpcFunctions = {
     },
 
     // Helper function for reloadExample()
-    sendExample: function (o, sendResponse)  {
-        var self = this;
+    sendExample: function (options, sendResponse)  {
+        var self          = this
+            , o           = options
+            , file        = o.download_dir + o.DS + o.file_name
+            , writeStream = fs.createWriteStream(file)
+            ;
+
         // Stream to file.
-        var file = fs.createWriteStream(o.download_dir + o.DS + o.file_name);
-        file.on('close', function(){
-            // Unpack
-            self.unzip(o.download_dir + o.DS + o.file_name, o.download_dir + o.DS, function(){
-                var url = o.download_dir + o.DS + o.opts.name + '-master'; // Github adds prefix to the folder
+        writeStream.on('close', function() {
+            console.log('prepare to unzip');
+            // Unpack when file is written.
+            self.unzip(file, o.download_dir + o.DS, function() {
+                var url = o.download_dir + o.DS + o.options.name + '-master'; // Github adds prefix to the folder
+                console.log('URL is ');
+                console.log(url);
                 self.bundleApp(url, false, function(actualPath) {
-                    fs.stat(actualPath, function(err, stat){
+                    fs.stat(actualPath, function(err, stat) {
                         console.log('Datasize: ' + stat.size);
 
                         console.log("---------- S e n d i n g   B u n d l e --------");
@@ -302,10 +310,13 @@ var rpcFunctions = {
                 });
             });
         });
-        file.on('error', function(e){
+
+        writeStream.on('error', function(e){
             console.log('Error: ' + e);
         });
-        request(o.opts.url).pipe(file);
+
+        // Download file and pipe it to the writeStream
+        request(o.options.url).pipe(writeStream);
     },
 
     /*
@@ -837,6 +848,7 @@ var rpcFunctions = {
             + vars.globals.fileSeparator
             + projectName
             ;
+
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
                 // Collect Stats
@@ -1615,5 +1627,6 @@ vars.methods.loadConfig(function () {
 });
 
 rpc.exposeModule('manager', rpcFunctions);
+exports.toHex8Byte = toHex8Byte;
 exports.send = sendToClients;
 exports.rpc = rpcFunctions;
