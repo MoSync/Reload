@@ -1,5 +1,6 @@
-var vars = require('../application/globals')
-    , ReloadManager = require('../application/reload_manager');
+var vars = require('../application/globals'),
+	fs = require('fs'),
+    ReloadManager = require('../application/reload_manager');
 
 /**
  * Object that accumulates data sent over a streaming
@@ -147,27 +148,26 @@ var create = function (port) {
      */
     function processMessage(jsonString, socket) {
         // The data is always in JSON format.
-        var message = JSON.parse(jsonString)
-            , self = this;
+       console.log('@@@jsonstring');
+       console.log(jsonString);
+        var message = JSON.parse(jsonString);
 
-        if (message !== undefined) {
+        if (message != undefined) {
             // The device sent info upon connecting.
-            if (message.message === "clientConnectRequest") {
+            if (message.message == "clientConnectRequest") {
                 // Check for protocol compatibility
                 var protocolDevice = (typeof message.params.protocolVersion === 'undefined');
-                var protocolsMatch = (unescape(message.params.protocolVersion) !== vars.globals.protocolVersion);
+                var protocolsMatch = (unescape(message.params.protocolVersion) != vars.globals.protocolVersion)
                 if ( protocolDevice || protocolsMatch ) {
-                    console.log("ERROR client version is not compatible with server version ", 0);
-
+                    console.log("ERROR client version is not compatible with server version.", 0);
                     // Send client disconnection command
                     try {
                         // Construct message with proper header.
-                        var msg           = JSON.stringify( { message: "Disconnect", data: "Incompatible Client and Server versions"} )
-                            , fullMessage = "RELOADMSG" + ReloadManager.toHex8Byte(msg.length) + msg
-                        ;
-                        socket.write(fullMessage, "ascii") ;
+                        var message = JSON.stringify( { message: "Disconnect", data: "Incompatible Client and Server versions"} );
+                        var fullMessage = "RELOADMSG" + self.toHex8Byte(message.length) + message;
+                        var result = socket.write(fullMessage, "ascii");
                     } catch (err) {
-                        console.log("ERROR tcp_server.js: processMessage: " + err, 0);
+                        console.log("ERROR tcp_server.js: processMessage: " + err, 0)
                     }
 
                 } else {
@@ -177,11 +177,11 @@ var create = function (port) {
                         vars.methods.loadStats(function (statistics) {
                             var actionTS = new Date().getTime();
                             var client = {
-                                localIP  : socket.remoteAddress,
-                                platform : message.params.platform,
-                                version  : message.params.version,
-                                action   : "connect",
-                                actionTS : actionTS
+                                localIP:    socket.remoteAddress,
+                                platform:   message.params.platform,
+                                version:    message.params.version,
+                                action:     "connect",
+                                actionTS :  actionTS
                             };
                             statistics.clients.push(client);
                             vars.methods.saveStats(statistics);
@@ -211,8 +211,8 @@ var create = function (port) {
                 // Dispatch log message to WebUI through WebSockets.
                 var md = vars.MsgDispatcher;
                 md.dispatch({
-                    target : 'log',
-                    msg    : unescape(unescape(message.params)).replace("\n","</br>")
+                    target: 'log',
+                    msg: unescape(unescape(message.params)).replace("\n","</br>")
                 });
 
             } else if (message.message === "getProjectList") {
@@ -222,8 +222,8 @@ var create = function (port) {
                 ReloadManager.send({
                     message: "projectList",
                     data: {
-                        projectsCount : vars.globals.projectListJSON.length,
-                        projects      : vars.globals.projectListJSON
+                        projectsCount: vars.globals.projectListJSON.length,
+                        projects: vars.globals.projectListJSON
                     }
                 }, [socket]);
                 console.log("Total Projects sent: " + vars.globals.projectListJSON.length);
@@ -247,7 +247,7 @@ var create = function (port) {
             socket.on('close', function (had_error)
             {
                 var address = "-unknown address-";
-                if (socket.deviceInfo !== undefined)
+                if (socket.deviceInfo != undefined)
                 {
                     address = socket.deviceInfo.address;
 
@@ -258,10 +258,10 @@ var create = function (port) {
                             var actionTS = new Date().getTime();
 
                             var disconnectedClient = {
-                                localIP  : address,
-                                platform : socket.deviceInfo.platform,
-                                version  : socket.deviceInfo.version,
-                                action   : "disconnect",
+                                localIP: address,
+                                platform: socket.deviceInfo.platform,
+                                version: socket.deviceInfo.version,
+                                action: "disconnect",
                                 actionTS : actionTS
                             };
 
@@ -280,6 +280,7 @@ var create = function (port) {
                         if (vars.globals.clientList[i].remoteAddress ==
                             socket.remoteAddress)
                         {
+
                             vars.globals.clientList.splice(i,1);
                             generateDeviceInfoListJSON();
                             break;

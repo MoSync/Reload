@@ -50,12 +50,7 @@ FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/wormhole.js",
 FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/main.cpp", "ReloadServer/templates/ReloadTemplate/"
 
 puts "making the information files"
-# Make a plain text resource file for the Client.
-File.open("ReloadClient/Resources/information", "w") do |file|
-    file.puts("MoSync Reload Version #{version}")
-    file.puts(time_stamp)
-    file.puts(protocolVersion)
-end
+FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
 FileUtils.cp ENV['MOSYNCDIR'] + "/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
 FileUtils.rm_rf "ReloadServer/UI/docs"
 FileUtils.cp_r ENV['MOSYNCDIR'] + "/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/html5", "ReloadServer/UI/docs"
