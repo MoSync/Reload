@@ -53,6 +53,7 @@ define([
         render: function () {
             var compiledTemplate = _.template( contentTemplate, {} );
             this.$el.html( compiledTemplate );
+            this.delegateEvents();
             return this.$el;
         },
 
