@@ -195,7 +195,9 @@ var rpcFunctions = {
             return false;
         }
 
-        var feed = [];
+        var self = this
+            , feed = []
+            ;
 
         var params = {
             url: vars.globals.sampleProjectsFeedUrl
@@ -203,29 +205,66 @@ var rpcFunctions = {
                 'User-Agent': 'MoSync Reload ' + JSON.stringify(vars.globals.versionInfo)
             }
         };
-        request(params, function(error, response, body){
-            if (!error && response.statusCode == 200) {
-                var res = JSON.parse(body);
-                res.forEach(function(p){
-                    console.log(p);
-                    var archive_url = p.html_url+'/archive/master.zip';
-                    feed.push({
-                        "url": archive_url
-                        , "name": p.name
-                        , "description": p.description
-                        , "screenshot": "screenshot"
+        request(params, function(error, response, body) {
+            if (!error && response.statusCode === 200) {
+                var res = JSON.parse(body)
+                    , counter = 0
+                    ;
+                res.forEach(function(p) {
+                    var screenshot    = p.html_url + '/raw/master/screenshot.png'
+                        , archive_url = p.html_url+'/archive/master.zip'
+                        ;
+                    self.confirmScreenshot(screenshot, function(error, screenshot) {
+                        console.log(screenshot);
+                        feed.push({
+                            'url'           : archive_url
+                            , 'name'        : p.name
+                            , 'description' : p.description
+                            , 'screenshot'  : screenshot
+                        });
+                        counter++;
+                        // Send response only when all array items are analyzed.
+                        if (counter === res.length) {
+                            sendResponse({
+                                hasError : false,
+                                data     : feed
+                            });
+                        }
                     });
-                });
-
-                sendResponse({
-                    hasError: false,
-                    data: feed
                 });
             } else {
                 console.log(error);
                 console.log(vars.globals.sampleProjectsFeedUrl);
                 console.log(response.statusCode);
             }
+        });
+    },
+
+    /**
+     * Helper function. Check if the screenshot image is in the repo.
+     * Add a default image if the screenshot.png is not in the root of
+     * the repo.
+     */
+    confirmScreenshot: function (img_url, callback) {
+        var self = this;
+        var params = {
+            url: img_url
+            , headers: {
+                'User-Agent': 'MoSync Reload ' + JSON.stringify(vars.globals.versionInfo)
+            }
+        };
+
+        request(params, function(error, response, body){
+            // Default image for a screenshot.
+            var e = true
+                , r = 'http://www.mosync.com/sites/all/themes/mosync/css/img/reload3.png'
+                ;
+            // Image confirmed.
+            if (!error && response.statusCode === 200) {
+                e = false;
+                r = img_url;
+            }
+            callback(e, r);
         });
     },
 
