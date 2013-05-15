@@ -47,6 +47,10 @@ public:
 
 private:
 	/**
+	 * Widget that holds mosync image needed for WP
+	 */
+	Widget *mMosync;
+	/**
 	 * Reload logo Widget
 	 */
 	Image *mReloadImage;
@@ -65,7 +69,7 @@ private:
 	 * Relative  layout container that holds all
 	 * the elements of the splash screen
 	 */
-	RelativeLayout *mContainer;
+	VerticalLayout *mContainer;
 
 };
 

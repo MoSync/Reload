@@ -56,7 +56,8 @@ class ReloadClient :
 	public Wormhole::HybridMoblet,
 	public SocketHandlerListener,
 	public DownloadHandlerListener,
-	public Wormhole::LogMessageListener
+	public Wormhole::LogMessageListener,
+	public TimerListener
 {
 public:
 	// ========== Creation and destruction ==========
@@ -70,6 +71,8 @@ public:
 	 * Destructor.
 	 */
 	virtual ~ReloadClient();
+
+	void ReloadClient::runTimerEvent();
 
 	/**
 	 * Creation/initialization.

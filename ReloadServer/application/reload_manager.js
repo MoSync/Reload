@@ -897,7 +897,7 @@ var rpcFunctions = {
                     message: 'ReloadBundle',
                     url: escape(url),
                     fileSize: data.length
-                });
+                }, clientList);
 
                 sendResponse({hasError: false, data: "Bundle sent to clients."});
 

@@ -104,6 +104,12 @@ private:
 	 */
 	void setScreenValues();
 private:
+
+	/**
+	 * The current screen orientation.
+	 */
+	int mCurrentOrientation;
+
 	/**
 	 * Array with login screen listeners.
 	 */
@@ -159,6 +165,11 @@ private:
 	 * Holds the project name of the currently selected project
 	 */
 	MAUtil::String mSelectedProjectName;
+
+	/**
+	 * Stores the widget Height depending on the screen size
+	 */
+	int mWidgetHeight;
 };
 
 #endif /* STOREDPROJECTSSCREEN_H_ */

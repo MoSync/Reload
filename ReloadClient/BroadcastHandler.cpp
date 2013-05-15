@@ -36,7 +36,7 @@ using namespace MAUtil;
 /**
  * Constructor.
  */
-BroadcastHandler::BroadcastHandler(LoginScreen *loginScreen) :
+BroadcastHandler::BroadcastHandler(LoginLayout *loginScreen) :
 	mDatagramSocket(this)
 {
 	mLoginScreen = loginScreen;
