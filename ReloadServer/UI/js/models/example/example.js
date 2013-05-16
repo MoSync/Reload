@@ -37,7 +37,6 @@ define([
         copy: function (opts) {
             var self = this;
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.copyExample',
                 params: [JSON.stringify(opts)],
