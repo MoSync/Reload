@@ -514,7 +514,7 @@ var rpcFunctions = {
         if (darwin || linux) {
             command = 'unzip ' + file + ' -d ' + dest;
         } else {
-            command = 'path_to_unzip.exe';
+            command = 'bin\\win\\unzip.exe ' + file + ' -d ' + dest;
         }
 
         exec(command, function(error, stdout, stderr) {
@@ -872,6 +872,7 @@ var rpcFunctions = {
             console.log("Renaming Project from " + oldName + " to " + newName, 0);
 
             var exec = require('child_process').exec;
+            var command;
             var respond = sendResponse;
 
             function resultCommand(error, stdout, stderr) {
@@ -896,7 +897,7 @@ var rpcFunctions = {
                 var substitute = '<name>' + newName + '<\/name>';
                 var newData = projectData.replace(re, substitute);
 
-                    projectFile =
+                projectFile =
                     vars.globals.rootWorkspacePath
                     + vars.globals.fileSeparator
                     + newName
@@ -911,7 +912,7 @@ var rpcFunctions = {
             var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
             var linux = vars.globals.localPlatform.indexOf("linux") >=0;
             if( darwin || linux ) {
-                var command =
+                command =
                     "mv "
                     + this.fixPathsUnix(vars.globals.rootWorkspacePath)
                     + this.fixPathsUnix(vars.globals.fileSeparator)
@@ -922,7 +923,7 @@ var rpcFunctions = {
                     + this.fixPathsUnix(newName)
                     ;
             } else {
-                var command =
+                command =
                     "rename \""
                     + vars.globals.rootWorkspacePath
                     + vars.globals.fileSeparator
@@ -937,8 +938,8 @@ var rpcFunctions = {
             exec(command, resultCommand);
 
         } catch(err) {
-            console.log("ERROR in renameProject(" + oldname + ", " + newName + "): " + err, 0);
-            sendResponse({hasError: true, data: "Error in renameProject(" + oldname + ", " + newName + "): " + err});
+            console.log("ERROR in renameProject(" + oldName + ", " + newName + "): " + err, 0);
+            sendResponse({hasError: true, data: "Error in renameProject(" + oldName + ", " + newName + "): " + err});
         }
     },
 
@@ -951,9 +952,10 @@ var rpcFunctions = {
     reloadProject: function (projectName, debug, sendResponse, clientList) {
 
         //check if parameter passing was correct
-        if (typeof sendResponse !== 'function') return false;
+        if (typeof sendResponse !== 'function') {
+            return false;
+        }
 
-        var self = this;
         var weinreDebug = (typeof debug === "boolean")? debug : false;
 
         console.log("-----------------------------------------------");
@@ -1031,7 +1033,10 @@ var rpcFunctions = {
      * (RPC): Evaluate JS on the clients.
      */
     evalJS: function (script, sendResponse) {
-        if(typeof sendResponse !== 'function') return false;
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
         console.log("@@@ ====================================");
         console.log("@@@ evalJS " + script);
         //console.log("@@@ Callstack:");
@@ -1060,9 +1065,7 @@ var rpcFunctions = {
         console.log("Path to TempFiles: " + pathToTempBundle);
 
         if(weinreDebug) {
-
             try {
-
                 ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
                     if (err) {
                         console.log('ERROR Copy Process      : Error-' + err, 0);
@@ -1070,8 +1073,6 @@ var rpcFunctions = {
                     console.log('Copy Process      : Successfull');
 
                     self.debugInjection(projectDir, function (){
-
-
                             //INJECT WEINRE SCRIPT
                             //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
                             //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
