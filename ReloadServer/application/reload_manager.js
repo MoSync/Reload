@@ -8,6 +8,8 @@ var http    = require('http');
 var url     = require('url');
 var zip     = require('unzip');
 var request = require('request');
+var esprima = require('esprima');
+var domtosource = require('domtosource');
 
 
 /**
@@ -837,6 +839,97 @@ var rpcFunctions = {
             + vars.globals.fileSeparator
             + projectName
             ;
+        
+        // Find all javascript files 
+        // Parsing and checking for syntax errors
+        console.log("-------------------------------------------");
+        console.log("Checking javascript files for syntax errors");
+        var applicationPath = projectPath + vars.globals.fileSeparator + "LocalFiles";
+        //console.log("Application Path: " + applicationPath);
+        //var files = fs.readdirSync(applicationPath);
+        //console.log("Files found in the app:");
+        //console.log(files);
+
+        function readDir(directoryPath) {
+            var files = fs.readdirSync(directoryPath);
+            for (i in files) {
+
+                var checkFile = directoryPath + 
+                                vars.globals.fileSeparator +
+                                files[i];
+
+                var fileStats = fs.statSync(checkFile);
+                if(fileStats.isFile() && files[i].match(/\b[\w-.]+\.js\b/g) ) {
+                    var fileData = fs.readFileSync(checkFile);
+                    try {
+                        //console.log("Checking file: " + checkFile);
+                        var results = esprima.parse(fileData,
+                                                    { startLineNumber : 0 });
+                        console.log("\u001b[32m" + checkFile.replace(applicationPath,"") + 
+                                    " No Syntax Errors" + "\u001b[0m");
+                    } catch (e) {
+                        //console.log("ERROR in file " + checkFile, 0);
+                        console.log("\u001b[31;4m" + checkFile.replace(applicationPath,"") + "  " +
+                                    "\u001b[31m" + e + "\u001b[0m");
+                    }
+                } else if (fileStats.isDirectory()){
+                    readDir(checkFile);
+                }
+            }
+        }
+
+        readDir(applicationPath);
+        // Check javascript in script tags of index.html
+        var applicationEntryPoint = projectPath + 
+                                    vars.globals.fileSeparator + 
+                                    "LocalFiles" + 
+                                    vars.globals.fileSeparator + 
+                                    "index.html";
+
+        var indexFileData = fs.readFileSync(applicationEntryPoint, 'utf8');
+
+        var embededScriptTags = domtosource.find(indexFileData, 'script:not([src])', true);
+        //console.log(embededScriptTags);
+        for (i in embededScriptTags) {
+            
+            //console.log(embededScriptTags[i].html);
+            var script = cheerio.load(embededScriptTags[i].html);
+            //console.log(script('script').html());
+            try {
+                var result = esprima.parse(
+                                script('script').html(), 
+                                { startLineNumber : embededScriptTags[i].line-1 }
+                            );
+                console.log("\u001b[32m No syntax errors in embedded script \u001b[0m");
+            } catch (e) {
+                //console.log("ERROR in " + );
+                console.log("\u001b[31;11m" + 
+                            applicationEntryPoint.replace(applicationPath,"") + "  " +
+                            e + "\u001b[0m");
+                //console.log(e);
+            }
+        }
+        console.log("-------------------------------------------");
+        // $ = cheerio.load(indexFileData,{
+        //     lowerCaseTags: false
+        // });
+        
+        // var embededScriptTags = 
+        //     $("script:not([src])").each( function (index, element) {
+        //         // $(this).html(debugNotice + 
+        //         //              "try {" + 
+        //         //                 $(this).html() + 
+        //         //              " } catch (e) { mosync.rlog(e.stack); };");
+        //         try {
+        //             var result = esprima.parse($(this).html());
+        //             console.log("No syntax errors in embedded script");
+        //         } catch (e) {
+        //             console.log("ERROR in " + applicationEntryPoint);
+        //             console.log(e);
+        //         }
+        // });
+        //console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");        
+
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
                 // Collect Stats
@@ -1534,8 +1627,7 @@ var rpcFunctions = {
                 ;
 
         /**
-         * Load the index.html file and parse it to a new window object
-         * including jQuery for accessing and manipulating elements
+         * Load the index.html file for accessing and manipulating elements
          */
         $ = cheerio.load(data,{
             lowerCaseTags: false
