@@ -356,7 +356,7 @@ var rpcFunctions = {
 
         fs.exists(o.download_dir + o.DS + o.options.name + '-master', function(exists) {
             if (exists) {
-                console.log('File was already extracted.', 0);
+                console.log('File was already extracted.');
                 bundle(o.download_dir + o.DS + o.options.name + '-master');
                 return;
             }
@@ -366,7 +366,6 @@ var rpcFunctions = {
             writer = fs.createWriteStream(file);
             // Stream to file.
             writer.on('close', function() {
-                console.log('Prepare to unzip', 0);
                 // Unpack when file is written.
                 self.unzip(file, o.download_dir + o.DS, function() {
                     // Github adds prefix to the folder
@@ -380,7 +379,7 @@ var rpcFunctions = {
             });
 
             writer.on('error', function(e){
-                console.log('Error: ' + e);
+                console.log('Error: ' + e, 0);
             });
 
             return writer;
@@ -425,12 +424,11 @@ var rpcFunctions = {
             }
 
             // Download only if not already there.
-            console.log('Make a request to ' + opts.url, 0);
             request(opts.url).pipe((function() {
                 writer = fs.createWriteStream(zipFile);
 
                 writer.on('close', function(){
-                    console.log('Writestream closed', 0);
+                    console.log('Writestream closed');
 
                     self.unzip(zipFile, vars.globals.rootWorkspacePath, function(error, result) {
                         if (error) {
