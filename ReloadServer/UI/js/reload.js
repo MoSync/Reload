@@ -30,17 +30,17 @@ define([
             params = {};
 
             // Send data with POST
-            params.url          = 'http://localhost:' + location.port;
-            params.data         = JSON.stringify(options.rpcMsg);
-            params.contentType  = 'application/json';
-            params.type         = 'POST';
-            params.dataType     = 'json';
+            //params.url          = 'http://localhost:' + location.port;
+            //params.data         = JSON.stringify(options.rpcMsg);
+            //params.contentType  = 'application/json';
+            //params.type         = 'POST';
+            //params.dataType     = 'json';
 
             // Send data with GET
             params.url           = 'http://' + location.host + '/proccess';
-            params.data          = options.rpcMsg;
-            params.type          = 'GET';
-            params.dataType      = 'jsonp';
+            //params.data          = options.rpcMsg;
+            //params.type          = 'GET';
+            //params.dataType      = 'jsonp';
 
             console.log(params.url);
             // Only rpc calls are supported for now.
