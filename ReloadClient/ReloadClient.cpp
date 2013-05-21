@@ -440,7 +440,9 @@ void ReloadClient::exit()
 	{
 		// Close the running app and show the start screen.
 		mRunningApp = false;
-		mReloadScreenController->showConnectedScreen();
+
+		// Show the Tab Screen
+		MainScreenSingleton::getInstance()->show();
 	}
 	else
 	{
