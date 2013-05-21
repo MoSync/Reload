@@ -6,7 +6,6 @@ var ncp     = require('../node_modules/ncp');
 var cheerio = require('cheerio');
 var http    = require('http');
 var url     = require('url');
-var zip     = require('unzip');
 var request = require('request');
 
 
@@ -212,8 +211,9 @@ var rpcFunctions = {
                     ;
                 res.forEach(function(p) {
                     var screenshot    = p.html_url + '/raw/master/screenshot.png'
-                        , archive_url = p.html_url+'/archive/master.zip'
+                        , archive_url = 'https://codeload.github.com/MoSyncSamples/' + p.name + '/zip/master'
                         ;
+
                     self.confirmScreenshot(screenshot, function(error, screenshot) {
                         console.log(screenshot);
                         feed.push({
@@ -246,7 +246,6 @@ var rpcFunctions = {
      * the repo.
      */
     confirmScreenshot: function (img_url, callback) {
-        var self = this;
         var params = {
             url: img_url
             , headers: {
@@ -268,6 +267,13 @@ var rpcFunctions = {
         });
     },
 
+    /**
+     * (RPC) Reload an example app.
+     * @param {...*} options Expected to contain name and zip url of the
+     * project.
+     * @param {function(...)} sendResponse Callback from
+     * jsonrpc.js:handleMessage() used to send response to the socket.
+     */
     reloadExample: function (options, sendResponse) {
         if(typeof sendResponse !== 'function') {
             return false;
@@ -311,98 +317,157 @@ var rpcFunctions = {
         });
     },
 
-    // Helper function for reloadExample()
+    /**
+     * Helper function for reloadExample
+     * Download the zip file, unzip it and bundle the contents.
+     * @param {...*} options
+     * @param {function(...)} callback
+     */
     sendExample: function (options, sendResponse)  {
         var self          = this
             , o           = options
             , file        = o.download_dir + o.DS + o.file_name
-            , writeStream = fs.createWriteStream(file)
+            , writer
             ;
 
-        // Stream to file.
-        writeStream.on('close', function() {
-            console.log('prepare to unzip');
-            // Unpack when file is written.
-            self.unzip(file, o.download_dir + o.DS, function() {
-                var url = o.download_dir + o.DS + o.options.name + '-master'; // Github adds prefix to the folder
-                console.log('URL is ');
-                console.log(url);
-                self.bundleApp(url, false, function(actualPath) {
-                    fs.stat(actualPath, function(err, stat) {
-                        console.log('Datasize: ' + stat.size);
+        // Internal shortcut to bundleApp
+        var bundle = function(url) {
+            self.bundleApp(url, false, function(actualPath) {
+                fs.stat(actualPath, function(err, stat) {
+                    console.log('Datasize: ' + stat.size);
 
-                        console.log("---------- S e n d i n g   B u n d l e --------");
-                        console.log("actualPath: " + actualPath);
-                        console.log("url: " + url);
+                    console.log("---------- S e n d i n g   B u n d l e --------");
+                    console.log("actualPath: " + actualPath);
+                    console.log("url: " + url);
 
-                        sendToClients({
-                            message: 'ReloadBundle',
-                            url: escape(url),
-                            fileSize: stat.size
-                        });
-
-                        sendResponse({
-                            success: true,
-                            error: null
-                        });
+                    sendToClients({
+                        message: 'ReloadBundle',
+                        url: escape(url),
+                        fileSize: stat.size
                     });
-                });
-            });
-        });
 
-        writeStream.on('error', function(e){
-            console.log('Error: ' + e);
-        });
-
-        // Download file and pipe it to the writeStream
-        request(o.options.url).pipe(writeStream);
-    },
-
-    /*
-     * (RPC) Copies a project to current workspace directory.
-     * If a project is not in $HOME/.reload/examples/ it's downloaded to
-     * current workspace dir and unpacked there.
-     */
-    copyExample: function (opts, sendResponse) {
-        if(typeof sendResponse !== 'function') {
-            return false;
-        }
-
-        var self, opts, home_dir, DS, download_dir;
-
-        self = this;
-        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        DS = vars.globals.fileSeparator;
-        download_dir = home_dir + DS + '.reload' + DS + 'examples';
-        opts = JSON.parse(opts);
-        file_name    = url.parse(opts.url).pathname.split('/').pop();
-
-        var file = fs.createWriteStream(download_dir + DS + file_name);
-        file.on('close', function(){
-            self.unzip(download_dir + DS + file_name, vars.globals.rootWorkspacePath, function(resp){
-                console.log('Unzip successful');
-
-                // Remove downloaded zip.
-                fs.unlink(download_dir + DS + file_name, function(){
-                    console.log(download_dir + DS + file_name + ' removed');
-                    // Notify callee.
                     sendResponse({
                         success: true,
                         error: null
                     });
                 });
             });
+        };
+
+        fs.exists(o.download_dir + o.DS + o.options.name + '-master', function(exists) {
+            if (exists) {
+                console.log('File was already extracted.');
+                bundle(o.download_dir + o.DS + o.options.name + '-master');
+                return;
+            }
+
+        // Download file and pipe it to the writeStream
+        request(o.options.url).pipe((function(){
+            writer = fs.createWriteStream(file);
+            // Stream to file.
+            writer.on('close', function() {
+                // Unpack when file is written.
+                self.unzip(file, o.download_dir + o.DS, function() {
+                    // Github adds prefix to the folder
+                    bundle(o.download_dir + o.DS + o.options.name + '-master');
+
+                    // Remove downloaded zip.
+                    fs.unlink(file, function() {
+                        console.log(file + ' removed');
+                    });
+                });
+            });
+
+            writer.on('error', function(e){
+                console.log('Error: ' + e, 0);
+            });
+
+            return writer;
+        })());
         });
-        file.on('error', function(e){
-            console.log('Error: ' + e, 0);
-        });
-        request(opts.url).pipe(file);
+
     },
-    /*
+
+    /**
+     * (RPC) Copies a project to current workspace directory.
+     * If a project is not in $HOME/.reload/examples/ it's downloaded to
+     * current workspace dir and unpacked there.
+     * @param {...*} opts Parameter object.
+     * @param {function(...)} sendResponse Callback for response
+     * handling.
+     */
+    copyExample: function (opts, sendResponse) {
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        var self, opts, home_dir, DS, file_name, download_dir, zipFile, writer;
+
+        self            = this;
+        home_dir        = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+        DS              = vars.globals.fileSeparator;
+        opts            = JSON.parse(opts);
+        download_dir    = home_dir + DS + '.reload' + DS + 'examples';
+        file_name       = url.parse(opts.url).pathname.split('/').pop();
+        zipFile         = download_dir + DS + file_name;
+
+        // Check if workspace already has the unzipped file.
+        var path = vars.globals.rootWorkspacePath + DS + opts.name + '-master';
+        fs.exists(path, function(exists) {
+            if (exists) {
+                console.log('Project already exists in the workspace.');
+                sendResponse({
+                    success: false,
+                    error: true
+                });
+                return;
+            }
+
+            // Download only if not already there.
+            request(opts.url).pipe((function() {
+                writer = fs.createWriteStream(zipFile);
+
+                writer.on('close', function(){
+                    console.log('Writestream closed');
+
+                    self.unzip(zipFile, vars.globals.rootWorkspacePath, function(error, result) {
+                        if (error) {
+                            console.log('Unzip did not succeed.');
+                            sendResponse({
+                                success: false,
+                                error: true
+                            });
+                            return;
+                        }
+
+                        // Remove downloaded zip.
+                        fs.unlink(zipFile, function() {
+                            console.log(zipFile + ' removed');
+                            sendResponse({
+                                success: true,
+                                error: null
+                            });
+                        });
+                    });
+                });
+
+                writer.on('error', function(e) {
+                    console.log('Error: ' + e, 0);
+                });
+
+                // Pass writeStream object to the pipe.
+                return writer;
+            })());
+        });
+
+    },
+
+    /**
      * Copies a file.
-     * @src         
-     * @dest        
-     * @callback    
+     * @param {} src Source
+     * @param {} dest Destination
+     * @param {function(...)} callback Function to be called when
+     * completed.
      */
     copy: function (src, dest, callback) {
         console.log('copy() called');
@@ -432,29 +497,43 @@ var rpcFunctions = {
         }
     },
 
-    /*
+    /**
      * Unzip a file to a destination directory.
-     * @file        Zip file name including full path.
-     * @dest        Destination directory of unzipped files.
-     * @callback    Called upon completion of unzip.
+     * @param {String} file Zip file name including full path.
+     * @param {String} dest Destination directory of unzipped files.
+     * @param {function(...)} callback Called upon completion of unzip.
      */
     unzip: function (file, dest, callback) {
-        var res = {};
-        fs.createReadStream(file)
-        .pipe(zip.Extract({ path: dest }))
-        .on('close', function(){
-            console.log('Finished extraction.');
-            res.file = file;
-            callback(res);
+        var exec    = require('child_process').exec;
+        var darwin  = vars.globals.localPlatform.indexOf("darwin") >= 0;
+        var linux   = vars.globals.localPlatform.indexOf("linux") >= 0;
+        var command;
+
+        if (darwin || linux) {
+            command = 'unzip ' + file + ' -d ' + dest;
+        } else {
+            command = 'bin\\win\\unzip.exe ' + file + ' -d ' + dest;
+        }
+
+        exec(command, function(error, stdout, stderr) {
+            var e = false, r = {};
+
+            if (error) {
+                console.log("stdout: " + stdout, 0);
+                console.log("stderr: " + stderr, 0);
+                console.log("error: "  + error , 0);
+                e = true;
+            }
+
+            callback(e, r);
         });
     },
 
-     /*
+     /**
       * Internal method to download a file from a specified URL.
-      *
-      * @location   url pointing to wanted file.
-      * @dest       download directory (no file name at the end)
-      * @callback   Callback is returned with a {file: 'filepath' } object passed.
+      * @param {String} location Url pointing to wanted file.
+      * @param {String} dest Download directory (no file name at the end)
+      * @param {function(...)} callback Callback is returned with a {file: 'filepath' } object passed.
       */
     download: function (location, dest, callback) {
         var request, options, file, fileName, DS, res;
@@ -791,6 +870,7 @@ var rpcFunctions = {
             console.log("Renaming Project from " + oldName + " to " + newName, 0);
 
             var exec = require('child_process').exec;
+            var command;
             var respond = sendResponse;
 
             function resultCommand(error, stdout, stderr) {
@@ -815,7 +895,7 @@ var rpcFunctions = {
                 var substitute = '<name>' + newName + '<\/name>';
                 var newData = projectData.replace(re, substitute);
 
-                    projectFile =
+                projectFile =
                     vars.globals.rootWorkspacePath
                     + vars.globals.fileSeparator
                     + newName
@@ -830,7 +910,7 @@ var rpcFunctions = {
             var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
             var linux = vars.globals.localPlatform.indexOf("linux") >=0;
             if( darwin || linux ) {
-                var command =
+                command =
                     "mv "
                     + this.fixPathsUnix(vars.globals.rootWorkspacePath)
                     + this.fixPathsUnix(vars.globals.fileSeparator)
@@ -841,7 +921,7 @@ var rpcFunctions = {
                     + this.fixPathsUnix(newName)
                     ;
             } else {
-                var command =
+                command =
                     "rename \""
                     + vars.globals.rootWorkspacePath
                     + vars.globals.fileSeparator
@@ -856,8 +936,8 @@ var rpcFunctions = {
             exec(command, resultCommand);
 
         } catch(err) {
-            console.log("ERROR in renameProject(" + oldname + ", " + newName + "): " + err, 0);
-            sendResponse({hasError: true, data: "Error in renameProject(" + oldname + ", " + newName + "): " + err});
+            console.log("ERROR in renameProject(" + oldName + ", " + newName + "): " + err, 0);
+            sendResponse({hasError: true, data: "Error in renameProject(" + oldName + ", " + newName + "): " + err});
         }
     },
 
@@ -870,9 +950,10 @@ var rpcFunctions = {
     reloadProject: function (projectName, debug, sendResponse, clientList) {
 
         //check if parameter passing was correct
-        if (typeof sendResponse !== 'function') return false;
+        if (typeof sendResponse !== 'function') {
+            return false;
+        }
 
-        var self = this;
         var weinreDebug = (typeof debug === "boolean")? debug : false;
 
         console.log("-----------------------------------------------");
@@ -950,7 +1031,10 @@ var rpcFunctions = {
      * (RPC): Evaluate JS on the clients.
      */
     evalJS: function (script, sendResponse) {
-        if(typeof sendResponse !== 'function') return false;
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
         console.log("@@@ ====================================");
         console.log("@@@ evalJS " + script);
         //console.log("@@@ Callstack:");
@@ -979,9 +1063,7 @@ var rpcFunctions = {
         console.log("Path to TempFiles: " + pathToTempBundle);
 
         if(weinreDebug) {
-
             try {
-
                 ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
                     if (err) {
                         console.log('ERROR Copy Process      : Error-' + err, 0);
@@ -989,8 +1071,6 @@ var rpcFunctions = {
                     console.log('Copy Process      : Successfull');
 
                     self.debugInjection(projectDir, function (){
-
-
                             //INJECT WEINRE SCRIPT
                             //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
                             //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
