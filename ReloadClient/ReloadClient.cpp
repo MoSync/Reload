@@ -402,6 +402,7 @@ void ReloadClient::openWormhole(MAHandle webViewHandle)
  */
 void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 {
+	lprintfln("KEY PRESSED: %d", keyCode);
 	if (mRunningApp)
 	{
 		// Forward to PhoneGap MessageHandler.
@@ -412,6 +413,8 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
 
 		if (MAK_BACK == keyCode)
 		{
+			lprintfln("@@@ RELOAD: shouldExit = %d", mReloadScreenController->shouldExit());
+
 			if (mReloadScreenController->shouldExit())
 			{
 				// on wp7, we cannot exit the application programmatically - the
@@ -436,11 +439,14 @@ void ReloadClient::keyPressEvent(int keyCode, int nativeCode)
  */
 void ReloadClient::exit()
 {
+	lprintfln("EXIT CALLED");
 	if (mRunningApp)
 	{
 		// Close the running app and show the start screen.
 		mRunningApp = false;
-		mReloadScreenController->showConnectedScreen();
+
+		// Show the Tab Screen
+		MainScreenSingleton::getInstance()->show();
 	}
 	else
 	{
