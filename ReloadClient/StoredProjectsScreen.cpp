@@ -69,14 +69,22 @@ StoredProjectsScreen::~StoredProjectsScreen()
 void StoredProjectsScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0x000000);
+	if(mOS.find("iPhone") >= 0)
+	{
+		mMainLayout->setBackgroundColor(0x000000);
+	}
+
 	Screen::setMainWidget(mMainLayout);
 
 	mScreenLabel = new Label();
 	//mScreenLabel->setBackgroundColor(66,133,244);
 	mScreenLabel->setBackgroundColor(0xFF8B00);
 	mScreenLabel->setBackgroundGradient(0xFFA900, 0xFF7A00);
-	mScreenLabel->setFontColor(0xFFFFFF);
+	mScreenLabel->setFontColor(0x000000);
+	if(mOS.find("iPhone") >= 0)
+	{
+		mScreenLabel->setFontColor(0xFFFFFF);
+	}
 	mScreenLabel->setHeight(mWidgetHeight);
 	mScreenLabel->setText("Saved Projects: " + integerToString(mProjects->size()));
 	mScreenLabel->fillSpaceHorizontally();
