@@ -133,6 +133,7 @@ void WorkspaceLayout::createMainLayout() {
 	mListView->addListViewListener(this);
 	if(mOS.find("iPhone") >= 0)
 	{
+		this->setBackgroundColor(0x000000);
 		mListView->setProperty(MAW_WIDGET_BACKGROUND_COLOR,"00000000");
 	}
 
@@ -154,7 +155,7 @@ void WorkspaceLayout::createMainLayout() {
 	//loadingProjectsIndicator->setPosition((int)(mScreenWidth*0.5) - 40, (int)(mScreenHeight*0.5) - 80 );
 	//mActivityIndicatorContainer->addChild(loadingProjectsIndicator);
 
-	this->setBackgroundColor(0x000000);
+
 }
 
 /**
