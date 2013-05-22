@@ -25,6 +25,17 @@ var JSONRPC = {
 
         resObj = response;
 
+        // Parse bool values in the param list of the message.
+        var o = message.params;
+        for (var key in o) {
+            if (o[key] === 'true') {
+                o[key] = true;
+            } else if (o[key] === 'false') {
+                o[key] = false;
+            }
+        }
+        message.params = o;
+
         // processingResult is the object passed with response message
         // from exposed RPC function.
         //
@@ -38,6 +49,7 @@ var JSONRPC = {
         //      response(processingResult);
         // }
         this.handleMessage(message, function(processingResult) {
+            console.log(message);
 
             var responseObject = {
                 'id':      0,
@@ -217,7 +229,7 @@ var JSONRPC = {
         var method = this.functions[message.method];
 
         try {
-            // Check for the function module to set the appropriate 
+            // Check for the function module to set the appropriate
             // context to apply
             var functionCall = message.method.split('.');
             var moduleName = functionCall[0];
