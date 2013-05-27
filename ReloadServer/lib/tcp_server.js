@@ -196,7 +196,7 @@ var create = function (port) {
                     var msg = "Client "
                             + socket.remoteAddress
                             + " ("
-                            + socket.deviceInfo.name
+                            + unescape(socket.deviceInfo.name)
                             + ") has connected.";
                     console.log( msg , 0 );
                 }
