@@ -273,7 +273,7 @@ var create = function (port) {
                     console.log(
                         "Client " +
                         address + " (" +
-                        socket.deviceInfo.name +
+                        unescape(socket.deviceInfo.name) +
                         ") has disconnected.", 0);
                     for (var i = 0; i < vars.globals.clientList.length; i++)
                     {
