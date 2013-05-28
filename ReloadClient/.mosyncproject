@@ -16,7 +16,7 @@
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="Accelerometer Bluetooth Calendar Camera Compass Contacts File\ Storage Gyroscope Internet\ Access Location Location/Coarse Location/Fine Orientation Power\ Management Proximity Push\ Notifications SMS Vibration"/>
-<property key="build.prefs:app.vendor/Release" value="MoSync SDK"/>
+<property key="build.prefs:app.vendor/Release" value="MoSyncSDK"/>
 <property key="build.prefs:app.version/Release" value="1.0.1"/>
 <property key="build.prefs:extra.link.sw/Debug" value="-master-dump"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
