@@ -279,6 +279,14 @@ var rpcFunctions = {
             return false;
         }
 
+        if (vars.globals.deviceInfoListJSON.length === 0) {
+            sendResponse({
+                hasError: true,
+                data: 'No clients connected.'
+            });
+            return;
+        }
+
         var self           = this
             , options      = JSON.parse(options) // Options string is expected to contain JSON.
             , home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']
@@ -361,13 +369,16 @@ var rpcFunctions = {
                 return;
             }
 
-        // Download file and pipe it to the writeStream
-        request(o.options.url).pipe((function(){
             writer = fs.createWriteStream(file);
+            // Download file and pipe it to the writeStream
+            writer.on('open', function() {
+                request(o.options.url).pipe(writer);
+            });
+
             // Stream to file.
             writer.on('close', function() {
                 // Unpack when file is written.
-                self.unzip(file, o.download_dir + o.DS, function() {
+                self.unzip(file, o.download_dir, function() {
                     // Github adds prefix to the folder
                     bundle(o.download_dir + o.DS + o.options.name + '-master');
 
@@ -382,10 +393,7 @@ var rpcFunctions = {
                 console.log('Error: ' + e, 0);
             });
 
-            return writer;
-        })());
         });
-
     },
 
     /**
@@ -512,7 +520,7 @@ var rpcFunctions = {
         if (darwin || linux) {
             command = 'unzip ' + file + ' -d ' + dest;
         } else {
-            command = 'bin\\win\\unzip.exe ' + file + ' -d ' + dest;
+            command = 'bin\\win\\unzip.exe "' + file + '" -d ' + '"' + dest + '"';
         }
 
         exec(command, function(error, stdout, stderr) {
@@ -952,6 +960,14 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') {
             return false;
+        }
+
+        if (vars.globals.clientList.length === 0) {
+            sendResponse({
+                hasError: true,
+                data: 'No clients connected',
+            });
+            return;
         }
 
         var weinreDebug = (typeof debug === "boolean")? debug : false;
