@@ -796,6 +796,7 @@ void ReloadClient::handleJSONMessage(const String& json)
 		// Get message parameters.
 		String urlData = (jsonRoot->getValueForKey("url"))->toString();
 		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
+		getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
 
 		// Initiate the download.
 		downloadBundle(urlData, fileSize);
