@@ -369,9 +369,12 @@ var rpcFunctions = {
                 return;
             }
 
-        // Download file and pipe it to the writeStream
-        request(o.options.url).pipe((function(){
             writer = fs.createWriteStream(file);
+            // Download file and pipe it to the writeStream
+            writer.on('open', function() {
+                request(o.options.url).pipe(writer);
+            });
+
             // Stream to file.
             writer.on('close', function() {
                 // Unpack when file is written.
@@ -390,10 +393,7 @@ var rpcFunctions = {
                 console.log('Error: ' + e, 0);
             });
 
-            return writer;
-        })());
         });
-
     },
 
     /**
