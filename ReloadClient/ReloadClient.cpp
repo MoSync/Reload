@@ -707,8 +707,15 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 
 void ReloadClient::cancelDownload()
 {
+	/* TODO: Reveert to Previous commit after the downloader
+	 * class is fixed
+	 * commit 84ee4985a892f121cd25529b006bd8ae72330f36
+	 * Merge: f5af6fc e0426b8
+	 * Author: Abi Waqas <abi@mosync.com>
+	 * Date:   Wed May 22 03:14:38 2013 -0700
+	 */
 	mDownloadHandler.cancelDownload();
-	//MainScreenSingleton::getInstance()->show();
+
 	mReloadScreenController->showConnectedScreen();
 }
 
@@ -789,6 +796,7 @@ void ReloadClient::handleJSONMessage(const String& json)
 		// Get message parameters.
 		String urlData = (jsonRoot->getValueForKey("url"))->toString();
 		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
+		getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
 
 		// Initiate the download.
 		downloadBundle(urlData, fileSize);
