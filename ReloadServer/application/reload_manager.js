@@ -367,7 +367,7 @@ var rpcFunctions = {
             // Stream to file.
             writer.on('close', function() {
                 // Unpack when file is written.
-                self.unzip(file, o.download_dir + o.DS, function() {
+                self.unzip(file, o.download_dir, function() {
                     // Github adds prefix to the folder
                     bundle(o.download_dir + o.DS + o.options.name + '-master');
 
@@ -512,7 +512,7 @@ var rpcFunctions = {
         if (darwin || linux) {
             command = 'unzip ' + file + ' -d ' + dest;
         } else {
-            command = 'bin\\win\\unzip.exe ' + file + ' -d ' + dest;
+            command = 'bin\\win\\unzip.exe "' + file + '" -d ' + '"' + dest + '"';
         }
 
         exec(command, function(error, stdout, stderr) {
