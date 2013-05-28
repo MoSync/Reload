@@ -57,7 +57,8 @@ function reloadProject(name, inspect, cb) {
             return;
         }
 
-        var result = JSON.parse(body).result;
+        var body = JSON.parse(body),
+        result = (body.error) ? body.error : body.result;
         cb(result);
     });
 }

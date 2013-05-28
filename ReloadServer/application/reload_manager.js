@@ -279,6 +279,14 @@ var rpcFunctions = {
             return false;
         }
 
+        if (vars.globals.deviceInfoListJSON.length === 0) {
+            sendResponse({
+                hasError: true,
+                data: 'No clients connected.'
+            });
+            return;
+        }
+
         var self           = this
             , options      = JSON.parse(options) // Options string is expected to contain JSON.
             , home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']
@@ -952,6 +960,14 @@ var rpcFunctions = {
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') {
             return false;
+        }
+
+        if (vars.globals.clientList.length === 0) {
+            sendResponse({
+                hasError: true,
+                data: 'No clients connected',
+            });
+            return;
         }
 
         var weinreDebug = (typeof debug === "boolean")? debug : false;
