@@ -22,7 +22,11 @@
 .include "custom.js"
 .res SERVER
 .image "server.png"
+.res SERVER_ANDROID
+.image "server_android.png"
 .res LOCAL
 .image "local.png"
+.res LOCAL_ANDROID
+.image "local_android.png"
 .eof
 
