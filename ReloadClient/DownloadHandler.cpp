@@ -34,11 +34,15 @@ using namespace MAUtil;
 
 DownloadHandler::DownloadHandler()
 {
-	mDownloader.addDownloadListener(this);
+	isCanceled = false;
+	//	mDownloader = new MAUtil::Downloader;
+
+	//mDownloader->addDownloadListener(this);
 }
 
 DownloadHandler::~DownloadHandler()
 {
+	//delete mDownloader;
 }
 
 // ========== High-level public protocol ==========
@@ -48,32 +52,43 @@ void DownloadHandler::setListener(DownloadHandlerListener* listener)
 	mListener = listener;
 }
 
+
+
 void DownloadHandler::addDownloadListener(DownloadListener* listener)
 {
-	mDownloader.addDownloadListener(listener);
+	//mDownloader->addDownloadListener(listener);
+	mDownloadListener = listener;
 }
 
 bool DownloadHandler::isDownloading()
 {
-	return mDownloader.isDownloading();
+	return mDownloader->isDownloading();
 }
 
 int DownloadHandler::startDownload(const char* url)
 {
 	// Do not start if there already is a download in progress.
-	if (mDownloader.isDownloading())
+	/*if (mDownloader->isDownloading())
 	{
 		return -1;
+	}*/
+	if(mDownloader != NULL)
+	{
+		mDownloader->removeDownloadListener(mDownloadListener);
 	}
-
-	int result = mDownloader.beginDownloading(url);
+	isCanceled = false;
+	Downloader * downloader = new Downloader();
+	mDownloader = downloader;
+	mDownloader->addDownloadListener(this);
+	mDownloader->addDownloadListener(mDownloadListener);
+	int result = mDownloader->beginDownloading(url);
 
 	return result;
 }
 
 int DownloadHandler::cancelDownload()
 {
-	return mDownloader.cancelDownloading();
+	isCanceled = true;
 }
 
 // ========== DownloadListener protocol ==========
@@ -94,6 +109,11 @@ void DownloadHandler::downloadCancelled(Downloader* downloader)
  */
 void DownloadHandler::error(Downloader* downloader, int code)
 {
+	if(downloader != mDownloader)
+	{
+		delete downloader;
+		return;
+	}
 	mListener->downloadHandlerError(code);
 }
 
@@ -104,5 +124,13 @@ void DownloadHandler::error(Downloader* downloader, int code)
  */
 void DownloadHandler::finishedDownloading(Downloader* downloader, MAHandle data)
 {
-	mListener->downloadHandlerSuccess(data);
+	if(downloader != mDownloader)
+	{
+		return;
+	}
+
+	if(!isCanceled)
+	{
+		mListener->downloadHandlerSuccess(data);
+	}
 }

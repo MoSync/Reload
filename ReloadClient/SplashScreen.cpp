@@ -61,7 +61,10 @@ SplashScreen::SplashScreen() : Screen()
 	mContainer->fillSpaceVertically();
 	mContainer->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mContainer->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
-	mContainer->setBackgroundColor(0x000000);
+	if(os.find("iPhone") >= 0)
+	{
+		mContainer->setBackgroundColor(0x000000);
+	}
 
 	mReloadImage = new Image();
 	mReloadImage->setImage(LOGO_IMAGE);
@@ -70,7 +73,10 @@ SplashScreen::SplashScreen() : Screen()
 
 	mPoweredBy = new Label();
 	mPoweredBy->setText("powered by");
-	mPoweredBy->setFontColor(0xffffff);
+	if(os.find("iPhone") >= 0)
+	{
+		mPoweredBy->setFontColor(0xffffff);
+	}
 	mPoweredBy->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	mPoweredBy->fillSpaceHorizontally();
 

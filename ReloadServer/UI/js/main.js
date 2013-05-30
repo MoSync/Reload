@@ -36,6 +36,8 @@ require.config({
     }
 });
 
+// Include CSS files programmatically.
+// Something requirejs doesn't support.
 function loadCss(url) {
     var link = document.createElement("link");
     link.type = "text/css";
@@ -43,6 +45,7 @@ function loadCss(url) {
     link.href = url;
     document.getElementsByTagName("head")[0].appendChild(link);
 }
+
 require([ 'reload' ], function (Reload) {
     // The "reload" dependency is passed in as "Reload"
     Reload.initialize();

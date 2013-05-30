@@ -98,10 +98,11 @@ void LoginLayout::createMainLayout()
 
 void LoginLayout::createWidgetLayout()
 {
-	this->setBackgroundColor(0x000000);
+
 
 	if(mOS == "iPhone OS")
 	{
+		this->setBackgroundColor(0x000000);
 		mServersTitle = new ImageButton();
 		((ImageButton*)mServersTitle)->addButtonListener(this);
 		((ImageButton*)mServersTitle)->setBackgroundImage(RELOAD_BG);

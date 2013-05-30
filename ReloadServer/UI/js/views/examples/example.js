@@ -30,7 +30,8 @@ define([
             console.log(this.model);
             var data = {
                 name: this.model.get('name'),
-                description: this.model.get('description')
+                description: this.model.get('description'),
+                screenshot: this.model.get('screenshot')
             };
             this.compiledTemplate = _.template( template, data );
             return this.$el.html( this.compiledTemplate );
