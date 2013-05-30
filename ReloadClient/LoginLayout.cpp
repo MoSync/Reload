@@ -241,6 +241,10 @@ void LoginLayout::buttonClicked(Widget *button)
 
 	if(button == mServerConnectButton)
 	{
+		if(mBroadcastHandler != NULL) {
+			delete mBroadcastHandler;
+			mBroadcastHandler = NULL;
+		}
 		//Trim the beggining and end of the string of any spaces.
 		int firstCharPos = mServerIPBox->getText().findFirstNotOf(' ', 0);
 		int lastCharPos = mServerIPBox->getText().findFirstOf(' ', firstCharPos);
@@ -265,7 +269,10 @@ void LoginLayout::buttonClicked(Widget *button)
 	}
 	else if(button == mServersTitle)
 	{
-		delete mBroadcastHandler;
+		if(mBroadcastHandler != NULL) {
+			delete mBroadcastHandler;
+			mBroadcastHandler = NULL;
+		}
 		this->emptyServerList();
 		this->findServers();
 	}
@@ -325,12 +332,16 @@ void LoginLayout::listViewItemClicked(ListView *listView, ListViewItem *listView
 	}
 	else if (listViewItem->getPropertyString("text") != "")
 	{
+		if(mBroadcastHandler != NULL) {
+			delete mBroadcastHandler;
+			mBroadcastHandler = NULL;
+		}
+
 		lprintfln("@@@ RELOAD: Connect to server %s", listViewItem->getPropertyString("text").c_str());
 		for (int j = 0; j < mReloadUIListeners.size(); j++)
 		{
 			mReloadUIListeners[j]->connectToSelectedServer(listViewItem->getPropertyString("text"));
 		}
-		delete mBroadcastHandler;
 	}
 }
 
