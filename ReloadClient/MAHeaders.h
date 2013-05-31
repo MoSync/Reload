@@ -9,4 +9,6 @@
 #define INFO_TEXT 9
 #define CUSTOM_JS 10
 #define SERVER 11
-#define LOCAL 12
+#define SERVER_ANDROID 12
+#define LOCAL 13
+#define LOCAL_ANDROID 14
