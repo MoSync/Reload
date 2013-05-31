@@ -321,7 +321,10 @@
 #include <mastdlib.h>
 #include <maarg.h>
 #include <maassert.h>
+#include <maheap.h>
+#include <mavsprintf.h>
 //#include <errno.h>
+#include "snprintf.h"
 
 #ifdef isdigit
 #undef isdigit
@@ -376,16 +379,16 @@
 /* prototypes */
 
 #if defined(NEED_ASPRINTF)
-int asprintf   (char **ptr, const char *fmt, /*args*/ ...);
+int asprintf   (char **ptr, const char *fmt, /*args*/ ...) ATTRIB_2;
 #endif
 #if defined(NEED_VASPRINTF)
-int vasprintf  (char **ptr, const char *fmt, va_list ap);
+int vasprintf  (char **ptr, const char *fmt, va_list ap) VATTRIB_2;
 #endif
 #if defined(NEED_ASNPRINTF)
-int asnprintf  (char **ptr, size_t str_m, const char *fmt, /*args*/ ...);
+int asnprintf  (char **ptr, size_t str_m, const char *fmt, /*args*/ ...) ATTRIB_3;
 #endif
 #if defined(NEED_VASNPRINTF)
-int vasnprintf (char **ptr, size_t str_m, const char *fmt, va_list ap);
+int vasnprintf (char **ptr, size_t str_m, const char *fmt, va_list ap) VATTRIB_3;
 #endif
 
 #if defined(HAVE_SNPRINTF)
@@ -400,9 +403,9 @@ int vasnprintf (char **ptr, size_t str_m, const char *fmt, va_list ap);
 #endif
 
 #if !defined(HAVE_SNPRINTF) || defined(PREFER_PORTABLE_SNPRINTF)
-int portable_snprintf(char *str, size_t str_m, const char *fmt, /*args*/ ...);
+int portable_snprintf(char *str, size_t str_m, const char *fmt, /*args*/ ...) ATTRIB_3;
 #if !defined(NEED_SNPRINTF_ONLY)
-int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
+int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap) VATTRIB_3;
 #endif
 #endif
 
@@ -564,7 +567,9 @@ int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap) {
       }
       p += n; str_l += n;
     } else {
+#if defined(PERL_COMPATIBLE) || defined(LINUX_COMPATIBLE)
       const char *starting_p;
+#endif
       size_t min_field_width = 0, precision = 0;
       int zero_padding = 0, precision_specified = 0, justify_left = 0;
       int alternate_form = 0, force_sign = 0;
@@ -593,7 +598,10 @@ int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap) {
 
       str_arg = credits;/* just to make compiler happy (defined but not used)*/
       str_arg = NULL;
-      starting_p = p; p++;  /* skip '%' */
+#if defined(PERL_COMPATIBLE) || defined(LINUX_COMPATIBLE)
+      starting_p = p;
+#endif
+			p++;  /* skip '%' */
    /* parse flags */
       while (*p == '0' || *p == '-' || *p == '+' ||
              *p == ' ' || *p == '#' || *p == '\'') {
@@ -908,7 +916,7 @@ int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap) {
             }
           }
        /* zero padding to specified precision? */
-          if (num_of_digits < precision) 
+          if (num_of_digits < precision)
             number_of_zeros_to_pad = precision - num_of_digits;
         }
      /* zero padding to specified minimal field width? */

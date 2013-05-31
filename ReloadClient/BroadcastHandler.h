@@ -57,7 +57,7 @@ public:
 	/**
 	 * Method that starts a broadcast for server discovery
 	 */
-	void BroadcastHandler::findServer();
+	void findServer();
 
 	/**
 	 * The connect() operation has finished.
@@ -83,12 +83,12 @@ private:
 	/**
 	 * Method that executes writeTo using UDP socket connection
 	 */
-	void BroadcastHandler::broadcast();
+	void broadcast();
 
 	/**
 	 * Initialize the buffer
 	 */
-	void BroadcastHandler::initializeBuffer();
+	void initializeBuffer();
 
 	/**
 	 * The UDP socket used for registering with the server

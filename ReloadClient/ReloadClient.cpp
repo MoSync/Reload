@@ -31,7 +31,6 @@ MA 02110-1301, USA.
 #include <maapi.h>
 
 #include "ReloadClient.h"
-#include "ReloadNativeUIMessageHandler.h"
 #include "Log.h"
 #include "MainScreenSingleton.h"
 #include "MainScreen.h"
@@ -91,7 +90,7 @@ public:
 	void dataDownloaded(MAHandle data, int result)
 	{
 		// If we get data then delete it.
-		if (NULL != data)
+		if (0 != data)
 		{
 			maDestroyPlaceholder(data);
 		}

@@ -95,7 +95,7 @@ public:
 	/**
 	 * Close the connection to the server.
 	 */
-	void SocketHandler::closeConnection();
+	void closeConnection();
 
 	/**
 	 * Send a message to the server.
@@ -146,13 +146,13 @@ protected:
 	/**
 	 * Deallocate internal read buffer.
 	 */
-	void SocketHandler::deallocateReadBuffer();
+	void deallocateReadBuffer();
 
 	/**
 	 * Allocate internal read buffer.
 	 * @param size Size of buffer.
 	 */
-	void SocketHandler::allocateReadBuffer(int size);
+	void allocateReadBuffer(int size);
 
 	/**
 	 * Read numBytes of data from the socket into buffer.

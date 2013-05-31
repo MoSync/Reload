@@ -72,7 +72,7 @@ public:
 	 */
 	virtual ~ReloadClient();
 
-	void ReloadClient::runTimerEvent();
+	void runTimerEvent();
 
 	/**
 	 * Creation/initialization.

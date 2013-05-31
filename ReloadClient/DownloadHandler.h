@@ -97,7 +97,7 @@ public:
 	/**
 	 * Cancel any ongoing download.
 	 */
-	int cancelDownload();
+	void cancelDownload();
 
 
 public:

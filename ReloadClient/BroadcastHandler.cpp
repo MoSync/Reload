@@ -65,10 +65,7 @@ BroadcastHandler::~BroadcastHandler()
  */
 void BroadcastHandler::initializeBuffer()
 {
-	for(int i = 0; i < BUFFER_SIZE; i++)
-	{
-		mBuffer[i] = NULL;
-	}
+	memset(mBuffer, 0, BUFFER_SIZE);
 }
 
 /**

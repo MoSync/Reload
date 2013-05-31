@@ -93,8 +93,9 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 	//Just load whatever app we have already extracted
 	if (mStoredProjectScreen == NULL)
 	{
-		int orientation = maScreenGetCurrentOrientation();
-		mStoredProjectScreen = new StoredProjectsScreen(os, orientation, mReloadClient->getListOfSavedProjects());
+		int currentOrientation = maScreenGetCurrentOrientation();
+		mStoredProjectScreen = new StoredProjectsScreen(os, currentOrientation,
+			mReloadClient->getListOfSavedProjects());
 		mStoredProjectScreen->setTitle("Local");
 		mStoredProjectScreen->addReloadUIListener(this);
 		if ( mOS.find("Android") >= 0 )

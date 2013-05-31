@@ -86,7 +86,7 @@ int DownloadHandler::startDownload(const char* url)
 	return result;
 }
 
-int DownloadHandler::cancelDownload()
+void DownloadHandler::cancelDownload()
 {
 	isCanceled = true;
 }
