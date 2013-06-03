@@ -790,102 +790,111 @@ var rpcFunctions = {
     // options:
     //      - empty (true,false) Empty the directory without deleting 
 
-    removeRecursive: function (path, cb, options) {
+    removeRecursive: function (pathToDelete, cb, options) {
         var self = this,
-            initialPath = path;
+            initialPath = pathToDelete;
 
-        if(typeof options === "undefined") {
-            var options = {};
+        // parameter check
+        if( !(options && typeof options === "object") ) {
+            options = new Object();
             options.empty = false;
         }
 
-        fs.stat(path, function (err, stats) {
+        function remove(pathToDelete, cb, options) {
 
-            if (err) {
-                cb(err, stats);
-                return;
-            }
+            fs.stat(pathToDelete, function (err, stats) {
 
-            if (stats.isFile()) {
-
-                fs.unlink(path, function (err) {
-                    if(err) {
-                        cb(err,null);
-                    } else {
-                        cb(null,true);
-                    }
+                if (err) {
+                    cb(err, stats);
                     return;
-                });
+                }
 
-            } else if (stats.isDirectory()) {
+                if (stats.isFile()) {
 
-                // A folder may contain files
-                // We need to delete the files first
-                // When all are deleted we could delete the
-                // dir itself
-                fs.readdir(path, function (err, files) {
-                    if (err) {
-                        cb(err,null);
+                    fs.unlink(pathToDelete, function (err) {
+                        if(err) {
+                            cb(err,null);
+                        } else {
+                            cb(null,true);
+                        }
                         return;
-                    }
+                    });
 
-                    var f_length = files.length;
-                    var f_delete_index = 0;
+                } else if (stats.isDirectory()) {
 
-                    // Check and keep track of deleted files
-                    // Delete the folder itself when the files are deleted
+                    // A folder may contain files
+                    // We need to delete the files first
+                    // When all are deleted we could delete the
+                    // dir itself
+                    fs.readdir(pathToDelete, function (err, files) {
+                        if (err) {
+                            cb(err,null);
+                            return;
+                        }
 
-                    var checkStatus = function() {
+                        var f_length = files.length;
+                        var f_delete_index = 0;
 
-                        // We check the status
-                        // and count till we r done
-                        if (f_length===f_delete_index) {
+                        // Check and keep track of deleted files
+                        // Delete the folder itself when the files are deleted
 
-                            if (path !== initialPath) {
+                        var checkStatus = function() {
 
-                                fs.rmdir(path, function(err) {
-                                    if (err) {
-                                        cb(err,null);
-                                    } else {
-                                        cb(null,true);
-                                    }
-                                });
-                            } else {
-                                cb(null,true);
-                                return true;   
+                            // We check the status
+                            // and count till we r done
+                            if (f_length===f_delete_index) {
+
+                                if (!(options.empty) || 
+                                     ((options.empty) && 
+                                     (pathToDelete !== initialPath))) {
+                                    console.log(path.dirname(pathToDelete));
+                                    console.log(initialPath);
+                                    fs.rmdir(pathToDelete, function(err) {
+                                        if (err) {
+                                            cb("1" + err,null);
+                                        } else {
+                                            cb(null,true);
+                                        }
+                                    });
+                                } else {
+                                    cb(null,true);
+                                    return true;   
+                                }
+                                
                             }
-                            
+                            return false;
+                        };
+
+                        if (!checkStatus()) {
+
+                            for (var i = 0; i < f_length; i++) {
+
+                                // Create a local scope for filePath
+                                // Not really needed, but just good practice
+                                // (as strings arn't passed by reference)
+                                (function(){
+                                    var filePath = path.join(pathToDelete, files[i]);
+                                    // Add a named function as callback
+                                    // just to enlighten debugging
+                                    remove(filePath, function removeRecursiveCB(err, status) {
+                                        if (!err) {
+
+                                            f_delete_index ++;
+                                            checkStatus();
+                                        } else {
+                                            cb(err,null);
+                                            return;
+                                        }
+                                    }, options);
+                                })()
+                            }
                         }
-                        return false;
-                    };
+                    });
+                }
+            });    
+        };
 
-                    if (!checkStatus()) {
-
-                        for (var i = 0; i < f_length; i++) {
-
-                            // Create a local scope for filePath
-                            // Not really needed, but just good practice
-                            // (as strings arn't passed by reference)
-                            (function(){
-                                var filePath = path + vars.globals.fileSeparator + files[i];
-                                // Add a named function as callback
-                                // just to enlighten debugging
-                                self.removeRecursive(filePath, function removeRecursiveCB(err, status) {
-                                    if (!err) {
-
-                                        f_delete_index ++;
-                                        checkStatus();
-                                    } else {
-                                        cb(err,null);
-                                        return;
-                                    }
-                                });
-                            })()
-                        }
-                    }
-                });
-            }
-        });
+        remove(pathToDelete, cb, options);
     },
 
     /**
@@ -1016,7 +1025,7 @@ var rpcFunctions = {
         //var files = fs.readdirSync(applicationPath);
         //console.log("Files found in the app:");
         //console.log(files);
-
+        var syntaxCheckingStatus = true;
         function readDir(directoryPath) {
             var files = fs.readdirSync(directoryPath);
             for (i in files) {
@@ -1034,18 +1043,33 @@ var rpcFunctions = {
                                                     { startLineNumber : 0 });
                         console.log("\u001b[32m" + checkFile.replace(applicationPath,"") + 
                                     " No Syntax Errors" + "\u001b[0m");
+                        if (syntaxCheckingStatus !== false) {
+                            syntaxCheckingStatus = true;
+                        }
                     } catch (e) {
                         //console.log("ERROR in file " + checkFile, 0);
                         console.log("\u001b[31;4m" + checkFile.replace(applicationPath,"") + "  " +
                                     "\u001b[31m" + e + "\u001b[0m");
+                        
+                        syntaxCheckingStatus = false;
+                        //mosync.rlog('<div style="background-color: #FFEBEB; color:red">' + e + '</div>');
                     }
                 } else if (fileStats.isDirectory()){
                     readDir(checkFile);
                 }
             }
         }
-
         readDir(applicationPath);
+
+        if( !syntaxCheckingStatus ) {
+            // TODO: Send response to the server ?
+            sendResponse({
+                hasError: true,
+                data: 'Javascript errors',
+            });
+            return;
+        }
+
         // Check javascript in script tags of index.html
         var applicationEntryPoint = projectPath + 
                                     vars.globals.fileSeparator + 
@@ -1073,6 +1097,11 @@ var rpcFunctions = {
                 console.log("\u001b[31;11m" + 
                             applicationEntryPoint.replace(applicationPath,"") + "  " +
                             e + "\u001b[0m");
+                sendResponse({
+                    hasError: true,
+                    data: e,
+                });
+                return;
                 //console.log(e);
             }
         }
@@ -1191,7 +1220,7 @@ var rpcFunctions = {
         console.log("Path to Project  : " + pathToLocalFiles);
         console.log("Path to TempFiles: " + pathToTempBundle);
 
-        if(weinreDebug === "true") {
+        if(weinreDebug === true) {
 
             try {
                 self.debugInjection(projectDir, function (){
@@ -1834,7 +1863,8 @@ var rpcFunctions = {
             projectOuputFolder = projectName
                 + vars.globals.fileSeparator + 'TempBundle',
 
-            debugerFiles = "C:\\WorkingDir\\Aardwolf\\samples";
+            //debugerFiles = "C:\\WorkingDir\\Aardwolf\\samples";
+            debugerFiles = path.resolve("aardwolf","samples");
 
             // data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
 
@@ -1869,7 +1899,7 @@ var rpcFunctions = {
                     callback();    
                 }
             });
-        }, { "empty": true});
+        }, { "empty": true });
 
         
         // /**

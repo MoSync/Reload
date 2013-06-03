@@ -16,7 +16,7 @@ var fs = require('fs');
 
 
 /* Verbose mode */
-config.verbose = true;
+config.verbose = false;
 
 /* Run the debug file server or not */
 config.runDebugServer = true;

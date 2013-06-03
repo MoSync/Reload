@@ -6,13 +6,11 @@
 
 var path = require('path');
 var fs = require('fs');
-//var watch = require('node-watch');
+var watch = require('node-watch');
 
-var config = require('./config/config.defaults.js');
-    // path to project
-
+var config = require('../config/config.defaults.js');
 var util = require('./server-util.js');
-var rewriter = require('./rewriter/jsrewriter.js');
+var rewriter = require('../rewriter/jsrewriter.js');
 
 var cachePath,
     fileCache = {
@@ -22,16 +20,7 @@ var cachePath,
     };
 
 
-function run(customConfig) {
-
-    // Set custom configuration
-    if(config && typeof customConfig === 'object') {
-        for (i in customConfig) {
-            config[i] = customConfig[i];
-        }
-    }
-    //return;
-
+function run() {
     if (!fs.existsSync(config.fileServerBaseDir)) {
         console.error('ERROR: Path does not exist: ' + config.fileServerBaseDir);
         process.exit(1);
@@ -40,19 +29,19 @@ function run(customConfig) {
     processFiles();
 
     var serverBaseDir = path.normalize(config.fileServerBaseDir);
-    // // Watch for file changes
-    // watch(serverBaseDir, function(fileName) {
-    //     if (fileName) {
-    //         for (var i = 0; i < config.ignoreFiles.length; i++) {
-    //             if (fileName.indexOf(config.ignoreFiles[i]) >= 0) {
-    //                 return;
-    //             }
-    //         }
-    //         var file = fileName.substr(serverBaseDir.length);
-    //         file = file.replace(/\\/g, '/');
-    //         processFile(file, true);
-    //     }
-    // });
+    // Watch for file changes
+    watch(serverBaseDir, function(fileName) {
+        if (fileName) {
+            for (var i = 0; i < config.ignoreFiles.length; i++) {
+                if (fileName.indexOf(config.ignoreFiles[i]) >= 0) {
+                    return;
+                }
+            }
+            var file = fileName.substr(serverBaseDir.length);
+            file = file.replace(/\\/g, '/');
+            processFile(file, true);
+        }
+    });
 }
 
 function processFiles() {
@@ -67,7 +56,6 @@ function processFiles() {
 
     if (fs.existsSync(cachePath)) {
         fileCache = JSON.parse(fs.readFileSync(cachePath).toString());
-        console.log(fileCache);
 
         // Flush cache if white or black list has changed
         if (!fileCache.blackList.equals(config.blackList) || !fileCache.whiteList.equals(config.whiteList)) {
@@ -84,11 +72,8 @@ function processFiles() {
     }
 
     // Copy Aardwolf script
-    content =  fs.readFileSync(path.join(__dirname, './js/aardwolf.js'));
+    content =  fs.readFileSync(path.join(__dirname, '../js/aardwolf.js'));
 
-    // TODO: Remove this functionality because the files are store locally
-    // and are not served by the server in <script> tags the src attribute 
-    // has a relative path to the script files
     content = content
         .toString()
         .replace(/__SERVER_HOST__/g, config.serverHost)
@@ -151,10 +136,7 @@ function processFile(fileName, writeCache) {
         }
     }
 
-    // Do not include wormhole.js in the code reqritting procedure
-    // as it causes errors
-    if ((mustDebug && fileName.substr(-3) === '.js' && fileName.indexOf("wormhole.js") < 0 ) || 
-        fileName === config.indexFile) {
+    if ((mustDebug && fileName.substr(-3) === '.js') || fileName === config.indexFile) {
 
         var content = fs.readFileSync(origFilePath).toString();
         if (fileName === config.indexFile) {
