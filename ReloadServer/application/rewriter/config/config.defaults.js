@@ -28,7 +28,7 @@ config.runOfflineRewriter = false;
 config.serverHost = ''; // Can be retrieved automatically or asked to the user
 
 /* port on which the server listens for requests */
-config.serverPort = 8000;
+config.serverPort = 8501;
 
 /* Full path to directory holding source files you wish to debug */
 config.fileServerBaseDir = path.join(__dirname, '../samples');
