@@ -81,8 +81,8 @@ File.readlines("Clients/iOS/Classes/MoSyncAppDelegateBackup.mm").each do |line|
   if(line.include?("- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {"))
     initialFile.puts("//Adding the debug support for webkit")
     initialFile.puts("\#ifdef JSDEBUG")
-  	initialFile.puts("	[NSClassFromString(@\"WebView\") _enableRemoteInspector];")
-  	initialFile.puts("\#endif")
+    initialFile.puts("  [NSClassFromString(@\"WebView\") _enableRemoteInspector];")
+    initialFile.puts("\#endif")
   end
 end
 initialFile.close
@@ -138,6 +138,9 @@ FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_
 puts "Copying command line tool"
 FileUtils.cp_r "ReloadServer/cli", "/Volumes/MoSyncReload/cli"
 
+puts "Copying Aardwolf server"
+FileUtils.cp_r "ReloadServer/aardwolf", "/Volumes/MoSyncReload/aardwolf"
+
 puts "Copying Readme"
 FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSyncReload/"
 FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_Windows"
@@ -155,6 +158,10 @@ files_to_copy.each { |item|
 puts "Copying command line tool"
 FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Linux/server/"
 FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Windows/server/"
+
+puts "Copying Aardwolf server"
+FileUtils.cp_r "ReloadServer/aardwolf", "Build/#{time_stamp}/MoSync_Reload_Linux/server/"
+FileUtils.cp_r "ReloadServer/aardwolf", "Build/#{time_stamp}/MoSync_Reload_Windows/server/"
 
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Windows/* Build/#{time_stamp}/MoSync_Reload_Windows"
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"
