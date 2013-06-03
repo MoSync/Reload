@@ -138,9 +138,6 @@ FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_
 puts "Copying command line tool"
 FileUtils.cp_r "ReloadServer/cli", "/Volumes/MoSyncReload/cli"
 
-puts "Copying Aardwolf server"
-FileUtils.cp_r "ReloadServer/aardwolf", "/Volumes/MoSyncReload/aardwolf"
-
 puts "Copying Readme"
 FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSyncReload/"
 FileUtils.cp_r "ReadMe.txt", "Build/#{time_stamp}/MoSync_Reload_Windows"
