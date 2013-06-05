@@ -17,20 +17,32 @@ MA 02110-1301, USA.
 */
 
 /*
- * MainScreen.cpp
+ * ServerScreen.cpp
  *
- *  Created on: Feb 1, 2013
- *      Author: Spiridon Alexandru
+ *  Created on: May 13, 2013
+ *      Author: Kostas Tsolakis
  */
+#include "ServerScreen.h"
 
-#include "MainScreen.h"
-#include "LoginLayout.h"
+ServerScreen::ServerScreen(VerticalLayout *loginLayout,
+			 	 	 	   VerticalLayout *workspaceLayout)
+			: Screen()
+{
+	this->setEnabledLayout(1);
+	mLoginLayout = loginLayout;
+	mWorkspaceLayout = workspaceLayout;
+}
 
-MainScreen::MainScreen():
-	TabScreen()
+ServerScreen::~ServerScreen()
 {
 }
 
-MainScreen::~MainScreen()
+int ServerScreen::getEnabledLayout()
 {
+	return mEnabledLayout;
+}
+
+void ServerScreen::setEnabledLayout(int layout)
+{
+	mEnabledLayout = layout;
 }

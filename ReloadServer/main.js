@@ -113,9 +113,9 @@ function getLatestPath(done) {
  * Starting the http and TCP Services
  */
 getLatestPath(function(){
-    manager.rpc.findProjects(); // Generate project list.
-    manager.rpc.getVersionInfo(function (a){});
     manager.rpc.getNetworkIP(function(){
+        manager.rpc.findProjects(); // Generate project list.
+        manager.rpc.getVersionInfo();
         WebUI       = server.create(8283);
         tcpSocket   = tcp.create(7000);
         udp         = udp.create(41234);
