@@ -232,6 +232,14 @@ var create = function (port) {
                 console.log("Reloading project Request")
                 var project = message.params.projectName;
                 ReloadManager.rpc.reloadProject(project, false, function (){}, [socket]);
+            } else if (message.message === "evalResponse") {
+                // Dispatch list of clients to WebUI through WebSockets.
+                var md = vars.MsgDispatcher;
+                md.dispatch({
+                    target: 'evalResult',
+                    msg: message
+                });
+
             }
         }
     }

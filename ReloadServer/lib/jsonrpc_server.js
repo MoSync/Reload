@@ -77,6 +77,14 @@ create = function(port) {
                 case 'log':
                     socket.emit('log', { msg: msg.msg });
                 break;
+
+                case 'evalResult':
+                    var result = [];
+                    socket.emit('evalResult', {
+                        msg: msg.msg
+                    });
+                break;
+
                 default:
                     console.log('Unknown target ' + msg.target);
             }

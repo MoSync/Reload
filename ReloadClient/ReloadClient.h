@@ -189,6 +189,9 @@ public:
 	 */
 	void evaluateScript(const String& script);
 
+	void evaluate(const String& script, const String& fingerprint);
+	void evalResponse(Wormhole::MessageStream& message);
+
 	// ========== Launching apps ==========
 
     /**

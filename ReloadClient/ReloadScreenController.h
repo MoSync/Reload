@@ -50,7 +50,7 @@ public:
 	 */
 	ReloadScreenController(ReloadClient *client);
 
-	~ReloadScreenController();
+	virtual ~ReloadScreenController();
 
 	/**
 	 * Creates the screen, the layouts, the widgets and positions everything.

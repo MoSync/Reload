@@ -201,8 +201,9 @@ void LoginScreen::rebuildScreenLayout(int screenWidth, int screenHeight)
 	}
 	else
 	{
-		int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
-		int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
+        // TODO: Detected as unused.
+		//int logoBottomY = (int)(screenHeight * LOGO_SCREEN_HEIGHT_PORTRAIT_RATIO);
+		//int menuBottomY = logoBottomY + (int)(screenHeight * MENU_SCREEN_HEIGHT_PORTRAIT_RATIO);
 
 		/*positionBottomLayout(screenWidth, screenHeight,
 				BOTTOM_SCREEN_HEIGHT_PORTRAIT_RATIO,
@@ -541,7 +542,7 @@ int LoginScreen::positionBottomLayout(int screenWidth, int screenHeight, float s
 	int logoWidth = (int)((float)screenWidth * logoWidthRatio);
 	int infoWidth = (int)((float)screenWidth * infoWidthRatio);
 	int logoLeft = (int)((float)screenWidth * logoLeftRatio);
-	int infoLeft = (int)((float)screenWidth * infoLeftRatio);
+	//int infoLeft = (int)((float)screenWidth * infoLeftRatio);
 	int logoInfoDistance = (int)(screenWidth - logoWidth - infoWidth - logoLeft * 2);
 	int logoHeight = (int)((float)height * logoHeightRatio);
 	int logoTop = (int)((float)height * logoTopRatio);
