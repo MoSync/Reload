@@ -183,6 +183,7 @@ ReloadClient::ReloadClient()
 	// Show first screen.
 	mReloadScreenController->showNotConnectedScreen();
 
+	// Register custom function callable from javascript.
 	addMessageFun("EvalResponse", (FunTable::MessageHandlerFun)&ReloadClient::evalResponse);
 }
 
