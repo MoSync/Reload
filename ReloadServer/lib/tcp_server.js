@@ -196,7 +196,7 @@ var create = function (port) {
                     var msg = "Client "
                             + socket.remoteAddress
                             + " ("
-                            + socket.deviceInfo.name
+                            + unescape(socket.deviceInfo.name)
                             + ") has connected.";
                     console.log( msg , 0 );
                 }
@@ -281,7 +281,7 @@ var create = function (port) {
                     console.log(
                         "Client " +
                         address + " (" +
-                        socket.deviceInfo.name +
+                        unescape(socket.deviceInfo.name) +
                         ") has disconnected.", 0);
                     for (var i = 0; i < vars.globals.clientList.length; i++)
                     {
