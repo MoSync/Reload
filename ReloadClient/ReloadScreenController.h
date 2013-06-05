@@ -26,17 +26,16 @@ MA 02110-1301, USA.
 #ifndef RELOADSCREENCONTROLLER_H_
 #define RELOADSCREENCONTROLLER_H_
 
-#include "LoginScreen.h"
+#include "LoginLayout.h"
 #include "ReloadUIListener.h"
+#include "ServerScreen.h"
 
-//#include "BroadcastHandler.h"
-
+// Forward Declarations
 class ReloadClient;
 class ReloadTabScreen;
 class ConnectionScreen;
-class WorkspaceScreen;
+class WorkspaceLayout;
 class StoredProjectsScreen;
-//class ServersDialog;
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
@@ -92,17 +91,6 @@ public:
 	virtual void defaultAddress();
 
 	/**
-	 * Called when the connect button is clicked.
-	 * @param address The address contained by the connect EditBox.
-	 */
-	virtual void connectButtonClicked(String address);
-
-	/**
-	 * Called when find servers button is clicked
-	 */
-	virtual void findServersButtonClicked();
-
-	/**
 	 * Called when selecting a specific server from available server list
 	 * @param ipAddress
 	 */
@@ -116,7 +104,7 @@ public:
 	/**
 	 * Called when the reload last app button is clicked.
 	 */
-	virtual void loadStoredProjectsButtonClicked();
+	virtual void loadStoredProjects();
 
 	/**
 	 * Called when the info button is clicked.
@@ -170,7 +158,7 @@ public:
 private:
 	int mAppLevel;
 
-	Screen * mServerScreen;
+	ServerScreen * mServerScreen;
 	/**
 	 * The ReloadClient the handles the business logic of tha application.
 	 */
@@ -184,12 +172,12 @@ private:
 	/**
 	 * The login screen containing the connection options and the reload last app option.
 	 */
-	LoginScreen *mLoginScreen;
+	LoginLayout *mLoginLayout;
 
 	/**
 	 * The workspace screen, containing a list with the workspace projects.
 	 */
-	WorkspaceScreen *mWorkspaceScreen;
+	WorkspaceLayout *mWorkspaceLayout;
 
 	/**
 	 * The screen containing projects saved on the device.

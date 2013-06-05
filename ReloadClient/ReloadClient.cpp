@@ -25,6 +25,7 @@ MA 02110-1301, USA.
 
 #include "mastdlib.h"
 
+#include <MAUtil/Environment.h>
 #include <Wormhole/HighLevelHttpConnection.h>
 #include <Wormhole/Encoder.h>
 #include <maapi.h>
@@ -161,18 +162,24 @@ static void DeleteFolderRecursively(const char *path)
 
 ReloadClient::ReloadClient()
 {
-	lprintfln("@@@ ReloadClient");
 	// Initialize application.
-	// Order of calls are important as data needed by
-	// later calls are created in earlier calls.
+	lprintfln("@@@ ReloadClient");
+	setScreenOrientation();
+
 	Screen *splashScreen = new SplashScreen();
 	splashScreen->show();
-	int startTime = maGetMilliSecondCount();
-	while( maGetMilliSecondCount() < startTime + 2000){
-		//sleep
-	}
 
-	setScreenOrientation();
+	MAUtil::Environment::addTimer(this, 2000, 1);
+}
+
+ReloadClient::~ReloadClient()
+{
+}
+
+void ReloadClient::runTimerEvent()
+{
+	// Order of calls are important as data needed by
+	// later calls are created in earlier calls.
 	initializeWebView();
 	initializeVariables();
 	initializeFiles();
@@ -182,10 +189,6 @@ ReloadClient::ReloadClient()
 
 	// Show first screen.
 	mReloadScreenController->showNotConnectedScreen();
-}
-
-ReloadClient::~ReloadClient()
-{
 }
 
 void ReloadClient::setScreenOrientation()
@@ -437,7 +440,9 @@ void ReloadClient::exit()
 	{
 		// Close the running app and show the start screen.
 		mRunningApp = false;
-		mReloadScreenController->showConnectedScreen();
+
+		// Show the Tab Screen
+		MainScreenSingleton::getInstance()->show();
 	}
 	else
 	{
@@ -678,10 +683,10 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 					NULL, "OK", NULL);
 			mProjectToSave = "";
 
-			//mReloadScreenController->showConnectedScreen();
+			mReloadScreenController->showConnectedScreen();
+
 			// Update the local list of projects
-			mReloadScreenController->loadStoredProjectsButtonClicked();
-			MainScreenSingleton::getInstance()->show();
+			mReloadScreenController->loadStoredProjects();
 		}
 		else
 		{
@@ -702,9 +707,16 @@ void ReloadClient::downloadHandlerSuccess(MAHandle data)
 
 void ReloadClient::cancelDownload()
 {
+	/* TODO: Reveert to Previous commit after the downloader
+	 * class is fixed
+	 * commit 84ee4985a892f121cd25529b006bd8ae72330f36
+	 * Merge: f5af6fc e0426b8
+	 * Author: Abi Waqas <abi@mosync.com>
+	 * Date:   Wed May 22 03:14:38 2013 -0700
+	 */
 	mDownloadHandler.cancelDownload();
-	MainScreenSingleton::getInstance()->show();
-	//mReloadScreenController->showConnectedScreen();
+
+	mReloadScreenController->showConnectedScreen();
 }
 
 void ReloadClient::connectToServer(const char* serverAddress)
@@ -784,6 +796,7 @@ void ReloadClient::handleJSONMessage(const String& json)
 		// Get message parameters.
 		String urlData = (jsonRoot->getValueForKey("url"))->toString();
 		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
+		getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
 
 		// Initiate the download.
 		downloadBundle(urlData, fileSize);
@@ -832,7 +845,8 @@ void ReloadClient::handleJSONMessage(const String& json)
 			tmp.url = row->getValueForKey("url")->toString();
 			mProjects.add(tmp);
 		}
-		mReloadScreenController->pushWorkspaceScreen();
+		mReloadScreenController->showConnectedScreen();
+		//mReloadScreenController->pushWorkspaceScreen();
 	}
 	else
 	{
@@ -941,6 +955,7 @@ void ReloadClient::evaluateScript(const String& script)
  */
 void ReloadClient::launchSavedApp(MAUtil::String projectName)
 {
+	lprintfln("@@@ RELOAD: Launching app: %s", projectName.c_str());
 	MAUtil::String fullAppPath;
 
 	if (projectName == "")
@@ -1118,11 +1133,11 @@ void ReloadClient::sendClientDeviceInfo()
 				"\"protocolVersion\":\"%s\""
 			"}"
 		"}",
-		deviceOS,
-		deviceName,
-		deviceUUID,
-		deviceOSVersion,
-		mProtocolVersion
+		(Encoder::escape(deviceOS)).c_str(),
+		(Encoder::escape(deviceName)).c_str(),
+		(Encoder::escape(deviceUUID)).c_str(),
+		(Encoder::escape(deviceOSVersion)).c_str(),
+		(Encoder::escape(mProtocolVersion)).c_str()
 		);
 
 	sendTCPMessage(buffer);

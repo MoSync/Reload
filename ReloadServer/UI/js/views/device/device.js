@@ -27,11 +27,11 @@ define([
 
         render: function () {
             var data = {
-                address:   this.model.get('address'),
-                platform:  this.model.get('platform'),
-                name:      this.model.get('name'),
-                uuid:      this.model.get('uuid'),
-                version:   this.model.get('version'),
+                address:   unescape(this.model.get('address')),
+                platform:  unescape(this.model.get('platform')),
+                name:      unescape(this.model.get('name')),
+                uuid:      unescape(this.model.get('uuid')),
+                version:   unescape(this.model.get('version')),
             };
             var compiledTemplate = _.template( deviceTemplate, {data: data} );
 

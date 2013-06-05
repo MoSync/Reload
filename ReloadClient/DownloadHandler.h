@@ -99,6 +99,7 @@ public:
 	 */
 	int cancelDownload();
 
+
 public:
 
 	// ========== Inherited DownloadListener protocol ==========
@@ -123,6 +124,7 @@ public:
      */
     void finishedDownloading(MAUtil::Downloader* downloader, MAHandle data);
 
+
 protected:
 
 	// ========== Instance variables ==========
@@ -135,7 +137,12 @@ protected:
 	/**
 	 * Downloader for bundles.
 	 */
-	MAUtil::Downloader mDownloader;
+	MAUtil::Downloader *mDownloader;
+
+	DownloadListener* mDownloadListener;
+
+	bool isCanceled;
+
 };
 
 #endif

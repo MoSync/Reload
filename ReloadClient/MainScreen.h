@@ -36,11 +36,6 @@ public:
 	MainScreen();
 
 	~MainScreen();
-
-	/**
-	 * Called just before the screen begins rotating.
-	 */
-	virtual void orientationWillChange();
 };
 
 #endif /* MAINSCREEN_H_ */

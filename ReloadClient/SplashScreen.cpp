@@ -32,42 +32,81 @@ using namespace NativeUI;
 
 SplashScreen::SplashScreen() : Screen()
 {
-	maScreenSetFullscreen(1);
+	// Get Orientation, OS, Screen dimensions
+	int orientation = maScreenGetCurrentOrientation();
+
+	char buffer[64];
+	maGetSystemProperty(
+		"mosync.device.OS",
+		buffer,
+		64);
+	MAUtil::String os = buffer;
+
 	MAExtent ex = maGetScrSize();
 	int screenWidth = EXTENT_X(ex);
 	int screenHeight = EXTENT_Y(ex);
+	int baseSize;
+	if (orientation == MA_SCREEN_ORIENTATION_PORTRAIT_UP ||
+			orientation == MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN)
+	{
+		baseSize = screenWidth;
+	}
+	else
+	{
+		baseSize = screenHeight;
+	}
 
-	RelativeLayout *mContainer = new RelativeLayout();
+	mContainer = new VerticalLayout();
 	mContainer->fillSpaceHorizontally();
 	mContainer->fillSpaceVertically();
-	mContainer->setBackgroundColor(0x000000);
+	mContainer->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mContainer->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	if(os.find("iPhone") >= 0)
+	{
+		mContainer->setBackgroundColor(0x000000);
+	}
 
-	Image * mReloadImage = new Image();
+	mReloadImage = new Image();
 	mReloadImage->setImage(LOGO_IMAGE);
 	mReloadImage->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	mReloadImage->setWidth(screenWidth);
-	lprintfln("@@@ RELOAD: height=%d", mReloadImage->getHeight());
-	mReloadImage->setPosition(0, (int)((float)screenHeight*0.3));
+	mReloadImage->setWidth((int)((float)baseSize * 0.8));
 
-	Label * mPoweredBy = new Label();
+	mPoweredBy = new Label();
 	mPoweredBy->setText("powered by");
-	mPoweredBy->setFontColor(0xffffff);
-	mPoweredBy->setWidth(screenWidth);
-	mPoweredBy->setPosition(0,(int)((float)screenHeight*0.3)+(int)((float)screenHeight*0.15));
+	if(os.find("iPhone") >= 0)
+	{
+		mPoweredBy->setFontColor(0xffffff);
+	}
 	mPoweredBy->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mPoweredBy->fillSpaceHorizontally();
 
-	Image * mMosyncImage = new Image();
+	mMosyncImage = new Image();
 	mMosyncImage->setImage(MOSYNC_IMAGE);
 	mMosyncImage->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
-	mMosyncImage->setWidth((int)((float)screenWidth * 0.3));
-	mMosyncImage->setPosition((int)((float)screenWidth * 0.35),
-							 (int)((float)screenHeight*0.3)+(int)((float)screenHeight*0.15)+(int)((float)screenHeight*0.07));
+	mMosyncImage->setWidth((int)((float)baseSize * 0.4));
 
 	mContainer->addChild(mReloadImage);
 	mContainer->addChild(mPoweredBy);
-	mContainer->addChild(mMosyncImage);
+
+	/**
+	 * On WP the mosync logo does not align vertically in the center.
+	 * Create a layout and align it inside the layout instead
+	 */
+	if(os.find("Windows") >= 0)
+	{
+		mMosync = new HorizontalLayout();
+		mMosync->setWidth((int)((float)baseSize * 0.8));
+		((HorizontalLayout *)mMosync)->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		mMosync->addChild(mMosyncImage);
+	}
+	else
+	{
+		mMosync = (Widget*)mMosyncImage;
+	}
+	mContainer->addChild(mMosync);
 
 	this->addChild(mContainer);
+	this->setMainWidget(mContainer);
 }
 
 SplashScreen::~SplashScreen()

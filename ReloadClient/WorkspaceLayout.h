@@ -17,15 +17,19 @@ MA 02110-1301, USA.
 */
 
 /*
- * StoredProjectsScreen.h
+ * WorkspaceLayout.h
  *
- *  Created on: Feb 27, 2013
+ *  Created on: Jan 31, 2013
  *      Author: Spiridon Alexandru
  */
 
-#ifndef STOREDPROJECTSSCREEN_H_
-#define STOREDPROJECTSSCREEN_H_
+#ifndef WORKSPACELAYOUT_H_
+#define WORKSPACELAYOUT_H_
 
+#include <maapi.h>
+#include <MAUtil/util.h>
+
+// Include all the wrappers.
 #include <NativeUI/Widgets.h>
 #include "ReloadUIListener.h"
 #include "dataTypes.h"
@@ -33,8 +37,8 @@ MA 02110-1301, USA.
 using namespace NativeUI;
 using namespace MAUtil;
 
-class StoredProjectsScreen:
-	public Screen,
+class WorkspaceLayout:
+	public VerticalLayout,
 	public ListViewListener,
 	public ButtonListener
 {
@@ -45,18 +49,12 @@ public:
 	 * @param os The current os.
 	 * @param orientation The current device orientation.
 	 */
-	StoredProjectsScreen(MAUtil::String os, int orientation,
-						 MAUtil::Vector <reloadProject> * projects);
+	WorkspaceLayout(MAUtil::String os, int orientation);
 
 	/**
 	 * Destructor.
 	 */
-	~StoredProjectsScreen();
-
-	/**
-	 * Updates the list view that contains the stored projects
-	 */
-	void updateProjectList();
+	~WorkspaceLayout();
 
 	/**
 	 * Add a reload UI event listener.
@@ -69,6 +67,13 @@ public:
 	 * @param listener The listener that receives reload UI events.
 	 */
 	void removeReloadUIListener(ReloadUIListener* listener);
+
+	/**
+	 * If there is no list populates the List View Widget with the project data
+	 * from mProjects vector. Else destroys and deallocates previous list items
+	 * and creates new ones.
+	 */
+	void updateProjectList(MAUtil::Vector <reloadProject> * projects);
 
 private:
 	/**
@@ -88,21 +93,14 @@ private:
 	 * @param listView The list view object that generated the event.
 	 * @param listViewItem The ListViewItem object that was clicked.
 	 */
-	virtual void listViewItemClicked(
-		ListView* listView,
-		ListViewItem* listViewItem);
-
-	/**
-	 * Called after the screen orientation has changed.
-	 * Available only on iOS and Windows Phone 7.1 platforms.
-	 */
-	virtual void orientationDidChange();
+	virtual void listViewItemClicked(ListView * listView, int index );
 
 	/**
 	 * Sets the screen height/width values and the screen width ratio
 	 * for the save and reload buttons.
 	 */
 	void setScreenValues();
+
 private:
 
 	/**
@@ -116,25 +114,25 @@ private:
 	MAUtil::Vector<ReloadUIListener*> mReloadUIListeners;
 
 	/**
-	 * Main layout.
+	 * The button that refreshes the workspace project list.
 	 */
-	VerticalLayout* mMainLayout;
+	TextWidget* mRefreshButton;
 
 	/**
-	 * Screen Label
+	 * The button that disconnects us from the server.
 	 */
-	Label *mScreenLabel;
+	TextWidget *mDisconnectButton;
+
+	/**
+	 * Activity Indicato container that is shown when updating
+	 * project list
+	 */
+	RelativeLayout *mActivityIndicatorContainer;
 
 	/**
 	 * The alphabetical list view.
 	 */
 	ListView* mListView;
-
-	/**
-	 * An array containing the list view item reload buttons.
-	 * Used to identify which list view item button has been clicked.
-	 */
-	MAUtil::Vector<Button*> mLoadButtons;
 
 	/**
 	 * The platform the client is running on.
@@ -152,14 +150,29 @@ private:
 	int mScreenHeight;
 
 	/**
-	 * The reload button screen width ratio.
+	 * The save button screen width ratio.
 	 */
-	float mLoadButtonWidthRatio;
+	float mSaveButtonWidthRatio;
 
 	/**
-	 *
+	 * The reload button screen width ratio.
 	 */
-	MAUtil::Vector <reloadProject> *mProjects;
+	float mReloadButtonWidthRatio;
+
+	/**
+	 * Holds the List View index of the currently selected project
+	 */
+	int mSelectedProject;
+
+	/**
+	 * The save button widget
+	 */
+	TextWidget * mSaveButton;
+
+	/**
+	 * The reload Button widget
+	 */
+	TextWidget * mReloadButton;
 
 	/**
 	 * Holds the project name of the currently selected project
@@ -172,4 +185,4 @@ private:
 	int mWidgetHeight;
 };
 
-#endif /* STOREDPROJECTSSCREEN_H_ */
+#endif /* WORKSPACELAYOUT_H_ */
