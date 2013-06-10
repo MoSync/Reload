@@ -50,7 +50,12 @@ FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/wormhole.js",
 FileUtils.cp "#{ENV['MOSYNCDIR']}/templates/HTML5 JS WebUI Project/main.cpp", "ReloadServer/templates/ReloadTemplate/"
 
 puts "making the information files"
-FileUtils.cp "ReloadServer/build.dat", "ReloadClient/Resources/information"
+# Make a plain text resource file for the Client.
+File.open("ReloadClient/Resources/information", "w") do |file|
+    file.puts("MoSync Reload Version #{version}")
+    file.puts(time_stamp)
+    file.puts(protocolVersion)
+end
 FileUtils.cp ENV['MOSYNCDIR'] + "/bin/version.dat", "ReloadServer/MoSyncVersion.dat"
 FileUtils.rm_rf "ReloadServer/UI/docs"
 FileUtils.cp_r ENV['MOSYNCDIR'] + "/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/html5", "ReloadServer/UI/docs"
@@ -76,8 +81,8 @@ File.readlines("Clients/iOS/Classes/MoSyncAppDelegateBackup.mm").each do |line|
   if(line.include?("- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {"))
     initialFile.puts("//Adding the debug support for webkit")
     initialFile.puts("\#ifdef JSDEBUG")
-  	initialFile.puts("	[NSClassFromString(@\"WebView\") _enableRemoteInspector];")
-  	initialFile.puts("\#endif")
+    initialFile.puts("  [NSClassFromString(@\"WebView\") _enableRemoteInspector];")
+    initialFile.puts("\#endif")
   end
 end
 initialFile.close
@@ -131,7 +136,7 @@ FileUtils.cp_r "ReloadClient/Clients/iOS", "Build/#{time_stamp}/MoSync_Reload_Li
 FileUtils.cp_r "ReloadClient/Clients/WindowsPhone", "Build/#{time_stamp}/MoSync_Reload_Linux/WindowsPhone Client"
 
 puts "Copying command line tool"
-FileUtils.cp_r "cli", "/Volumes/MoSyncReload/cli"
+FileUtils.cp_r "ReloadServer/cli", "/Volumes/MoSyncReload/cli"
 
 puts "Copying Readme"
 FileUtils.cp_r "ReadMe.txt", "/Volumes/MoSyncReload/"
@@ -148,8 +153,12 @@ files_to_copy.each { |item|
 }
 
 puts "Copying command line tool"
-FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Linux/server"
-FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Windows/server"
+FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Linux/server/"
+FileUtils.cp "ReloadServer/cli", "Build/#{time_stamp}/MoSync_Reload_Windows/server/"
+
+puts "Copying Aardwolf server"
+FileUtils.cp_r "ReloadServer/aardwolf", "Build/#{time_stamp}/MoSync_Reload_Linux/server/"
+FileUtils.cp_r "ReloadServer/aardwolf", "Build/#{time_stamp}/MoSync_Reload_Windows/server/"
 
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Windows/* Build/#{time_stamp}/MoSync_Reload_Windows"
 sh "cp -rf ReloadAppTemplates/MoSync_Reload_Linux/* Build/#{time_stamp}/MoSync_Reload_Linux"

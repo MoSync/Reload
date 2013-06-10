@@ -6,8 +6,10 @@ var ncp     = require('../node_modules/ncp');
 var cheerio = require('cheerio');
 var http    = require('http');
 var url     = require('url');
-var zip     = require('unzip');
 var request = require('request');
+var esprima = require('esprima');
+var domtosource   = require('domtosource');
+var debugRewriter = require('./rewriter/rewriter-server');
 
 
 /**
@@ -138,7 +140,7 @@ var rpcFunctions = {
         var socket = net.createConnection(80, "www.example.com");
         socket.on('connect', function () {
             vars.globals.ip = socket.address().address;
-            console.log('got ip from socket ' +vars.globals.ip );
+            console.log('got ip from socket ' + vars.globals.ip );
             if (sendResponse !== undefined) {
                 sendResponse({hasError: false, data: vars.globals.ip});
             } else {
@@ -162,7 +164,7 @@ var rpcFunctions = {
         if ( (typeof sendResponse !== 'function') &&
             (sendResponse !== undefined) ) return false;
 
-        if ( vars.globals.ip === null ) {
+        if ( !vars.globals.ip ) {
             this.getIpFromSocket(sendResponse);
         } else {
             if ( sendResponse !== undefined ) {
@@ -175,10 +177,6 @@ var rpcFunctions = {
      * (RPC): Returns the version information of Reload
      */
     getVersionInfo: function (sendResponse) {
-
-        //check if parameter passing was correct
-        if(typeof sendResponse !== 'function') return false;
-
         var file = fs.readFileSync("build.dat", "ascii");
         vars.globals.versionInfo = JSON.parse(file);
         vars.globals.protocolVersion = JSON.parse(file).protocolVersion;
@@ -186,7 +184,9 @@ var rpcFunctions = {
         console.log('version info');
         console.log(vars.globals.versionInfo);
 
-        sendResponse({hasError: false, data: JSON.stringify(vars.globals.versionInfo)});
+        if (typeof sendResponse === 'function') {
+            sendResponse({hasError: false, data: JSON.stringify(vars.globals.versionInfo)});
+        }
     },
 
     /**
@@ -197,31 +197,43 @@ var rpcFunctions = {
             return false;
         }
 
-        var feed = [];
+        var self = this
+            , feed = []
+            ;
 
         var params = {
-            url: vars.globals.sampleProjectsFeedUrl,
-            headers: {
+            url: vars.globals.sampleProjectsFeedUrl
+            , headers: {
                 'User-Agent': 'MoSync Reload ' + JSON.stringify(vars.globals.versionInfo)
             }
         };
-        request(params, function(error, response, body){
-            if (!error && response.statusCode == 200) {
-                var res = JSON.parse(body);
-                res.forEach(function(p){
-                    console.log(p);
-                    var archive_url = p.html_url+'/archive/master.zip';
-                    feed.push({
-                        "url": archive_url,
-                        "name": p.name,
-                        "description": p.description,
-                        "screenshot": "screenshot"
-                    });
-                });
+        request(params, function(error, response, body) {
+            if (!error && response.statusCode === 200) {
+                var res = JSON.parse(body)
+                    , counter = 0
+                    ;
+                res.forEach(function(p) {
+                    var screenshot    = p.html_url + '/raw/master/screenshot.png'
+                        , archive_url = 'https://codeload.github.com/MoSyncSamples/' + p.name + '/zip/master'
+                        ;
 
-                sendResponse({
-                    hasError: false,
-                    data: feed
+                    self.confirmScreenshot(screenshot, function(error, screenshot) {
+                        console.log(screenshot);
+                        feed.push({
+                            'url'           : archive_url
+                            , 'name'        : p.name
+                            , 'description' : p.description
+                            , 'screenshot'  : screenshot
+                        });
+                        counter++;
+                        // Send response only when all array items are analyzed.
+                        if (counter === res.length) {
+                            sendResponse({
+                                hasError : false,
+                                data     : feed
+                            });
+                        }
+                    });
                 });
             } else {
                 console.log(error);
@@ -231,32 +243,75 @@ var rpcFunctions = {
         });
     },
 
-    reloadExample: function (opts, sendResponse) {
+    /**
+     * Helper function. Check if the screenshot image is in the repo.
+     * Add a default image if the screenshot.png is not in the root of
+     * the repo.
+     */
+    confirmScreenshot: function (img_url, callback) {
+        var params = {
+            url: img_url
+            , headers: {
+                'User-Agent': 'MoSync Reload ' + JSON.stringify(vars.globals.versionInfo)
+            }
+        };
+
+        request(params, function(error, response, body){
+            // Default image for a screenshot.
+            var e = true
+                , r = 'http://www.mosync.com/sites/all/themes/mosync/css/img/reload3.png'
+                ;
+            // Image confirmed.
+            if (!error && response.statusCode === 200) {
+                e = false;
+                r = img_url;
+            }
+            callback(e, r);
+        });
+    },
+
+    /**
+     * (RPC) Reload an example app.
+     * @param {...*} options Expected to contain name and zip url of the
+     * project.
+     * @param {function(...)} sendResponse Callback from
+     * jsonrpc.js:handleMessage() used to send response to the socket.
+     */
+    reloadExample: function (options, sendResponse) {
         if(typeof sendResponse !== 'function') {
             return false;
         }
 
-        var self = this;
-        var home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'],
-            DS           = vars.globals.fileSeparator,
-            download_dir = home_dir + DS + '.reload' + DS + 'examples',
-            opts         = JSON.parse(opts),
-            file_name    = url.parse(opts.url).pathname.split('/').pop();
+        if (vars.globals.deviceInfoListJSON.length === 0) {
+            sendResponse({
+                hasError: true,
+                data: 'No clients connected.'
+            });
+            return;
+        }
+
+        var self           = this
+            , options      = JSON.parse(options) // Options string is expected to contain JSON.
+            , home_dir     = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']
+            , DS           = vars.globals.fileSeparator
+            , download_dir = home_dir + DS + '.reload' + DS + 'examples'
+            , file_name    = url.parse(options.url).pathname.split('/').pop()
+            ;
 
         // Options object to encapsulate parameters passed between
         // functions.
         var o = {
-            home_dir     : home_dir,
-            DS           : DS,
-            download_dir : download_dir,
-            opts         : opts,
-            file_name    : file_name
+            home_dir       : home_dir
+            , DS           : DS
+            , download_dir : download_dir
+            , options      : options
+            , file_name    : file_name
         };
 
         // Create download directory if it does not exist.
         fs.exists(o.download_dir, function(exists) {
             if (!exists) {
-                console.log("Download dir does not exist. Create it!");
+                console.log('Download dir does not exist. Create it!');
                 fs.mkdir(o.home_dir + o.DS + '.reload', 0755, function(e) {
                     if (!e) {
                         fs.mkdir(o.home_dir + o.DS + '.reload' + o.DS + 'examples', 0755, function(e) {
@@ -273,88 +328,157 @@ var rpcFunctions = {
         });
     },
 
-    // Helper function for reloadExample()
-    sendExample: function (o, sendResponse)  {
-        var self = this;
-        // Stream to file.
-        var file = fs.createWriteStream(o.download_dir + o.DS + o.file_name);
-        file.on('close', function(){
-            // Unpack
-            self.unzip(o.download_dir + o.DS + o.file_name, o.download_dir + o.DS, function(){
-                var url = o.download_dir + o.DS + o.opts.name + '-master'; // Github adds prefix to the folder
-                self.bundleApp(url, false, function(actualPath) {
-                    fs.stat(actualPath, function(err, stat){
-                        console.log('Datasize: ' + stat.size);
-
-                        console.log("---------- S e n d i n g   B u n d l e --------");
-                        console.log("actualPath: " + actualPath);
-                        console.log("url: " + url);
-
-                        sendToClients({
-                            message: 'ReloadBundle',
-                            url: url,
-                            fileSize: stat.size
-                        });
-
-                        sendResponse({
-                            success: true,
-                            error: null
-                        });
-                    });
-                });
-            });
-        });
-        file.on('error', function(e){
-            console.log('Error: ' + e);
-        });
-        request(o.opts.url).pipe(file);
-    },
-
-    /*
-     * (RPC) Copies a project to current workspace directory.
-     * If a project is not in $HOME/.reload/examples/ it's downloaded to
-     * current workspace dir and unpacked there.
+    /**
+     * Helper function for reloadExample
+     * Download the zip file, unzip it and bundle the contents.
+     * @param {...*} options
+     * @param {function(...)} callback
      */
-    copyExample: function (opts, sendResponse) {
-        if(typeof sendResponse !== 'function') {
-            return false;
-        }
+    sendExample: function (options, sendResponse)  {
+        var self          = this
+            , o           = options
+            , file        = o.download_dir + o.DS + o.file_name
+            , writer
+            ;
 
-        var self, opts, home_dir, DS, download_dir;
+        // Internal shortcut to bundleApp
+        var bundle = function(url) {
+            self.bundleApp(url, false, function(actualPath) {
+                fs.stat(actualPath, function(err, stat) {
+                    console.log('Datasize: ' + stat.size);
 
-        self = this;
-        home_dir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-        DS = vars.globals.fileSeparator;
-        download_dir = home_dir + DS + '.reload' + DS + 'examples';
-        opts = JSON.parse(opts);
-        file_name    = url.parse(opts.url).pathname.split('/').pop();
+                    console.log("---------- S e n d i n g   B u n d l e --------");
+                    console.log("actualPath: " + actualPath);
+                    console.log("url: " + url);
 
-        var file = fs.createWriteStream(download_dir + DS + file_name);
-        file.on('close', function(){
-            self.unzip(download_dir + DS + file_name, vars.globals.rootWorkspacePath, function(resp){
-                console.log('Unzip successful');
+                    sendToClients({
+                        message: 'ReloadBundle',
+                        url: escape(url),
+                        fileSize: stat.size
+                    });
 
-                // Remove downloaded zip.
-                fs.unlink(download_dir + DS + file_name, function(){
-                    console.log(download_dir + DS + file_name + ' removed');
-                    // Notify callee.
                     sendResponse({
                         success: true,
                         error: null
                     });
                 });
             });
+        };
+
+        fs.exists(o.download_dir + o.DS + o.options.name + '-master', function(exists) {
+            if (exists) {
+                console.log('File was already extracted.');
+                bundle(o.download_dir + o.DS + o.options.name + '-master');
+                return;
+            }
+
+            writer = fs.createWriteStream(file);
+            // Download file and pipe it to the writeStream
+            writer.on('open', function() {
+                request(o.options.url).pipe(writer);
+            });
+
+            // Stream to file.
+            writer.on('close', function() {
+                // Unpack when file is written.
+                self.unzip(file, o.download_dir, function() {
+                    // Github adds prefix to the folder
+                    bundle(o.download_dir + o.DS + o.options.name + '-master');
+
+                    // Remove downloaded zip.
+                    fs.unlink(file, function() {
+                        console.log(file + ' removed');
+                    });
+                });
+            });
+
+            writer.on('error', function(e){
+                console.log('Error: ' + e, 0);
+            });
+
         });
-        file.on('error', function(e){
-            console.log('Error: ' + e, 0);
-        });
-        request(opts.url).pipe(file);
     },
-    /*
+
+    /**
+     * (RPC) Copies a project to current workspace directory.
+     * If a project is not in $HOME/.reload/examples/ it's downloaded to
+     * current workspace dir and unpacked there.
+     * @param {...*} opts Parameter object.
+     * @param {function(...)} sendResponse Callback for response
+     * handling.
+     */
+    copyExample: function (opts, sendResponse) {
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        var self, opts, home_dir, DS, file_name, download_dir, zipFile, writer;
+
+        self            = this;
+        home_dir        = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+        DS              = vars.globals.fileSeparator;
+        opts            = JSON.parse(opts);
+        download_dir    = home_dir + DS + '.reload' + DS + 'examples';
+        file_name       = url.parse(opts.url).pathname.split('/').pop();
+        zipFile         = download_dir + DS + file_name;
+
+        // Check if workspace already has the unzipped file.
+        var path = vars.globals.rootWorkspacePath + DS + opts.name + '-master';
+        fs.exists(path, function(exists) {
+            if (exists) {
+                console.log('Project already exists in the workspace.');
+                sendResponse({
+                    success: false,
+                    error: true
+                });
+                return;
+            }
+
+            // Download only if not already there.
+            request(opts.url).pipe((function() {
+                writer = fs.createWriteStream(zipFile);
+
+                writer.on('close', function(){
+                    console.log('Writestream closed');
+
+                    self.unzip(zipFile, vars.globals.rootWorkspacePath, function(error, result) {
+                        if (error) {
+                            console.log('Unzip did not succeed.');
+                            sendResponse({
+                                success: false,
+                                error: true
+                            });
+                            return;
+                        }
+
+                        // Remove downloaded zip.
+                        fs.unlink(zipFile, function() {
+                            console.log(zipFile + ' removed');
+                            sendResponse({
+                                success: true,
+                                error: null
+                            });
+                        });
+                    });
+                });
+
+                writer.on('error', function(e) {
+                    console.log('Error: ' + e, 0);
+                });
+
+                // Pass writeStream object to the pipe.
+                return writer;
+            })());
+        });
+
+    },
+
+    /**
      * Copies a file.
-     * @src         
-     * @dest        
-     * @callback    
+     * @param {} src Source
+     * @param {} dest Destination
+     * @param {function(...)} callback Function to be called when
+     * completed.
      */
     copy: function (src, dest, callback) {
         console.log('copy() called');
@@ -384,29 +508,43 @@ var rpcFunctions = {
         }
     },
 
-    /*
+    /**
      * Unzip a file to a destination directory.
-     * @file        Zip file name including full path.
-     * @dest        Destination directory of unzipped files.
-     * @callback    Called upon completion of unzip.
+     * @param {String} file Zip file name including full path.
+     * @param {String} dest Destination directory of unzipped files.
+     * @param {function(...)} callback Called upon completion of unzip.
      */
     unzip: function (file, dest, callback) {
-        var res = {};
-        fs.createReadStream(file)
-        .pipe(zip.Extract({ path: dest }))
-        .on('close', function(){
-            console.log('Finished extraction.');
-            res.file = file;
-            callback(res);
+        var exec    = require('child_process').exec;
+        var darwin  = vars.globals.localPlatform.indexOf("darwin") >= 0;
+        var linux   = vars.globals.localPlatform.indexOf("linux") >= 0;
+        var command;
+
+        if (darwin || linux) {
+            command = 'unzip ' + file + ' -d ' + dest;
+        } else {
+            command = 'bin\\win\\unzip.exe "' + file + '" -d ' + '"' + dest + '"';
+        }
+
+        exec(command, function(error, stdout, stderr) {
+            var e = false, r = {};
+
+            if (error) {
+                console.log("stdout: " + stdout, 0);
+                console.log("stderr: " + stderr, 0);
+                console.log("error: "  + error , 0);
+                e = true;
+            }
+
+            callback(e, r);
         });
     },
 
-     /*
+     /**
       * Internal method to download a file from a specified URL.
-      *
-      * @location   url pointing to wanted file.
-      * @dest       download directory (no file name at the end)
-      * @callback   Callback is returned with a {file: 'filepath' } object passed.
+      * @param {String} location Url pointing to wanted file.
+      * @param {String} dest Download directory (no file name at the end)
+      * @param {function(...)} callback Callback is returned with a {file: 'filepath' } object passed.
       */
     download: function (location, dest, callback) {
         var request, options, file, fileName, DS, res;
@@ -470,7 +608,7 @@ var rpcFunctions = {
     findProjects: function () {
         var WP   = vars.globals.rootWorkspacePath,
             DS   = vars.globals.fileSeparator,
-            HOST = vars.globals.host + ':' + vars.globals.port;
+            HOST = vars.globals.ip + ':' + vars.globals.port;
 
         try {
             var files    = fs.readdirSync( WP ),
@@ -488,7 +626,7 @@ var rpcFunctions = {
                         if (LocalfileStat && LocalfileStat.isDirectory()) {
                             // Add to the list of projcts
                             projects.push({
-                                url:   HOST + file + '/LocalFiles.html',
+                                url:   'http://' + HOST + '/' + file + '/LocalFiles.html',
                                 name:  file,
                                 path:  WP + DS + file
                             });
@@ -641,94 +779,122 @@ var rpcFunctions = {
         });
     },
 
+
     /**
      * (internal function) Deletes recursively a file or folder given in "path"
      * and all of it's contents if there are any.
+     * options:
+     *      - empty: if true empty the directory without deleting it
      */
-    removeRecursive: function (path, cb) {
-        var self = this;
+    // FIXME: Fix this function so it can support options parameter
+    // options:
+    //      - empty (true,false) Empty the directory without deleting 
 
-        fs.stat(path, function (err, stats) {
+    removeRecursive: function (pathToDelete, cb, options) {
+        var self = this,
+            initialPath = pathToDelete;
 
-            if (err) {
-                cb(err, stats);
-                return;
-            }
+        // parameter check
+        if( !(options && typeof options === "object") ) {
+            options = new Object();
+            options.empty = false;
+        }
 
-            if (stats.isFile()) {
+        function remove(pathToDelete, cb, options) {
 
-                fs.unlink(path, function (err) {
-                    if(err) {
-                        cb(err,null);
-                    } else {
-                        cb(null,true);
-                    }
+            fs.stat(pathToDelete, function (err, stats) {
+
+                if (err) {
+                    cb(err, stats);
                     return;
-                });
+                }
 
-            } else if (stats.isDirectory()) {
+                if (stats.isFile()) {
 
-                // A folder may contain files
-                // We need to delete the files first
-                // When all are deleted we could delete the
-                // dir itself
-                fs.readdir(path, function (err, files) {
-                    if (err) {
-                        cb(err,null);
+                    fs.unlink(pathToDelete, function (err) {
+                        if(err) {
+                            cb(err,null);
+                        } else {
+                            cb(null,true);
+                        }
                         return;
-                    }
+                    });
 
-                    var f_length = files.length;
-                    var f_delete_index = 0;
+                } else if (stats.isDirectory()) {
 
-                    // Check and keep track of deleted files
-                    // Delete the folder itself when the files are deleted
+                    // A folder may contain files
+                    // We need to delete the files first
+                    // When all are deleted we could delete the
+                    // dir itself
+                    fs.readdir(pathToDelete, function (err, files) {
+                        if (err) {
+                            cb(err,null);
+                            return;
+                        }
 
-                    var checkStatus = function() {
+                        var f_length = files.length;
+                        var f_delete_index = 0;
 
-                        // We check the status
-                        // and count till we r done
-                        if (f_length===f_delete_index) {
+                        // Check and keep track of deleted files
+                        // Delete the folder itself when the files are deleted
 
-                            fs.rmdir(path, function(err) {
-                                if (err) {
-                                    cb(err,null);
+                        var checkStatus = function() {
+
+                            // We check the status
+                            // and count till we r done
+                            if (f_length===f_delete_index) {
+
+                                if (!(options.empty) || 
+                                     ((options.empty) && 
+                                     (pathToDelete !== initialPath))) {
+                                    console.log(path.dirname(pathToDelete));
+                                    console.log(initialPath);
+                                    fs.rmdir(pathToDelete, function(err) {
+                                        if (err) {
+                                            cb("1" + err,null);
+                                        } else {
+                                            cb(null,true);
+                                        }
+                                    });
                                 } else {
                                     cb(null,true);
+                                    return true;   
                                 }
-                            });
-                            return true;
+                                
+                            }
+                            return false;
+                        };
+
+                        if (!checkStatus()) {
+
+                            for (var i = 0; i < f_length; i++) {
+
+                                // Create a local scope for filePath
+                                // Not really needed, but just good practice
+                                // (as strings arn't passed by reference)
+                                (function(){
+                                    var filePath = path.join(pathToDelete, files[i]);
+                                    // Add a named function as callback
+                                    // just to enlighten debugging
+                                    remove(filePath, function removeRecursiveCB(err, status) {
+                                        if (!err) {
+
+                                            f_delete_index ++;
+                                            checkStatus();
+                                        } else {
+                                            cb(err,null);
+                                            return;
+                                        }
+                                    }, options);
+                                })()
+                            }
                         }
-                        return false;
-                    };
+                    });
+                }
+            });    
+        };
 
-                    if (!checkStatus()) {
-
-                        for (var i = 0; i < f_length; i++) {
-
-                            // Create a local scope for filePath
-                            // Not really needed, but just good practice
-                            // (as strings arn't passed by reference)
-                            (function(){
-                                var filePath = path + vars.globals.fileSeparator + files[i];
-                                // Add a named function as callback
-                                // just to enlighten debugging
-                                self.removeRecursive(filePath, function removeRecursiveCB(err, status) {
-                                    if (!err) {
-
-                                        f_delete_index ++;
-                                        checkStatus();
-                                    } else {
-                                        cb(err,null);
-                                        return;
-                                    }
-                                });
-                            })()
-                        }
-                    }
-                });
-            }
-        });
+        remove(pathToDelete, cb, options);
     },
 
     /**
@@ -743,6 +909,7 @@ var rpcFunctions = {
             console.log("Renaming Project from " + oldName + " to " + newName, 0);
 
             var exec = require('child_process').exec;
+            var command;
             var respond = sendResponse;
 
             function resultCommand(error, stdout, stderr) {
@@ -767,7 +934,7 @@ var rpcFunctions = {
                 var substitute = '<name>' + newName + '<\/name>';
                 var newData = projectData.replace(re, substitute);
 
-                    projectFile =
+                projectFile =
                     vars.globals.rootWorkspacePath
                     + vars.globals.fileSeparator
                     + newName
@@ -782,7 +949,7 @@ var rpcFunctions = {
             var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
             var linux = vars.globals.localPlatform.indexOf("linux") >=0;
             if( darwin || linux ) {
-                var command =
+                command =
                     "mv "
                     + this.fixPathsUnix(vars.globals.rootWorkspacePath)
                     + this.fixPathsUnix(vars.globals.fileSeparator)
@@ -793,7 +960,7 @@ var rpcFunctions = {
                     + this.fixPathsUnix(newName)
                     ;
             } else {
-                var command =
+                command =
                     "rename \""
                     + vars.globals.rootWorkspacePath
                     + vars.globals.fileSeparator
@@ -808,8 +975,8 @@ var rpcFunctions = {
             exec(command, resultCommand);
 
         } catch(err) {
-            console.log("ERROR in renameProject(" + oldname + ", " + newName + "): " + err, 0);
-            sendResponse({hasError: true, data: "Error in renameProject(" + oldname + ", " + newName + "): " + err});
+            console.log("ERROR in renameProject(" + oldName + ", " + newName + "): " + err, 0);
+            sendResponse({hasError: true, data: "Error in renameProject(" + oldName + ", " + newName + "): " + err});
         }
     },
 
@@ -821,10 +988,56 @@ var rpcFunctions = {
      */
     reloadProject: function (projectName, debug, sendResponse, clientList) {
 
-        //check if parameter passing was correct
-        if (typeof sendResponse !== 'function') return false;
+        function sendToAardwolfServer(error, file) {
 
-        var self = this;
+            var options = {
+                hotsname: 'http://' + vars.globals.ip,
+                port : 8501,
+                path : '/mobile/console',
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json'
+                }
+            };
+
+            var req = http.request(options, function (res) {
+                console.log('STATUS: ' + res.statusCode);
+                console.log('HEADERS: ' + JSON.stringify(res.headers));
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    console.log('BODY: ' + chunk);
+                });
+            });
+
+            req.on('error', function(e) {
+                console.log('Error with request ot Aardwolf: ' + e.message);
+            });
+
+            var syntaxErrorData = {
+                command: 'report-syntax',
+                message: error.message,
+                file: file,
+                line: error.lineNumber,
+                column: error.column
+            }
+
+            req.write(JSON.stringify(syntaxErrorData));
+            req.end();
+        }
+
+        //check if parameter passing was correct
+        if (typeof sendResponse !== 'function') {
+            return false;
+        }
+
+        if (vars.globals.clientList.length === 0) {
+            sendResponse({
+                hasError: true,
+                data: 'No clients connected',
+            });
+            return;
+        }
+
         var weinreDebug = (typeof debug === "boolean")? debug : false;
 
         console.log("-----------------------------------------------");
@@ -839,13 +1052,100 @@ var rpcFunctions = {
             + vars.globals.fileSeparator
             + projectName
             ;
+        
+        // Find all javascript files 
+        // Parsing and checking for syntax errors
+        console.log("-------------------------------------------");
+        console.log("Checking javascript files for syntax errors");
+        var applicationPath = projectPath + vars.globals.fileSeparator + "LocalFiles";
+        //console.log("Application Path: " + applicationPath);
+        //var files = fs.readdirSync(applicationPath);
+        //console.log("Files found in the app:");
+        //console.log(files);
+        var syntaxCheckingStatus = true;
+        function readDir(directoryPath) {
+            var files = fs.readdirSync(directoryPath);
+            for (i in files) {
+
+                var checkFile = directoryPath + 
+                                vars.globals.fileSeparator +
+                                files[i];
+
+                var fileStats = fs.statSync(checkFile);
+                if(fileStats.isFile() && files[i].match(/\b[\w-.]+\.js\b/g) ) {
+                    var fileData = fs.readFileSync(checkFile);
+                    try {
+
+                        var results = esprima.parse(fileData,
+                                                    { startLineNumber : 0 });
+                        console.log(checkFile.replace(applicationPath,"") + " No Syntax Errors");
+                        if (syntaxCheckingStatus !== false) {
+                            syntaxCheckingStatus = true;
+                        }
+                    } catch (e) {
+
+                        console.log(checkFile.replace(applicationPath,"") + "  " + e );
+                        
+                        sendToAardwolfServer(e, checkFile.replace(applicationPath,""));
+                        
+                        syntaxCheckingStatus = false;
+                    }
+                } else if (fileStats.isDirectory()){
+                    readDir(checkFile);
+                }
+            }
+        }
+        readDir(applicationPath);
+
+        if( !syntaxCheckingStatus ) {
+
+            sendResponse({
+                hasError: true,
+                data: 'Javascript errors',
+            });
+            return;
+        }
+
+        // Check javascript in script tags of index.html
+        var applicationEntryPoint = projectPath + 
+                                    vars.globals.fileSeparator + 
+                                    "LocalFiles" + 
+                                    vars.globals.fileSeparator + 
+                                    "index.html";
+
+        var indexFileData = fs.readFileSync(applicationEntryPoint, 'utf8');
+
+        var embededScriptTags = domtosource.find(indexFileData, 'script:not([src])', true);
+
+        for (i in embededScriptTags) {
+            
+            var script = cheerio.load(embededScriptTags[i].html);
+            
+            try {
+                var result = esprima.parse(
+                                script('script').html(), 
+                                { startLineNumber : embededScriptTags[i].line-1 }
+                            );
+                console.log("\u001b[32m No syntax errors in embedded script \u001b[0m");
+            } catch (e) {
+
+                console.log(applicationEntryPoint.replace(applicationPath,"") + "  " + e);
+                sendToAardwolfServer(e, applicationEntryPoint.replace(applicationPath,""));
+                sendResponse({
+                    hasError: true,
+                    data: e,
+                });
+                return;
+            }
+        }
+        console.log("-------------------------------------------");
+
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
                 // Collect Stats
                 if (vars.globals.statistics === true) {
                     var indexPath =
-                        vars.globals.fileSeparator
-                        + projectPath
+                        projectPath
                         + vars.globals.fileSeparator
                         + "LocalFiles"
                         + vars.globals.fileSeparator
@@ -886,9 +1186,9 @@ var rpcFunctions = {
                 // Send the new bundle URL to the device clients.
                 sendToClients({
                     message: 'ReloadBundle',
-                    url: url,
+                    url: escape(url),
                     fileSize: data.length
-                });
+                }, clientList);
 
                 sendResponse({hasError: false, data: "Bundle sent to clients."});
 
@@ -902,7 +1202,10 @@ var rpcFunctions = {
      * (RPC): Evaluate JS on the clients.
      */
     evalJS: function (script, sendResponse) {
-        if(typeof sendResponse !== 'function') return false;
+        if(typeof sendResponse !== 'function') {
+            return false;
+        }
+
         console.log("@@@ ====================================");
         console.log("@@@ evalJS " + script);
         //console.log("@@@ Callstack:");
@@ -930,84 +1233,74 @@ var rpcFunctions = {
         console.log("Path to Project  : " + pathToLocalFiles);
         console.log("Path to TempFiles: " + pathToTempBundle);
 
-        if(weinreDebug) {
+        if(weinreDebug === true) {
 
             try {
+                self.debugInjection(projectDir, function (){
 
-                ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
-                    if (err) {
-                        console.log('ERROR Copy Process      : Error-' + err, 0);
+                //=============================== Inject the WEINRE Inspection script =========================
+                var injectedScript = "<script src=\"http://" + vars.globals.ip +
+                                     ":8080/target/target-script-min.js\"></script>";
+
+                var pathOfIndexHTML =   path.join(pathToTempBundle, "index.html");
+
+                console.log("Path to index.html: " + pathOfIndexHTML);
+                var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
+
+                var injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
+
+                fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+
+                console.log("WEINRE Injection  : Successfull");
+                //=============================================================================================
+
+                    console.log("----------- C r e a t e   B u n d l e ---------");
+                    var exec = require('child_process').exec;
+
+                    function puts(error, stdout, stderr)
+                    {
+                        console.log("stdout: " + stdout);
+
+                        if (error) {
+                            console.log("ERROR stderr: " + stderr, 0);
+                            console.log("ERROR error : " + error, 0);
+                        }
+
+                        callback(projectDir + "/LocalFiles.bin");
+
+                        // Delete TempBundle directory
+                        self.removeRecursive(pathToTempBundle, function (error, status){
+                            if(!error) {
+                                console.log("Delete Temp: Successfull");
+                            }
+                            else {
+                                console.log("Delete Temp: Error-" + error);
+                            }
+                        });
                     }
-                    console.log('Copy Process      : Successfull');
 
-                    self.debugInjection(projectDir, function (){
+                    var bundleCommand = "bin\\win\\Bundle.exe";
 
+                    if (vars.globals.localPlatform.indexOf("darwin") >=0)
+                    {
+                      bundleCommand = "bin/mac/Bundle";
+                    }
+                    else if (vars.globals.localPlatform.indexOf("linux") >=0)
+                    {
+                      bundleCommand = "bin/linux/Bundle";
+                    }
 
-                            //INJECT WEINRE SCRIPT
-                            //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
-                            //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
-                            console.log("Server IP         : "+vars.globals.ip);
-                            var injectedScript = "<script src=\"http://" + vars.globals.ip +
-                                                 ":8080/target/target-script-min.js\"></script>";
-
-                            var pathOfIndexHTML =   pathToTempBundle +
-                                                    vars.globals.fileSeparator + "index.html";
-
-                            console.log("Path to index.html: " + pathOfIndexHTML);
-                            var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
-
-                            injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
-
-                            fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
-
-                            console.log("WEINRE Injection  : Successfull");
-
-                            console.log("----------- C r e a t e   B u n d l e ---------");
-                            var exec = require('child_process').exec;
-
-                            function puts(error, stdout, stderr)
-                            {
-                                console.log("stdout: " + stdout);
-
-                                if (error) {
-                                    console.log("ERROR stderr: " + stderr, 0);
-                                    console.log("ERROR error : " + error, 0);
-                                }
-
-                                callback(projectDir + "/LocalFiles.bin");
-
-                                // Delete TempBundle directory
-                                self.removeRecursive(pathToTempBundle, function (error, status){
-                                    if(!error) {
-                                        console.log("Delete Temp: Successfull");
-                                    }
-                                    else {
-                                        console.log("Delete Temp: Error-" + error);
-                                    }
-                                });
-                            }
-
-                            var bundleCommand = "bin\\win\\Bundle.exe";
-
-                            if (vars.globals.localPlatform.indexOf("darwin") >=0)
-                            {
-                              bundleCommand = "bin/mac/Bundle";
-                            }
-                            else if (vars.globals.localPlatform.indexOf("linux") >=0)
-                            {
-                              bundleCommand = "bin/linux/Bundle";
-                            }
-
-                            var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
-                                projectDir  +
-                                vars.globals.fileSeparator + "LocalFiles.bin\"";
-                            exec(command, puts);
-                    });
+                    var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
+                        projectDir  +
+                        vars.globals.fileSeparator + "LocalFiles.bin\"";
+                    exec(command, puts);
                 });
+                
             } catch(err) {
                 console.log("ERROR in bundleApp: " + err, 0);
             }
         } else {
+            console.log("DEBUGGIN IS DISABLED");
             try {
 
                 console.log("----------- C r e a t e   B u n d l e ---------");
@@ -1520,93 +1813,39 @@ var rpcFunctions = {
 
         var self = this,
 
-            indexHtmlPath =
-                projectName
-                + vars.globals.fileSeparator + 'TempBundle'
-                + vars.globals.fileSeparator + 'index.html'
-                ,
+            projectSourceFolder = projectName
+                + vars.globals.fileSeparator + 'LocalFiles',
 
-            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"))
-                ,
+            projectOuputFolder = projectName
+                + vars.globals.fileSeparator + 'TempBundle',
 
-            debugNotice =
-                "/**\n"
-                + " * NOTICE: The try catch statement is automaticaly added\n"
-                + " * when the project is reloaded in debug mode.\n"
-                + " */\n"
-                ;
+            debugerFiles = path.resolve("aardwolf","samples");
 
-        /**
-         * Load the index.html file and parse it to a new window object
-         * including jQuery for accessing and manipulating elements
-         */
-        $ = cheerio.load(data,{
-            lowerCaseTags: false
-        });
+        console.log("\u001b[32m[SOURCE] " + projectSourceFolder + "\u001b[0m");
+        console.log("\u001b[32m[DESTIN] " + projectOuputFolder + "\u001b[0m");
+        console.log("\u001b[32m[DEBUGS] " + debugerFiles + "\u001b[0m");
 
-        /**
-         * Get all embeded script tags
-         */
+        // Remove Old directory from aardwolf server
+        this.removeRecursive(debugerFiles, function () {
 
-        var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
-            $(this).html(debugNotice + "try {" + $(this).html() + " } catch (e) { mosync.rlog(e.stack); };");
-        });
-        console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
+            console.log(arguments);
+            // Copy project source files on aardwolf server
+            ncp.ncp(projectSourceFolder, debugerFiles, function (error) {
+                
+                if(error) {
+                    console.log("ERROR: in debugInjection " + error, 0);
+                } else {
+                    debugRewriter.run(
+                        {
+                            "fileServerBaseDir" : projectSourceFolder,
+                            "outputDir"         : projectOuputFolder,
+                            "serverHost"        : vars.globals.ip,
+                        });
 
-        /**
-         * Get all external js script files
-         */
-        var externalScriptFiles = $("script[src]:not([class='jsdom'])").each(function (index, element){
-
-            if( element.attribs.src !== "js/wormhole.js") {
-                var scriptPath =
-                    vars.globals.fileSeparator
-                    + 'TempBundle'
-                    + vars.globals.fileSeparator
-                    + self.fixPathsUnix(element.attribs.src)
-                    ;
-
-                try {
-                    var s = fs.statSync(scriptPath);
-                    if( s.isFile() ) {
-                        var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
-                        jsFileData = debugNotice + "try {" + jsFileData + "} catch (e) { mosync.rlog(e.stack); };";
-                        fs.writeFileSync(scriptPath, jsFileData, "utf8");
-                    }
-                } catch (e) {
-                    console.log("ERROR in debugInjection:", 0);
-                    console.log(e, 0);
+                    callback();    
                 }
-            }
-        });
-        console.log("--Debug Feature-- There was: " + externalScriptFiles.length + " external JS scripts found.");
-
-        /**
-         * Get all elements that have inline js code
-         * To add more tag attributes:
-         *   - add the attribute name (lowercase in attrs)
-         * TODO: search more elements than only div
-         */
-        var attrs = ["onclick", "onevent", "onload"];    // Attribute list
-        var inlineJsCode = $("div,body").each(function (index, element){
-
-            for( var i in element.attribs ) {
-                for( var j = 0; j < attrs.length; j++) {
-                    if( i.toLowerCase() == attrs[j] ) {
-                        var inlineCode = $(this).attr(i);
-                        $(element).attr(i, debugNotice + "try {" + inlineCode + "} catch (e) { mosync.rlog(e.stack); };");
-                    }
-                }
-            }
-        });
-        console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-
-         /**
-          * Write index.html file
-          */
-        fs.writeFileSync(indexHtmlPath, $.html(), "utf8");
-
-        callback();
+            });
+        }, { "empty": true });
     }
 };
 
@@ -1618,5 +1857,6 @@ vars.methods.loadConfig(function () {
 });
 
 rpc.exposeModule('manager', rpcFunctions);
+exports.toHex8Byte = toHex8Byte;
 exports.send = sendToClients;
 exports.rpc = rpcFunctions;

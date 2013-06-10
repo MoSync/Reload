@@ -27,38 +27,34 @@ MA 02110-1301, USA.
 #include "ReloadScreenController.h"
 #include "MainScreenSingleton.h"
 #include "MainScreen.h"
-#include "WorkspaceScreen.h"
+#include "WorkspaceLayout.h"
 #include "StoredProjectsScreen.h"
-#include "ServersDialog.h"
 
 using namespace MAUtil; // Class Moblet
 using namespace NativeUI; // WebView widget.
+
 
 /**
  * Constructor.
  * @param client The ReloadClient that will handle all the reload business logic.
  */
 ReloadScreenController::ReloadScreenController(ReloadClient *client) :
-		mLoginScreen(NULL),
-		mWorkspaceScreen(NULL),
-		mStoredProjectScreen(NULL)//,
-		//mServersDialog(NULL)
+		mLoginLayout(NULL),
+		mWorkspaceLayout(NULL),
+		mStoredProjectScreen(NULL)
 {
 	mReloadClient = client;
 }
 
 ReloadScreenController::~ReloadScreenController()
 {
-	mLoginScreen->removeReloadUIListener(this);
-	mWorkspaceScreen->removeReloadUIListener(this);
+	mLoginLayout->removeReloadUIListener(this);
+	mWorkspaceLayout->removeReloadUIListener(this);
 	mStoredProjectScreen->removeReloadUIListener(this);
 
-	delete mLoginScreen;
-	delete mWorkspaceScreen;
+	delete mLoginLayout;
+	delete mWorkspaceLayout;
 	delete mStoredProjectScreen;
-	//delete mServersDialog;
-	//delete mBroadcastHandler;
-
 	delete MainScreenSingleton::getInstance();
 }
 
@@ -75,8 +71,24 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 {
 	mOS = os;
 
-	mLoginScreen = new LoginScreen(os, orientation);
-	mLoginScreen->addReloadUIListener(this);
+	mLoginLayout = new LoginLayout(os, orientation);
+	mLoginLayout->addReloadUIListener(this);
+
+	mWorkspaceLayout = new WorkspaceLayout(mOS, orientation);
+	mWorkspaceLayout->addReloadUIListener(this);
+
+	mServerScreen = new ServerScreen(mLoginLayout, mWorkspaceLayout);
+	mServerScreen->setTitle("Server");
+
+	if ( mOS.find("Android") >= 0 )
+	{
+		mServerScreen->setIcon(SERVER_ANDROID);
+	}
+	else if( mOS.find("iPhone OS") >= 0 )
+	{
+		mServerScreen->setIcon(SERVER);
+	}
+
 
 	//Just load whatever app we have already extracted
 	if (mStoredProjectScreen == NULL)
@@ -85,17 +97,26 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 		mStoredProjectScreen = new StoredProjectsScreen(os, orientation, mReloadClient->getListOfSavedProjects());
 		mStoredProjectScreen->setTitle("Local");
 		mStoredProjectScreen->addReloadUIListener(this);
+		if ( mOS.find("Android") >= 0 )
+		{
+			mStoredProjectScreen->setIcon(LOCAL_ANDROID);
+		}
+		else if( mOS.find("iPhone OS") >= 0 )
+		{
+			mStoredProjectScreen->setIcon(LOCAL);
+		}
 	}
 	else
 	{
 		mStoredProjectScreen->updateProjectList();
 	}
 
-	mServerScreen = new Screen();
-	mServerScreen->setTitle("Server");
+	mServerScreen->addChild(mLoginLayout);
+	mServerScreen->setMainWidget(mLoginLayout);
+
 	MainScreenSingleton::getInstance()->addTab(mServerScreen);
 	MainScreenSingleton::getInstance()->addTab(mStoredProjectScreen);
-	//mServerScreen->addChild(mLoginScreen);
+
 	MainScreenSingleton::getInstance()->show();
 }
 
@@ -142,7 +163,7 @@ void ReloadScreenController::showNotConnectedScreen()
 void ReloadScreenController::defaultAddress()
 {
 	lprintfln("@@@@ RELOAD: address=%s",mReloadClient->getServerIpAddress().c_str());
-	mLoginScreen->setDefaultIPAddress(mReloadClient->getServerIpAddress().c_str());
+	mLoginLayout->setDefaultIPAddress(mReloadClient->getServerIpAddress().c_str());
 }
 
 /**
@@ -150,31 +171,16 @@ void ReloadScreenController::defaultAddress()
  */
 void ReloadScreenController::pushWorkspaceScreen()
 {
-	mAppLevel = 2;
-	//mLoginScreen->setTitle("");
-	if (mWorkspaceScreen == NULL)
+	if (mServerScreen->getChild(0) == mLoginLayout)
 	{
-		int orientation = maScreenGetCurrentOrientation();
-		mWorkspaceScreen = new WorkspaceScreen(mOS, orientation, mReloadClient->getListOfProjects());
-		mWorkspaceScreen->setTitle("Workspace");
-		mWorkspaceScreen->addReloadUIListener(this);
+		mServerScreen->removeChild(mLoginLayout);
+		mServerScreen->addChild(mWorkspaceLayout);
 	}
-	else
-	{
-		mWorkspaceScreen->updateProjectList();
-		//MainScreenSingleton::getInstance()->show();
-	}
+	mWorkspaceLayout->updateProjectList(mReloadClient->getListOfProjects());
 
-	mServerScreen->removeChild(mLoginScreen);
-	mServerScreen->addChild(mWorkspaceScreen);
+	mServerScreen->setEnabledLayout(2);
 	MainScreenSingleton::getInstance()->show();
-	//MainScreenSingleton::getInstance()->removeChild(mStoredProjectScreen);
-	//MainScreenSingleton::getInstance()->addChild(mLoginScreen);
-	//MainScreenSingleton::getInstance()->addChild(mStoredProjectScreen);
-	//if(MainScreenSingleton::getInstance()->getStackSize() < 2)
-	//{
-	//	MainScreenSingleton::getInstance()->push(mWorkspaceScreen);
-	//}
+
 	lprintfln("@@@ RELOAD: push workspace mServerScreen Widgets count=%d", mServerScreen->countChildWidgets());
 }
 
@@ -184,7 +190,7 @@ void ReloadScreenController::pushWorkspaceScreen()
 
 void ReloadScreenController::updateWorkspaceScreen()
 {
-	mWorkspaceScreen->updateProjectList();
+	mWorkspaceLayout->updateProjectList(mReloadClient->getListOfProjects());
 }
 
 /**
@@ -192,53 +198,19 @@ void ReloadScreenController::updateWorkspaceScreen()
  */
 void ReloadScreenController::popWorkspaceScreen()
 {
-	//int screenCount = MainScreenSingleton::getInstance()->getStackSize();
+	mServerScreen->setEnabledLayout(1);
 
-	//if (screenCount >= 2)
-	//{
-	//	MainScreenSingleton::getInstance()->pop();
-	//}
+	mLoginLayout->emptyServerList();
+	mLoginLayout->findServers();
 
-	//mServerScreen->removeChild(mWorkspaceScreen);
-	mAppLevel = 1;
-	mLoginScreen->emptyServerList();
-	mLoginScreen->findServers();
-	if(mServerScreen->countChildWidgets() == 1)
+	if( mServerScreen->countChildWidgets() > 0 && mServerScreen->getChild(0) == mWorkspaceLayout )
 	{
-		mServerScreen->removeChild(mWorkspaceScreen);
+		mServerScreen->removeChild(mWorkspaceLayout);
+		mServerScreen->addChild(mLoginLayout);
 	}
 
-	mServerScreen->addChild(mLoginScreen);
-	lprintfln("@@@ RELOAD: pop workspace mServerScreen Widgets count=%d", mServerScreen->countChildWidgets());
 	MainScreenSingleton::getInstance()->show();
-}
-
-/**
- * Called when the connect button is clicked.
- * @param address The address contained by the connect EditBox.
- */
-void ReloadScreenController::connectButtonClicked(String address)
-{
-	mReloadClient->connectToServer(address.c_str());
-}
-
-/**
- * Called when find servers button is clicked
- */
-void ReloadScreenController::findServersButtonClicked()
-{
-	//if(mServersDialog == NULL)
-	//{
-	//	int orientation = maScreenGetCurrentOrientation();
-	//	mServersDialog = new ServersDialog(mOS, orientation);
-	//	mServersDialog->setTitle("Servers");
-	//	mServersDialog->addReloadUIListener(this);
-	//}
-
-	//mServersDialog->show();
-	// TODO: make broadcast for server discovery
-	//mBroadcastHandler = new BroadcastHandler(mServersDialog);
-	//mBroadcastHandler->findServer();
+	lprintfln("@@@ RELOAD: pop workspace mServerScreen Widgets count=%d", mServerScreen->countChildWidgets());
 }
 
 /**
@@ -247,15 +219,6 @@ void ReloadScreenController::findServersButtonClicked()
  */
 void ReloadScreenController::connectToSelectedServer(MAUtil::String ipAddress)
 {
-	//mServersDialog->hide();
-	//mServersDialog->emptyServerList();
-	//if (ipAddress != "")
-	//{
-		//defaultAddress(ipAddress.c_str());
-		//mReloadClient->connectToServer(ipAddress.c_str());
-	//}
-	//delete mBroadcastHandler;
-	//defaultAddress();
 	mReloadClient->connectToServer(ipAddress.c_str());
 }
 
@@ -270,7 +233,7 @@ void ReloadScreenController::disconnectButtonClicked()
 /**
  * Called when the reload last app button is clicked.
  */
-void ReloadScreenController::loadStoredProjectsButtonClicked()
+void ReloadScreenController::loadStoredProjects()
 {
 	lprintfln("@@@@ RELOAD: loadStoredProjectsButtonClicked");
 	//Just load whatever app we have already extracted
@@ -286,7 +249,6 @@ void ReloadScreenController::loadStoredProjectsButtonClicked()
 	{
 		mStoredProjectScreen->updateProjectList();
 	}
-	//MainScreenSingleton::getInstance()->push(mStoredProjectScreen);
 }
 
 /**
@@ -304,7 +266,6 @@ void ReloadScreenController::infoButtonClicked()
  */
 void ReloadScreenController::saveProjectClicked(MAUtil::String projectName)
 {
-	lprintfln("@@@@ RELOAD: saveProjectClicked");
 	mReloadClient->saveProjectFromServer(projectName);
 }
 
@@ -340,7 +301,7 @@ void ReloadScreenController::launchSavedApp(MAUtil::String projectName)
  */
 bool ReloadScreenController::shouldExit()
 {
-	if (mAppLevel > 1)
+	if(mServerScreen->getEnabledLayout() > 1)
 	{
 		return false;
 	}

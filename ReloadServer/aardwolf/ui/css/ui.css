@@ -1,0 +1,271 @@
+
+body, html {
+    height: 100%;
+    font-size: 14px;
+}
+
+body {
+    font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
+    margin: 0;
+    padding: 0px;
+}
+
+div, textarea {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+h2 {
+    margin: 0;
+    margin-bottom: 5px;
+    padding: 0;
+    clear: both;
+    font-weight: bold;
+    font-size: 16px;
+
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    color: #333;
+}
+
+h2:not(:first-of-type) {
+    margin-top: 10px;
+}
+
+pre {
+    margin: 0;
+}
+
+textarea {
+    font-family: "Courier New";
+    font-size: 14px;
+}
+
+#top-toolbar {
+    position: absolute;
+    height: 60px;
+    width: 100%;
+    z-index: 500;
+
+    padding: 8px 0 5px 10px;
+    border-bottom: 1px solid #aaa;
+
+    background-image: -webkit-linear-gradient(top, #F0F0F0, #ccc);
+    background-image: -moz-linear-gradient(top,    #F0F0F0, #ccc);
+    background-image: -ms-linear-gradient(top,     #F0F0F0, #ccc);
+    background-image: -o-linear-gradient(top,      #F0F0F0, #ccc);
+    background-image: linear-gradient(top,         #F0F0F0, #ccc);
+}
+
+#options {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+#center-panels {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    padding-top: 60px;
+    padding-right: 430px;
+    padding-bottom: 250px;
+
+    margin: 0;
+    border: 0;
+
+    overflow: hidden;
+    z-index: 400;
+}
+
+#code-container {
+    background: url(../img/code-bg.png);
+    background-position: -8px 0px;
+    background-repeat: repeat-y;
+    height: 100%;
+    overflow: auto;
+}
+
+#code {
+    white-space: pre;
+    font-family: "Courier New", monospace;
+    margin: 5px 0 50px 0;
+}
+
+#code .comment {
+    color: green;
+}
+
+#code .keyword {
+    color: blue;
+}
+
+#code .literal {
+    color: purple;
+}
+
+#code .string {
+    color: purple;
+}
+
+#code .number {
+    color: brown;
+}
+
+#code .linenum {
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+}
+#code .linenum.no-breakpoint {
+    color: grey;
+    cursor: default;
+    font-weight: normal;
+}
+
+#code .linenum.breakpoint {
+    font-weight: bold;
+    color: white;
+    background-color: red;
+}
+
+#sidebar {
+    display: block;
+    width: 430px;
+    padding: 5px;
+
+    position: absolute;
+    right: 0px;
+    top: 60px;
+    bottom: 250px;
+
+    overflow: auto;
+    border-left: 2px solid #bbb;
+    background: #f7f7f7;
+}
+
+#output {
+    border-top: 2px solid #bbb;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 250px;
+    width: 100%;
+
+    background: white;
+    font-family: "Courier New";
+
+    z-index: 500;
+    overflow: hidden;
+}
+
+#output-inner {
+    overflow:auto;
+    height: 88%;
+}
+#output-inner div {
+    border-bottom: 1px solid #bbb;
+    padding: 3px;
+}
+#output-bar {
+    width: 100%;
+    border-top: 2px solid #aaaaaa;
+    position:absolute;
+    bottom: 0px;
+    background-color: white;
+}
+
+#output-bar.big-bar {
+    top: 50px;
+}
+
+.big-bar textarea {
+    min-height: 180px;
+}
+
+#eval {
+    position: absolute;
+    border: none;
+    right: 0px;
+    left: 50px;
+}
+#output-bar span {
+    color: #0040D0;
+    border: none;
+    font-weight: bolder;
+    line-height: 29px;
+    padding-right: 5px;
+}
+#showBig {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#btn-clear {
+    position: absolute;
+    right: 15px;
+}
+#btn-eval {
+    position: absolute;
+    right: 15px;
+    top: 55px;
+    z-index: 30;
+}
+
+#breakpoints {
+    list-style-type: none;
+    padding-left: 10px;
+}
+#breakpoints li {
+    border: 1px solid grey;
+    padding: 5px 10px;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: auto;
+}
+#breakpoints li span {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    padding-left: 20px;
+}
+
+#breakpoints li span.breakpoint {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+    cursor: pointer;
+    padding-left: 0px;
+}
+#breakpoints li span.breakpoint:hover {
+    text-decoration: underline;
+}
+
+.unselectable {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+
+    /*
+      Introduced in IE 10.
+      See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+    */
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+
+
+
+

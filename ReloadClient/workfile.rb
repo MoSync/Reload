@@ -34,9 +34,9 @@ androidPackagePath = packagePath + "Android/"
 iOSPackagePath = packagePath + "iOS/"
 wp7PackagePath = packagePath + "WindowsPhone/"
 
-projectViews = Dir.entries("./View")
+
 projectMainFiles = Dir.entries(".")
-projectFiles = projectMainFiles + projectViews
+projectFiles = projectMainFiles
 cppFiles = []
 cFiles = []
 hFiles = []
