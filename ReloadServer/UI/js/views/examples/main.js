@@ -9,7 +9,7 @@ define([
 
         name: 'examples',
 
-        className: 'span12 pad10',
+        className: 'span12 pad10 examples',
 
         initialize: function (options) {
             _.bindAll(this, 'render', 'close');
@@ -17,6 +17,7 @@ define([
         },
 
         render: function () {
+            this.delegateEvents();
             return this.$el.html( this.examples.render() );
         },
 
@@ -24,6 +25,7 @@ define([
             //Remove view from DOM
             this.remove();
             this.examples.close();
+            this.undelegateEvents();
             Backbone.View.prototype.remove.call(this);
         }
 
