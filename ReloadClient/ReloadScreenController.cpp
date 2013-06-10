@@ -79,7 +79,16 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 
 	mServerScreen = new ServerScreen(mLoginLayout, mWorkspaceLayout);
 	mServerScreen->setTitle("Server");
-	mServerScreen->setIcon(SERVER);
+
+	if ( mOS.find("Android") >= 0 )
+	{
+		mServerScreen->setIcon(SERVER_ANDROID);
+	}
+	else if( mOS.find("iPhone OS") >= 0 )
+	{
+		mServerScreen->setIcon(SERVER);
+	}
+
 
 	//Just load whatever app we have already extracted
 	if (mStoredProjectScreen == NULL)
@@ -88,7 +97,14 @@ void ReloadScreenController::initializeScreen(MAUtil::String &os, int orientatio
 		mStoredProjectScreen = new StoredProjectsScreen(os, orientation, mReloadClient->getListOfSavedProjects());
 		mStoredProjectScreen->setTitle("Local");
 		mStoredProjectScreen->addReloadUIListener(this);
-		mStoredProjectScreen->setIcon(LOCAL);
+		if ( mOS.find("Android") >= 0 )
+		{
+			mStoredProjectScreen->setIcon(LOCAL_ANDROID);
+		}
+		else if( mOS.find("iPhone OS") >= 0 )
+		{
+			mStoredProjectScreen->setIcon(LOCAL);
+		}
 	}
 	else
 	{
