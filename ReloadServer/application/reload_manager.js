@@ -988,6 +988,43 @@ var rpcFunctions = {
      */
     reloadProject: function (projectName, debug, sendResponse, clientList) {
 
+        function sendToAardwolfServer(error, file) {
+
+            var options = {
+                hotsname: 'http://' + vars.globals.ip,
+                port : 8501,
+                path : '/mobile/console',
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json'
+                }
+            };
+
+            var req = http.request(options, function (res) {
+                console.log('STATUS: ' + res.statusCode);
+                console.log('HEADERS: ' + JSON.stringify(res.headers));
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    console.log('BODY: ' + chunk);
+                });
+            });
+
+            req.on('error', function(e) {
+                console.log('Error with request ot Aardwolf: ' + e.message);
+            });
+
+            var syntaxErrorData = {
+                command: 'report-syntax',
+                message: error.message,
+                file: file,
+                line: error.lineNumber,
+                column: error.column
+            }
+
+            req.write(JSON.stringify(syntaxErrorData));
+            req.end();
+        }
+
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') {
             return false;
@@ -1038,21 +1075,20 @@ var rpcFunctions = {
                 if(fileStats.isFile() && files[i].match(/\b[\w-.]+\.js\b/g) ) {
                     var fileData = fs.readFileSync(checkFile);
                     try {
-                        //console.log("Checking file: " + checkFile);
+
                         var results = esprima.parse(fileData,
                                                     { startLineNumber : 0 });
-                        console.log("\u001b[32m" + checkFile.replace(applicationPath,"") + 
-                                    " No Syntax Errors" + "\u001b[0m");
+                        console.log(checkFile.replace(applicationPath,"") + " No Syntax Errors");
                         if (syntaxCheckingStatus !== false) {
                             syntaxCheckingStatus = true;
                         }
                     } catch (e) {
-                        //console.log("ERROR in file " + checkFile, 0);
-                        console.log("\u001b[31;4m" + checkFile.replace(applicationPath,"") + "  " +
-                                    "\u001b[31m" + e + "\u001b[0m");
+
+                        console.log(checkFile.replace(applicationPath,"") + "  " + e );
+                        
+                        sendToAardwolfServer(e, checkFile.replace(applicationPath,""));
                         
                         syntaxCheckingStatus = false;
-                        //mosync.rlog('<div style="background-color: #FFEBEB; color:red">' + e + '</div>');
                     }
                 } else if (fileStats.isDirectory()){
                     readDir(checkFile);
@@ -1062,7 +1098,7 @@ var rpcFunctions = {
         readDir(applicationPath);
 
         if( !syntaxCheckingStatus ) {
-            // TODO: Send response to the server ?
+
             sendResponse({
                 hasError: true,
                 data: 'Javascript errors',
@@ -1080,12 +1116,11 @@ var rpcFunctions = {
         var indexFileData = fs.readFileSync(applicationEntryPoint, 'utf8');
 
         var embededScriptTags = domtosource.find(indexFileData, 'script:not([src])', true);
-        //console.log(embededScriptTags);
+
         for (i in embededScriptTags) {
             
-            //console.log(embededScriptTags[i].html);
             var script = cheerio.load(embededScriptTags[i].html);
-            //console.log(script('script').html());
+            
             try {
                 var result = esprima.parse(
                                 script('script').html(), 
@@ -1093,39 +1128,17 @@ var rpcFunctions = {
                             );
                 console.log("\u001b[32m No syntax errors in embedded script \u001b[0m");
             } catch (e) {
-                //console.log("ERROR in " + );
-                console.log("\u001b[31;11m" + 
-                            applicationEntryPoint.replace(applicationPath,"") + "  " +
-                            e + "\u001b[0m");
+
+                console.log(applicationEntryPoint.replace(applicationPath,"") + "  " + e);
+                sendToAardwolfServer(e, applicationEntryPoint.replace(applicationPath,""));
                 sendResponse({
                     hasError: true,
                     data: e,
                 });
                 return;
-                //console.log(e);
             }
         }
         console.log("-------------------------------------------");
-        // $ = cheerio.load(indexFileData,{
-        //     lowerCaseTags: false
-        // });
-        
-        // var embededScriptTags = 
-        //     $("script:not([src])").each( function (index, element) {
-        //         // $(this).html(debugNotice + 
-        //         //              "try {" + 
-        //         //                 $(this).html() + 
-        //         //              " } catch (e) { mosync.rlog(e.stack); };");
-        //         try {
-        //             var result = esprima.parse($(this).html());
-        //             console.log("No syntax errors in embedded script");
-        //         } catch (e) {
-        //             console.log("ERROR in " + applicationEntryPoint);
-        //             console.log(e);
-        //         }
-        // });
-        //console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");        
-
 
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
@@ -1224,6 +1237,23 @@ var rpcFunctions = {
 
             try {
                 self.debugInjection(projectDir, function (){
+
+                //=============================== Inject the WEINRE Inspection script =========================
+                var injectedScript = "<script src=\"http://" + vars.globals.ip +
+                                     ":8080/target/target-script-min.js\"></script>";
+
+                var pathOfIndexHTML =   path.join(pathToTempBundle, "index.html");
+
+                console.log("Path to index.html: " + pathOfIndexHTML);
+                var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
+
+                var injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
+
+                fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+
+                console.log("WEINRE Injection  : Successfull");
+                //=============================================================================================
+
                     console.log("----------- C r e a t e   B u n d l e ---------");
                     var exec = require('child_process').exec;
 
@@ -1265,76 +1295,7 @@ var rpcFunctions = {
                         vars.globals.fileSeparator + "LocalFiles.bin\"";
                     exec(command, puts);
                 });
-                // ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
-                //     if (err) {
-                //         console.log('ERROR Copy Process      : Error-' + err, 0);
-                //     }
-                //     console.log('Copy Process      : Successfull');
-
-                //     self.debugInjection(projectDir, function (){
-
-
-                //             //INJECT WEINRE SCRIPT
-                //             //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
-                //             //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
-                //             console.log("Server IP         : "+vars.globals.ip);
-                //             var injectedScript = "<script src=\"http://" + vars.globals.ip +
-                //                                  ":8080/target/target-script-min.js\"></script>";
-
-                //             var pathOfIndexHTML =   pathToTempBundle +
-                //                                     vars.globals.fileSeparator + "index.html";
-
-                //             console.log("Path to index.html: " + pathOfIndexHTML);
-                //             var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
-
-                //             injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
-
-                //             fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
-
-                //             console.log("WEINRE Injection  : Successfull");
-
-                //             console.log("----------- C r e a t e   B u n d l e ---------");
-                //             var exec = require('child_process').exec;
-
-                //             function puts(error, stdout, stderr)
-                //             {
-                //                 console.log("stdout: " + stdout);
-
-                //                 if (error) {
-                //                     console.log("ERROR stderr: " + stderr, 0);
-                //                     console.log("ERROR error : " + error, 0);
-                //                 }
-
-                //                 callback(projectDir + "/LocalFiles.bin");
-
-                //                 // Delete TempBundle directory
-                //                 self.removeRecursive(pathToTempBundle, function (error, status){
-                //                     if(!error) {
-                //                         console.log("Delete Temp: Successfull");
-                //                     }
-                //                     else {
-                //                         console.log("Delete Temp: Error-" + error);
-                //                     }
-                //                 });
-                //             }
-
-                //             var bundleCommand = "bin\\win\\Bundle.exe";
-
-                //             if (vars.globals.localPlatform.indexOf("darwin") >=0)
-                //             {
-                //               bundleCommand = "bin/mac/Bundle";
-                //             }
-                //             else if (vars.globals.localPlatform.indexOf("linux") >=0)
-                //             {
-                //               bundleCommand = "bin/linux/Bundle";
-                //             }
-
-                //             var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
-                //                 projectDir  +
-                //                 vars.globals.fileSeparator + "LocalFiles.bin\"";
-                //             exec(command, puts);
-                //     });
-                // });
+                
             } catch(err) {
                 console.log("ERROR in bundleApp: " + err, 0);
             }
@@ -1852,29 +1813,14 @@ var rpcFunctions = {
 
         var self = this,
 
-            // indexHtmlPath =
-            //     projectName
-            //     + vars.globals.fileSeparator + 'TempBundle'
-            //     + vars.globals.fileSeparator + 'index.html',
-
             projectSourceFolder = projectName
                 + vars.globals.fileSeparator + 'LocalFiles',
 
             projectOuputFolder = projectName
                 + vars.globals.fileSeparator + 'TempBundle',
 
-            //debugerFiles = "C:\\WorkingDir\\Aardwolf\\samples";
             debugerFiles = path.resolve("aardwolf","samples");
 
-            // data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8")),
-
-            // debugNotice =
-            //     "/**\n"
-            //     + " * NOTICE: The try catch statement is automaticaly added\n"
-            //     + " * when the project is reloaded in debug mode.\n"
-            //     + " */\n";
-
-        //console.log("\u001b[32mindexHtmlPath:" + indexHtmlPath + "\u001b[0m");
         console.log("\u001b[32m[SOURCE] " + projectSourceFolder + "\u001b[0m");
         console.log("\u001b[32m[DESTIN] " + projectOuputFolder + "\u001b[0m");
         console.log("\u001b[32m[DEBUGS] " + debugerFiles + "\u001b[0m");
@@ -1885,7 +1831,7 @@ var rpcFunctions = {
             console.log(arguments);
             // Copy project source files on aardwolf server
             ncp.ncp(projectSourceFolder, debugerFiles, function (error) {
-
+                
                 if(error) {
                     console.log("ERROR: in debugInjection " + error, 0);
                 } else {
@@ -1900,77 +1846,6 @@ var rpcFunctions = {
                 }
             });
         }, { "empty": true });
-
-        
-        // /**
-        //  * Load the index.html file for accessing and manipulating elements
-        //  */
-        // $ = cheerio.load(data,{
-        //     lowerCaseTags: false
-        // });
-
-        // /**
-        //  * Get all embeded script tags
-        //  */
-        // var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
-        //     $(this).html(debugNotice + "try {" + $(this).html() + " } catch (e) { mosync.rlog(e.stack); };");
-        // });
-        // console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
-
-        // /**
-        //  * Get all external js script files
-        //  */
-        // var externalScriptFiles = $("script[src]:not([class='jsdom'])").each(function (index, element){
-
-        //     if( element.attribs.src !== "js/wormhole.js") {
-        //         var scriptPath =
-        //             vars.globals.fileSeparator
-        //             + 'TempBundle'
-        //             + vars.globals.fileSeparator
-        //             + self.fixPathsUnix(element.attribs.src)
-        //             ;
-
-        //         try {
-        //             var s = fs.statSync(scriptPath);
-        //             if( s.isFile() ) {
-        //                 var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
-        //                 jsFileData = debugNotice + "try {" + jsFileData + "} catch (e) { mosync.rlog(e.stack); };";
-        //                 fs.writeFileSync(scriptPath, jsFileData, "utf8");
-        //             }
-        //         } catch (e) {
-        //             console.log("ERROR in debugInjection:", 0);
-        //             console.log(e, 0);
-        //         }
-        //     }
-        // });
-        // console.log("--Debug Feature-- There was: " + externalScriptFiles.length + " external JS scripts found.");
-
-        // /**
-        //  * Get all elements that have inline js code
-        //  * To add more tag attributes:
-        //  *   - add the attribute name (lowercase in attrs)
-        //  * TODO: search more elements than only div
-        //  */
-        // var attrs = ["onclick", "onevent", "onload"];    // Attribute list
-        // var inlineJsCode = $("div,body").each(function (index, element){
-
-        //     for( var i in element.attribs ) {
-        //         for( var j = 0; j < attrs.length; j++) {
-        //             if( i.toLowerCase() == attrs[j] ) {
-        //                 var inlineCode = $(this).attr(i);
-        //                 $(element).attr(i, debugNotice + "try {" + inlineCode + "} catch (e) { mosync.rlog(e.stack); };");
-        //             }
-        //         }
-        //     }
-        // });
-        // console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-
-        //  /**
-        //   * Write index.html file
-        //   */
-        // fs.writeFileSync(indexHtmlPath, $.html(), "utf8");
-
-        //callback();
     }
 };
 

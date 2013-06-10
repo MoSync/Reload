@@ -559,6 +559,9 @@ function processOutput(data) {
         case 'report-exception':
             writeToConsole('<b>EXCEPTION</b>: ' + data.message + ' at ' + data.file + ', line ' + data.line);
             break;
+        case 'report-syntax' :
+        	writeToConsole('<b>JAVASCRIPT ERROR</b>: ' + data.message + ' at ' + data.file + ', line ' + data.line + ', column ' + data.column);
+            break;
         case 'report-breakpoint':
             showBreakpoint(data);
             break;
