@@ -1046,6 +1046,18 @@ var rpcFunctions = {
     /**
      * (RPC): Evaluate JS on the clients.
      */
+    evaluate: function (script, fingerprint, sendResponse) {
+        sendResponse({hasError: false, data: "ok"});
+        sendToClients({
+            message: 'Evaluate',
+            script: script,
+            fingerprint: fingerprint
+        });
+    },
+
+    /**
+     * (RPC): Evaluate JS on the clients.
+     */
     evalJS: function (script, sendResponse) {
         if(typeof sendResponse !== 'function') {
             return false;

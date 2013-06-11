@@ -321,7 +321,8 @@
 #include <mastdlib.h>
 #include <maarg.h>
 #include <maassert.h>
-//#include <errno.h>
+#include <maheap.h>
+#include <mavsprintf.h>
 
 #ifdef isdigit
 #undef isdigit
