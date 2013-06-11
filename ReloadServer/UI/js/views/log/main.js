@@ -35,7 +35,7 @@ define([
                       'restoreScroll');
 
             var self = this;
-            var socket = io.connect('http://localhost:8283');
+            var socket = io.connect('http://' + location.host);
 
             socket.on('log', function (data) {
                 self.updateLog(data);

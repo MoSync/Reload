@@ -481,6 +481,11 @@ ul#projects li a.select-project {
 #do-selection i {
     margin-right: 8px;
 }
+
+.examples {
+    padding: 10px 0 0 0;
+}
+
 a.thumbnail {
     position: relative;
     width: 240px;

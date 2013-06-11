@@ -19,7 +19,7 @@ MA 02110-1301, USA.
 /**
  * @file ReloadClient.h
  *
- *  Author: Ali Sarrafi, Iraklis Rossis, Mikael Kindborg
+ *	Author: Ali Sarrafi, Iraklis Rossis, Mikael Kindborg
  */
 
 #ifndef MOSYNC_RELOAD_RELOADCLIENT_H
@@ -141,30 +141,30 @@ public:
 
 	// ========== Methods called from the UI  ==========
 
-    /**
-     * Called from the UI to cancel the download.
-     */
-    void cancelDownload();
+	/**
+	 * Called from the UI to cancel the download.
+	 */
+	void cancelDownload();
 
-    /**
-     * Open connection to the Reload server.
-     * @param serverAddress IP-address as a string.
-     */
-    void connectToServer(const char* serverAddress);
+	/**
+	 * Open connection to the Reload server.
+	 * @param serverAddress IP-address as a string.
+	 */
+	void connectToServer(const char* serverAddress);
 
-    /**
-     * Disconnect from the Reload server.
-     */
-    void disconnectFromServer();
+	/**
+	 * Disconnect from the Reload server.
+	 */
+	void disconnectFromServer();
 
-    /**
-     * Shows an alert with the disconnection message from server
-     * @param disconnectData The message that the server sent
-     * 						 when disconnecting the client
-     */
-    void showDisconnectionMessage (MAUtil::String disconnectData);
+	/**
+	 * Shows an alert with the disconnection message from server
+	 * @param disconnectData The message that the server sent
+	 *						 when disconnecting the client
+	 */
+	void showDisconnectionMessage (MAUtil::String disconnectData);
 
-    // ========== Server message handling  ==========
+	// ========== Server message handling  ==========
 
 	/**
 	 * Handle JSON messages.
@@ -192,22 +192,37 @@ public:
 	 */
 	void evaluateScript(const String& script);
 
+	/**
+	 * Evaluate the given script in the main web view and
+	 * send the result back using mosync.bridge.send(['Custom',
+	 * 'EvalResponse', {'res': response, 'fingerprint': id}])
+	 * @param script
+	 * @param fingerprint
+	 */
+	void evaluate(const String& script, const String& fingerprint);
+
+	 /**
+	 * Send result of script evaluation to the server.
+	 * @param message
+	 */
+	void evalResponse(Wormhole::MessageStream& message);
+
 	// ========== Launching apps ==========
 
-    /**
-     * Loads the HTML files that were extracted last time.
-     */
-    void launchSavedApp(MAUtil::String projectName);
+	/**
+	 * Loads the HTML files that were extracted last time.
+	 */
+	void launchSavedApp(MAUtil::String projectName);
 
-    /**
-     * Resets the client (destroys widgets and stops sensors)
-     * in preparation for a new app
-     */
-    void freeHardware();
+	/**
+	 * Resets the client (destroys widgets and stops sensors)
+	 * in preparation for a new app
+	 */
+	void freeHardware();
 
-    /**
-     * Empty the folder where apps are stored.
-     */
+	/**
+	 * Empty the folder where apps are stored.
+	 */
 	void clearAppsFolder(MAUtil::String appFolder);
 
 	// ========== Send info to server  ==========
@@ -227,12 +242,12 @@ public:
 	 */
 	void reloadProjectFromServer(MAUtil::String projectName);
 
-    /**
-     * Sends information about the device to the server.
-     */
-    void sendClientDeviceInfo();
+	/**
+	 * Sends information about the device to the server.
+	 */
+	void sendClientDeviceInfo();
 
-    // ========== Helper methods ==========
+	// ========== Helper methods ==========
 
 	/**
 	 * Send a TCP message to the server. Prepends the message
@@ -241,41 +256,41 @@ public:
 	 */
 	void sendTCPMessage(const MAUtil::String& message);
 
-    /**
-     * Get client info.
-     * @return String with client info.
-     */
+	/**
+	 * Get client info.
+	 * @return String with client info.
+	 */
 	MAUtil::String getInfo();
 
-    /**
-     * This method handles any connection error messages.
-     * @param errorCode The error code that was returned.
-     */
-    void showConnectionErrorMessage(int errorCode);
+	/**
+	 * This method handles any connection error messages.
+	 * @param errorCode The error code that was returned.
+	 */
+	void showConnectionErrorMessage(int errorCode);
 
-    /**
-     * Getter returns the vector of projects on server
-     * @return MAUtil::Vector <reloadProject>
-     */
-    MAUtil::Vector <reloadProject> * getListOfProjects();
+	/**
+	 * Getter returns the vector of projects on server
+	 * @return MAUtil::Vector <reloadProject>
+	 */
+	MAUtil::Vector <reloadProject> * getListOfProjects();
 
-    /**
+	/**
 	 * Getter returns the vector of projects stored on the device
 	 * @return MAUtil::Vector <reloadProject>
 	 */
-    MAUtil::Vector <reloadProject> * getListOfSavedProjects();
+	MAUtil::Vector <reloadProject> * getListOfSavedProjects();
 
-    /**
-     * Getter: Returns the servers last used ip address
-     * @return A string with the ip address
-     */
-    MAUtil::String getServerIpAddress();
+	/**
+	 * Getter: Returns the servers last used ip address
+	 * @return A string with the ip address
+	 */
+	MAUtil::String getServerIpAddress();
 
 private:
 	/**
 	 * Class that handles the Login Screen UI.
 	 */
-    ReloadScreenController* mReloadScreenController;
+	ReloadScreenController* mReloadScreenController;
 
 	/**
 	 * Class that handles the Loading screen UI.

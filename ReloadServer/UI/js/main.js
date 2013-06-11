@@ -8,6 +8,7 @@ require.config({
         'socket.io':                   '/socket.io/socket.io.js',
         'codemirror':                  'vendor/codemirror/lib/codemirror',
         'codemirror.mode.javascript':  'vendor/codemirror/mode/javascript/javascript',
+        'gridalicious':                'vendor/jquery.grid-a-licious.min',
         'jquery.draggable':            'vendor/jquery-ui-1.10.1.custom.min',
         'chardinjs':                   'vendor/chardinjs.min'
     },
