@@ -12,3 +12,4 @@
 #define SERVER_ANDROID 12
 #define LOCAL 13
 #define LOCAL_ANDROID 14
+#define RUN_TESTS_JS 15

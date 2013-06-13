@@ -24,7 +24,6 @@ define([
             this.collection.on('add', this.appendExampleView);
 
             // React when all thumbnails with examples are ready.
-            //
             this.collection.on('done', function(){
                 self.$el.gridalicious({
                     selector: '.thumbnail',

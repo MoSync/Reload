@@ -178,6 +178,7 @@ public:
 	 */
 	void downloadBundle(const String& urlData, int fileSize);
 
+	void reloadBundle(const String& json);
 	/**
 	 * Experimental method not used.
 	 */
@@ -306,6 +307,11 @@ private:
 	 * TODO: Document what this variable is used for.
 	 */
 	bool mHasPage;
+
+	/**
+	 * Flag to signal running of tests.
+	 */
+	bool mRunTests;
 
 	/**
 	 * The platform the client is running on.
