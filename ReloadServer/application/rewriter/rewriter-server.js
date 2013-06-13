@@ -30,7 +30,6 @@ function run(customConfig) {
             config[i] = customConfig[i];
         }
     }
-    //return;
 
     if (!fs.existsSync(config.fileServerBaseDir)) {
         console.error('ERROR: Path does not exist: ' + config.fileServerBaseDir);
@@ -40,19 +39,6 @@ function run(customConfig) {
     processFiles();
 
     var serverBaseDir = path.normalize(config.fileServerBaseDir);
-    // // Watch for file changes
-    // watch(serverBaseDir, function(fileName) {
-    //     if (fileName) {
-    //         for (var i = 0; i < config.ignoreFiles.length; i++) {
-    //             if (fileName.indexOf(config.ignoreFiles[i]) >= 0) {
-    //                 return;
-    //             }
-    //         }
-    //         var file = fileName.substr(serverBaseDir.length);
-    //         file = file.replace(/\\/g, '/');
-    //         processFile(file, true);
-    //     }
-    // });
 }
 
 function processFiles() {

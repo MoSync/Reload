@@ -19,19 +19,14 @@ define([
             _.bindAll(this, 'render', 'close');
             var serveIpModel = new ServerIpModel();
             serveIpModel.on( 'change', function(){
-                //$('.serverip').html(serveIpModel.get('ip'));
+
                 self.compiledTemplate = _.template( aardwolfTemplate, { serverIp : serveIpModel.get('ip') } );
-                console.log('hello aardwolf');
                 self.render();
             });
         },
 
         render: function () {
             var data = {};
-            console.log(aardwolfTemplate);
-
-            console.log($('iframe').contents().find('#toolbar'));
-
             return this.$el.html( this.compiledTemplate );
         },
 
