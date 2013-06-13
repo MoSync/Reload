@@ -207,6 +207,14 @@ iframe {
     top: 10px;
     bottom: 0;
 }
+
+.aardwolf {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    bottom: 0;
+}
+
 #log {
     bottom: 22px;
     height: 300px;

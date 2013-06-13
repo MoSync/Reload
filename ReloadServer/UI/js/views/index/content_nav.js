@@ -58,6 +58,7 @@ define([
 
             items.append($('<li data-name="workbench"><a href="/#/workbench">Workbench</a></li>'));
             items.append($('<li data-name="docs"><a href="/#/docs">API Reference</a></li>'));
+            items.append($('<li data-name="aardwolf"><a href="/#/aardwolf">Debug</a></li>'));
             items.append($('<li data-name="feedback" class="pull-right"><a href="/#/feedback">Send us feedback!</a></li>'));
 
             var nav = this.$el.html(items);

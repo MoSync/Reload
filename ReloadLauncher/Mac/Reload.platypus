@@ -24,6 +24,7 @@
 		<string>../../ReloadServer/node_modules</string>
 		<string>../../ReloadServer/cli</string>
 		<string>../../Licenses</string>
+		<string>../../ReloadServer/aardwolf</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-4.6</string>

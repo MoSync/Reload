@@ -7,6 +7,9 @@ var cheerio = require('cheerio');
 var http    = require('http');
 var url     = require('url');
 var request = require('request');
+var esprima = require('esprima');
+var domtosource   = require('domtosource');
+var debugRewriter = require('./rewriter/rewriter-server');
 
 
 /**
@@ -776,94 +779,122 @@ var rpcFunctions = {
         });
     },
 
+
     /**
      * (internal function) Deletes recursively a file or folder given in "path"
      * and all of it's contents if there are any.
+     * options:
+     *      - empty: if true empty the directory without deleting it
      */
-    removeRecursive: function (path, cb) {
-        var self = this;
+    // FIXME: Fix this function so it can support options parameter
+    // options:
+    //      - empty (true,false) Empty the directory without deleting 
 
-        fs.stat(path, function (err, stats) {
+    removeRecursive: function (pathToDelete, cb, options) {
+        var self = this,
+            initialPath = pathToDelete;
 
-            if (err) {
-                cb(err, stats);
-                return;
-            }
+        // parameter check
+        if( !(options && typeof options === "object") ) {
+            options = new Object();
+            options.empty = false;
+        }
 
-            if (stats.isFile()) {
+        function remove(pathToDelete, cb, options) {
 
-                fs.unlink(path, function (err) {
-                    if(err) {
-                        cb(err,null);
-                    } else {
-                        cb(null,true);
-                    }
+            fs.stat(pathToDelete, function (err, stats) {
+
+                if (err) {
+                    cb(err, stats);
                     return;
-                });
+                }
 
-            } else if (stats.isDirectory()) {
+                if (stats.isFile()) {
 
-                // A folder may contain files
-                // We need to delete the files first
-                // When all are deleted we could delete the
-                // dir itself
-                fs.readdir(path, function (err, files) {
-                    if (err) {
-                        cb(err,null);
+                    fs.unlink(pathToDelete, function (err) {
+                        if(err) {
+                            cb(err,null);
+                        } else {
+                            cb(null,true);
+                        }
                         return;
-                    }
+                    });
 
-                    var f_length = files.length;
-                    var f_delete_index = 0;
+                } else if (stats.isDirectory()) {
 
-                    // Check and keep track of deleted files
-                    // Delete the folder itself when the files are deleted
+                    // A folder may contain files
+                    // We need to delete the files first
+                    // When all are deleted we could delete the
+                    // dir itself
+                    fs.readdir(pathToDelete, function (err, files) {
+                        if (err) {
+                            cb(err,null);
+                            return;
+                        }
 
-                    var checkStatus = function() {
+                        var f_length = files.length;
+                        var f_delete_index = 0;
 
-                        // We check the status
-                        // and count till we r done
-                        if (f_length===f_delete_index) {
+                        // Check and keep track of deleted files
+                        // Delete the folder itself when the files are deleted
 
-                            fs.rmdir(path, function(err) {
-                                if (err) {
-                                    cb(err,null);
+                        var checkStatus = function() {
+
+                            // We check the status
+                            // and count till we r done
+                            if (f_length===f_delete_index) {
+
+                                if (!(options.empty) || 
+                                     ((options.empty) && 
+                                     (pathToDelete !== initialPath))) {
+                                    console.log(path.dirname(pathToDelete));
+                                    console.log(initialPath);
+                                    fs.rmdir(pathToDelete, function(err) {
+                                        if (err) {
+                                            cb("1" + err,null);
+                                        } else {
+                                            cb(null,true);
+                                        }
+                                    });
                                 } else {
                                     cb(null,true);
+                                    return true;   
                                 }
-                            });
-                            return true;
+                                
+                            }
+                            return false;
+                        };
+
+                        if (!checkStatus()) {
+
+                            for (var i = 0; i < f_length; i++) {
+
+                                // Create a local scope for filePath
+                                // Not really needed, but just good practice
+                                // (as strings arn't passed by reference)
+                                (function(){
+                                    var filePath = path.join(pathToDelete, files[i]);
+                                    // Add a named function as callback
+                                    // just to enlighten debugging
+                                    remove(filePath, function removeRecursiveCB(err, status) {
+                                        if (!err) {
+
+                                            f_delete_index ++;
+                                            checkStatus();
+                                        } else {
+                                            cb(err,null);
+                                            return;
+                                        }
+                                    }, options);
+                                })()
+                            }
                         }
-                        return false;
-                    };
+                    });
+                }
+            });    
+        };
 
-                    if (!checkStatus()) {
-
-                        for (var i = 0; i < f_length; i++) {
-
-                            // Create a local scope for filePath
-                            // Not really needed, but just good practice
-                            // (as strings arn't passed by reference)
-                            (function(){
-                                var filePath = path + vars.globals.fileSeparator + files[i];
-                                // Add a named function as callback
-                                // just to enlighten debugging
-                                self.removeRecursive(filePath, function removeRecursiveCB(err, status) {
-                                    if (!err) {
-
-                                        f_delete_index ++;
-                                        checkStatus();
-                                    } else {
-                                        cb(err,null);
-                                        return;
-                                    }
-                                });
-                            })()
-                        }
-                    }
-                });
-            }
-        });
+        remove(pathToDelete, cb, options);
     },
 
     /**
@@ -957,6 +988,43 @@ var rpcFunctions = {
      */
     reloadProject: function (projectName, debug, sendResponse, clientList) {
 
+        function sendToAardwolfServer(error, file) {
+
+            var options = {
+                hotsname: 'http://' + vars.globals.ip,
+                port : 8501,
+                path : '/mobile/console',
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json'
+                }
+            };
+
+            var req = http.request(options, function (res) {
+                console.log('STATUS: ' + res.statusCode);
+                console.log('HEADERS: ' + JSON.stringify(res.headers));
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    console.log('BODY: ' + chunk);
+                });
+            });
+
+            req.on('error', function(e) {
+                console.log('Error with request ot Aardwolf: ' + e.message);
+            });
+
+            var syntaxErrorData = {
+                command: 'report-syntax',
+                message: error.message,
+                file: file,
+                line: error.lineNumber,
+                column: error.column
+            }
+
+            req.write(JSON.stringify(syntaxErrorData));
+            req.end();
+        }
+
         //check if parameter passing was correct
         if (typeof sendResponse !== 'function') {
             return false;
@@ -984,6 +1052,93 @@ var rpcFunctions = {
             + vars.globals.fileSeparator
             + projectName
             ;
+        
+        // Find all javascript files 
+        // Parsing and checking for syntax errors
+        console.log("-------------------------------------------");
+        console.log("Checking javascript files for syntax errors");
+        var applicationPath = projectPath + vars.globals.fileSeparator + "LocalFiles";
+        //console.log("Application Path: " + applicationPath);
+        //var files = fs.readdirSync(applicationPath);
+        //console.log("Files found in the app:");
+        //console.log(files);
+        var syntaxCheckingStatus = true;
+        function readDir(directoryPath) {
+            var files = fs.readdirSync(directoryPath);
+            for (i in files) {
+
+                var checkFile = directoryPath + 
+                                vars.globals.fileSeparator +
+                                files[i];
+
+                var fileStats = fs.statSync(checkFile);
+                if(fileStats.isFile() && files[i].match(/\b[\w-.]+\.js\b/g) ) {
+                    var fileData = fs.readFileSync(checkFile);
+                    try {
+
+                        var results = esprima.parse(fileData,
+                                                    { startLineNumber : 0 });
+                        console.log(checkFile.replace(applicationPath,"") + " No Syntax Errors");
+                        if (syntaxCheckingStatus !== false) {
+                            syntaxCheckingStatus = true;
+                        }
+                    } catch (e) {
+
+                        console.log(checkFile.replace(applicationPath,"") + "  " + e );
+                        
+                        sendToAardwolfServer(e, checkFile.replace(applicationPath,""));
+                        
+                        syntaxCheckingStatus = false;
+                    }
+                } else if (fileStats.isDirectory()){
+                    readDir(checkFile);
+                }
+            }
+        }
+        readDir(applicationPath);
+
+        if( !syntaxCheckingStatus ) {
+
+            sendResponse({
+                hasError: true,
+                data: 'Javascript errors',
+            });
+            return;
+        }
+
+        // Check javascript in script tags of index.html
+        var applicationEntryPoint = projectPath + 
+                                    vars.globals.fileSeparator + 
+                                    "LocalFiles" + 
+                                    vars.globals.fileSeparator + 
+                                    "index.html";
+
+        var indexFileData = fs.readFileSync(applicationEntryPoint, 'utf8');
+
+        var embededScriptTags = domtosource.find(indexFileData, 'script:not([src])', true);
+
+        for (i in embededScriptTags) {
+            
+            var script = cheerio.load(embededScriptTags[i].html);
+            
+            try {
+                var result = esprima.parse(
+                                script('script').html(), 
+                                { startLineNumber : embededScriptTags[i].line-1 }
+                            );
+                console.log("\u001b[32m No syntax errors in embedded script \u001b[0m");
+            } catch (e) {
+
+                console.log(applicationEntryPoint.replace(applicationPath,"") + "  " + e);
+                sendToAardwolfServer(e, applicationEntryPoint.replace(applicationPath,""));
+                sendResponse({
+                    hasError: true,
+                    data: e,
+                });
+                return;
+            }
+        }
+        console.log("-------------------------------------------");
 
         this.bundleApp(projectPath, weinreDebug, function(actualPath) {
             try {
@@ -1090,80 +1245,74 @@ var rpcFunctions = {
         console.log("Path to Project  : " + pathToLocalFiles);
         console.log("Path to TempFiles: " + pathToTempBundle);
 
-        if(weinreDebug) {
+        if(weinreDebug === true) {
+
             try {
-                ncp.ncp(pathToLocalFiles, pathToTempBundle, function (err){
-                    if (err) {
-                        console.log('ERROR Copy Process      : Error-' + err, 0);
+                self.debugInjection(projectDir, function (){
+
+                //=============================== Inject the WEINRE Inspection script =========================
+                var injectedScript = "<script src=\"http://" + vars.globals.ip +
+                                     ":8080/target/target-script-min.js\"></script>";
+
+                var pathOfIndexHTML =   path.join(pathToTempBundle, "index.html");
+
+                console.log("Path to index.html: " + pathOfIndexHTML);
+                var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
+
+                var injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
+
+                fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
+
+                console.log("WEINRE Injection  : Successfull");
+                //=============================================================================================
+
+                    console.log("----------- C r e a t e   B u n d l e ---------");
+                    var exec = require('child_process').exec;
+
+                    function puts(error, stdout, stderr)
+                    {
+                        console.log("stdout: " + stdout);
+
+                        if (error) {
+                            console.log("ERROR stderr: " + stderr, 0);
+                            console.log("ERROR error : " + error, 0);
+                        }
+
+                        callback(projectDir + "/LocalFiles.bin");
+
+                        // Delete TempBundle directory
+                        self.removeRecursive(pathToTempBundle, function (error, status){
+                            if(!error) {
+                                console.log("Delete Temp: Successfull");
+                            }
+                            else {
+                                console.log("Delete Temp: Error-" + error);
+                            }
+                        });
                     }
-                    console.log('Copy Process      : Successfull');
 
-                    self.debugInjection(projectDir, function (){
-                            //INJECT WEINRE SCRIPT
-                            //<script src="http://<serverip>:<port>/target/target-script-min.js"></script>
-                            //eg: <script src="http://192.168.0.103:8080/target/target-script-min.js"></script>
-                            console.log("Server IP         : "+vars.globals.ip);
-                            var injectedScript = "<script src=\"http://" + vars.globals.ip +
-                                                 ":8080/target/target-script-min.js\"></script>";
+                    var bundleCommand = "bin\\win\\Bundle.exe";
 
-                            var pathOfIndexHTML =   pathToTempBundle +
-                                                    vars.globals.fileSeparator + "index.html";
+                    if (vars.globals.localPlatform.indexOf("darwin") >=0)
+                    {
+                      bundleCommand = "bin/mac/Bundle";
+                    }
+                    else if (vars.globals.localPlatform.indexOf("linux") >=0)
+                    {
+                      bundleCommand = "bin/linux/Bundle";
+                    }
 
-                            console.log("Path to index.html: " + pathOfIndexHTML);
-                            var originalIndexHTMLData = fs.readFileSync( pathOfIndexHTML, "utf8" );
-
-                            injectedIndexHTML = originalIndexHTMLData.replace( "<head>","<head>" + injectedScript );
-
-                            fs.writeFileSync(pathOfIndexHTML ,injectedIndexHTML, "utf8" );
-
-                            console.log("WEINRE Injection  : Successfull");
-
-                            console.log("----------- C r e a t e   B u n d l e ---------");
-                            var exec = require('child_process').exec;
-
-                            function puts(error, stdout, stderr)
-                            {
-                                console.log("stdout: " + stdout);
-
-                                if (error) {
-                                    console.log("ERROR stderr: " + stderr, 0);
-                                    console.log("ERROR error : " + error, 0);
-                                }
-
-                                callback(projectDir + "/LocalFiles.bin");
-
-                                // Delete TempBundle directory
-                                self.removeRecursive(pathToTempBundle, function (error, status){
-                                    if(!error) {
-                                        console.log("Delete Temp: Successfull");
-                                    }
-                                    else {
-                                        console.log("Delete Temp: Error-" + error);
-                                    }
-                                });
-                            }
-
-                            var bundleCommand = "bin\\win\\Bundle.exe";
-
-                            if (vars.globals.localPlatform.indexOf("darwin") >=0)
-                            {
-                              bundleCommand = "bin/mac/Bundle";
-                            }
-                            else if (vars.globals.localPlatform.indexOf("linux") >=0)
-                            {
-                              bundleCommand = "bin/linux/Bundle";
-                            }
-
-                            var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
-                                projectDir  +
-                                vars.globals.fileSeparator + "LocalFiles.bin\"";
-                            exec(command, puts);
-                    });
+                    var command =  bundleCommand + " -in \"" + pathToTempBundle + "\" -out \"" +
+                        projectDir  +
+                        vars.globals.fileSeparator + "LocalFiles.bin\"";
+                    exec(command, puts);
                 });
+                
             } catch(err) {
                 console.log("ERROR in bundleApp: " + err, 0);
             }
         } else {
+            console.log("DEBUGGIN IS DISABLED");
             try {
 
                 console.log("----------- C r e a t e   B u n d l e ---------");
@@ -1676,93 +1825,39 @@ var rpcFunctions = {
 
         var self = this,
 
-            indexHtmlPath =
-                projectName
-                + vars.globals.fileSeparator + 'TempBundle'
-                + vars.globals.fileSeparator + 'index.html'
-                ,
+            projectSourceFolder = projectName
+                + vars.globals.fileSeparator + 'LocalFiles',
 
-            data = String(fs.readFileSync( indexHtmlPath.replace("TempBundle","LocalFiles"), "utf8"))
-                ,
+            projectOuputFolder = projectName
+                + vars.globals.fileSeparator + 'TempBundle',
 
-            debugNotice =
-                "/**\n"
-                + " * NOTICE: The try catch statement is automaticaly added\n"
-                + " * when the project is reloaded in debug mode.\n"
-                + " */\n"
-                ;
+            debugerFiles = path.resolve("aardwolf","samples");
 
-        /**
-         * Load the index.html file and parse it to a new window object
-         * including jQuery for accessing and manipulating elements
-         */
-        $ = cheerio.load(data,{
-            lowerCaseTags: false
-        });
+        console.log("\u001b[32m[SOURCE] " + projectSourceFolder + "\u001b[0m");
+        console.log("\u001b[32m[DESTIN] " + projectOuputFolder + "\u001b[0m");
+        console.log("\u001b[32m[DEBUGS] " + debugerFiles + "\u001b[0m");
 
-        /**
-         * Get all embeded script tags
-         */
+        // Remove Old directory from aardwolf server
+        this.removeRecursive(debugerFiles, function () {
 
-        var embededScriptTags = $("script:not([class='jsdom']):not([src])").each( function (index, element) {
-            $(this).html(debugNotice + "try {" + $(this).html() + " } catch (e) { mosync.rlog(e.stack); };");
-        });
-        console.log("--Debug Feature-- There was: " + embededScriptTags.length + " embeded JS scripts found.");
+            console.log(arguments);
+            // Copy project source files on aardwolf server
+            ncp.ncp(projectSourceFolder, debugerFiles, function (error) {
+                
+                if(error) {
+                    console.log("ERROR: in debugInjection " + error, 0);
+                } else {
+                    debugRewriter.run(
+                        {
+                            "fileServerBaseDir" : projectSourceFolder,
+                            "outputDir"         : projectOuputFolder,
+                            "serverHost"        : vars.globals.ip,
+                        });
 
-        /**
-         * Get all external js script files
-         */
-        var externalScriptFiles = $("script[src]:not([class='jsdom'])").each(function (index, element){
-
-            if( element.attribs.src !== "js/wormhole.js") {
-                var scriptPath =
-                    vars.globals.fileSeparator
-                    + 'TempBundle'
-                    + vars.globals.fileSeparator
-                    + self.fixPathsUnix(element.attribs.src)
-                    ;
-
-                try {
-                    var s = fs.statSync(scriptPath);
-                    if( s.isFile() ) {
-                        var jsFileData = String(fs.readFileSync(scriptPath, "utf8"));
-                        jsFileData = debugNotice + "try {" + jsFileData + "} catch (e) { mosync.rlog(e.stack); };";
-                        fs.writeFileSync(scriptPath, jsFileData, "utf8");
-                    }
-                } catch (e) {
-                    console.log("ERROR in debugInjection:", 0);
-                    console.log(e, 0);
+                    callback();    
                 }
-            }
-        });
-        console.log("--Debug Feature-- There was: " + externalScriptFiles.length + " external JS scripts found.");
-
-        /**
-         * Get all elements that have inline js code
-         * To add more tag attributes:
-         *   - add the attribute name (lowercase in attrs)
-         * TODO: search more elements than only div
-         */
-        var attrs = ["onclick", "onevent", "onload"];    // Attribute list
-        var inlineJsCode = $("div,body").each(function (index, element){
-
-            for( var i in element.attribs ) {
-                for( var j = 0; j < attrs.length; j++) {
-                    if( i.toLowerCase() == attrs[j] ) {
-                        var inlineCode = $(this).attr(i);
-                        $(element).attr(i, debugNotice + "try {" + inlineCode + "} catch (e) { mosync.rlog(e.stack); };");
-                    }
-                }
-            }
-        });
-        console.log("--Debug Feature-- There was: " + inlineJsCode.length + " inline JS scripts found.");
-
-         /**
-          * Write index.html file
-          */
-        fs.writeFileSync(indexHtmlPath, $.html(), "utf8");
-
-        callback();
+            });
+        }, { "empty": true });
     }
 };
 
