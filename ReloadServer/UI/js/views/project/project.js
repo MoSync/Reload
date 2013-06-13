@@ -24,9 +24,9 @@ define([
                       'render',
                       'toggle',
                       'control',
-                      'reloadProject',
                       'openFolder',
                       'removeProject',
+                      'runTests',
                       'renameProject');
 
             this.projectList = options.projectList;
@@ -103,12 +103,20 @@ define([
                 break;
 
             case 'delete':
-                this.removeProject(id);
+                this.removeProject();
+                break;
+
+            case 'test':
+                this.runTests();
                 break;
 
             default:
                 console.log('Unknown action');
             }
+        },
+
+        runTests: function () {
+            this.model.reload('test');
         },
 
         renameProject: function () {
@@ -119,7 +127,6 @@ define([
             // RPC when project obj is modified by the dialog.
             this.model.on('change:name', function(){
                 var options     = {};
-                options.url     = 'http://localhost:8283';
                 options.rpcMsg  = {
                     method: 'manager.renameProject',
                     params: [oldName, self.model.get('name')],
@@ -147,53 +154,8 @@ define([
             dialog.render();
         },
 
-        reloadProject: function () {
-            var self = this;
-            // TODO refactor reload function from
-            // sidebar_reload_button.js
-
-            // Check if a project is selected.
-            if (this.parent.selectedProject === null) {
-                alert ('Please select a project.');
-                return;
-            }
-
-            // TODO Make an extra pull for device list before trying to
-            // reload.
-            // Check if any devices are connected.
-            if (this.parent.deviceCount === 0) {
-                alert ('Please connect a device.');
-                return;
-            }
-
-            console.log('--- R e l o a d i n g ---');
-            console.log(this.model.get('name'));
-            var options     = {};
-            options.url     = 'http://localhost:8283';
-            options.rpcMsg  = {
-                method: 'manager.reloadProject',
-                params: [this.model.get('name'), this.parent.debug],
-                id: 0
-            };
-
-            options.success = function (resp) {
-                console.log('reload');
-                console.log(resp.result);
-                // Clear log.
-                self.parent.views.logView.clear();
-            };
-
-            options.error   = function (resp) {
-                console.log('could not remove project folder');
-                console.log(resp);
-            };
-
-            this.model.rpc(options);
-        },
-
         openFolder: function () {
             var options     = {};
-            options.url     = 'http://localhost:8283';
             options.rpcMsg  = {
                 method: 'manager.openProjectFolder',
                 params: [this.model.get('name')],
@@ -216,7 +178,6 @@ define([
             var self = this;
             this.model.on('change:destroy', function() {
                 var options     = {};
-                options.url     = 'http://localhost:8283';
                 options.rpcMsg  = {
                     method: 'manager.removeProject',
                     params: [self.model.get('name')],
