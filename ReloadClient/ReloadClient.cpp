@@ -259,6 +259,7 @@ void ReloadClient::initializeVariables()
 	mRunningApp = false;
 	mProtocolVersion = 0;
 	mProjectToSave = "";
+	mRunTests = false;
 
 	// Get the OS we are on.
 	char buffer[64];
@@ -404,6 +405,14 @@ void ReloadClient::openWormhole(MAHandle webViewHandle)
 	String script = SysLoadStringResource(CUSTOM_JS);
 	script += "('" + mAppPath + "')";
 	callJS(webViewHandle, script.c_str());
+
+	// Run tests when wormhole is loaded.
+	if (mRunTests)
+	{
+		script = SysLoadStringResource(RUN_TESTS_JS);
+		script += "('" + mAppPath + "')";
+		callJS(webViewHandle, script.c_str());
+	}
 
 	// Call super class method to handler initialization.
 	HybridMoblet::openWormhole(webViewHandle);
@@ -806,19 +815,20 @@ void ReloadClient::handleJSONMessage(const String& json)
 	// Download a bundle.
 	if (message == "ReloadBundle")
 	{
-		// Get message parameters.
-		String urlData = (jsonRoot->getValueForKey("url"))->toString();
-		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
-		getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
-
-		// Initiate the download.
-		downloadBundle(urlData, fileSize);
+		mRunTests = false;
+		LOG("@@@@@ Reload Bundle");
+		reloadBundle(json);
 	}
 	// Disconnect from server.
 	else if (message == "Disconnect")
 	{
 		LOG("@@@ disconnect");
 		disconnectFromServer();
+	}
+	else if (message == "RunTests")
+	{
+		mRunTests = true;
+		reloadBundle(json);
 	}
 	// Evaluate a JavaScript string.
 	else if (message == "EvalJS")
@@ -931,6 +941,22 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 		LOG("@@@ RELOAD: downloadBundle ERROR: %d\n", result);
 		showConnectionErrorMessage(result);
 	}
+}
+
+void ReloadClient::reloadBundle(const String& json)
+{
+	// Parse JSON data.
+	YAJLDom::Value* jsonRoot = YAJLDom::parse(
+		(const unsigned char*)json.c_str(),
+		json.size());
+
+	// Get message parameters.
+	String urlData = (jsonRoot->getValueForKey("url"))->toString();
+	int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
+	getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
+
+	// Initiate the download.
+	downloadBundle(urlData, fileSize);
 }
 
 /**

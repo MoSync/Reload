@@ -28,5 +28,7 @@
 .image "local.png"
 .res LOCAL_ANDROID
 .image "local_android.png"
+.res RUN_TESTS_JS
+.ubin
+.include "runtests.js"
 .eof
-

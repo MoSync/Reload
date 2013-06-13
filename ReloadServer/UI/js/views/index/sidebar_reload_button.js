@@ -10,8 +10,6 @@ define([
 
         reloadButton: '#reload-button',
 
-        debugFlag: false,
-
         events: {
             'click #reload-button': 'doReload',
             'click #debug-button':  'doDebug'
@@ -41,8 +39,7 @@ define([
         doDebug: function() {
             $('#reload-button').removeClass('btn-primary');
             $('#debug-button').addClass('btn-primary');
-            this.debugFlag = true;
-            this.reload();
+            this.reload('weinre');
         },
 
         doReload: function () {
@@ -52,7 +49,7 @@ define([
             this.reload();
         },
 
-        reload: function () {
+        reload: function (flag) {
             var self = this;
 
             // Check if a project is selected.
@@ -88,9 +85,7 @@ define([
             this.parent.selectedProject.on('reloaded', function(){
                 self.parent.views.logView.clear();
             });
-            this.parent.selectedProject.reload(this.debugFlag);
-
-            this.debugFlag = false;
+            this.parent.selectedProject.reload(flag);
         }
 
     });
