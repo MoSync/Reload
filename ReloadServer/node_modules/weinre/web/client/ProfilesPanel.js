@@ -23,7 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const UserInitiatedProfileName = "org.webkit.profiles.user-initiated";
+var UserInitiatedProfileName = "org.webkit.profiles.user-initiated";
 
 WebInspector.ProfileType = function(id, name)
 {
@@ -525,7 +525,7 @@ WebInspector.ProfilesPanel.prototype = {
     {
         var views = [];
 
-        const visibleView = this.visibleView;
+        var visibleView = this.visibleView;
         if (visibleView && visibleView.performSearch)
             views.push(visibleView);
 

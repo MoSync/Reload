@@ -188,7 +188,7 @@ WebInspector.CookiesTable.prototype = {
         data[4] = cookie.type === WebInspector.Cookie.Type.Request ? "" :
             (cookie.session ? WebInspector.UIString("Session") : new Date(cookie.expires).toGMTString());
         data[5] = cookie.size;
-        const checkmark = "\u2713";
+        var checkmark = "\u2713";
         data[6] = (cookie.httpOnly ? checkmark : "");
         data[7] = (cookie.secure ? checkmark : "");
 

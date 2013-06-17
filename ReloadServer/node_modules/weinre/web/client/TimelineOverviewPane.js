@@ -310,7 +310,7 @@ WebInspector.TimelineOverviewPane.prototype = {
 
     _setWindowPosition: function(start, end)
     {
-        const rulerAdjustment = 1 / this._overviewGrid.element.clientWidth;
+        var rulerAdjustment = 1 / this._overviewGrid.element.clientWidth;
         if (typeof start === "number") {
             this.windowLeft = start / this._overviewGrid.element.clientWidth;
             this._leftResizeElement.style.left = this.windowLeft * 100 + "%";

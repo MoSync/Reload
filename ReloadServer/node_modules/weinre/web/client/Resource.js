@@ -717,7 +717,7 @@ WebInspector.Resource.prototype = {
 
     _contentURL: function()
     {
-        const maxDataUrlSize = 1024 * 1024;
+        var maxDataUrlSize = 1024 * 1024;
         // If resource content is not available or won't fit a data URL, fall back to using original URL.
         if (this._content == null || this._content.length > maxDataUrlSize)
             return this.url;

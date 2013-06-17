@@ -259,7 +259,7 @@ WebInspector.HeapSnapshotView.prototype = {
         // The second and subsequent levels of heap snapshot nodes represent retainers,
         // so recursive expansion will be infinite, since a graph is being traversed.
         // So default to a recursion cap of 2 levels.
-        const maxDepth = 2;
+        var maxDepth = 2;
 
         while (current) {
             if (matchesQuery(current))

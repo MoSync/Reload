@@ -654,7 +654,7 @@ WebInspector.ResourcesPanel.prototype = {
     {
         var views = [];
 
-        const visibleView = this.visibleView;
+        var visibleView = this.visibleView;
         if (visibleView.performSearch)
             views.push(visibleView);
 
@@ -828,7 +828,7 @@ WebInspector.BaseStorageTreeElement.prototype = {
         // Override it since we use margin-left in place of treeoutline's text-indent.
         // Hence we need to take padding into consideration. This all is needed for leading
         // icons in the tree.
-        const paddingLeft = 14;
+        var paddingLeft = 14;
         var left = this.listItemElement.totalOffsetLeft + paddingLeft;
         return event.pageX >= left && event.pageX <= left + this.arrowToggleWidth && this.hasChildren;
     }

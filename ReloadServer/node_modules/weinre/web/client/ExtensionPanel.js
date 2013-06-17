@@ -33,6 +33,7 @@ WebInspector.ExtensionPanel = function(id, label, iconURL, options)
     this.toolbarItemLabel = label;
     this._addStyleRule(".toolbar-item." + id + " .toolbar-icon", "background-image: url(" + iconURL + ");");
     WebInspector.Panel.call(this, id);
+    this._initialize(options);
 }
 
 WebInspector.ExtensionPanel.prototype = {
@@ -76,7 +77,19 @@ WebInspector.ExtensionPanel.prototype = {
         var style = document.createElement("style");
         style.textContent = selector + " { " + body + " }";
         document.head.appendChild(style);
-    }
+    },
+
+    _initialize: function (options) 
+    {    
+        var aardwolfIP = options.ip,
+            iframe = document.createElement('iframe');
+
+        iframe.src = "http://" + aardwolfIP + ":8501/ui/index.html";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+
+        this.element.appendChild(iframe);
+     }
 }
 
 WebInspector.ExtensionPanel.prototype.__proto__ = WebInspector.Panel.prototype;

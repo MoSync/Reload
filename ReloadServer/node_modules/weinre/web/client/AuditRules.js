@@ -657,7 +657,7 @@ WebInspector.AuditRules.ImageDimensionsRule.prototype = {
         {
             --context.imagesLeft;
 
-            const node = WebInspector.domAgent.nodeForId(imageId);
+            var node = WebInspector.domAgent.nodeForId(imageId);
             var src = node.getAttribute("src");
             if (!src.asParsedURL()) {
                 for (var frameOwnerCandidate = node; frameOwnerCandidate; frameOwnerCandidate = frameOwnerCandidate.parentNode) {
@@ -670,7 +670,7 @@ WebInspector.AuditRules.ImageDimensionsRule.prototype = {
             if (completeSrc)
                 src = completeSrc;
 
-            const computedStyle = styles.computedStyle;
+            var computedStyle = styles.computedStyle;
             if (computedStyle.getPropertyValue("position") === "absolute") {
                 if (!context.imagesLeft)
                     doneCallback(context);
@@ -710,7 +710,7 @@ WebInspector.AuditRules.ImageDimensionsRule.prototype = {
 
         function pushImageNodes()
         {
-            const nodeIds = [];
+            var nodeIds = [];
             var nodes = document.getElementsByTagName("img");
             for (var i = 0; i < nodes.length; ++i) {
                 if (!nodes[i].src)

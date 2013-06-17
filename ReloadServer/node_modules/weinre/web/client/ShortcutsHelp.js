@@ -65,7 +65,7 @@ WebInspector.ShortcutsHelp.prototype = {
         }
         orderedSections = orderedSections.sort(compareSections);
 
-        const wrapAfter = height / nColumns;
+        var wrapAfter = height / nColumns;
         var table = document.createElement("table");
         table.className = "help-table";
         var row = table.createChild("tr");
