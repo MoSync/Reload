@@ -113,7 +113,7 @@ WebInspector.ResourceTimingView.createTimingTable = function(resource)
     addRow(WebInspector.UIString("Waiting"), "waiting", resource.timing.sendEnd, resource.timing.receiveHeadersEnd);
     addRow(WebInspector.UIString("Receiving"), "receiving", (resource.responseReceivedTime - resource.timing.requestTime) * 1000, (resource.endTime - resource.timing.requestTime) * 1000);
 
-    const chartWidth = 200;
+    var chartWidth = 200;
     var total = (resource.endTime - resource.timing.requestTime) * 1000;
     var scale = chartWidth / total;
 

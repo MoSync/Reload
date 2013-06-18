@@ -1109,7 +1109,7 @@ WebInspector.NetworkBaseCalculator.prototype = {
 
     computeBarGraphLabels: function(item)
     {
-        const label = this.formatValue(this._value(item));
+        var label = this.formatValue(this._value(item));
         return {left: label, right: label, tooltip: label};
     },
 
@@ -1620,9 +1620,9 @@ WebInspector.NetworkDataGridNode.prototype = {
         this._labelRightElement.removeStyleClass("after");
         this._labelRightElement.removeStyleClass("hidden");
 
-        const labelPadding = 10;
-        const barRightElementOffsetWidth = this._barRightElement.offsetWidth;
-        const barLeftElementOffsetWidth = this._barLeftElement.offsetWidth;
+        var labelPadding = 10;
+        var barRightElementOffsetWidth = this._barRightElement.offsetWidth;
+        var barLeftElementOffsetWidth = this._barLeftElement.offsetWidth;
 
         if (this._barLeftElement) {
             var leftBarWidth = barLeftElementOffsetWidth - labelPadding;
@@ -1632,12 +1632,12 @@ WebInspector.NetworkDataGridNode.prototype = {
             var rightBarWidth = barRightElementOffsetWidth - labelPadding;
         }
 
-        const labelLeftElementOffsetWidth = this._labelLeftElement.offsetWidth;
-        const labelRightElementOffsetWidth = this._labelRightElement.offsetWidth;
+        var labelLeftElementOffsetWidth = this._labelLeftElement.offsetWidth;
+        var labelRightElementOffsetWidth = this._labelRightElement.offsetWidth;
 
-        const labelBefore = (labelLeftElementOffsetWidth > leftBarWidth);
-        const labelAfter = (labelRightElementOffsetWidth > rightBarWidth);
-        const graphElementOffsetWidth = this._graphElement.offsetWidth;
+        var labelBefore = (labelLeftElementOffsetWidth > leftBarWidth);
+        var labelAfter = (labelRightElementOffsetWidth > rightBarWidth);
+        var graphElementOffsetWidth = this._graphElement.offsetWidth;
 
         if (labelBefore && (graphElementOffsetWidth * (this._percentages.start / 100)) < (labelLeftElementOffsetWidth + 10))
             var leftHidden = true;

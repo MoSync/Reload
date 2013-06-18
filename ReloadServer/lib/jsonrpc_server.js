@@ -99,6 +99,8 @@ create = function(port) {
         vars.methods.startWebUI();
     }
 
+    vars.methods.startAardwolfServer();
+    
     console.log('Server started listening on port: ' + port, 0);
 };
 

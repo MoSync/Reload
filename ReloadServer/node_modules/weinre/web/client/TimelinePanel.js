@@ -543,14 +543,14 @@ WebInspector.TimelinePanel.prototype = {
         var visibleTop = this._scrollTop;
         var visibleBottom = visibleTop + this._containerElement.clientHeight;
 
-        const rowHeight = WebInspector.TimelinePanel.rowHeight;
+        var rowHeight = WebInspector.TimelinePanel.rowHeight;
 
         // Convert visible area to visible indexes. Always include top-level record for a visible nested record.
         var startIndex = Math.max(0, Math.min(Math.floor(visibleTop / rowHeight) - 1, recordsInWindow.length - 1));
         var endIndex = Math.min(recordsInWindow.length, Math.ceil(visibleBottom / rowHeight));
 
         // Resize gaps first.
-        const top = (startIndex * rowHeight) + "px";
+        var top = (startIndex * rowHeight) + "px";
         this._topGapElement.style.height = top;
         this.sidebarElement.style.top = top;
         this.sidebarResizeElement.style.top = top;
@@ -691,8 +691,8 @@ WebInspector.TimelineCalculator.prototype = {
 
     computeBarGraphWindowPosition: function(record, clientWidth)
     {
-        const minWidth = 5;
-        const borderWidth = 4;
+        var minWidth = 5;
+        var borderWidth = 4;
         var workingArea = clientWidth - minWidth - borderWidth;
         var percentages = this.computeBarGraphPercentages(record);
         var left = percentages.start / 100 * workingArea;
@@ -723,8 +723,8 @@ WebInspector.TimelineCalculator.prototype = {
         if (this._absoluteMinimumBoundary === -1 || lowerBound < this._absoluteMinimumBoundary)
             this._absoluteMinimumBoundary = lowerBound;
 
-        const minimumTimeFrame = 0.1;
-        const minimumDeltaForZeroSizeEvents = 0.01;
+        var minimumTimeFrame = 0.1;
+        var minimumDeltaForZeroSizeEvents = 0.01;
         var upperBound = Math.max(record._lastChildEndTime + minimumDeltaForZeroSizeEvents, lowerBound + minimumTimeFrame);
         if (this._absoluteMaximumBoundary === -1 || upperBound > this._absoluteMaximumBoundary)
             this._absoluteMaximumBoundary = upperBound;
@@ -948,7 +948,7 @@ WebInspector.TimelinePanel.FormattedRecord.prototype = {
             calculator.formatValue(this.startTime - calculator.minimumBoundary));
         contentHelper._appendTextRow(WebInspector.UIString("Duration"), text);
 
-        const recordTypes = WebInspector.TimelineAgent.RecordType;
+        var recordTypes = WebInspector.TimelineAgent.RecordType;
 
         switch (this.type) {
             case recordTypes.GCEvent:
@@ -1152,7 +1152,7 @@ WebInspector.TimelineExpandableElement = function(container)
 WebInspector.TimelineExpandableElement.prototype = {
     _update: function(record, index, barPosition)
     {
-        const rowHeight = WebInspector.TimelinePanel.rowHeight;
+        var rowHeight = WebInspector.TimelinePanel.rowHeight;
         if (record._visibleChildrenCount || record._invisibleChildrenCount) {
             this._element.style.top = index * rowHeight + "px";
             this._element.style.left = barPosition.left + "px";

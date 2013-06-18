@@ -196,6 +196,34 @@ var methods = {
         exec(command, puts);
 
         return;
+    },
+
+    startAardwolfServer: function () {
+        var exec    = require('child_process').exec,
+            command = "";
+
+        function puts(error, stdout, stderr) {
+            console.log("stdout: " + stdout, 0);
+            if (error) {
+                console.log("stderr: " + stderr, 0);
+                console.log("error: "  + error , 0);
+            }
+        }
+
+        console.log("Starting aardwolf server using ip " + globals.ip);
+        command = "bin\\win\\node.exe aardwolf\\app.js -h " + globals.ip;
+
+        if (globals.localPlatform.indexOf("darwin") >= 0) {
+
+            command = "bin/mac/node aardwolf/app.js -h " + globals.ip;
+        } else if (globals.localPlatform.indexOf("linux") >= 0) {
+
+            command = "bin/linux/node aardwolf/app.js -h " + globals.ip;
+        }
+        
+        exec(command, puts);
+
+        return;  
     }
 };
 

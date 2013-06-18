@@ -138,6 +138,40 @@ startServer = () ->
 
     app.use jsonBodyParser()
 
+    #-------------------------------------------------------------------------------
+    # RPC Request to Reload for aquiring ip address
+    app.all /^\/ws\/reload(.*)/, (request, response, next) ->
+        http = require "http"
+        responseData = ""
+        options =
+            port: 8283
+            method : "POST"
+            headers :
+                "Content-Type" : "application/json"
+
+        data = 
+            method : "manager.getNetworkIP"
+            params : []
+            id : null
+
+        req = http.request options, (res) ->
+            res.on "data", (chunk) ->
+                responseData += chunk
+                return
+            res.on "end", () ->
+                response.send (JSON.parse responseData).result
+                return
+            return
+
+        req.on "error", (e) ->
+            console.log("Cannot make request to reload server: " + e)
+            response.send 500
+            return
+
+        req.write JSON.stringify data
+        req.end()
+        return
+
     app.all /^\/ws\/client(.*)/, (request, response, next) ->
         uri = request.params[0]
         uri = '/' if uri == ''
