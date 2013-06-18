@@ -23,6 +23,10 @@ if (argv['white-list']){ config.whiteList = argv['white-list'].split(','); }
 
 try {
     /* Makes sure the path exists and gets rid of any trailing slashes. */
+    if( !fs.existsSync(config.fileServerBaseDir)) {
+    	//create it 
+    	fs.mkdirSync(config.fileServerBaseDir);
+    }
     config.fileServerBaseDir = fs.realpathSync(config.fileServerBaseDir);
 } catch (e) {
     console.error(e.message);
