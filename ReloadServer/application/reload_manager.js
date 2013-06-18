@@ -1017,6 +1017,7 @@ var rpcFunctions = {
             case 'weinre':
                 message = 'ReloadBundle';
                 weinreDebug = true;
+                console.log("FLAG: " + weinreDebug);
                 break;
             default:
                 message = 'ReloadBundle';
@@ -1132,7 +1133,7 @@ var rpcFunctions = {
         }
 
         // Check javascript syntax only when in debug mode
-        if(debug) {
+        if (weinreDebug) {
             readDir(applicationPath);
         }
 
