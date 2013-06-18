@@ -1095,7 +1095,11 @@ var rpcFunctions = {
                 }
             }
         }
-        readDir(applicationPath);
+
+        // Check javascript syntax only when in debug mode
+        if(debug) {
+            readDir(applicationPath);
+        }
 
         if( !syntaxCheckingStatus ) {
 

@@ -50,15 +50,9 @@ define([
         render: function () {
             var items = $('<li data-name="index" class="active"><a href="/#">Quick Start</a></li>');
             items.append($('<li data-name="examples"><a href="/#/examples">Examples</a></li>'));
-
-            // Weinre works only in webkit for now :(
-            if ($.browser.webkit) {
-                items.append($('<li data-name="weinre"><a href="/#/weinre">Weinre (Beta)</a></li>'));
-            }
-
+            items.append($('<li data-name="weinre"><a href="/#/weinre">Debug</a></li>'));
             items.append($('<li data-name="workbench"><a href="/#/workbench">Workbench</a></li>'));
             items.append($('<li data-name="docs"><a href="/#/docs">API Reference</a></li>'));
-            items.append($('<li data-name="aardwolf"><a href="/#/aardwolf">Debug</a></li>'));
             items.append($('<li data-name="feedback" class="pull-right"><a href="/#/feedback">Send us feedback!</a></li>'));
 
             var nav = this.$el.html(items);
