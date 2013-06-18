@@ -101,7 +101,7 @@ WebInspector.AuditLauncherView.prototype = {
             return aTitle.localeCompare(bTitle);
         }
         var insertBefore = insertionIndexForObjectInListSortedByFunction(category, this._sortedCategories, compareCategories);
-        this._categoriesElement.insertBefore(categoryElement, this._categoriesElement.children[insertBefore]);
+        this._categoriesElement.insertBefore(categoryElement, this._categoriesElement.children[insertBefore] || null);
         this._sortedCategories.splice(insertBefore, 0, category);
         this._updateButton();
     },

@@ -234,7 +234,7 @@ WebInspector.ElementsPanel.prototype = {
         // Call searchCanceled since it will reset everything we need before doing a new search.
         this.searchCanceled();
 
-        const whitespaceTrimmedQuery = query.trim();
+        var whitespaceTrimmedQuery = query.trim();
         if (!whitespaceTrimmedQuery.length)
             return;
 

@@ -11,7 +11,6 @@ define([
     'views/workbench/main',
     'views/docs/main',
     'views/feedback/main',
-    'views/aardwolf/main',
     'collections/projects'
 ], function ($, _, Backbone,
              ViewHandler,
@@ -23,7 +22,6 @@ define([
              WorkbenchView,
              DocsView,
              FeedbackView,
-             AardwolfView,
              ProjectCollection
             ) {
 
@@ -63,7 +61,6 @@ define([
             'workbench':  'showWorkbench',
             'docs':       'showDocs',
             'feedback':   'showFeedback',
-            'aardwolf':   'showAardwolf', 
 
             // Default
             '*actions':   'defaultAction'
@@ -84,7 +81,6 @@ define([
         views.workbenchView = new WorkbenchView();
         views.docsView      = new DocsView();
         views.feedbackView  = new FeedbackView();
-        views.aardwolfView  = new AardwolfView();
 
         var viewHandler = new ViewHandler({
             views: views,
@@ -125,9 +121,6 @@ define([
         });
         router.on('route:showFeedback', function () {
             viewHandler.show(views.feedbackView);
-        });
-        router.on('route:showAardwolf', function () {
-            viewHandler.show(views.aardwolfView);
         });
         router.on('route:defaultAction', function (actions) {
             // We have no matching route, lets just log what the URL was

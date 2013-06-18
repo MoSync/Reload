@@ -655,7 +655,7 @@ WebInspector.SourceFrame.prototype = {
         } else if (!this._hoverElement.hasStyleClass("webkit-javascript-ident"))
             return;
 
-        const toolTipDelay = this._popup ? 600 : 1000;
+        var toolTipDelay = this._popup ? 600 : 1000;
         this._hoverTimer = setTimeout(this._mouseHover.bind(this, this._hoverElement), toolTipDelay);
     },
 
@@ -761,8 +761,8 @@ WebInspector.SourceFrame.prototype = {
                 popupContentElement.appendChild(section.element);
 
                 this._popup = new WebInspector.Popover(popupContentElement);
-                const popupWidth = 300;
-                const popupHeight = 250;
+                var popupWidth = 300;
+                var popupHeight = 250;
                 this._popup.show(element, popupWidth, popupHeight);
             }
             this._popup.highlightElement = element;

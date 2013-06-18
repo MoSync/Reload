@@ -72,16 +72,16 @@ WebInspector.Popover.prototype = {
 
     _positionElement: function(anchorElement, preferredWidth, preferredHeight)
     {
-        const borderWidth = 25;
-        const scrollerWidth = 11;
-        const arrowHeight = 15;
-        const arrowOffset = 10;
-        const borderRadius = 10;
+        var borderWidth = 25;
+        var scrollerWidth = 11;
+        var arrowHeight = 15;
+        var arrowOffset = 10;
+        var borderRadius = 10;
 
         // Skinny tooltips are not pretty, their arrow location is not nice.
         preferredWidth = Math.max(preferredWidth, 50);
-        const totalWidth = window.innerWidth;
-        const totalHeight = window.innerHeight;
+        var totalWidth = window.innerWidth;
+        var totalHeight = window.innerHeight;
 
         var anchorBox = {x: anchorElement.totalOffsetLeft, y: anchorElement.totalOffsetTop, width: anchorElement.offsetWidth, height: anchorElement.offsetHeight};
         while (anchorElement !== document.body) {
@@ -198,7 +198,7 @@ WebInspector.PopoverHelper.prototype = {
         if (!this._hoverElement)
             return;
 
-        const toolTipDelay = isMouseDown ? 0 : (this._popup ? this._timeout * 0.6 : this._timeout);
+        var toolTipDelay = isMouseDown ? 0 : (this._popup ? this._timeout * 0.6 : this._timeout);
         this._hoverTimer = setTimeout(this._mouseHover.bind(this, this._hoverElement), toolTipDelay);
     },
 

@@ -149,10 +149,10 @@ WebInspector.KeyboardShortcut._makeKeyFromCodeAndModifiers = function(keyCode, m
 
 WebInspector.KeyboardShortcut._modifiersToString = function(modifiers)
 {
-    const cmdKey = "\u2318";
-    const optKey = "\u2325";
-    const shiftKey = "\u21e7";
-    const ctrlKey = "\u2303";
+    var cmdKey = "\u2318";
+    var optKey = "\u2325";
+    var shiftKey = "\u21e7";
+    var ctrlKey = "\u2303";
 
     var isMac = WebInspector.isMac();
     var res = "";
