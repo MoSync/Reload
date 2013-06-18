@@ -189,6 +189,19 @@ void ReloadClient::runTimerEvent()
 
 	// Show first screen.
 	mReloadScreenController->showNotConnectedScreen();
+
+	// Register custom function callable from javascript.
+	addMessageFun("EvalResponse", (FunTable::MessageHandlerFun)&ReloadClient::evalResponse);
+}
+
+// Send result of script evaluation to the server.
+void ReloadClient::evalResponse(Wormhole::MessageStream& message)
+{
+	MAUtil::String msg = message.getNext();
+	LOG("@@@@@ evalResponse %s", msg.c_str());
+
+	MAUtil::String out = "{\"message\":\"evalResponse\",\"params\": [\"" + Encoder::escape(msg) +"\"]}";
+	sendTCPMessage(out);
 }
 
 void ReloadClient::setScreenOrientation()
@@ -246,6 +259,7 @@ void ReloadClient::initializeVariables()
 	mRunningApp = false;
 	mProtocolVersion = 0;
 	mProjectToSave = "";
+	mRunTests = false;
 
 	// Get the OS we are on.
 	char buffer[64];
@@ -391,6 +405,14 @@ void ReloadClient::openWormhole(MAHandle webViewHandle)
 	String script = SysLoadStringResource(CUSTOM_JS);
 	script += "('" + mAppPath + "')";
 	callJS(webViewHandle, script.c_str());
+
+	// Run tests when wormhole is loaded.
+	if (mRunTests)
+	{
+		script = SysLoadStringResource(RUN_TESTS_JS);
+		script += "('" + mAppPath + "')";
+		callJS(webViewHandle, script.c_str());
+	}
 
 	// Call super class method to handler initialization.
 	HybridMoblet::openWormhole(webViewHandle);
@@ -793,13 +815,9 @@ void ReloadClient::handleJSONMessage(const String& json)
 	// Download a bundle.
 	if (message == "ReloadBundle")
 	{
-		// Get message parameters.
-		String urlData = (jsonRoot->getValueForKey("url"))->toString();
-		int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
-		getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
-
-		// Initiate the download.
-		downloadBundle(urlData, fileSize);
+		mRunTests = false;
+		LOG("@@@@@ Reload Bundle");
+		reloadBundle(json);
 	}
 	// Disconnect from server.
 	else if (message == "Disconnect")
@@ -807,12 +825,25 @@ void ReloadClient::handleJSONMessage(const String& json)
 		LOG("@@@ disconnect");
 		disconnectFromServer();
 	}
+	else if (message == "RunTests")
+	{
+		mRunTests = true;
+		reloadBundle(json);
+	}
 	// Evaluate a JavaScript string.
 	else if (message == "EvalJS")
 	{
 		// Get message parameters.
 		String script = (jsonRoot->getValueForKey("script"))->toString();
 		evaluateScript(script);
+	}
+	// Evaluate a JavaScript string for a test case.
+	else if (message == "Evaluate")
+	{
+		// Get message parameters.
+		String script = (jsonRoot->getValueForKey("script"))->toString();
+		String fingerprint = (jsonRoot->getValueForKey("fingerprint"))->toString();
+		evaluate(script, fingerprint);
 	}
 	else if (message == "Disconnect")
 	{
@@ -912,6 +943,22 @@ void ReloadClient::downloadBundle(const String& urlData, int fileSize)
 	}
 }
 
+void ReloadClient::reloadBundle(const String& json)
+{
+	// Parse JSON data.
+	YAJLDom::Value* jsonRoot = YAJLDom::parse(
+		(const unsigned char*)json.c_str(),
+		json.size());
+
+	// Get message parameters.
+	String urlData = (jsonRoot->getValueForKey("url"))->toString();
+	int fileSize = (jsonRoot->getValueForKey("fileSize"))->toInt();
+	getWebView()->callJS("try{mosync.nativeui.destroyAll()}catch{console.log(\"error cleaning up\")}");
+
+	// Initiate the download.
+	downloadBundle(urlData, fileSize);
+}
+
 /**
  * New function called to download index.html from the server.
  * TODO: This is experimental code. NOT USED.
@@ -943,8 +990,23 @@ void ReloadClient::evaluateScript(const String& script)
 	url += "try{var res=eval(unescape('";
 	url += script;
 	url += "'));";
-	url += "if (typeof res!=='undefined'){mosync.rlog('javascript:'+JSON.stringify(res))}}";
-	url += "catch(err){mosync.rlog('javascript:'+err)}";
+	url += "if (typeof res!=='undefined'){mosync.rlog('javascript:'+JSON.stringify(res));}}";
+	url += "catch(err){mosync.rlog('javascript:'+err);}";
+	getWebView()->openURL(url);
+}
+
+// ========== Evaluate JavaScript for a specific test case ==========
+void ReloadClient::evaluate(const String& script, const String& fingerprint)
+{
+	LOG("@@@@@ script %s", script.c_str());
+	LOG("@@@@@ fingerprint %s", fingerprint.c_str());
+
+	String url = "javascript:";
+	url += "try{var res=eval(unescape('";
+	url += script;
+	url += "'));";
+	url += "mosync.bridge.send([\'Custom\', \'EvalResponse\', JSON.stringify({'res': res, 'fingerprint': " + fingerprint + "})]);}";
+	url += "catch(err){mosync.bridge.send([\'Custom\', \'EvalResponse\', JSON.stringify({'res': err, 'fingerprint': " + fingerprint + "})]);}";
 	getWebView()->openURL(url);
 }
 
@@ -1075,8 +1137,8 @@ void ReloadClient::reloadProjectFromServer(MAUtil::String projectName)
 {
 	MAUtil::String tmpMsg = "{ \"message\": \"reloadProject\","
 							  "\"params\" : {"
-							  	  "\"projectName\": \"" + projectName + "\""
-							    "}"
+								  "\"projectName\": \"" + projectName + "\""
+								"}"
 							"}";
 	sendTCPMessage(tmpMsg);
 }

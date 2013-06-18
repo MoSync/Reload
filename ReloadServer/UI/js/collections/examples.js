@@ -24,8 +24,14 @@ define([
             };
 
             options.success = function (resp) {
+                var count = 0;
                 _.map(resp.result, function (p) {
+                    count++;
                     self.push(new ExampleModel(p));
+
+                    if (count === resp.result.length) {
+                        self.trigger('done');
+                    }
                 });
             };
 

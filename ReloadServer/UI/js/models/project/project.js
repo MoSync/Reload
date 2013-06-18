@@ -3,26 +3,35 @@ define([
        'backbone'
 ], function(_, Backbone){
     var ProjectModel = Backbone.Model.extend({
-        reload: function (debug) {
-            var d = debug || false;
-            var self = this;
-            console.log('!!! Reloading ' + this.get('name') + ' with debug flag: ' + d);
+        reload: function (flag) {
+
+            var method, self = this;
+            switch(flag) {
+                case 'weinre':
+                    method = 'runWeinre';
+                break;
+
+                case 'test':
+                    method = 'runTests';
+                break;
+
+                default:
+                    method = 'reload';
+            }
 
             var options     = {};
             options.rpcMsg  = {
-                method: 'manager.reloadProject',
-                params: [this.get('name'), d],
+                method: 'manager.' + method,
+                params: [this.get('name')],
                 id: 0
             };
 
             options.success = function (resp) {
-                console.log('reload successful');
                 console.log(resp);
                 self.trigger('reloaded');
             };
 
             options.error   = function (resp) {
-                console.log('could not reload');
                 console.log(resp);
             };
 

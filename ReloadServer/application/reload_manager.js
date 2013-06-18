@@ -898,6 +898,27 @@ var rpcFunctions = {
     },
 
     /**
+     * (RPC): Reload normally.
+     */
+    reload: function (projectName, sendResponse) {
+        this.reloadProject(projectName, '', sendResponse);
+    },
+
+    /**
+     * (RPC): Reload with test cases.
+     */
+    runTests: function (projectName, sendResponse) {
+        this.reloadProject(projectName, 'test', sendResponse);
+    },
+
+    /**
+     * (RPC): Reload with weinre injection.
+     */
+    runWeinre: function(projectName, sendResponse) {
+        this.reloadProject(projectName, 'weinre', sendResponse);
+    },
+
+    /**
      * (RPC): Rename the "oldName" project to "newName"
      */
     renameProject: function (oldName, newName, sendResponse) {
@@ -986,7 +1007,23 @@ var rpcFunctions = {
      *        - Bundles the project folder
      *        - Request the mobile device to "Reload" the project.
      */
-    reloadProject: function (projectName, debug, sendResponse, clientList) {
+    reloadProject: function (projectName, flag, sendResponse, clientList) {
+
+        var message, weinreDebug;
+        switch (flag) {
+            case 'test':
+                message = 'RunTests';
+                break;
+            case 'weinre':
+                message = 'ReloadBundle';
+                weinreDebug = true;
+                break;
+            default:
+                message = 'ReloadBundle';
+        }
+
+        console.log('@@@ message');
+        console.log(message);
 
         function sendToAardwolfServer(error, file) {
 
@@ -1037,8 +1074,6 @@ var rpcFunctions = {
             });
             return;
         }
-
-        var weinreDebug = (typeof debug === "boolean")? debug : false;
 
         console.log("-----------------------------------------------");
         console.log("-                 R e l o a d                 -");
@@ -1189,7 +1224,7 @@ var rpcFunctions = {
 
                 // Send the new bundle URL to the device clients.
                 sendToClients({
-                    message: 'ReloadBundle',
+                    message: message,
                     url: escape(url),
                     fileSize: data.length
                 }, clientList);
@@ -1199,6 +1234,18 @@ var rpcFunctions = {
             } catch (e) {
                 sendResponse({hasError: true, data: "Error in reloadProject: " + e});
             }
+        });
+    },
+
+    /**
+     * (RPC): Evaluate JS on the clients.
+     */
+    evaluate: function (script, fingerprint, sendResponse) {
+        sendResponse({hasError: false, data: "ok"});
+        sendToClients({
+            message: 'Evaluate',
+            script: script,
+            fingerprint: fingerprint
         });
     },
 
