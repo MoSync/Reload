@@ -1,17 +1,18 @@
 -----------------------
-Copyright (C) 2012 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
+Copyright (C) 2013 David Axmark.
+
+MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
 
 Licenses for MoSync Reload and the third-party libraries and applications included in it are located in the /Licenses subdirectory of your MoSync Reload installation directory:
 
-agpl-3.0.txt covers MoSync Reload Server.
-gpl.txt covers MoSync Reload Client.
+Apache-License-v2.0.txt covers MoSync Reload Server and Client, except as noted elsewhere.
+Apache-License-v2.0.txt also covers weinre.
 joyent-node-v0.8.8-license.txt covers node.js
-Apache-License-v2.0.txt covers weinre
 
-The following modules are covered by lincense stated in LICENSE file in their 
+The following modules are covered by lincense stated in LICENSE file in their
 respective folders: coffee-script, nopt, underscore, socket.io, policyfile,
 ncp, jsdom, contextify, htmlparser, nwmatcher, request, htmlparser2, underscore,
 express, connect, debug, mkdirp, send, mime.
 
-The following modules are coverd by license stated in the README.md file in 
+The following modules are coverd by license stated in the README.md file in
 their respective folders: redis, cheerio, cheerio-select, commander, cookie-signature
